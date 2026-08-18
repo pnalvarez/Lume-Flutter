@@ -7,7 +7,7 @@ import 'package:lume/core/auth/auth_token_provider.dart';
 final class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._tokenProvider);
 
-  final AuthTokenProvider _tokenProvider;
+  final IAuthTokenProvider _tokenProvider;
 
   static const authorizationHeader = 'Authorization';
 

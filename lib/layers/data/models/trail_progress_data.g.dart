@@ -9,7 +9,6 @@ part of 'trail_progress_data.dart';
 LevelProgressData _$LevelProgressDataFromJson(Map<String, dynamic> json) =>
     LevelProgressData(
       levelId: (json['level_id'] as num).toInt(),
-      quizScore: (json['quiz_score'] as num?)?.toDouble(),
       completed: json['completed'] as bool? ?? false,
       completedAt: json['completed_at'] == null
           ? null
@@ -19,7 +18,6 @@ LevelProgressData _$LevelProgressDataFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$LevelProgressDataToJson(LevelProgressData instance) =>
     <String, dynamic>{
       'level_id': instance.levelId,
-      'quiz_score': instance.quizScore,
       'completed': instance.completed,
       'completed_at': instance.completedAt?.toIso8601String(),
     };
@@ -92,11 +90,6 @@ TrailBootstrapData _$TrailBootstrapDataFromJson(
           ?.map((e) => SubmoduleData.fromJson(e as Map<String, dynamic>))
           .toList() ??
       [],
-  quizQuestions:
-      (json['quiz_questions'] as List<dynamic>?)
-          ?.map((e) => QuizQuestionData.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      [],
   submodulePairs:
       (json['submodule_pairs'] as List<dynamic>?)
           ?.map((e) => SubmodulePairData.fromJson(e as Map<String, dynamic>))
@@ -122,7 +115,6 @@ Map<String, dynamic> _$TrailBootstrapDataToJson(
   'categories': instance.categories.map((e) => e.toJson()).toList(),
   'levels': instance.levels.map((e) => e.toJson()).toList(),
   'submodules': instance.submodules.map((e) => e.toJson()).toList(),
-  'quiz_questions': instance.quizQuestions.map((e) => e.toJson()).toList(),
   'submodule_pairs': instance.submodulePairs.map((e) => e.toJson()).toList(),
   'level_progress': instance.levelProgress.map((e) => e.toJson()).toList(),
   'pair_progress': instance.pairProgress.map((e) => e.toJson()).toList(),

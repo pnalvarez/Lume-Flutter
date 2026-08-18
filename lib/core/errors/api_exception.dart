@@ -1,4 +1,4 @@
-/// Transport-level failure from [ApiClient]. Independent of Dio.
+/// Transport-level failure from [IApiClient]. Independent of Dio.
 sealed class ApiException implements Exception {
   const ApiException({this.message, this.statusCode, this.cause});
 

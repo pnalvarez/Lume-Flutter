@@ -1,20 +1,19 @@
+import 'package:injectable/injectable.dart';
 import 'package:lume/core/network/api_client.dart';
+import 'package:lume/core/storage/cache_keys.dart';
+import 'package:lume/core/storage/storage_client.dart';
+import 'package:lume/core/storage/storage_json.dart';
 import 'package:lume/layers/data/json_map.dart';
 import 'package:lume/layers/data/models/game_data.dart';
 import 'package:lume/layers/data/models/trail_progress_data.dart';
 
 /// Catalog and progress for modules, levels, submodules, and games.
-abstract interface class TrailDataSource {
-  Future<TrailBootstrapData> fetchBootstrap();
+abstract interface class ITrailDataSource {
+  Future<TrailBootstrapData> fetchBootstrap({bool forceRefresh = false});
 
-  Future<TrailProgressData> fetchProgress();
+  Future<TrailProgressData> fetchProgress({bool forceRefresh = false});
 
-  Future<List<GameTrailData>> fetchGameTrails();
-
-  Future<LevelProgressData> saveLevelQuiz({
-    required int levelId,
-    required num score,
-  });
+  Future<List<GameTrailData>> fetchGameTrails({bool forceRefresh = false});
 
   Future<PairProgressData> savePairProgress({
     required int pairId,
@@ -22,39 +21,73 @@ abstract interface class TrailDataSource {
   });
 }
 
-final class RemoteTrailDataSource implements TrailDataSource {
-  RemoteTrailDataSource(this._apiClient);
+@Injectable(as: ITrailDataSource)
+final class TrailDataSource implements ITrailDataSource {
+  TrailDataSource(this._apiClient, this._storage);
 
-  final ApiClient _apiClient;
+  final IApiClient _apiClient;
+  final IStorageClient _storage;
 
   @override
-  Future<TrailBootstrapData> fetchBootstrap() async {
+  Future<TrailBootstrapData> fetchBootstrap({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cached = await _storage.readObject(
+        CacheKeys.trailBootstrap,
+        TrailBootstrapData.fromJson,
+      );
+      if (cached != null) return cached;
+    }
+
     final raw = await _apiClient.rpc<Map<String, dynamic>>('get_trail_bootstrap');
-    return TrailBootstrapData.fromJson(asJsonMap(raw));
-  }
-
-  @override
-  Future<TrailProgressData> fetchProgress() async {
-    final raw = await _apiClient.rpc<Map<String, dynamic>>('get_trail_progress');
-    return TrailProgressData.fromJson(asJsonMap(raw));
-  }
-
-  @override
-  Future<List<GameTrailData>> fetchGameTrails() async {
-    final raw = await _apiClient.rpc<List<dynamic>>('get_game_trails');
-    return parseJsonList(raw, GameTrailData.fromJson);
-  }
-
-  @override
-  Future<LevelProgressData> saveLevelQuiz({
-    required int levelId,
-    required num score,
-  }) async {
-    final raw = await _apiClient.rpc<Map<String, dynamic>>(
-      'save_level_quiz',
-      params: {'p_level_id': levelId, 'p_score': score},
+    final data = TrailBootstrapData.fromJson(asJsonMap(raw));
+    await _storage.writeObject(
+      CacheKeys.trailBootstrap,
+      data,
+      (value) => value.toJson(),
     );
-    return LevelProgressData.fromJson(asJsonMap(raw));
+    return data;
+  }
+
+  @override
+  Future<TrailProgressData> fetchProgress({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cached = await _storage.readObject(
+        CacheKeys.trailProgress,
+        TrailProgressData.fromJson,
+      );
+      if (cached != null) return cached;
+    }
+
+    final raw = await _apiClient.rpc<Map<String, dynamic>>('get_trail_progress');
+    final data = TrailProgressData.fromJson(asJsonMap(raw));
+    await _storage.writeObject(
+      CacheKeys.trailProgress,
+      data,
+      (value) => value.toJson(),
+    );
+    return data;
+  }
+
+  @override
+  Future<List<GameTrailData>> fetchGameTrails({
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh) {
+      final cached = await _storage.readList(
+        CacheKeys.gameTrails,
+        GameTrailData.fromJson,
+      );
+      if (cached.isNotEmpty) return cached;
+    }
+
+    final raw = await _apiClient.rpc<List<dynamic>>('get_game_trails');
+    final data = parseJsonList(raw, GameTrailData.fromJson);
+    await _storage.writeList(
+      CacheKeys.gameTrails,
+      data,
+      (value) => value.toJson(),
+    );
+    return data;
   }
 
   @override
@@ -66,6 +99,13 @@ final class RemoteTrailDataSource implements TrailDataSource {
       'save_pair_progress',
       params: {'p_pair_id': pairId, 'p_score_pct': scorePct},
     );
-    return PairProgressData.fromJson(asJsonMap(raw));
+    final data = PairProgressData.fromJson(asJsonMap(raw));
+    await _invalidateTrailCaches();
+    return data;
+  }
+
+  Future<void> _invalidateTrailCaches() async {
+    await _storage.delete(CacheKeys.trailBootstrap);
+    await _storage.delete(CacheKeys.trailProgress);
   }
 }

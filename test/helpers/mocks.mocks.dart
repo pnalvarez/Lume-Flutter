@@ -5,21 +5,47 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i2;
 
-import 'package:lume/core/auth/auth_token_provider.dart' as _i11;
-import 'package:lume/core/network/api_client.dart' as _i7;
-import 'package:lume/core/network/api_response.dart' as _i8;
-import 'package:lume/core/network/http_method.dart' as _i9;
+import 'package:lume/core/auth/auth_token_provider.dart' as _i16;
+import 'package:lume/core/network/api_client.dart' as _i12;
+import 'package:lume/core/network/api_response.dart' as _i13;
+import 'package:lume/core/network/http_method.dart' as _i14;
+import 'package:lume/core/storage/storage_client.dart' as _i17;
 import 'package:lume/layers/data/datasource/category_preference_data_source.dart'
-    as _i15;
-import 'package:lume/layers/data/datasource/game_data_source.dart' as _i13;
-import 'package:lume/layers/data/datasource/profile_data_source.dart' as _i14;
-import 'package:lume/layers/data/datasource/trail_data_source.dart' as _i12;
+    as _i21;
+import 'package:lume/layers/data/datasource/game_data_source.dart' as _i19;
+import 'package:lume/layers/data/datasource/profile_data_source.dart' as _i20;
+import 'package:lume/layers/data/datasource/trail_data_source.dart' as _i18;
 import 'package:lume/layers/data/models/category_data.dart' as _i6;
 import 'package:lume/layers/data/models/game_data.dart' as _i4;
 import 'package:lume/layers/data/models/profile_data.dart' as _i5;
 import 'package:lume/layers/data/models/trail_progress_data.dart' as _i3;
+import 'package:lume/layers/domain/models/category/category_preferences_domain.dart'
+    as _i8;
+import 'package:lume/layers/domain/models/game/game_trail_domain.dart' as _i25;
+import 'package:lume/layers/domain/models/game/submodule_games_domain.dart'
+    as _i11;
+import 'package:lume/layers/domain/models/profile/profile_domain.dart' as _i7;
+import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart'
+    as _i9;
+import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart'
+    as _i10;
+import 'package:lume/layers/domain/repository/category_preference_repository.dart'
+    as _i23;
+import 'package:lume/layers/domain/repository/game_repository.dart' as _i26;
+import 'package:lume/layers/domain/repository/profile_repository.dart' as _i22;
+import 'package:lume/layers/domain/repository/trail_repository.dart' as _i24;
+import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart'
+    as _i28;
+import 'package:lume/layers/domain/usecases/get_game_trails.dart' as _i32;
+import 'package:lume/layers/domain/usecases/get_profile.dart' as _i27;
+import 'package:lume/layers/domain/usecases/get_submodule_games.dart' as _i34;
+import 'package:lume/layers/domain/usecases/get_trail_bootstrap.dart' as _i30;
+import 'package:lume/layers/domain/usecases/get_trail_progress.dart' as _i31;
+import 'package:lume/layers/domain/usecases/save_category_preferences.dart'
+    as _i29;
+import 'package:lume/layers/domain/usecases/save_pair_progress.dart' as _i33;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i10;
+import 'package:mockito/src/dummies.dart' as _i15;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -54,42 +80,71 @@ class _FakeTrailProgressData_2 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _FakeLevelProgressData_3 extends _i1.SmartFake
-    implements _i3.LevelProgressData {
-  _FakeLevelProgressData_3(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _FakePairProgressData_4 extends _i1.SmartFake
+class _FakePairProgressData_3 extends _i1.SmartFake
     implements _i3.PairProgressData {
-  _FakePairProgressData_4(Object parent, Invocation parentInvocation)
+  _FakePairProgressData_3(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSubmoduleGamesData_5 extends _i1.SmartFake
+class _FakeSubmoduleGamesData_4 extends _i1.SmartFake
     implements _i4.SubmoduleGamesData {
-  _FakeSubmoduleGamesData_5(Object parent, Invocation parentInvocation)
+  _FakeSubmoduleGamesData_4(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeProfileData_6 extends _i1.SmartFake implements _i5.ProfileData {
-  _FakeProfileData_6(Object parent, Invocation parentInvocation)
+class _FakeProfileData_5 extends _i1.SmartFake implements _i5.ProfileData {
+  _FakeProfileData_5(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeCategoryPreferencesData_7 extends _i1.SmartFake
+class _FakeCategoryPreferencesData_6 extends _i1.SmartFake
     implements _i6.CategoryPreferencesData {
-  _FakeCategoryPreferencesData_7(Object parent, Invocation parentInvocation)
+  _FakeCategoryPreferencesData_6(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-/// A class which mocks [ApiClient].
+class _FakeProfileDomain_7 extends _i1.SmartFake implements _i7.ProfileDomain {
+  _FakeProfileDomain_7(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeCategoryPreferencesDomain_8 extends _i1.SmartFake
+    implements _i8.CategoryPreferencesDomain {
+  _FakeCategoryPreferencesDomain_8(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeTrailBootstrapDomain_9 extends _i1.SmartFake
+    implements _i9.TrailBootstrapDomain {
+  _FakeTrailBootstrapDomain_9(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeTrailProgressDomain_10 extends _i1.SmartFake
+    implements _i10.TrailProgressDomain {
+  _FakeTrailProgressDomain_10(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakePairProgressDomain_11 extends _i1.SmartFake
+    implements _i10.PairProgressDomain {
+  _FakePairProgressDomain_11(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeSubmoduleGamesDomain_12 extends _i1.SmartFake
+    implements _i11.SubmoduleGamesDomain {
+  _FakeSubmoduleGamesDomain_12(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+/// A class which mocks [IApiClient].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockApiClient extends _i1.Mock implements _i7.ApiClient {
+class MockIApiClient extends _i1.Mock implements _i12.IApiClient {
   @override
-  _i2.Future<_i8.ApiResponse<T>> request<T>({
-    required _i9.HttpMethod? method,
+  _i2.Future<_i13.ApiResponse<T>> request<T>({
+    required _i14.HttpMethod? method,
     required String? endpoint,
     Map<String, Object?>? queryParameters,
     Map<String, String>? headers,
@@ -103,8 +158,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
               #headers: headers,
               #body: body,
             }),
-            returnValue: _i2.Future<_i8.ApiResponse<T>>.value(
-              _i10.dummyValue<_i8.ApiResponse<T>>(
+            returnValue: _i2.Future<_i13.ApiResponse<T>>.value(
+              _i15.dummyValue<_i13.ApiResponse<T>>(
                 this,
                 Invocation.method(#request, [], {
                   #method: method,
@@ -115,8 +170,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
                 }),
               ),
             ),
-            returnValueForMissingStub: _i2.Future<_i8.ApiResponse<T>>.value(
-              _i10.dummyValue<_i8.ApiResponse<T>>(
+            returnValueForMissingStub: _i2.Future<_i13.ApiResponse<T>>.value(
+              _i15.dummyValue<_i13.ApiResponse<T>>(
                 this,
                 Invocation.method(#request, [], {
                   #method: method,
@@ -128,7 +183,7 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
               ),
             ),
           )
-          as _i2.Future<_i8.ApiResponse<T>>);
+          as _i2.Future<_i13.ApiResponse<T>>);
 
   @override
   _i2.Future<T> get<T>({
@@ -143,8 +198,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
               #headers: headers,
             }),
             returnValue:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(#get, [], {
                       #endpoint: endpoint,
@@ -163,8 +218,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
                   }),
                 ),
             returnValueForMissingStub:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(#get, [], {
                       #endpoint: endpoint,
@@ -198,8 +253,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
               #headers: headers,
             }),
             returnValue:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(#post, [], {
                       #endpoint: endpoint,
@@ -218,8 +273,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
                   }),
                 ),
             returnValueForMissingStub:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(#post, [], {
                       #endpoint: endpoint,
@@ -253,8 +308,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
               {#params: params, #headers: headers},
             ),
             returnValue:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(
                       #rpc,
@@ -273,8 +328,8 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
                   ),
                 ),
             returnValueForMissingStub:
-                _i10.ifNotNull(
-                  _i10.dummyValueOrNull<T>(
+                _i15.ifNotNull(
+                  _i15.dummyValueOrNull<T>(
                     this,
                     Invocation.method(
                       #rpc,
@@ -296,58 +351,128 @@ class MockApiClient extends _i1.Mock implements _i7.ApiClient {
           as _i2.Future<T>);
 }
 
-/// A class which mocks [AuthTokenProvider].
+/// A class which mocks [IAuthTokenProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthTokenProvider extends _i1.Mock
-    implements _i11.AuthTokenProvider {}
+class MockIAuthTokenProvider extends _i1.Mock
+    implements _i16.IAuthTokenProvider {}
 
-/// A class which mocks [TrailDataSource].
+/// A class which mocks [IStorageClient].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTrailDataSource extends _i1.Mock implements _i12.TrailDataSource {
+class MockIStorageClient extends _i1.Mock implements _i17.IStorageClient {
   @override
-  _i2.Future<_i3.TrailBootstrapData> fetchBootstrap() =>
+  _i2.Future<String?> read(String? key) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchBootstrap, []),
+            Invocation.method(#read, [key]),
+            returnValue: _i2.Future<String?>.value(),
+            returnValueForMissingStub: _i2.Future<String?>.value(),
+          )
+          as _i2.Future<String?>);
+
+  @override
+  _i2.Future<void> write(String? key, String? value) =>
+      (super.noSuchMethod(
+            Invocation.method(#write, [key, value]),
+            returnValue: _i2.Future<void>.value(),
+            returnValueForMissingStub: _i2.Future<void>.value(),
+          )
+          as _i2.Future<void>);
+
+  @override
+  _i2.Future<void> delete(String? key) =>
+      (super.noSuchMethod(
+            Invocation.method(#delete, [key]),
+            returnValue: _i2.Future<void>.value(),
+            returnValueForMissingStub: _i2.Future<void>.value(),
+          )
+          as _i2.Future<void>);
+
+  @override
+  _i2.Future<bool> containsKey(String? key) =>
+      (super.noSuchMethod(
+            Invocation.method(#containsKey, [key]),
+            returnValue: _i2.Future<bool>.value(false),
+            returnValueForMissingStub: _i2.Future<bool>.value(false),
+          )
+          as _i2.Future<bool>);
+
+  @override
+  _i2.Future<void> clear() =>
+      (super.noSuchMethod(
+            Invocation.method(#clear, []),
+            returnValue: _i2.Future<void>.value(),
+            returnValueForMissingStub: _i2.Future<void>.value(),
+          )
+          as _i2.Future<void>);
+}
+
+/// A class which mocks [ITrailDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockITrailDataSource extends _i1.Mock implements _i18.ITrailDataSource {
+  @override
+  _i2.Future<_i3.TrailBootstrapData> fetchBootstrap({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchBootstrap, [], {
+              #forceRefresh: forceRefresh,
+            }),
             returnValue: _i2.Future<_i3.TrailBootstrapData>.value(
               _FakeTrailBootstrapData_1(
                 this,
-                Invocation.method(#fetchBootstrap, []),
+                Invocation.method(#fetchBootstrap, [], {
+                  #forceRefresh: forceRefresh,
+                }),
               ),
             ),
             returnValueForMissingStub: _i2.Future<_i3.TrailBootstrapData>.value(
               _FakeTrailBootstrapData_1(
                 this,
-                Invocation.method(#fetchBootstrap, []),
+                Invocation.method(#fetchBootstrap, [], {
+                  #forceRefresh: forceRefresh,
+                }),
               ),
             ),
           )
           as _i2.Future<_i3.TrailBootstrapData>);
 
   @override
-  _i2.Future<_i3.TrailProgressData> fetchProgress() =>
+  _i2.Future<_i3.TrailProgressData> fetchProgress({
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchProgress, []),
+            Invocation.method(#fetchProgress, [], {
+              #forceRefresh: forceRefresh,
+            }),
             returnValue: _i2.Future<_i3.TrailProgressData>.value(
               _FakeTrailProgressData_2(
                 this,
-                Invocation.method(#fetchProgress, []),
+                Invocation.method(#fetchProgress, [], {
+                  #forceRefresh: forceRefresh,
+                }),
               ),
             ),
             returnValueForMissingStub: _i2.Future<_i3.TrailProgressData>.value(
               _FakeTrailProgressData_2(
                 this,
-                Invocation.method(#fetchProgress, []),
+                Invocation.method(#fetchProgress, [], {
+                  #forceRefresh: forceRefresh,
+                }),
               ),
             ),
           )
           as _i2.Future<_i3.TrailProgressData>);
 
   @override
-  _i2.Future<List<_i4.GameTrailData>> fetchGameTrails() =>
+  _i2.Future<List<_i4.GameTrailData>> fetchGameTrails({
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchGameTrails, []),
+            Invocation.method(#fetchGameTrails, [], {
+              #forceRefresh: forceRefresh,
+            }),
             returnValue: _i2.Future<List<_i4.GameTrailData>>.value(
               <_i4.GameTrailData>[],
             ),
@@ -357,37 +482,6 @@ class MockTrailDataSource extends _i1.Mock implements _i12.TrailDataSource {
                 ),
           )
           as _i2.Future<List<_i4.GameTrailData>>);
-
-  @override
-  _i2.Future<_i3.LevelProgressData> saveLevelQuiz({
-    required int? levelId,
-    required num? score,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#saveLevelQuiz, [], {
-              #levelId: levelId,
-              #score: score,
-            }),
-            returnValue: _i2.Future<_i3.LevelProgressData>.value(
-              _FakeLevelProgressData_3(
-                this,
-                Invocation.method(#saveLevelQuiz, [], {
-                  #levelId: levelId,
-                  #score: score,
-                }),
-              ),
-            ),
-            returnValueForMissingStub: _i2.Future<_i3.LevelProgressData>.value(
-              _FakeLevelProgressData_3(
-                this,
-                Invocation.method(#saveLevelQuiz, [], {
-                  #levelId: levelId,
-                  #score: score,
-                }),
-              ),
-            ),
-          )
-          as _i2.Future<_i3.LevelProgressData>);
 
   @override
   _i2.Future<_i3.PairProgressData> savePairProgress({
@@ -400,7 +494,7 @@ class MockTrailDataSource extends _i1.Mock implements _i12.TrailDataSource {
               #scorePct: scorePct,
             }),
             returnValue: _i2.Future<_i3.PairProgressData>.value(
-              _FakePairProgressData_4(
+              _FakePairProgressData_3(
                 this,
                 Invocation.method(#savePairProgress, [], {
                   #pairId: pairId,
@@ -409,7 +503,7 @@ class MockTrailDataSource extends _i1.Mock implements _i12.TrailDataSource {
               ),
             ),
             returnValueForMissingStub: _i2.Future<_i3.PairProgressData>.value(
-              _FakePairProgressData_4(
+              _FakePairProgressData_3(
                 this,
                 Invocation.method(#savePairProgress, [], {
                   #pairId: pairId,
@@ -421,31 +515,35 @@ class MockTrailDataSource extends _i1.Mock implements _i12.TrailDataSource {
           as _i2.Future<_i3.PairProgressData>);
 }
 
-/// A class which mocks [GameDataSource].
+/// A class which mocks [IGameDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGameDataSource extends _i1.Mock implements _i13.GameDataSource {
+class MockIGameDataSource extends _i1.Mock implements _i19.IGameDataSource {
   @override
   _i2.Future<_i4.SubmoduleGamesData> fetchSubmoduleGames({
     required int? submoduleId,
+    bool? forceRefresh = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#fetchSubmoduleGames, [], {
               #submoduleId: submoduleId,
+              #forceRefresh: forceRefresh,
             }),
             returnValue: _i2.Future<_i4.SubmoduleGamesData>.value(
-              _FakeSubmoduleGamesData_5(
+              _FakeSubmoduleGamesData_4(
                 this,
                 Invocation.method(#fetchSubmoduleGames, [], {
                   #submoduleId: submoduleId,
+                  #forceRefresh: forceRefresh,
                 }),
               ),
             ),
             returnValueForMissingStub: _i2.Future<_i4.SubmoduleGamesData>.value(
-              _FakeSubmoduleGamesData_5(
+              _FakeSubmoduleGamesData_4(
                 this,
                 Invocation.method(#fetchSubmoduleGames, [], {
                   #submoduleId: submoduleId,
+                  #forceRefresh: forceRefresh,
                 }),
               ),
             ),
@@ -453,44 +551,63 @@ class MockGameDataSource extends _i1.Mock implements _i13.GameDataSource {
           as _i2.Future<_i4.SubmoduleGamesData>);
 }
 
-/// A class which mocks [ProfileDataSource].
+/// A class which mocks [IProfileDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProfileDataSource extends _i1.Mock implements _i14.ProfileDataSource {
+class MockIProfileDataSource extends _i1.Mock
+    implements _i20.IProfileDataSource {
   @override
-  _i2.Future<_i5.ProfileData> fetchProfile() =>
+  _i2.Future<_i5.ProfileData> fetchProfile({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchProfile, []),
+            Invocation.method(#fetchProfile, [], {#forceRefresh: forceRefresh}),
             returnValue: _i2.Future<_i5.ProfileData>.value(
-              _FakeProfileData_6(this, Invocation.method(#fetchProfile, [])),
+              _FakeProfileData_5(
+                this,
+                Invocation.method(#fetchProfile, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
             ),
             returnValueForMissingStub: _i2.Future<_i5.ProfileData>.value(
-              _FakeProfileData_6(this, Invocation.method(#fetchProfile, [])),
+              _FakeProfileData_5(
+                this,
+                Invocation.method(#fetchProfile, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
             ),
           )
           as _i2.Future<_i5.ProfileData>);
 }
 
-/// A class which mocks [CategoryPreferenceDataSource].
+/// A class which mocks [ICategoryPreferenceDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockCategoryPreferenceDataSource extends _i1.Mock
-    implements _i15.CategoryPreferenceDataSource {
+class MockICategoryPreferenceDataSource extends _i1.Mock
+    implements _i21.ICategoryPreferenceDataSource {
   @override
-  _i2.Future<_i6.CategoryPreferencesData> fetchCategoriesWithPreferences() =>
+  _i2.Future<_i6.CategoryPreferencesData> fetchCategoriesWithPreferences({
+    bool? forceRefresh = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#fetchCategoriesWithPreferences, []),
+            Invocation.method(#fetchCategoriesWithPreferences, [], {
+              #forceRefresh: forceRefresh,
+            }),
             returnValue: _i2.Future<_i6.CategoryPreferencesData>.value(
-              _FakeCategoryPreferencesData_7(
+              _FakeCategoryPreferencesData_6(
                 this,
-                Invocation.method(#fetchCategoriesWithPreferences, []),
+                Invocation.method(#fetchCategoriesWithPreferences, [], {
+                  #forceRefresh: forceRefresh,
+                }),
               ),
             ),
             returnValueForMissingStub:
                 _i2.Future<_i6.CategoryPreferencesData>.value(
-                  _FakeCategoryPreferencesData_7(
+                  _FakeCategoryPreferencesData_6(
                     this,
-                    Invocation.method(#fetchCategoriesWithPreferences, []),
+                    Invocation.method(#fetchCategoriesWithPreferences, [], {
+                      #forceRefresh: forceRefresh,
+                    }),
                   ),
                 ),
           )
@@ -505,7 +622,7 @@ class MockCategoryPreferenceDataSource extends _i1.Mock
               #categoryIds: categoryIds,
             }),
             returnValue: _i2.Future<_i6.CategoryPreferencesData>.value(
-              _FakeCategoryPreferencesData_7(
+              _FakeCategoryPreferencesData_6(
                 this,
                 Invocation.method(#saveCategoryPreferences, [], {
                   #categoryIds: categoryIds,
@@ -514,7 +631,7 @@ class MockCategoryPreferenceDataSource extends _i1.Mock
             ),
             returnValueForMissingStub:
                 _i2.Future<_i6.CategoryPreferencesData>.value(
-                  _FakeCategoryPreferencesData_7(
+                  _FakeCategoryPreferencesData_6(
                     this,
                     Invocation.method(#saveCategoryPreferences, [], {
                       #categoryIds: categoryIds,
@@ -523,4 +640,464 @@ class MockCategoryPreferenceDataSource extends _i1.Mock
                 ),
           )
           as _i2.Future<_i6.CategoryPreferencesData>);
+}
+
+/// A class which mocks [IProfileRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIProfileRepository extends _i1.Mock
+    implements _i22.IProfileRepository {
+  @override
+  _i2.Future<_i7.ProfileDomain> getProfile({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#getProfile, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i7.ProfileDomain>.value(
+              _FakeProfileDomain_7(
+                this,
+                Invocation.method(#getProfile, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub: _i2.Future<_i7.ProfileDomain>.value(
+              _FakeProfileDomain_7(
+                this,
+                Invocation.method(#getProfile, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+          )
+          as _i2.Future<_i7.ProfileDomain>);
+}
+
+/// A class which mocks [ICategoryPreferenceRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockICategoryPreferenceRepository extends _i1.Mock
+    implements _i23.ICategoryPreferenceRepository {
+  @override
+  _i2.Future<_i8.CategoryPreferencesDomain> getCategoriesWithPreferences({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCategoriesWithPreferences, [], {
+              #forceRefresh: forceRefresh,
+            }),
+            returnValue: _i2.Future<_i8.CategoryPreferencesDomain>.value(
+              _FakeCategoryPreferencesDomain_8(
+                this,
+                Invocation.method(#getCategoriesWithPreferences, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i8.CategoryPreferencesDomain>.value(
+                  _FakeCategoryPreferencesDomain_8(
+                    this,
+                    Invocation.method(#getCategoriesWithPreferences, [], {
+                      #forceRefresh: forceRefresh,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i8.CategoryPreferencesDomain>);
+
+  @override
+  _i2.Future<_i8.CategoryPreferencesDomain> saveCategoryPreferences({
+    required List<int>? categoryIds,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#saveCategoryPreferences, [], {
+              #categoryIds: categoryIds,
+            }),
+            returnValue: _i2.Future<_i8.CategoryPreferencesDomain>.value(
+              _FakeCategoryPreferencesDomain_8(
+                this,
+                Invocation.method(#saveCategoryPreferences, [], {
+                  #categoryIds: categoryIds,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i8.CategoryPreferencesDomain>.value(
+                  _FakeCategoryPreferencesDomain_8(
+                    this,
+                    Invocation.method(#saveCategoryPreferences, [], {
+                      #categoryIds: categoryIds,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i8.CategoryPreferencesDomain>);
+}
+
+/// A class which mocks [ITrailRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockITrailRepository extends _i1.Mock implements _i24.ITrailRepository {
+  @override
+  _i2.Future<_i9.TrailBootstrapDomain> getBootstrap({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getBootstrap, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i9.TrailBootstrapDomain>.value(
+              _FakeTrailBootstrapDomain_9(
+                this,
+                Invocation.method(#getBootstrap, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i9.TrailBootstrapDomain>.value(
+                  _FakeTrailBootstrapDomain_9(
+                    this,
+                    Invocation.method(#getBootstrap, [], {
+                      #forceRefresh: forceRefresh,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i9.TrailBootstrapDomain>);
+
+  @override
+  _i2.Future<_i10.TrailProgressDomain> getProgress({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getProgress, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i10.TrailProgressDomain>.value(
+              _FakeTrailProgressDomain_10(
+                this,
+                Invocation.method(#getProgress, [], {
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i10.TrailProgressDomain>.value(
+                  _FakeTrailProgressDomain_10(
+                    this,
+                    Invocation.method(#getProgress, [], {
+                      #forceRefresh: forceRefresh,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i10.TrailProgressDomain>);
+
+  @override
+  _i2.Future<List<_i25.GameTrailDomain>> getGameTrails({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getGameTrails, [], {
+              #forceRefresh: forceRefresh,
+            }),
+            returnValue: _i2.Future<List<_i25.GameTrailDomain>>.value(
+              <_i25.GameTrailDomain>[],
+            ),
+            returnValueForMissingStub:
+                _i2.Future<List<_i25.GameTrailDomain>>.value(
+                  <_i25.GameTrailDomain>[],
+                ),
+          )
+          as _i2.Future<List<_i25.GameTrailDomain>>);
+
+  @override
+  _i2.Future<_i10.PairProgressDomain> savePairProgress({
+    required int? pairId,
+    required int? scorePct,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#savePairProgress, [], {
+              #pairId: pairId,
+              #scorePct: scorePct,
+            }),
+            returnValue: _i2.Future<_i10.PairProgressDomain>.value(
+              _FakePairProgressDomain_11(
+                this,
+                Invocation.method(#savePairProgress, [], {
+                  #pairId: pairId,
+                  #scorePct: scorePct,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i10.PairProgressDomain>.value(
+                  _FakePairProgressDomain_11(
+                    this,
+                    Invocation.method(#savePairProgress, [], {
+                      #pairId: pairId,
+                      #scorePct: scorePct,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i10.PairProgressDomain>);
+}
+
+/// A class which mocks [IGameRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGameRepository extends _i1.Mock implements _i26.IGameRepository {
+  @override
+  _i2.Future<_i11.SubmoduleGamesDomain> getSubmoduleGames({
+    required int? submoduleId,
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getSubmoduleGames, [], {
+              #submoduleId: submoduleId,
+              #forceRefresh: forceRefresh,
+            }),
+            returnValue: _i2.Future<_i11.SubmoduleGamesDomain>.value(
+              _FakeSubmoduleGamesDomain_12(
+                this,
+                Invocation.method(#getSubmoduleGames, [], {
+                  #submoduleId: submoduleId,
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i11.SubmoduleGamesDomain>.value(
+                  _FakeSubmoduleGamesDomain_12(
+                    this,
+                    Invocation.method(#getSubmoduleGames, [], {
+                      #submoduleId: submoduleId,
+                      #forceRefresh: forceRefresh,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i11.SubmoduleGamesDomain>);
+}
+
+/// A class which mocks [IGetProfile].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetProfile extends _i1.Mock implements _i27.IGetProfile {
+  @override
+  _i2.Future<_i7.ProfileDomain> call({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i7.ProfileDomain>.value(
+              _FakeProfileDomain_7(
+                this,
+                Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+              ),
+            ),
+            returnValueForMissingStub: _i2.Future<_i7.ProfileDomain>.value(
+              _FakeProfileDomain_7(
+                this,
+                Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+              ),
+            ),
+          )
+          as _i2.Future<_i7.ProfileDomain>);
+}
+
+/// A class which mocks [IGetCategoriesWithPreferences].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetCategoriesWithPreferences extends _i1.Mock
+    implements _i28.IGetCategoriesWithPreferences {
+  @override
+  _i2.Future<_i8.CategoryPreferencesDomain> call({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i8.CategoryPreferencesDomain>.value(
+              _FakeCategoryPreferencesDomain_8(
+                this,
+                Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i8.CategoryPreferencesDomain>.value(
+                  _FakeCategoryPreferencesDomain_8(
+                    this,
+                    Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+                  ),
+                ),
+          )
+          as _i2.Future<_i8.CategoryPreferencesDomain>);
+}
+
+/// A class which mocks [ISaveCategoryPreferences].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockISaveCategoryPreferences extends _i1.Mock
+    implements _i29.ISaveCategoryPreferences {
+  @override
+  _i2.Future<_i8.CategoryPreferencesDomain> call({
+    required List<int>? categoryIds,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#categoryIds: categoryIds}),
+            returnValue: _i2.Future<_i8.CategoryPreferencesDomain>.value(
+              _FakeCategoryPreferencesDomain_8(
+                this,
+                Invocation.method(#call, [], {#categoryIds: categoryIds}),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i8.CategoryPreferencesDomain>.value(
+                  _FakeCategoryPreferencesDomain_8(
+                    this,
+                    Invocation.method(#call, [], {#categoryIds: categoryIds}),
+                  ),
+                ),
+          )
+          as _i2.Future<_i8.CategoryPreferencesDomain>);
+}
+
+/// A class which mocks [IGetTrailBootstrap].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetTrailBootstrap extends _i1.Mock
+    implements _i30.IGetTrailBootstrap {
+  @override
+  _i2.Future<_i9.TrailBootstrapDomain> call({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i9.TrailBootstrapDomain>.value(
+              _FakeTrailBootstrapDomain_9(
+                this,
+                Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i9.TrailBootstrapDomain>.value(
+                  _FakeTrailBootstrapDomain_9(
+                    this,
+                    Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+                  ),
+                ),
+          )
+          as _i2.Future<_i9.TrailBootstrapDomain>);
+}
+
+/// A class which mocks [IGetTrailProgress].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetTrailProgress extends _i1.Mock implements _i31.IGetTrailProgress {
+  @override
+  _i2.Future<_i10.TrailProgressDomain> call({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<_i10.TrailProgressDomain>.value(
+              _FakeTrailProgressDomain_10(
+                this,
+                Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i10.TrailProgressDomain>.value(
+                  _FakeTrailProgressDomain_10(
+                    this,
+                    Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+                  ),
+                ),
+          )
+          as _i2.Future<_i10.TrailProgressDomain>);
+}
+
+/// A class which mocks [IGetGameTrails].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetGameTrails extends _i1.Mock implements _i32.IGetGameTrails {
+  @override
+  _i2.Future<List<_i25.GameTrailDomain>> call({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<List<_i25.GameTrailDomain>>.value(
+              <_i25.GameTrailDomain>[],
+            ),
+            returnValueForMissingStub:
+                _i2.Future<List<_i25.GameTrailDomain>>.value(
+                  <_i25.GameTrailDomain>[],
+                ),
+          )
+          as _i2.Future<List<_i25.GameTrailDomain>>);
+}
+
+/// A class which mocks [ISavePairProgress].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockISavePairProgress extends _i1.Mock implements _i33.ISavePairProgress {
+  @override
+  _i2.Future<_i10.PairProgressDomain> call({
+    required int? pairId,
+    required int? scorePct,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {
+              #pairId: pairId,
+              #scorePct: scorePct,
+            }),
+            returnValue: _i2.Future<_i10.PairProgressDomain>.value(
+              _FakePairProgressDomain_11(
+                this,
+                Invocation.method(#call, [], {
+                  #pairId: pairId,
+                  #scorePct: scorePct,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i10.PairProgressDomain>.value(
+                  _FakePairProgressDomain_11(
+                    this,
+                    Invocation.method(#call, [], {
+                      #pairId: pairId,
+                      #scorePct: scorePct,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i10.PairProgressDomain>);
+}
+
+/// A class which mocks [IGetSubmoduleGames].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetSubmoduleGames extends _i1.Mock
+    implements _i34.IGetSubmoduleGames {
+  @override
+  _i2.Future<_i11.SubmoduleGamesDomain> call({
+    required int? submoduleId,
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {
+              #submoduleId: submoduleId,
+              #forceRefresh: forceRefresh,
+            }),
+            returnValue: _i2.Future<_i11.SubmoduleGamesDomain>.value(
+              _FakeSubmoduleGamesDomain_12(
+                this,
+                Invocation.method(#call, [], {
+                  #submoduleId: submoduleId,
+                  #forceRefresh: forceRefresh,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i2.Future<_i11.SubmoduleGamesDomain>.value(
+                  _FakeSubmoduleGamesDomain_12(
+                    this,
+                    Invocation.method(#call, [], {
+                      #submoduleId: submoduleId,
+                      #forceRefresh: forceRefresh,
+                    }),
+                  ),
+                ),
+          )
+          as _i2.Future<_i11.SubmoduleGamesDomain>);
 }

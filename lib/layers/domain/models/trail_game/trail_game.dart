@@ -2,8 +2,8 @@ import 'package:lume/layers/domain/models/trail_game/trail_game_values.dart';
 import 'package:lume/layers/data/models/game_type.dart';
 
 /// Parsed trail game ready for presentation routing.
-sealed class TrailGame {
-  const TrailGame({
+sealed class TrailGameDomain {
+  const TrailGameDomain({
     required this.pairId,
     required this.sortOrder,
     required this.gameType,
@@ -16,8 +16,8 @@ sealed class TrailGame {
   final int? conceptId;
 }
 
-final class LightningQuizGame extends TrailGame {
-  const LightningQuizGame({
+final class LightningQuizGameDomain extends TrailGameDomain {
+  const LightningQuizGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -33,8 +33,8 @@ final class LightningQuizGame extends TrailGame {
   final String explanation;
 }
 
-final class WhoAmIGame extends TrailGame {
-  const WhoAmIGame({
+final class WhoAmIGameDomain extends TrailGameDomain {
+  const WhoAmIGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -52,8 +52,8 @@ final class WhoAmIGame extends TrailGame {
   final String explanation;
 }
 
-final class TrueOrMythGame extends TrailGame {
-  const TrueOrMythGame({
+final class TrueOrMythGameDomain extends TrailGameDomain {
+  const TrueOrMythGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -67,8 +67,8 @@ final class TrueOrMythGame extends TrailGame {
   final String explanation;
 }
 
-final class CompleteSentenceGame extends TrailGame {
-  const CompleteSentenceGame({
+final class CompleteSentenceGameDomain extends TrailGameDomain {
+  const CompleteSentenceGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -78,12 +78,12 @@ final class CompleteSentenceGame extends TrailGame {
   }) : super(gameType: GameType.completeSentence);
 
   final String sentence;
-  final List<SentenceBlank> blanks;
+  final List<SentenceBlankDomain> blanks;
   final String explanation;
 }
 
-final class MysteriousWordGame extends TrailGame {
-  const MysteriousWordGame({
+final class MysteriousWordGameDomain extends TrailGameDomain {
+  const MysteriousWordGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -99,8 +99,8 @@ final class MysteriousWordGame extends TrailGame {
   final String explanation;
 }
 
-final class BattleOfCuriositiesGame extends TrailGame {
-  const BattleOfCuriositiesGame({
+final class BattleOfCuriositiesGameDomain extends TrailGameDomain {
+  const BattleOfCuriositiesGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -120,8 +120,8 @@ final class BattleOfCuriositiesGame extends TrailGame {
   final String explanation;
 }
 
-final class ConnectionsGame extends TrailGame {
-  const ConnectionsGame({
+final class ConnectionsGameDomain extends TrailGameDomain {
+  const ConnectionsGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
@@ -130,13 +130,13 @@ final class ConnectionsGame extends TrailGame {
     required this.pairs,
   }) : super(gameType: GameType.connections);
 
-  final List<ConnectionItem> leftColumn;
-  final List<ConnectionItem> rightColumn;
-  final List<ConnectionPair> pairs;
+  final List<ConnectionItemDomain> leftColumn;
+  final List<ConnectionItemDomain> rightColumn;
+  final List<ConnectionPairDomain> pairs;
 }
 
-final class TimelineGame extends TrailGame {
-  const TimelineGame({
+final class TimelineGameDomain extends TrailGameDomain {
+  const TimelineGameDomain({
     required super.pairId,
     required super.sortOrder,
     super.conceptId,

@@ -1,16 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/category_preference_data_source.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../helpers/mocks.mocks.dart';
 
 void main() {
-  late MockApiClient apiClient;
-  late RemoteCategoryPreferenceDataSource sut;
+  late MockIApiClient apiClient;
+  late InMemoryStorageClient storage;
+  late CategoryPreferenceDataSource sut;
 
   setUp(() {
-    apiClient = MockApiClient();
-    sut = RemoteCategoryPreferenceDataSource(apiClient);
+    apiClient = MockIApiClient();
+    storage = InMemoryStorageClient();
+    sut = CategoryPreferenceDataSource(apiClient, storage);
   });
 
   test('fetchCategoriesWithPreferences parses English category JSON', () async {

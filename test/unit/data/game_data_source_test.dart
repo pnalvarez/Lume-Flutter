@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/game_data_source.dart';
 import 'package:lume/layers/data/models/game_type.dart';
 import 'package:mockito/mockito.dart';
@@ -6,12 +7,14 @@ import 'package:mockito/mockito.dart';
 import '../../helpers/mocks.mocks.dart';
 
 void main() {
-  late MockApiClient apiClient;
-  late RemoteGameDataSource sut;
+  late MockIApiClient apiClient;
+  late InMemoryStorageClient storage;
+  late GameDataSource sut;
 
   setUp(() {
-    apiClient = MockApiClient();
-    sut = RemoteGameDataSource(apiClient);
+    apiClient = MockIApiClient();
+    storage = InMemoryStorageClient();
+    sut = GameDataSource(apiClient, storage);
   });
 
   test('fetchSubmoduleGames posts p_submodule_id and parses SubmoduleGamesData',

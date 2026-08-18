@@ -78,32 +78,6 @@ class SubmoduleData {
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class QuizQuestionData {
-  const QuizQuestionData({
-    required this.id,
-    required this.sortOrder,
-    required this.prompt,
-    this.levelId,
-    this.options = const [],
-    this.imageUrl,
-  });
-
-  final int id;
-  final int? levelId;
-  final int sortOrder;
-  final String prompt;
-
-  @JsonKey(defaultValue: <String>[])
-  final List<String> options;
-  final String? imageUrl;
-
-  factory QuizQuestionData.fromJson(Map<String, dynamic> json) =>
-      _$QuizQuestionDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$QuizQuestionDataToJson(this);
-}
-
-@JsonSerializable(fieldRename: FieldRename.snake)
 class SubmodulePairData {
   const SubmodulePairData({
     required this.id,

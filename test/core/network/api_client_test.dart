@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/core/errors/api_exception.dart';
-import 'package:lume/core/network/dio_api_client.dart';
+import 'package:lume/core/network/api_client.dart';
 import 'package:lume/core/network/http_method.dart';
 import 'package:lume/core/network/interceptors/auth_interceptor.dart';
 import 'package:lume/core/network/interceptors/supabase_headers_interceptor.dart';
@@ -15,7 +15,7 @@ import '../../helpers/stub_http_adapter.dart';
 void main() {
   const baseUrl = 'https://example.com/rest/v1/';
 
-  DioApiClient clientWith(
+  ApiClient clientWith(
     Future<ResponseBody> Function(
       RequestOptions options,
       Stream<List<int>>? requestStream,
@@ -25,10 +25,10 @@ void main() {
     final dio = Dio(BaseOptions(baseUrl: baseUrl));
     dio.interceptors.addAll(interceptors);
     dio.httpClientAdapter = StubHttpAdapter(onFetch);
-    return DioApiClient(dio: dio);
+    return ApiClient(dio: dio);
   }
 
-  group('DioApiClient', () {
+  group('ApiClient', () {
     test('get returns decoded JSON on success', () async {
       final client = clientWith((options, _) async {
         expect(options.method, 'GET');
@@ -176,24 +176,24 @@ void main() {
     });
 
     test('create wires a usable client', () {
-      final tokens = MockAuthTokenProvider();
+      final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn(null);
 
       expect(
-        DioApiClient.create(
+        ApiClient.create(
           baseUrl: baseUrl,
           apiKey: 'anon-key',
           tokenProvider: tokens,
           enableLogging: false,
         ),
-        isA<DioApiClient>(),
+        isA<ApiClient>(),
       );
     });
   });
 
   group('AuthInterceptor', () {
-    test('attaches Bearer token from AuthTokenProvider', () async {
-      final tokens = MockAuthTokenProvider();
+    test('attaches Bearer token from IAuthTokenProvider', () async {
+      final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn('jwt-123');
 
       final client = clientWith(
@@ -209,7 +209,7 @@ void main() {
     });
 
     test('skips Authorization when there is no session token', () async {
-      final tokens = MockAuthTokenProvider();
+      final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn(null);
 
       final client = clientWith(
@@ -225,7 +225,7 @@ void main() {
 
     test('does not overwrite an Authorization header already on the request',
         () async {
-      final tokens = MockAuthTokenProvider();
+      final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn('interceptor-token');
 
       final client = clientWith(

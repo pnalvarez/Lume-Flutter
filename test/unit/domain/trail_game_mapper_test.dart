@@ -25,8 +25,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<LightningQuizGame>());
-    final quiz = game as LightningQuizGame;
+    expect(game, isA<LightningQuizGameDomain>());
+    final quiz = game as LightningQuizGameDomain;
     expect(quiz.prompt, 'What is AI?');
     expect(quiz.correctIndex, 1);
   });
@@ -42,8 +42,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<WhoAmIGame>());
-    final who = game as WhoAmIGame;
+    expect(game, isA<WhoAmIGameDomain>());
+    final who = game as WhoAmIGameDomain;
     expect(who.hints, ['Hint 1', 'Hint 2']);
     expect(who.correctAnswer, 'entropy');
   });
@@ -57,8 +57,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<TrueOrMythGame>());
-    expect((game as TrueOrMythGame).verdict, TrueOrMythVerdict.myth);
+    expect(game, isA<TrueOrMythGameDomain>());
+    expect((game as TrueOrMythGameDomain).verdict, TrueOrMythVerdict.myth);
   });
 
   test('parse maps complete sentence payload', () {
@@ -76,8 +76,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<CompleteSentenceGame>());
-    final sentence = game as CompleteSentenceGame;
+    expect(game, isA<CompleteSentenceGameDomain>());
+    final sentence = game as CompleteSentenceGameDomain;
     expect(sentence.blanks.single.correct, 'system');
   });
 
@@ -91,8 +91,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<MysteriousWordGame>());
-    expect((game as MysteriousWordGame).word, 'format');
+    expect(game, isA<MysteriousWordGameDomain>());
+    expect((game as MysteriousWordGameDomain).word, 'format');
   });
 
   test('parse maps battle of curiosities payload', () {
@@ -107,9 +107,9 @@ void main() {
       }),
     );
 
-    expect(game, isA<BattleOfCuriositiesGame>());
+    expect(game, isA<BattleOfCuriositiesGameDomain>());
     expect(
-      (game as BattleOfCuriositiesGame).correct,
+      (game as BattleOfCuriositiesGameDomain).correct,
       BattleCorrectSide.b,
     );
   });
@@ -133,8 +133,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<ConnectionsGame>());
-    final connections = game as ConnectionsGame;
+    expect(game, isA<ConnectionsGameDomain>());
+    final connections = game as ConnectionsGameDomain;
     expect(connections.pairs.single.leftId, 'e1');
   });
 
@@ -149,8 +149,8 @@ void main() {
       }),
     );
 
-    expect(game, isA<TimelineGame>());
-    expect((game as TimelineGame).correctIndex, 0);
+    expect(game, isA<TimelineGameDomain>());
+    expect((game as TimelineGameDomain).correctIndex, 0);
   });
 
   test('parse throws when game_payload is missing', () {
@@ -166,7 +166,7 @@ void main() {
     );
   });
 
-  test('SubmoduleGamesData.trailGames parses all games', () {
+  test('SubmoduleGamesData.trailGameDomains parses all games', () {
     final data = SubmoduleGamesData.fromJson({
       'id': 9,
       'title': 'Preview',
@@ -187,7 +187,7 @@ void main() {
       ],
     });
 
-    expect(data.trailGames, hasLength(1));
-    expect(data.trailGames.single, isA<WhoAmIGame>());
+    expect(data.trailGameDomains, hasLength(1));
+    expect(data.trailGameDomains.single, isA<WhoAmIGameDomain>());
   });
 }

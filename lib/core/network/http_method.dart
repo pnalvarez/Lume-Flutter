@@ -1,4 +1,4 @@
-/// HTTP verbs supported by [ApiClient].
+/// HTTP verbs supported by [IApiClient].
 enum HttpMethod {
   get,
   post,

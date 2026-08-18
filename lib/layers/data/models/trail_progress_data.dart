@@ -8,13 +8,11 @@ part 'trail_progress_data.g.dart';
 class LevelProgressData {
   const LevelProgressData({
     required this.levelId,
-    this.quizScore,
     this.completed = false,
     this.completedAt,
   });
 
   final int levelId;
-  final double? quizScore;
 
   @JsonKey(defaultValue: false)
   final bool completed;
@@ -81,7 +79,6 @@ class TrailBootstrapData {
     this.categories = const [],
     this.levels = const [],
     this.submodules = const [],
-    this.quizQuestions = const [],
     this.submodulePairs = const [],
     this.levelProgress = const [],
     this.pairProgress = const [],
@@ -100,9 +97,6 @@ class TrailBootstrapData {
 
   @JsonKey(defaultValue: <SubmoduleData>[])
   final List<SubmoduleData> submodules;
-
-  @JsonKey(defaultValue: <QuizQuestionData>[])
-  final List<QuizQuestionData> quizQuestions;
 
   @JsonKey(defaultValue: <SubmodulePairData>[])
   final List<SubmodulePairData> submodulePairs;

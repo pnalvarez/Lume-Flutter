@@ -1,6 +1,6 @@
-/// Shared value objects used by [TrailGame] variants.
-class SentenceBlank {
-  const SentenceBlank({
+/// Shared value objects used by [TrailGameDomain] variants.
+class SentenceBlankDomain {
+  const SentenceBlankDomain({
     required this.order,
     required this.options,
     required this.correct,
@@ -11,15 +11,15 @@ class SentenceBlank {
   final String correct;
 }
 
-class ConnectionItem {
-  const ConnectionItem({required this.id, required this.text});
+class ConnectionItemDomain {
+  const ConnectionItemDomain({required this.id, required this.text});
 
   final String id;
   final String text;
 }
 
-class ConnectionPair {
-  const ConnectionPair({
+class ConnectionPairDomain {
+  const ConnectionPairDomain({
     required this.leftId,
     required this.rightId,
     this.explanation,

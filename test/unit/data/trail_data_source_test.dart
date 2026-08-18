@@ -1,16 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/trail_data_source.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../helpers/mocks.mocks.dart';
 
 void main() {
-  late MockApiClient apiClient;
-  late RemoteTrailDataSource sut;
+  late MockIApiClient apiClient;
+  late InMemoryStorageClient storage;
+  late TrailDataSource sut;
 
   setUp(() {
-    apiClient = MockApiClient();
-    sut = RemoteTrailDataSource(apiClient);
+    apiClient = MockIApiClient();
+    storage = InMemoryStorageClient();
+    sut = TrailDataSource(apiClient, storage);
   });
 
   test('fetchBootstrap parses English RPC JSON into TrailBootstrapData', () async {

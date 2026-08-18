@@ -7,7 +7,7 @@ import 'package:lume/layers/domain/models/trail_game/trail_game_values.dart';
 abstract final class TrailGameMapper {
   const TrailGameMapper._();
 
-  static TrailGame parse(GameItemData item) {
+  static TrailGameDomain parse(GameItemData item) {
     final payload = item.gamePayload;
     if (payload == null || payload.isEmpty) {
       throw FormatException(
@@ -27,14 +27,14 @@ abstract final class TrailGameMapper {
     };
   }
 
-  static List<TrailGame> parseAll(Iterable<GameItemData> items) =>
+  static List<TrailGameDomain> parseAll(Iterable<GameItemData> items) =>
       [for (final item in items) parse(item)];
 
-  static LightningQuizGame _parseLightningQuiz(
+  static LightningQuizGameDomain _parseLightningQuiz(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return LightningQuizGame(
+    return LightningQuizGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -45,11 +45,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static WhoAmIGame _parseWhoAmI(
+  static WhoAmIGameDomain _parseWhoAmI(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return WhoAmIGame(
+    return WhoAmIGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -61,11 +61,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static TrueOrMythGame _parseTrueOrMyth(
+  static TrueOrMythGameDomain _parseTrueOrMyth(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return TrueOrMythGame(
+    return TrueOrMythGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -75,7 +75,7 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static CompleteSentenceGame _parseCompleteSentence(
+  static CompleteSentenceGameDomain _parseCompleteSentence(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
@@ -84,14 +84,14 @@ abstract final class TrailGameMapper {
       throw FormatException('Expected blanks array for complete_sentence');
     }
 
-    return CompleteSentenceGame(
+    return CompleteSentenceGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
       sentence: _requireString(payload, 'sentence'),
       blanks: [
         for (final blank in blanksRaw)
-          SentenceBlank(
+          SentenceBlankDomain(
             order: _requireInt(asJsonMap(blank), 'order'),
             options: _requireStringList(asJsonMap(blank), 'options'),
             correct: _requireString(asJsonMap(blank), 'correct'),
@@ -101,11 +101,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static MysteriousWordGame _parseMysteriousWord(
+  static MysteriousWordGameDomain _parseMysteriousWord(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return MysteriousWordGame(
+    return MysteriousWordGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -116,11 +116,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static BattleOfCuriositiesGame _parseBattle(
+  static BattleOfCuriositiesGameDomain _parseBattle(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return BattleOfCuriositiesGame(
+    return BattleOfCuriositiesGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -133,11 +133,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static ConnectionsGame _parseConnections(
+  static ConnectionsGameDomain _parseConnections(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return ConnectionsGame(
+    return ConnectionsGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -147,11 +147,11 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static TimelineGame _parseTimeline(
+  static TimelineGameDomain _parseTimeline(
     GameItemData item,
     Map<String, dynamic> payload,
   ) {
-    return TimelineGame(
+    return TimelineGameDomain(
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
@@ -163,7 +163,7 @@ abstract final class TrailGameMapper {
     );
   }
 
-  static List<ConnectionItem> _parseConnectionItems(
+  static List<ConnectionItemDomain> _parseConnectionItems(
     Map<String, dynamic> payload,
     String key,
   ) {
@@ -174,14 +174,14 @@ abstract final class TrailGameMapper {
 
     return [
       for (final item in raw)
-        ConnectionItem(
+        ConnectionItemDomain(
           id: _requireString(asJsonMap(item), 'id'),
           text: _requireString(asJsonMap(item), 'text'),
         ),
     ];
   }
 
-  static List<ConnectionPair> _parseConnectionPairs(
+  static List<ConnectionPairDomain> _parseConnectionPairs(
     Map<String, dynamic> payload,
   ) {
     final raw = payload['pairs'];
@@ -191,7 +191,7 @@ abstract final class TrailGameMapper {
 
     return [
       for (final item in raw)
-        ConnectionPair(
+        ConnectionPairDomain(
           leftId: _requireString(asJsonMap(item), 'left_id'),
           rightId: _requireString(asJsonMap(item), 'right_id'),
           explanation: _optionalString(asJsonMap(item), 'explanation'),
@@ -249,15 +249,15 @@ abstract final class TrailGameMapper {
 }
 
 extension GameItemDataTrailGame on GameItemData {
-  TrailGame toTrailGame() => TrailGameMapper.parse(this);
+  TrailGameDomain toTrailGameDomain() => TrailGameMapper.parse(this);
 }
 
 extension SubmoduleGamesDataTrailGames on SubmoduleGamesData {
-  List<TrailGame> get trailGames => TrailGameMapper.parseAll(games);
+  List<TrailGameDomain> get trailGameDomains => TrailGameMapper.parseAll(games);
 }
 
 extension GameTrailDataTrailGames on GameTrailData {
-  List<TrailGame> get trailGames => [
+  List<TrailGameDomain> get trailGameDomains => [
         for (final level in levels)
           for (final submodule in level.submodules)
             ...TrailGameMapper.parseAll(submodule.games),

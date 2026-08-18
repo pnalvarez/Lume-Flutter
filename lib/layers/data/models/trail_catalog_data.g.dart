@@ -64,30 +64,6 @@ Map<String, dynamic> _$SubmoduleDataToJson(SubmoduleData instance) =>
       'image_url': instance.imageUrl,
     };
 
-QuizQuestionData _$QuizQuestionDataFromJson(Map<String, dynamic> json) =>
-    QuizQuestionData(
-      id: (json['id'] as num).toInt(),
-      sortOrder: (json['sort_order'] as num).toInt(),
-      prompt: json['prompt'] as String,
-      levelId: (json['level_id'] as num?)?.toInt(),
-      options:
-          (json['options'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
-      imageUrl: json['image_url'] as String?,
-    );
-
-Map<String, dynamic> _$QuizQuestionDataToJson(QuizQuestionData instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'level_id': instance.levelId,
-      'sort_order': instance.sortOrder,
-      'prompt': instance.prompt,
-      'options': instance.options,
-      'image_url': instance.imageUrl,
-    };
-
 SubmodulePairData _$SubmodulePairDataFromJson(Map<String, dynamic> json) =>
     SubmodulePairData(
       id: (json['id'] as num).toInt(),

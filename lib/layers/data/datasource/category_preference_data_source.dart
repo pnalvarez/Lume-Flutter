@@ -1,27 +1,50 @@
+import 'package:injectable/injectable.dart';
 import 'package:lume/core/network/api_client.dart';
+import 'package:lume/core/storage/cache_keys.dart';
+import 'package:lume/core/storage/storage_client.dart';
+import 'package:lume/core/storage/storage_json.dart';
 import 'package:lume/layers/data/json_map.dart';
 import 'package:lume/layers/data/models/category_data.dart';
 
-abstract interface class CategoryPreferenceDataSource {
-  Future<CategoryPreferencesData> fetchCategoriesWithPreferences();
+abstract interface class ICategoryPreferenceDataSource {
+  Future<CategoryPreferencesData> fetchCategoriesWithPreferences({
+    bool forceRefresh = false,
+  });
 
   Future<CategoryPreferencesData> saveCategoryPreferences({
     required List<int> categoryIds,
   });
 }
 
-final class RemoteCategoryPreferenceDataSource
-    implements CategoryPreferenceDataSource {
-  RemoteCategoryPreferenceDataSource(this._apiClient);
+@Injectable(as: ICategoryPreferenceDataSource)
+final class CategoryPreferenceDataSource implements ICategoryPreferenceDataSource {
+  CategoryPreferenceDataSource(this._apiClient, this._storage);
 
-  final ApiClient _apiClient;
+  final IApiClient _apiClient;
+  final IStorageClient _storage;
 
   @override
-  Future<CategoryPreferencesData> fetchCategoriesWithPreferences() async {
+  Future<CategoryPreferencesData> fetchCategoriesWithPreferences({
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh) {
+      final cached = await _storage.readObject(
+        CacheKeys.categoryPreferences,
+        CategoryPreferencesData.fromJson,
+      );
+      if (cached != null) return cached;
+    }
+
     final raw = await _apiClient.rpc<Map<String, dynamic>>(
       'get_categories_with_preferences',
     );
-    return CategoryPreferencesData.fromJson(asJsonMap(raw));
+    final data = CategoryPreferencesData.fromJson(asJsonMap(raw));
+    await _storage.writeObject(
+      CacheKeys.categoryPreferences,
+      data,
+      (value) => value.toJson(),
+    );
+    return data;
   }
 
   @override
@@ -32,6 +55,12 @@ final class RemoteCategoryPreferenceDataSource
       'save_category_preferences',
       params: {'p_category_ids': categoryIds},
     );
-    return CategoryPreferencesData.fromJson(asJsonMap(raw));
+    final data = CategoryPreferencesData.fromJson(asJsonMap(raw));
+    await _storage.writeObject(
+      CacheKeys.categoryPreferences,
+      data,
+      (value) => value.toJson(),
+    );
+    return data;
   }
 }
