@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
@@ -11,10 +12,10 @@ class CategoryPreferencesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: const PageHeader(title: 'Categorias'),
+      appBar: const PageHeader(title: categoriesTitle),
       body: Center(
         child: Text(
-          'Escolha de categorias',
+          categoriesPlaceholder,
           style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
         ),
       ),

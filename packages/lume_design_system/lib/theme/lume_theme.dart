@@ -4,7 +4,7 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Light [ThemeData] — pastel baby-blue brand.
+/// Light [ThemeData] — sky-blue brand.
 ///
 /// Uses [AppColors.lightColorScheme] and maps tokens to all Material component themes.
 ThemeData lumeLightTheme() {
@@ -112,7 +112,7 @@ ThemeData lumeLightTheme() {
   );
 }
 
-/// Dark [ThemeData] — navy background with pastel blue accents.
+/// Dark [ThemeData] — navy background with sky-blue accents.
 ThemeData lumeDarkTheme() {
   const surface = Color(0xFF0D1B2A);
 

@@ -133,7 +133,7 @@ class ResultBanner extends StatelessWidget {
           ],
           if (actionLabel != null && onAction != null) ...[
             const SizedBox(height: AppSpacings.m),
-            LumeButton(label: actionLabel!, onPressed: onAction),
+            LumeButton(label: actionLabel!, onPressed: onAction, isExpanded: true),
           ],
         ],
       ),

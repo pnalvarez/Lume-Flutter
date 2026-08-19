@@ -92,6 +92,8 @@ final class AuthService implements IAuthService {
       rethrow;
     } on AuthException catch (error) {
       throw _mapAuthException(error, operation: 'signIn');
+    } on ArgumentError catch (error) {
+      throw _mapConfigError(error, operation: 'signIn');
     }
   }
 
@@ -118,6 +120,8 @@ final class AuthService implements IAuthService {
       rethrow;
     } on AuthException catch (error) {
       throw _mapAuthException(error, operation: 'signUp');
+    } on ArgumentError catch (error) {
+      throw _mapConfigError(error, operation: 'signUp');
     }
   }
 
@@ -213,6 +217,14 @@ AuthFailure _mapAuthException(
   return AuthOperationFailure(
     operation: operation,
     message: error.message,
+    cause: error,
+  );
+}
+
+AuthFailure _mapConfigError(ArgumentError error, {required String operation}) {
+  return AuthOperationFailure(
+    operation: operation,
+    message: 'failed to fetch',
     cause: error,
   );
 }

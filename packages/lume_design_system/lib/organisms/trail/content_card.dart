@@ -133,9 +133,10 @@ class ContentCard extends StatelessWidget {
             LumeButton(
               label: actionLabel!,
               onPressed: onAction,
-              variant: actionSecondary
-                  ? LumeButtonVariant.secondary
-                  : LumeButtonVariant.primary,
+              isExpanded: true,
+              trait: actionSecondary
+                  ? LumeButtonTrait.secondary
+                  : LumeButtonTrait.brand,
             ),
           ],
         ],

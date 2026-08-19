@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lume/app/navigation/app_router.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
 class LumeApp extends StatelessWidget {
@@ -10,7 +11,7 @@ class LumeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Lume',
+      title: authBrandTitle,
       theme: lumeLightTheme(),
       routerConfig: router.config(),
     );

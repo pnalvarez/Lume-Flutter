@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/home/home_bloc.dart';
@@ -47,7 +48,7 @@ class _HomeView extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: const PageHeader(title: 'Home'),
+        appBar: const PageHeader(title: homeTitle),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacings.xl2),
@@ -57,20 +58,21 @@ class _HomeView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Home',
+                      homeTitle,
                       style: typ.headlineS.copyWith(color: cs.onSurface),
                     ),
                     const SizedBox(height: AppSpacings.s),
                     Text(
-                      'Você está autenticado.',
+                      homeAuthenticatedMessage,
                       style: typ.body3Light.copyWith(
                         color: cs.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: AppSpacings.xl2),
                     LumeButton(
-                      label: 'Sair',
-                      variant: LumeButtonVariant.outline,
+                      label: homeSignOut,
+                      type: LumeButtonType.outlined,
+                      isExpanded: true,
                       isLoading: state.isSigningOut,
                       onPressed: state.isSigningOut
                           ? null

@@ -68,42 +68,42 @@ abstract final class AppColors {
   );
 }
 
-// --- Brand primary — baby-blue pastel (#A3CEEF) -------------------------
+// --- Brand primary — sky blue (#1B84DA) --------------------------------
 
 @immutable
 class _PrimaryPalette {
   const _PrimaryPalette();
 
-  /// Brand anchor: baby-blue pastel — `hsl(207 71% 79%)` → #A3CEEF
-  final Color primary = const Color(0xFFA3CEEF);
+  /// Brand anchor: saturated sky blue — `hsl(207 78% 48%)` → #1B84DA
+  final Color primary = const Color(0xFF1B84DA);
 
-  /// Dark blue for contrast on the bright primary — `hsl(210 42% 28%)` → #2A4A66
-  final Color onPrimary = const Color(0xFF2A4A66);
+  /// Text/icons on primary — white for contrast on the stronger blue.
+  final Color onPrimary = const Color(0xFFFFFFFF);
 
-  /// Light tinted container — `hsl(207 71% 90%)` → #D4E8F7
-  final Color primaryContainer = const Color(0xFFD4E8F7);
+  /// Light tinted container — `hsl(207 72% 88%)` → #C5E4F8
+  final Color primaryContainer = const Color(0xFFC5E4F8);
 
-  final Color onPrimaryContainer = const Color(0xFF2A4A66);
+  final Color onPrimaryContainer = const Color(0xFF0A3D66);
 
   /// Very light wash — used for muted surfaces and input backgrounds.
-  final Color primaryLight = const Color(0xFFD4E8F7);
+  final Color primaryLight = const Color(0xFFE3F2FB);
 }
 
-// --- Secondary — medium soft blue (#7AABCB) ----------------------------
+// --- Secondary — medium blue (#3B7FB0) ---------------------------------
 
 @immutable
 class _SecondaryPalette {
   const _SecondaryPalette();
 
-  /// `hsl(205 45% 64%)` → #7AABCB
-  final Color secondary = const Color(0xFF7AABCB);
+  /// `hsl(205 50% 46%)` → #3B7FB0
+  final Color secondary = const Color(0xFF3B7FB0);
 
-  final Color onSecondary = const Color(0xFF2A4A66);
+  final Color onSecondary = const Color(0xFFFFFFFF);
 
   /// Muted blue surface
-  final Color secondaryContainer = const Color(0xFFEBF3FB);
+  final Color secondaryContainer = const Color(0xFFD7ECF7);
 
-  final Color onSecondaryContainer = const Color(0xFF2A4A66);
+  final Color onSecondaryContainer = const Color(0xFF14344C);
 }
 
 // --- Accent — pastel gold (#E8C87A) ------------------------------------
@@ -146,19 +146,19 @@ class _SurfacePalette {
 
   final Color surfaceContainerHighest = const Color(0xFFD4E3EF);
 
-  /// Subdued text — `hsl(206 22% 58%)` → #7A96AD
-  final Color onSurfaceVariant = const Color(0xFF7A96AD);
+  /// Subdued text — `hsl(206 24% 44%)` → #56748C
+  final Color onSurfaceVariant = const Color(0xFF56748C);
 }
 
 @immutable
 class _OutlinePalette {
   const _OutlinePalette();
 
-  /// Border — `hsl(207 42% 94%)` → #E8F0F6
-  final Color outline = const Color(0xFFE8F0F6);
+  /// Border — `hsl(207 22% 82%)` → #C5D4E0
+  final Color outline = const Color(0xFFC5D4E0);
 
-  /// Input border — `hsl(213 15% 91%)` → #E4E8ED
-  final Color outlineVariant = const Color(0xFFE4E8ED);
+  /// Input border — `hsl(210 18% 78%)` → #BCC9D4
+  final Color outlineVariant = const Color(0xFFBCC9D4);
 }
 
 @immutable
@@ -167,7 +167,7 @@ class _InversePalette {
 
   final Color inverseSurface = const Color(0xFF1C2B3A);
   final Color onInverseSurface = const Color(0xFFF0F6FB);
-  final Color inversePrimary = const Color(0xFF7AABCB);
+  final Color inversePrimary = const Color(0xFF7EC8F0);
 }
 
 // --- Semantic states ----------------------------------------------------

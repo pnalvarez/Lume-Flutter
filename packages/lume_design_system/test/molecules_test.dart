@@ -32,9 +32,106 @@ void main() {
 
     testWidgets('shows spinner when loading', (tester) async {
       await tester.pumpWidget(_wrap(
-        const LumeButton(label: 'Loading', isLoading: true),
+        LumeButton(label: 'Loading', isLoading: true, onPressed: () {}),
       ));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('loading keeps enabled look and blocks taps', (tester) async {
+      await tester.pumpWidget(_wrap(
+        LumeButton(
+          label: 'Continuar',
+          isLoading: true,
+          onPressed: () {},
+        ),
+      ));
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      expect(button.onPressed, isNotNull);
+      expect(
+        button.style?.backgroundColor?.resolve({}),
+        lumeLightTheme().colorScheme.primary,
+      );
+      expect(find.byType(IgnorePointer), findsWidgets);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Continuar'), findsNothing);
+    });
+
+    testWidgets('link type underlines the label', (tester) async {
+      await tester.pumpWidget(_wrap(
+        LumeButton(
+          label: 'O que é o Lume?',
+          type: LumeButtonType.link,
+          trait: LumeButtonTrait.secondary,
+          onPressed: () {},
+        ),
+      ));
+      expect(find.text('O que é o Lume?'), findsOneWidget);
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      expect(
+        button.style?.textStyle?.resolve({})?.decoration,
+        TextDecoration.underline,
+      );
+    });
+
+    testWidgets('defaults to brand elevated', (tester) async {
+      await tester.pumpWidget(_wrap(
+        LumeButton(label: 'Continuar', onPressed: () {}),
+      ));
+      expect(find.byType(ElevatedButton), findsOneWidget);
+    });
+
+    testWidgets('isEnabled false blocks taps', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(_wrap(
+        LumeButton(
+          label: 'Continuar',
+          isEnabled: false,
+          onPressed: () => tapped = true,
+        ),
+      ));
+      await tester.tap(find.text('Continuar'));
+      expect(tapped, isFalse);
+      expect(
+        tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+        isNull,
+      );
+    });
+
+    testWidgets('isExpanded fills available width', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: lumeLightTheme(),
+          home: const Scaffold(
+            body: SizedBox(
+              width: 400,
+              child: LumeButton(
+                label: 'Go',
+                isExpanded: true,
+                onPressed: null,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byType(ElevatedButton)).width, 400);
+    });
+
+    testWidgets('isExpanded false hugs content', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: lumeLightTheme(),
+          home: const Scaffold(
+            body: SizedBox(
+              width: 400,
+              child: LumeButton(
+                label: 'Go',
+                onPressed: null,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byType(ElevatedButton)).width, lessThan(400));
     });
   });
 

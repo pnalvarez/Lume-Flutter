@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/usecases/mark_onboarding_seen.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart';
@@ -97,13 +98,13 @@ class _OnboardingViewState extends State<_OnboardingView> {
                     const LumeLogo(size: 40),
                     const SizedBox(width: AppSpacings.s),
                     Text(
-                      'LUME',
+                      authBrandTitle,
                       style: typ.subtitleM.copyWith(color: cs.onSurface),
                     ),
                     const Spacer(),
                     LumeButton(
-                      label: 'Pular',
-                      variant: LumeButtonVariant.link,
+                      label: onboardingSkip,
+                      type: LumeButtonType.text,
                       size: LumeButtonSize.sm,
                       onPressed: () {
                         context.read<OnboardingBloc>().add(
@@ -326,7 +327,7 @@ class _GamificationIllustration extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacings.xs),
                       Text(
-                        'Nv. 12',
+                        onboardingLevelBadge,
                         style: typ.tagS.copyWith(color: cs.secondary),
                       ),
                     ],
@@ -340,7 +341,7 @@ class _GamificationIllustration extends StatelessWidget {
               bottom: AppSpacings.xl,
               child: LumeProgressBar(
                 value: 0.82,
-                label: 'XP',
+                label: onboardingXpLabel,
                 showPercentage: false,
                 fillColor: cs.tertiary,
                 trackColor: cs.surface.withValues(alpha: 0.7),
@@ -351,7 +352,7 @@ class _GamificationIllustration extends StatelessWidget {
               right: AppSpacings.xl,
               bottom: AppSpacings.xl + 20,
               child: Text(
-                '820 / 1000',
+                onboardingXpProgress,
                 style: typ.tagS.copyWith(color: cs.secondary),
               ),
             ),
@@ -401,23 +402,21 @@ class _OnboardingFooter extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacings.xl),
-              SizedBox(
-                width: double.infinity,
-                child: LumeButton(
-                  label: state.isLast ? 'Começar agora' : 'Próximo',
-                  size: LumeButtonSize.lg,
-                  trailingIcon: state.isLast
-                      ? null
-                      : Icon(
-                          Icons.chevron_right_rounded,
-                          color: cs.onPrimary,
-                        ),
-                  onPressed: () {
-                    context.read<OnboardingBloc>().add(
-                      const OnboardingNextPressed(),
-                    );
-                  },
-                ),
+              LumeButton(
+                label: state.isLast ? onboardingStart : onboardingNext,
+                size: LumeButtonSize.lg,
+                isExpanded: true,
+                trailingIcon: state.isLast
+                    ? null
+                    : Icon(
+                        Icons.chevron_right_rounded,
+                        color: cs.onPrimary,
+                      ),
+                onPressed: () {
+                  context.read<OnboardingBloc>().add(
+                    const OnboardingNextPressed(),
+                  );
+                },
               ),
             ],
           );

@@ -11,9 +11,10 @@ import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
+import 'package:lume_design_system/atoms/spacing/spacings.dart';
+import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
-import 'package:lume_design_system/atoms/spacing/spacings.dart';
 
 @RoutePage()
 class LoginPage extends StatelessWidget {
@@ -114,7 +115,7 @@ class _LoginViewState extends State<_LoginView> {
                     alignment: Alignment.centerRight,
                     child: LumeButton(
                       label: loginForgotPassword,
-                      variant: LumeButtonVariant.link,
+                      type: LumeButtonType.text,
                       size: LumeButtonSize.sm,
                       onPressed: () {
                         context.read<LoginBloc>().add(
@@ -131,25 +132,41 @@ class _LoginViewState extends State<_LoginView> {
                       : loginCtaSignUp,
                   size: LumeButtonSize.lg,
                   isLoading: state.isSubmitting,
-                  onPressed: state.canSubmit
-                      ? () {
-                          context.read<LoginBloc>().add(const LoginSubmitted());
-                        }
-                      : null,
+                  isEnabled: state.canSubmit,
+                  isExpanded: true,
+                  onPressed: () {
+                    context.read<LoginBloc>().add(const LoginSubmitted());
+                  },
                 ),
                 const SizedBox(height: AppSpacings.l),
-                LumeButton(
-                  label: state.mode == LoginMode.login
-                      ? loginFooterNoAccount
-                      : loginFooterHasAccount,
-                  variant: LumeButtonVariant.link,
-                  onPressed: () {
-                    context.read<LoginBloc>().add(const LoginModeToggled());
-                  },
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      state.mode == LoginMode.login
+                          ? loginFooterNoAccountPrompt
+                          : loginFooterHasAccountPrompt,
+                      style: typ.body4Light.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    LumeButton(
+                      label: state.mode == LoginMode.login
+                          ? loginFooterNoAccountAction
+                          : loginFooterHasAccountAction,
+                      type: LumeButtonType.link,
+                      size: LumeButtonSize.sm,
+                      onPressed: () {
+                        context.read<LoginBloc>().add(const LoginModeToggled());
+                      },
+                    ),
+                  ],
                 ),
                 LumeButton(
                   label: loginWhatIsLume,
-                  variant: LumeButtonVariant.link,
+                  trait: LumeButtonTrait.secondary,
+                  type: LumeButtonType.link,
                   size: LumeButtonSize.sm,
                   onPressed: () {
                     context.read<LoginBloc>().add(

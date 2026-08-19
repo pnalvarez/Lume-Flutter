@@ -165,6 +165,7 @@ class _InvalidContent extends StatelessWidget {
         LumeButton(
           label: definePasswordRequestNewLink,
           size: LumeButtonSize.lg,
+          isExpanded: true,
           onPressed: () {
             context.read<DefinePasswordBloc>().add(
               const DefinePasswordRequestNewLink(),
@@ -251,13 +252,13 @@ class _ReadyForm extends StatelessWidget {
               : definePasswordSubmit,
           size: LumeButtonSize.lg,
           isLoading: state.isSubmitting,
-          onPressed: state.canSubmit
-              ? () {
-                  context.read<DefinePasswordBloc>().add(
-                    const DefinePasswordSubmitted(),
-                  );
-                }
-              : null,
+          isEnabled: state.canSubmit,
+          isExpanded: true,
+          onPressed: () {
+            context.read<DefinePasswordBloc>().add(
+              const DefinePasswordSubmitted(),
+            );
+          },
         ),
       ],
     );

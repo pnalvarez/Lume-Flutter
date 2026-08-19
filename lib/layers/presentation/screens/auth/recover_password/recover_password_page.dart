@@ -149,13 +149,13 @@ class _RequestForm extends StatelessWidget {
               : recoverPasswordSend,
           size: LumeButtonSize.lg,
           isLoading: state.isSubmitting,
-          onPressed: state.canSubmit
-              ? () {
-                  context.read<RecoverPasswordBloc>().add(
-                    const RecoverPasswordSubmitted(),
-                  );
-                }
-              : null,
+          isEnabled: state.canSubmit,
+          isExpanded: true,
+          onPressed: () {
+            context.read<RecoverPasswordBloc>().add(
+              const RecoverPasswordSubmitted(),
+            );
+          },
         ),
       ],
     );
@@ -214,6 +214,7 @@ class _SentContent extends StatelessWidget {
         LumeButton(
           label: authBackToLogin,
           size: LumeButtonSize.lg,
+          isExpanded: true,
           onPressed: () {
             context.read<RecoverPasswordBloc>().add(
               const RecoverPasswordGoToLogin(),

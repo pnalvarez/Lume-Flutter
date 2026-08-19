@@ -1,4 +1,4 @@
-/// Copy for the auth flow (login, sign-up, email confirmation, password recovery).
+/// User-facing copy for auth, onboarding, and early app chrome.
 library;
 
 // --- Shared chrome ----------------------------------------------------------
@@ -15,8 +15,10 @@ const String loginPasswordPlaceholder = 'senha';
 const String loginForgotPassword = 'Esqueci minha senha';
 const String loginCtaSignIn = 'Entrar';
 const String loginCtaSignUp = 'Criar conta';
-const String loginFooterNoAccount = 'Não tem conta? Criar uma';
-const String loginFooterHasAccount = 'Já tem conta? Entrar';
+const String loginFooterNoAccountPrompt = 'Não tem conta?';
+const String loginFooterNoAccountAction = 'Criar uma';
+const String loginFooterHasAccountPrompt = 'Já tem conta?';
+const String loginFooterHasAccountAction = 'Entrar';
 const String loginWhatIsLume = 'O que é o Lume?';
 const String loginEmailNotConfirmedNotice =
     'Confirme seu email antes de entrar.';
@@ -79,3 +81,34 @@ const String authErrorEmailAlreadyRegistered = 'Este email já está cadastrado.
 const String authErrorNetwork =
     'Não foi possível conectar. Verifique sua conexão e tente novamente.';
 const String authErrorGeneric = 'Erro ao autenticar';
+
+// --- Onboarding -------------------------------------------------------------
+
+const String onboardingSkip = 'Pular';
+const String onboardingNext = 'Próximo';
+const String onboardingStart = 'Começar agora';
+const String onboardingLevelBadge = 'Nv. 12';
+const String onboardingXpLabel = 'XP';
+const String onboardingXpProgress = '820 / 1000';
+const String onboardingSlide1Title = 'Você aprende pouco e esquece rápido ⚡';
+const String onboardingSlide1Body =
+    'A maioria das pessoas não tem tempo — nem paciência — pra sentar e estudar. O resultado? Um repertório raso, que não acompanha as conversas que importam. O Lume resolve isso em 5 minutos por dia.';
+const String onboardingSlide1Alt =
+    'Ilustração representando esquecimento e aprendizado raso';
+const String onboardingSlide2Title =
+    'Trilhas, revisões e jogos pra você chegar ao topo 🏆';
+const String onboardingSlide2Body =
+    'Desbloqueie trilhas de História, Filosofia, Arte, Ciência, Música, Literatura, Geografia e muito mais. Fixe o conteúdo em quizzes de revisão. Jogue Quiz Relâmpago, Verdade ou Mito e Batalha de Curiosidades. Ganhe XP, suba de nível e chegue ao nível máximo enquanto constrói um repertório que enriquece sua vida.';
+const String onboardingSlide2Alt =
+    'Ilustração de gamificação com barra de XP, troféu e estrelas';
+
+// --- Home -------------------------------------------------------------------
+
+const String homeTitle = 'Home';
+const String homeAuthenticatedMessage = 'Você está autenticado.';
+const String homeSignOut = 'Sair';
+
+// --- Categories -------------------------------------------------------------
+
+const String categoriesTitle = 'Categorias';
+const String categoriesPlaceholder = 'Escolha de categorias';

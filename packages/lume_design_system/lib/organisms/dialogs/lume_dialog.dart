@@ -146,9 +146,10 @@ class CelebrationDialog extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: AppSpacings.xl),
-                SizedBox(
-                  width: double.infinity,
-                  child: LumeButton(label: actionLabel, onPressed: onAction),
+                LumeButton(
+                  label: actionLabel,
+                  onPressed: onAction,
+                  isExpanded: true,
                 ),
               ],
             ),

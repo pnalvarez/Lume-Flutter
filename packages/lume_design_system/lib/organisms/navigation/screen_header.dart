@@ -14,7 +14,7 @@ class ScreenHeader extends StatelessWidget {
 
   const ScreenHeader({
     super.key,
-    required this.title,
+    this.title = '',
     this.onBack,
     this.trailing,
     this.backIcon = Icons.arrow_back_rounded,
@@ -50,6 +50,7 @@ class ScreenHeader extends StatelessWidget {
               ?trailing,
             ],
           ),
+          if (title.isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacings.l,

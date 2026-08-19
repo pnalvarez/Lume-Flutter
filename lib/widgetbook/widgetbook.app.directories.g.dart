@@ -84,6 +84,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                     .buttonAllVariants,
               ),
               _widgetbook.WidgetbookUseCase(
+                name: 'Interactive',
+                builder: _lume_widgetbook_use_cases_button_use_cases
+                    .buttonInteractive,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Disabled',
+                builder:
+                    _lume_widgetbook_use_cases_button_use_cases.buttonDisabled,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Expanded',
+                builder:
+                    _lume_widgetbook_use_cases_button_use_cases.buttonExpanded,
+              ),
+              _widgetbook.WidgetbookUseCase(
                 name: 'Sizes',
                 builder:
                     _lume_widgetbook_use_cases_button_use_cases.buttonSizes,
