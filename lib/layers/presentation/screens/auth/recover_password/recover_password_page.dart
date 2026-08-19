@@ -1,18 +1,19 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/usecases/request_password_recovery.dart';
-import 'package:lume/layers/presentation/screens/recover_password/recover_password_bloc.dart';
-import 'package:lume/layers/presentation/screens/recover_password/recover_password_event.dart';
-import 'package:lume/layers/presentation/screens/recover_password/recover_password_state.dart';
-import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_event.dart';
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
+import 'package:lume_design_system/organisms/navigation/screen_header.dart';
 
 @RoutePage()
 class RecoverPasswordPage extends StatelessWidget {
@@ -73,39 +74,41 @@ class _RecoverPasswordViewState extends State<_RecoverPasswordView> {
           context.router.maybePop();
         }
       },
-      child: AuthScaffold(
-        subtitle: 'Recuperação de senha',
-        child: BlocBuilder<RecoverPasswordBloc, RecoverPasswordState>(
-          builder: (context, state) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: LumeButton(
-                    label: 'Voltar',
-                    variant: LumeButtonVariant.link,
-                    size: LumeButtonSize.sm,
-                    leadingIcon: Icon(
-                      Icons.arrow_back_rounded,
-                      size: AppSizes.iconXs,
-                      color: cs.primary,
-                    ),
-                    onPressed: () {
-                      context.read<RecoverPasswordBloc>().add(
-                        const RecoverPasswordGoToLogin(),
-                      );
+      child: Scaffold(
+        backgroundColor: cs.surface,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ScreenHeader(
+                title: recoverPasswordSubtitle,
+                backTooltip: authBack,
+                onBack: () {
+                  context.read<RecoverPasswordBloc>().add(
+                    const RecoverPasswordGoToLogin(),
+                  );
+                },
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacings.xl2,
+                    AppSpacings.l,
+                    AppSpacings.xl2,
+                    AppSpacings.l,
+                  ),
+                  child: BlocBuilder<RecoverPasswordBloc, RecoverPasswordState>(
+                    builder: (context, state) {
+                      if (state.sent) {
+                        return _SentContent(email: state.email.trim());
+                      }
+                      return _RequestForm(controller: _email, state: state);
                     },
                   ),
                 ),
-                const SizedBox(height: AppSpacings.l),
-                if (state.sent)
-                  _SentContent(email: state.email.trim())
-                else
-                  _RequestForm(controller: _email, state: state),
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -125,13 +128,13 @@ class _RequestForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Informe o email cadastrado e enviaremos um link para você redefinir sua senha.',
+          recoverPasswordInstructions,
           style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacings.l),
         InputField(
           controller: controller,
-          placeholder: 'email',
+          placeholder: authEmailPlaceholder,
           keyboardType: TextInputType.emailAddress,
           onChanged: (value) {
             context.read<RecoverPasswordBloc>().add(
@@ -142,8 +145,8 @@ class _RequestForm extends StatelessWidget {
         const SizedBox(height: AppSpacings.m),
         LumeButton(
           label: state.isSubmitting
-              ? 'Enviando...'
-              : 'Enviar email de recuperação',
+              ? recoverPasswordSending
+              : recoverPasswordSend,
           size: LumeButtonSize.lg,
           isLoading: state.isSubmitting,
           onPressed: state.canSubmit
@@ -188,30 +191,28 @@ class _SentContent extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacings.m),
         Text(
-          'Email enviado!',
+          recoverPasswordSentTitle,
           textAlign: TextAlign.center,
           style: typ.subtitleM.copyWith(color: cs.onSurface),
         ),
         const SizedBox(height: AppSpacings.s),
         Text.rich(
           TextSpan(
-            text: 'Enviamos um link de recuperação para ',
+            text: recoverPasswordSentBodyPrefix,
             style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
             children: [
               TextSpan(
                 text: email,
                 style: typ.body4Medium.copyWith(color: cs.onSurface),
               ),
-              const TextSpan(
-                text: '. Verifique sua caixa de entrada e o spam.',
-              ),
+              const TextSpan(text: recoverPasswordSentBodySuffix),
             ],
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacings.xl2),
         LumeButton(
-          label: 'Voltar para o login',
+          label: authBackToLogin,
           size: LumeButtonSize.lg,
           onPressed: () {
             context.read<RecoverPasswordBloc>().add(

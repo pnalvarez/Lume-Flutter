@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:lume_design_system/atoms/icons/app_icons.dart';
+import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/layers/presentation/shared/lume_logo.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
-import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
@@ -14,7 +13,7 @@ class AuthScaffold extends StatelessWidget {
     required this.subtitle,
     required this.child,
     this.onBack,
-    this.brandTitle = 'LUME',
+    this.brandTitle = authBrandTitle,
   });
 
   final String subtitle;
@@ -49,29 +48,14 @@ class AuthScaffold extends StatelessWidget {
                         icon: Icons.arrow_back_rounded,
                         onPressed: onBack,
                         size: LumeIconButtonSize.sm,
-                        tooltip: 'Voltar',
+                        tooltip: authBack,
                       ),
                     ),
                   const SizedBox(height: AppSpacings.l),
-                  Center(
-                    child: Container(
-                      width: AppSizes.avatarXl,
-                      height: AppSizes.avatarXl,
-                      decoration: BoxDecoration(
-                        color: cs.primary,
-                        borderRadius: BorderRadius.circular(AppRadius.xl2),
-                      ),
-                      alignment: Alignment.center,
-                      child: SvgPicture.asset(
-                        AppIcons.sparkle,
-                        package: 'lume_design_system',
-                        width: AppSizes.iconL,
-                        height: AppSizes.iconL,
-                        colorFilter: ColorFilter.mode(
-                          cs.onPrimary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+                  const Center(
+                    child: LumeLogo(
+                      size: 112,
+                      variant: LumeLogoVariant.surface,
                     ),
                   ),
                   const SizedBox(height: AppSpacings.l),

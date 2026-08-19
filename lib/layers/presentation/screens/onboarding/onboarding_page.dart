@@ -9,13 +9,13 @@ import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_event.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_slides.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_state.dart';
+import 'package:lume/layers/presentation/shared/lume_logo.dart';
 import 'package:lume_design_system/atoms/icons/app_icons.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
-import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 
 @RoutePage()
@@ -94,25 +94,7 @@ class _OnboardingViewState extends State<_OnboardingView> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: AppSizes.avatarS,
-                      height: AppSizes.avatarS,
-                      decoration: BoxDecoration(
-                        color: cs.primary,
-                        borderRadius: BorderRadius.circular(AppRadius.m),
-                      ),
-                      alignment: Alignment.center,
-                      child: SvgPicture.asset(
-                        AppIcons.sparkle,
-                        package: 'lume_design_system',
-                        width: AppSizes.iconXs,
-                        height: AppSizes.iconXs,
-                        colorFilter: ColorFilter.mode(
-                          cs.onPrimary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
+                    const LumeLogo(size: 40),
                     const SizedBox(width: AppSpacings.s),
                     Text(
                       'LUME',
@@ -419,39 +401,23 @@ class _OnboardingFooter extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacings.xl),
-              Row(
-                children: [
-                  LumeIconButton(
-                    icon: Icons.chevron_left_rounded,
-                    variant: LumeIconButtonVariant.outline,
-                    onPressed: state.isFirst
-                        ? null
-                        : () {
-                            context.read<OnboardingBloc>().add(
-                              const OnboardingBackPressed(),
-                            );
-                          },
-                    tooltip: 'Voltar',
-                  ),
-                  const SizedBox(width: AppSpacings.m),
-                  Expanded(
-                    child: LumeButton(
-                      label: state.isLast ? 'Começar agora' : 'Próximo',
-                      size: LumeButtonSize.lg,
-                      trailingIcon: state.isLast
-                          ? null
-                          : Icon(
-                              Icons.chevron_right_rounded,
-                              color: cs.onPrimary,
-                            ),
-                      onPressed: () {
-                        context.read<OnboardingBloc>().add(
-                          const OnboardingNextPressed(),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+              SizedBox(
+                width: double.infinity,
+                child: LumeButton(
+                  label: state.isLast ? 'Começar agora' : 'Próximo',
+                  size: LumeButtonSize.lg,
+                  trailingIcon: state.isLast
+                      ? null
+                      : Icon(
+                          Icons.chevron_right_rounded,
+                          color: cs.onPrimary,
+                        ),
+                  onPressed: () {
+                    context.read<OnboardingBloc>().add(
+                      const OnboardingNextPressed(),
+                    );
+                  },
+                ),
               ),
             ],
           );

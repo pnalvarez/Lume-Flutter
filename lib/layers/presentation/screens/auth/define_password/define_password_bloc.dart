@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/domain/usecases/update_password.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_event.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_state.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_event.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
 final class DefinePasswordBloc
@@ -12,10 +13,10 @@ final class DefinePasswordBloc
     required IRestoreSession restoreSession,
     required IUpdatePassword updatePassword,
     required IClearPasswordRecovery clearPasswordRecovery,
-  })  : _restoreSession = restoreSession,
-        _updatePassword = updatePassword,
-        _clearPasswordRecovery = clearPasswordRecovery,
-        super(const DefinePasswordState()) {
+  }) : _restoreSession = restoreSession,
+       _updatePassword = updatePassword,
+       _clearPasswordRecovery = clearPasswordRecovery,
+       super(const DefinePasswordState()) {
     on<DefinePasswordStarted>(_onStarted);
     on<DefinePasswordChanged>(_onPasswordChanged);
     on<DefinePasswordConfirmChanged>(_onConfirmChanged);
@@ -72,7 +73,7 @@ final class DefinePasswordBloc
       emit(
         state.copyWith(
           isSubmitting: false,
-          notice: 'Senha redefinida com sucesso!',
+          notice: definePasswordSuccessNotice,
           destination: DefinePasswordDestination.home,
         ),
       );
@@ -91,7 +92,9 @@ final class DefinePasswordBloc
     Emitter<DefinePasswordState> emit,
   ) {
     _clearPasswordRecovery();
-    emit(state.copyWith(destination: DefinePasswordDestination.recoverPassword));
+    emit(
+      state.copyWith(destination: DefinePasswordDestination.recoverPassword),
+    );
   }
 
   void _onNavigationHandled(

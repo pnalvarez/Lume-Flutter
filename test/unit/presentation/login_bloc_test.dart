@@ -6,9 +6,9 @@ import 'package:lume/layers/domain/models/auth/auth_sign_up_result.dart';
 import 'package:lume/layers/domain/models/auth/auth_user.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
-import 'package:lume/layers/presentation/screens/login/login_bloc.dart';
-import 'package:lume/layers/presentation/screens/login/login_event.dart';
-import 'package:lume/layers/presentation/screens/login/login_state.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 
 class _SignIn implements ISignInWithEmail {
   Object? error;
@@ -38,8 +38,7 @@ class _SignUp implements ISignUpWithEmail {
   Future<AuthSignUpResult> call({
     required String email,
     required String password,
-  }) async =>
-      result;
+  }) async => result;
 }
 
 LoginBloc _bloc(_SignIn signIn, _SignUp signUp) {

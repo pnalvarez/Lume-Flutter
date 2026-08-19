@@ -1,15 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_event.dart';
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_state.dart';
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_event.dart';
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
-final class ConfirmEmailBloc extends Bloc<ConfirmEmailEvent, ConfirmEmailState> {
+final class ConfirmEmailBloc
+    extends Bloc<ConfirmEmailEvent, ConfirmEmailState> {
   ConfirmEmailBloc({
     required IResendConfirmationEmail resendConfirmationEmail,
     String email = '',
-  })  : _resendConfirmationEmail = resendConfirmationEmail,
-        super(ConfirmEmailState(email: email)) {
+  }) : _resendConfirmationEmail = resendConfirmationEmail,
+       super(ConfirmEmailState(email: email)) {
     on<ConfirmEmailChanged>(_onEmailChanged);
     on<ConfirmEmailResendPressed>(_onResendPressed);
     on<ConfirmEmailNoticeHandled>(_onNoticeHandled);
@@ -35,7 +37,7 @@ final class ConfirmEmailBloc extends Bloc<ConfirmEmailEvent, ConfirmEmailState> 
       emit(
         state.copyWith(
           isSubmitting: false,
-          notice: 'Email de confirmação reenviado.',
+          notice: confirmEmailResentNotice,
           isError: false,
         ),
       );

@@ -5,9 +5,9 @@ import 'package:lume/layers/domain/models/auth/auth_user.dart';
 import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/domain/usecases/update_password.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_bloc.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_event.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_state.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_event.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_state.dart';
 
 class _Restore implements IRestoreSession {
   _Restore(this.session);
@@ -90,7 +90,11 @@ void main() {
     ),
     act: (bloc) => bloc.add(const DefinePasswordSubmitted()),
     expect: () => [
-      isA<DefinePasswordState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<DefinePasswordState>().having(
+        (s) => s.isSubmitting,
+        'submitting',
+        true,
+      ),
       isA<DefinePasswordState>().having(
         (s) => s.destination,
         'destination',

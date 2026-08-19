@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_bloc.dart';
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_event.dart';
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_state.dart';
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_event.dart';
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_state.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
@@ -69,7 +70,7 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
         context.read<ConfirmEmailBloc>().add(const ConfirmEmailNoticeHandled());
       },
       child: AuthScaffold(
-        subtitle: 'Confirmação de email',
+        subtitle: confirmEmailSubtitle,
         child: BlocBuilder<ConfirmEmailBloc, ConfirmEmailState>(
           builder: (context, state) {
             return Column(
@@ -78,7 +79,7 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: LumeButton(
-                    label: 'Voltar para o login',
+                    label: authBackToLogin,
                     variant: LumeButtonVariant.link,
                     size: LumeButtonSize.sm,
                     leadingIcon: Icon(
@@ -108,14 +109,14 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
                 ),
                 const SizedBox(height: AppSpacings.m),
                 Text(
-                  'Verifique seu email',
+                  confirmEmailTitle,
                   textAlign: TextAlign.center,
                   style: typ.subtitleM.copyWith(color: cs.onSurface),
                 ),
                 const SizedBox(height: AppSpacings.s),
                 Text.rich(
                   TextSpan(
-                    text: 'Enviamos um link de confirmação para',
+                    text: confirmEmailBodyPrefix,
                     style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
                     children: [
                       if (state.email.trim().isNotEmpty)
@@ -124,10 +125,10 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
                           style: typ.body4Medium.copyWith(color: cs.onSurface),
                         )
                       else
-                        const TextSpan(text: ' o email cadastrado'),
-                      const TextSpan(
-                        text: '. Confirme sua conta antes de fazer login no Lume.',
-                      ),
+                        const TextSpan(
+                          text: confirmEmailBodyUnspecifiedRecipient,
+                        ),
+                      const TextSpan(text: confirmEmailBodySuffix),
                     ],
                   ),
                   textAlign: TextAlign.center,
@@ -135,7 +136,7 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
                 const SizedBox(height: AppSpacings.xl2),
                 InputField(
                   controller: _email,
-                  placeholder: 'email',
+                  placeholder: authEmailPlaceholder,
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
                     context.read<ConfirmEmailBloc>().add(
@@ -146,8 +147,8 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
                 const SizedBox(height: AppSpacings.m),
                 LumeButton(
                   label: state.isSubmitting
-                      ? 'Reenviando...'
-                      : 'Reenviar email de confirmação',
+                      ? confirmEmailResending
+                      : confirmEmailResend,
                   size: LumeButtonSize.lg,
                   isLoading: state.isSubmitting,
                   onPressed: state.canResend

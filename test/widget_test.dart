@@ -6,13 +6,14 @@ import 'package:lume/app/lume_app.dart';
 import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/app/navigation/auth_guard.dart';
 import 'package:lume/app/navigation/recovery_guard.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_page.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
-import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume/layers/presentation/shared/lume_logo.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
 import 'helpers/fake_auth_session_provider.dart';
@@ -41,7 +42,7 @@ void main() {
     await getIt.reset();
   });
 
-  testWidgets('LumeApp starts on the splash loader', (tester) async {
+  testWidgets('LumeApp starts on the splash logo', (tester) async {
     final session = FakeAuthSessionProvider();
     final router = AppRouter(
       authGuard: AuthGuard(session),
@@ -52,23 +53,25 @@ void main() {
     await tester.pump();
 
     expect(find.byType(SplashPage), findsOneWidget);
-    expect(find.byType(CircularLoader), findsOneWidget);
+    expect(find.byType(LumeLogo), findsOneWidget);
   });
 
   testWidgets('AuthScaffold shows brand title and subtitle', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: lumeLightTheme(),
-        home: const AuthScaffold(
-          subtitle: 'Entrar',
-          child: Text('form'),
-        ),
+        home: const AuthScaffold(subtitle: 'Entrar', child: Text('form')),
       ),
     );
     await tester.pump();
 
-    expect(find.text('LUME'), findsOneWidget);
+    expect(find.text(authBrandTitle), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
     expect(find.text('form'), findsOneWidget);
+    expect(find.byType(LumeLogo), findsOneWidget);
+    expect(
+      tester.widget<LumeLogo>(find.byType(LumeLogo)).variant,
+      LumeLogoVariant.surface,
+    );
   });
 }

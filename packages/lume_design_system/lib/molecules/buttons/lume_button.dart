@@ -140,11 +140,7 @@ class LumeButton extends StatelessWidget {
     };
   }
 
-  TextStyle get _textStyle => switch (size) {
-        LumeButtonSize.sm => typ.body4Semibold,
-        LumeButtonSize.md => typ.body3Semibold,
-        LumeButtonSize.lg => typ.body1Semibold,
-      };
+  TextStyle get _textStyle => typ.body3Medium;
 
   Widget _buildContent(ColorScheme cs) {
     if (isLoading) {

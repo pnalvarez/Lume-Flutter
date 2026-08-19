@@ -9,7 +9,7 @@ import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_event.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_state.dart';
-import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume/layers/presentation/shared/lume_logo.dart';
 
 /// Cold-start gate: restore the session, then replace this route.
 @RoutePage()
@@ -40,7 +40,10 @@ class _SplashView extends StatelessWidget {
         context.router.replace(_routeFor(destination));
       },
       child: const Scaffold(
-        body: CircularLoader(fullPage: true),
+        backgroundColor: Colors.white,
+        body: Center(
+          child: LumeLogo(size: 200),
+        ),
       ),
     );
   }

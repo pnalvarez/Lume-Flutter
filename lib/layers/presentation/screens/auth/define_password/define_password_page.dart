@@ -2,14 +2,15 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/repository/auth_repository.dart';
 import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/domain/usecases/update_password.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_bloc.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_event.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_state.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_event.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_state.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
@@ -84,17 +85,17 @@ class _DefinePasswordViewState extends State<_DefinePasswordView> {
         }
       },
       child: AuthScaffold(
-        subtitle: 'Definir nova senha',
+        subtitle: definePasswordSubtitle,
         child: BlocBuilder<DefinePasswordBloc, DefinePasswordState>(
           builder: (context, state) {
             return switch (state.status) {
               DefinePasswordStatus.checking => const _CheckingContent(),
               DefinePasswordStatus.invalid => const _InvalidContent(),
               DefinePasswordStatus.ready => _ReadyForm(
-                  password: _password,
-                  confirm: _confirm,
-                  state: state,
-                ),
+                password: _password,
+                confirm: _confirm,
+                state: state,
+              ),
             };
           },
         ),
@@ -114,7 +115,7 @@ class _CheckingContent extends StatelessWidget {
         const CircularLoader(),
         const SizedBox(height: AppSpacings.m),
         Text(
-          'Validando seu link de recuperação...',
+          definePasswordChecking,
           textAlign: TextAlign.center,
           style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
         ),
@@ -150,19 +151,19 @@ class _InvalidContent extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacings.m),
         Text(
-          'Link inválido ou expirado',
+          definePasswordInvalidTitle,
           textAlign: TextAlign.center,
           style: typ.subtitleM.copyWith(color: cs.onSurface),
         ),
         const SizedBox(height: AppSpacings.s),
         Text(
-          'Este link de recuperação não é mais válido. Solicite um novo para redefinir sua senha.',
+          definePasswordInvalidBody,
           textAlign: TextAlign.center,
           style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacings.xl2),
         LumeButton(
-          label: 'Solicitar novo link',
+          label: definePasswordRequestNewLink,
           size: LumeButtonSize.lg,
           onPressed: () {
             context.read<DefinePasswordBloc>().add(
@@ -189,7 +190,8 @@ class _ReadyForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final message = state.errorMessage ??
+    final message =
+        state.errorMessage ??
         ((state.password.isNotEmpty || state.confirmation.isNotEmpty)
             ? state.validationError
             : null);
@@ -198,13 +200,13 @@ class _ReadyForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Escolha uma nova senha para sua conta.',
+          definePasswordInstructions,
           style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacings.l),
         InputField(
           controller: password,
-          placeholder: 'nova senha',
+          placeholder: definePasswordPlaceholder,
           obscureText: true,
           onChanged: (value) {
             context.read<DefinePasswordBloc>().add(
@@ -215,7 +217,7 @@ class _ReadyForm extends StatelessWidget {
         const SizedBox(height: AppSpacings.m),
         InputField(
           controller: confirm,
-          placeholder: 'confirmar nova senha',
+          placeholder: definePasswordConfirmPlaceholder,
           obscureText: true,
           onChanged: (value) {
             context.read<DefinePasswordBloc>().add(
@@ -244,7 +246,9 @@ class _ReadyForm extends StatelessWidget {
         ],
         const SizedBox(height: AppSpacings.m),
         LumeButton(
-          label: state.isSubmitting ? 'Salvando...' : 'Redefinir senha',
+          label: state.isSubmitting
+              ? definePasswordSaving
+              : definePasswordSubmit,
           size: LumeButtonSize.lg,
           isLoading: state.isSubmitting,
           onPressed: state.canSubmit

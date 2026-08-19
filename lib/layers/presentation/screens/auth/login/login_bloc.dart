@@ -1,18 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/errors/auth_failure.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
-import 'package:lume/layers/presentation/screens/login/login_event.dart';
-import 'package:lume/layers/presentation/screens/login/login_state.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
 final class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required ISignInWithEmail signInWithEmail,
     required ISignUpWithEmail signUpWithEmail,
-  })  : _signInWithEmail = signInWithEmail,
-        _signUpWithEmail = signUpWithEmail,
-        super(const LoginState()) {
+  }) : _signInWithEmail = signInWithEmail,
+       _signUpWithEmail = signUpWithEmail,
+       super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginModeToggled>(_onModeToggled);
@@ -52,7 +53,9 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     if (!state.canSubmit) return;
-    emit(state.copyWith(isSubmitting: true, clearError: true, clearNotice: true));
+    emit(
+      state.copyWith(isSubmitting: true, clearError: true, clearNotice: true),
+    );
     try {
       if (state.mode == LoginMode.signup) {
         final result = await _signUpWithEmail(
@@ -82,16 +85,13 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         password: state.password,
       );
       emit(
-        state.copyWith(
-          isSubmitting: false,
-          destination: LoginDestination.home,
-        ),
+        state.copyWith(isSubmitting: false, destination: LoginDestination.home),
       );
     } on AuthEmailNotConfirmedFailure {
       emit(
         state.copyWith(
           isSubmitting: false,
-          notice: 'Confirme seu email antes de entrar.',
+          notice: loginEmailNotConfirmedNotice,
           destination: LoginDestination.confirmEmail,
         ),
       );
@@ -112,10 +112,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     emit(state.copyWith(destination: LoginDestination.recoverPassword));
   }
 
-  void _onWhatIsLume(
-    LoginWhatIsLumePressed event,
-    Emitter<LoginState> emit,
-  ) {
+  void _onWhatIsLume(LoginWhatIsLumePressed event, Emitter<LoginState> emit) {
     emit(state.copyWith(destination: LoginDestination.onboarding));
   }
 

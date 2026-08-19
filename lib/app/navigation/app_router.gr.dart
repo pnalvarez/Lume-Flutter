@@ -13,15 +13,16 @@ import 'package:auto_route/auto_route.dart' as _i9;
 import 'package:flutter/material.dart' as _i10;
 import 'package:lume/layers/presentation/screens/category_preferences/category_preferences_page.dart'
     as _i1;
-import 'package:lume/layers/presentation/screens/confirm_email/confirm_email_page.dart'
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_page.dart'
     as _i2;
-import 'package:lume/layers/presentation/screens/define_password/define_password_page.dart'
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_page.dart'
     as _i3;
 import 'package:lume/layers/presentation/screens/home/home_page.dart' as _i4;
-import 'package:lume/layers/presentation/screens/login/login_page.dart' as _i5;
+import 'package:lume/layers/presentation/screens/auth/login/login_page.dart'
+    as _i5;
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_page.dart'
     as _i6;
-import 'package:lume/layers/presentation/screens/recover_password/recover_password_page.dart'
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_page.dart'
     as _i7;
 import 'package:lume/layers/presentation/screens/splash/splash_page.dart'
     as _i8;

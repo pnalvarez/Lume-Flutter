@@ -2,12 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
+import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
-import 'package:lume/layers/presentation/screens/login/login_bloc.dart';
-import 'package:lume/layers/presentation/screens/login/login_event.dart';
-import 'package:lume/layers/presentation/screens/login/login_state.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
@@ -84,7 +85,7 @@ class _LoginViewState extends State<_LoginView> {
         }
       },
       child: AuthScaffold(
-        subtitle: 'Microlearning de História Mundial',
+        subtitle: loginSubtitle,
         child: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             return Column(
@@ -92,7 +93,7 @@ class _LoginViewState extends State<_LoginView> {
               children: [
                 InputField(
                   controller: _email,
-                  placeholder: 'email',
+                  placeholder: authEmailPlaceholder,
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) {
                     context.read<LoginBloc>().add(LoginEmailChanged(value));
@@ -101,7 +102,7 @@ class _LoginViewState extends State<_LoginView> {
                 const SizedBox(height: AppSpacings.m),
                 InputField(
                   controller: _password,
-                  placeholder: 'senha',
+                  placeholder: loginPasswordPlaceholder,
                   obscureText: true,
                   onChanged: (value) {
                     context.read<LoginBloc>().add(LoginPasswordChanged(value));
@@ -112,7 +113,7 @@ class _LoginViewState extends State<_LoginView> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: LumeButton(
-                      label: 'Esqueci minha senha',
+                      label: loginForgotPassword,
                       variant: LumeButtonVariant.link,
                       size: LumeButtonSize.sm,
                       onPressed: () {
@@ -126,8 +127,8 @@ class _LoginViewState extends State<_LoginView> {
                 const SizedBox(height: AppSpacings.m),
                 LumeButton(
                   label: state.mode == LoginMode.login
-                      ? 'Entrar'
-                      : 'Criar conta',
+                      ? loginCtaSignIn
+                      : loginCtaSignUp,
                   size: LumeButtonSize.lg,
                   isLoading: state.isSubmitting,
                   onPressed: state.canSubmit
@@ -139,15 +140,15 @@ class _LoginViewState extends State<_LoginView> {
                 const SizedBox(height: AppSpacings.l),
                 LumeButton(
                   label: state.mode == LoginMode.login
-                      ? 'Não tem conta? Criar uma'
-                      : 'Já tem conta? Entrar',
+                      ? loginFooterNoAccount
+                      : loginFooterHasAccount,
                   variant: LumeButtonVariant.link,
                   onPressed: () {
                     context.read<LoginBloc>().add(const LoginModeToggled());
                   },
                 ),
                 LumeButton(
-                  label: 'O que é o Lume?',
+                  label: loginWhatIsLume,
                   variant: LumeButtonVariant.link,
                   size: LumeButtonSize.sm,
                   onPressed: () {

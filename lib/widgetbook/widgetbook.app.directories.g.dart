@@ -347,6 +347,16 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookComponent(
+            name: 'ScreenHeader',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _lume_widgetbook_use_cases_navigation_use_cases
+                    .screenHeaderDefault,
+              ),
+            ],
+          ),
         ],
       ),
       _widgetbook.WidgetbookFolder(

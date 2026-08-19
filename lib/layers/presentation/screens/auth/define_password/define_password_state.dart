@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:lume/layers/presentation/screens/define_password/define_password_event.dart';
+import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_event.dart';
 
 @immutable
 final class DefinePasswordState {
@@ -23,22 +24,24 @@ final class DefinePasswordState {
 
   String? get validationError {
     if (password.isEmpty && confirmation.isEmpty) {
-      return 'Digite a nova senha e confirme a senha.';
+      return definePasswordValidationBothEmpty;
     }
-    if (password.isEmpty) return 'Digite a nova senha.';
-    if (confirmation.isEmpty) return 'Confirme a nova senha.';
+    if (password.isEmpty) return definePasswordValidationPasswordEmpty;
+    if (confirmation.isEmpty) return definePasswordValidationConfirmEmpty;
     if (password.length < 6) {
-      return 'A senha deve ter pelo menos 6 caracteres.';
+      return definePasswordValidationPasswordShort;
     }
     if (confirmation.length < 6) {
-      return 'A confirmação deve ter pelo menos 6 caracteres.';
+      return definePasswordValidationConfirmShort;
     }
-    if (password != confirmation) return 'As senhas não coincidem.';
+    if (password != confirmation) return definePasswordValidationMismatch;
     return null;
   }
 
   bool get canSubmit =>
-      !isSubmitting && validationError == null && status == DefinePasswordStatus.ready;
+      !isSubmitting &&
+      validationError == null &&
+      status == DefinePasswordStatus.ready;
 
   DefinePasswordState copyWith({
     DefinePasswordStatus? status,
@@ -76,12 +79,12 @@ final class DefinePasswordState {
 
   @override
   int get hashCode => Object.hash(
-        status,
-        password,
-        confirmation,
-        isSubmitting,
-        errorMessage,
-        notice,
-        destination,
-      );
+    status,
+    password,
+    confirmation,
+    isSubmitting,
+    errorMessage,
+    notice,
+    destination,
+  );
 }

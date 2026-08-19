@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:lume/layers/presentation/screens/login/login_event.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 
 @immutable
 final class LoginState {
@@ -60,12 +60,12 @@ final class LoginState {
 
   @override
   int get hashCode => Object.hash(
-        mode,
-        email,
-        password,
-        isSubmitting,
-        errorMessage,
-        notice,
-        destination,
-      );
+    mode,
+    email,
+    password,
+    isSubmitting,
+    errorMessage,
+    notice,
+    destination,
+  );
 }
