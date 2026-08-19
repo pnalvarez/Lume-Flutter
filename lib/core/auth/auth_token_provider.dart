@@ -5,3 +5,6 @@ abstract interface class IAuthTokenProvider {
   /// JWT or opaque access token, or `null` when the user is signed out.
   String? get accessToken;
 }
+
+/// Legacy name for [IAuthTokenProvider].
+typedef AuthTokenProvider = IAuthTokenProvider;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
 import 'package:lume_design_system/molecules/chips/chip_picker.dart';
+import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
 import 'package:lume_design_system/molecules/chips/status_chip.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
@@ -41,6 +42,39 @@ Widget chipPickerInteractive(BuildContext context) {
         items: const ['One', 'Two', 'Three', 'Four'],
         selectedIndex: selected,
         onSelected: (_) {},
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Selected and unselected', type: SelectableChip)
+Widget selectableChipStates(BuildContext context) {
+  final selected = context.knobs.boolean(
+    label: 'Selected',
+    initialValue: true,
+  );
+  final label = context.knobs.string(
+    label: 'Label',
+    initialValue: 'História',
+  );
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          SelectableChip(
+            label: label,
+            selected: selected,
+            onPressed: () {},
+          ),
+          SelectableChip(
+            label: 'Filosofia',
+            selected: !selected,
+            onPressed: () {},
+          ),
+        ],
       ),
     ),
   );

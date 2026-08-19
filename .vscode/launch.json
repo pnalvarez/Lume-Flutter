@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "lume",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://mizgtuwtuaculchwizkm.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pemd0dXd0dWFjdWxjaHdpemttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzUzMzMsImV4cCI6MjEwMjE1MTMzM30.qV1ksdwGM6PmIyhr2ClBVJKFCxOcoGCsmElCgIi6UcA"
+      ]
+    },
+    {
+      "name": "lume (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://mizgtuwtuaculchwizkm.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pemd0dXd0dWFjdWxjaHdpemttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzUzMzMsImV4cCI6MjEwMjE1MTMzM30.qV1ksdwGM6PmIyhr2ClBVJKFCxOcoGCsmElCgIi6UcA"
+      ]
+    },
+    {
+      "name": "lume (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://mizgtuwtuaculchwizkm.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pemd0dXd0dWFjdWxjaHdpemttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzUzMzMsImV4cCI6MjEwMjE1MTMzM30.qV1ksdwGM6PmIyhr2ClBVJKFCxOcoGCsmElCgIi6UcA"
+      ]
+    },
+    {
+      "name": "lume (widgetbook)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/widgetbook/main.widgetbook.dart"
+    }
+  ]
+}

@@ -357,6 +357,12 @@ class MockIApiClient extends _i1.Mock implements _i12.IApiClient {
 class MockIAuthTokenProvider extends _i1.Mock
     implements _i16.IAuthTokenProvider {}
 
+/// A class which mocks [IAuthTokenProvider].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAuthTokenProvider extends _i1.Mock
+    implements _i16.IAuthTokenProvider {}
+
 /// A class which mocks [IStorageClient].
 ///
 /// See the documentation for Mockito's code generation for more information.

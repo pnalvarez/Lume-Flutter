@@ -1,30 +1,74 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/app/lume_app.dart';
+import 'package:lume/app/navigation/app_router.dart';
+import 'package:lume/app/navigation/auth_guard.dart';
+import 'package:lume/app/navigation/recovery_guard.dart';
+import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/domain/models/auth/auth_session.dart';
+import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
+import 'package:lume/layers/domain/usecases/restore_session.dart';
+import 'package:lume/layers/presentation/screens/splash/splash_page.dart';
+import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
+import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/theme/lume_theme.dart';
 
-import 'package:lume/main.dart';
+import 'helpers/fake_auth_session_provider.dart';
+
+class _PendingRestoreSession implements IRestoreSession {
+  @override
+  Future<AuthSession?> call() => Completer<AuthSession?>().future;
+}
+
+class _PendingHasSeenOnboarding implements IHasSeenOnboarding {
+  @override
+  Future<bool> call() => Completer<bool>().future;
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() async {
+    await getIt.reset();
+    getIt
+      ..registerFactory<IRestoreSession>(_PendingRestoreSession.new)
+      ..registerFactoryAsync<IHasSeenOnboarding>(
+        () async => _PendingHasSeenOnboarding(),
+      );
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  tearDown(() async {
+    await getIt.reset();
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('LumeApp starts on the splash loader', (tester) async {
+    final session = FakeAuthSessionProvider();
+    final router = AppRouter(
+      authGuard: AuthGuard(session),
+      recoveryGuard: RecoveryGuard(session),
+    );
+
+    await tester.pumpWidget(LumeApp(router: router));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(SplashPage), findsOneWidget);
+    expect(find.byType(CircularLoader), findsOneWidget);
+  });
+
+  testWidgets('AuthScaffold shows brand title and subtitle', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: lumeLightTheme(),
+        home: const AuthScaffold(
+          subtitle: 'Entrar',
+          child: Text('form'),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('LUME'), findsOneWidget);
+    expect(find.text('Entrar'), findsOneWidget);
+    expect(find.text('form'), findsOneWidget);
   });
 }

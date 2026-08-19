@@ -17,6 +17,7 @@ analyzer:
     - macos/**
     - linux/**
     - "**/*.mocks.dart"
+    - "**/*.gr.dart"
     # Widgetbook entrypoint — only run via `flutter run -t`; dev-only imports are fine.
     - lib/widgetbook/**
 include: package:flutter_lints/flutter.yaml

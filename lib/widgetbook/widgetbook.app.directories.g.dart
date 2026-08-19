@@ -122,6 +122,16 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'SelectableChip',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Selected and unselected',
+                builder: _lume_widgetbook_use_cases_chips_and_progress_use_cases
+                    .selectableChipStates,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'StatChip',
             useCases: [
               _widgetbook.WidgetbookUseCase(

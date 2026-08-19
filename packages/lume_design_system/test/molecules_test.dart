@@ -5,6 +5,7 @@ import 'package:lume_design_system/molecules/badges/lume_badge.dart';
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/chips/chip_picker.dart';
+import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
 import 'package:lume_design_system/molecules/chips/stat_chip.dart';
 import 'package:lume_design_system/molecules/chips/status_chip.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
@@ -138,6 +139,17 @@ void main() {
       ));
       await tester.tap(find.text('B'));
       expect(selected, 1);
+    });
+
+    testWidgets('SelectableChip renders label', (tester) async {
+      await tester.pumpWidget(_wrap(
+        SelectableChip(
+          label: 'História',
+          selected: true,
+          onPressed: () {},
+        ),
+      ));
+      expect(find.text('História'), findsOneWidget);
     });
   });
 

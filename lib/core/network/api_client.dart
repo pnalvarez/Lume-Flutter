@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/core/auth/auth_token_provider.dart';
+import 'package:lume/core/config/app_config.dart';
 import 'package:lume/core/errors/api_exception.dart';
 import 'package:lume/core/network/api_response.dart';
 import 'package:lume/core/network/http_method.dart';
@@ -51,9 +52,14 @@ final class ApiClient implements IApiClient {
   ApiClient({required Dio dio}) : _dio = dio;
 
   @factoryMethod
-  factory ApiClient.fromInjection() => ApiClient.create(
-        baseUrl: const String.fromEnvironment('SUPABASE_URL'),
-        apiKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+  factory ApiClient.fromInjection(
+    AppConfig config,
+    IAuthTokenProvider tokenProvider,
+  ) =>
+      ApiClient.create(
+        baseUrl: config.supabaseUrl,
+        apiKey: config.supabaseAnonKey,
+        tokenProvider: tokenProvider,
       );
 
   /// Production wiring: timeouts, JSON headers, and optional interceptors.

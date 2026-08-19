@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lume/layers/data/models/category_data.dart';
 import 'package:lume/layers/data/models/game_data.dart';
 import 'package:lume/layers/data/repository/game_repository.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';

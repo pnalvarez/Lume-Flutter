@@ -23,6 +23,7 @@ import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 @GenerateNiceMocks([
   MockSpec<IApiClient>(),
   MockSpec<IAuthTokenProvider>(),
+  MockSpec<IAuthTokenProvider>(as: #MockAuthTokenProvider),
   MockSpec<IStorageClient>(),
   MockSpec<ITrailDataSource>(),
   MockSpec<IGameDataSource>(),
