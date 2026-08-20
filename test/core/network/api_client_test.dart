@@ -189,6 +189,52 @@ void main() {
         isA<ApiClient>(),
       );
     });
+
+    test('normalizeRestBaseUrl appends /rest/v1/ to the project origin', () {
+      expect(
+        ApiClient.normalizeRestBaseUrl('https://abc.supabase.co'),
+        'https://abc.supabase.co/rest/v1/',
+      );
+      expect(
+        ApiClient.normalizeRestBaseUrl('https://abc.supabase.co/'),
+        'https://abc.supabase.co/rest/v1/',
+      );
+      expect(
+        ApiClient.normalizeRestBaseUrl('https://abc.supabase.co/rest/v1'),
+        'https://abc.supabase.co/rest/v1/',
+      );
+      expect(
+        ApiClient.normalizeRestBaseUrl('https://abc.supabase.co/rest/v1/'),
+        'https://abc.supabase.co/rest/v1/',
+      );
+    });
+
+    test('create + rpc does not smash supabase.co into supabase.corpc', () async {
+      final tokens = MockIAuthTokenProvider();
+      when(tokens.accessToken).thenReturn(null);
+
+      late final RequestOptions captured;
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: ApiClient.normalizeRestBaseUrl(
+            'https://mizgtuwtuaculchwizkm.supabase.co',
+          ),
+        ),
+      );
+      dio.httpClientAdapter = StubHttpAdapter((options, _) async {
+        captured = options;
+        return jsonResponse(jsonEncode({'selected_ids': <int>[]}));
+      });
+      final client = ApiClient(dio: dio);
+
+      await client.rpc<Map<String, dynamic>>('get_categories_with_preferences');
+
+      expect(
+        captured.uri.toString(),
+        'https://mizgtuwtuaculchwizkm.supabase.co/rest/v1/rpc/'
+        'get_categories_with_preferences',
+      );
+    });
   });
 
   group('AuthInterceptor', () {

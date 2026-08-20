@@ -69,15 +69,29 @@ void main() {
   });
 
   group('AuthGate.splashDestination', () {
-    test('sends a confirmed session home', () {
+    test('sends a confirmed session with categories home', () {
       expect(
         AuthGate.splashDestination(
           hasSession: true,
           isEmailConfirmed: true,
           isPasswordRecovery: false,
           hasSeenOnboarding: false,
+          hasSelectedCategories: true,
         ),
         SplashDestination.home,
+      );
+    });
+
+    test('sends a confirmed session without categories to select category', () {
+      expect(
+        AuthGate.splashDestination(
+          hasSession: true,
+          isEmailConfirmed: true,
+          isPasswordRecovery: false,
+          hasSeenOnboarding: true,
+          hasSelectedCategories: false,
+        ),
+        SplashDestination.selectCategory,
       );
     });
 
@@ -88,6 +102,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: false,
+          hasSelectedCategories: false,
         ),
         SplashDestination.onboarding,
       );
@@ -97,6 +112,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
+          hasSelectedCategories: false,
         ),
         SplashDestination.login,
       );
@@ -106,6 +122,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
+          hasSelectedCategories: false,
         ),
         SplashDestination.login,
       );

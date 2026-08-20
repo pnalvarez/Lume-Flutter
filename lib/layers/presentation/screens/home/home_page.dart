@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/home/home_bloc.dart';
 import 'package:lume/layers/presentation/screens/home/home_event.dart';
 import 'package:lume/layers/presentation/screens/home/home_state.dart';
@@ -21,7 +20,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HomeBloc(signOut: getIt<ISignOut>()),
+      create: (_) => getIt<HomeBloc>(),
       child: const _HomeView(),
     );
   }

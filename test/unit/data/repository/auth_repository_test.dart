@@ -139,6 +139,21 @@ void main() {
       AppConfig.defaultPasswordRecoveryUrl,
     );
   });
+
+  test('signIn clears a stale password-recovery flag', () async {
+    session.isPasswordRecovery = true;
+    dataSource.nextSignIn = snapshot;
+    dataSource.currentSession = snapshot;
+
+    final domain = await sut.signIn(
+      email: 'ada@example.com',
+      password: 'secret1',
+    );
+
+    expect(session.isPasswordRecovery, isFalse);
+    expect(domain.isPasswordRecovery, isFalse);
+    expect(domain.user.id, 'user-1');
+  });
 }
 
 extension on AuthSessionSnapshot {

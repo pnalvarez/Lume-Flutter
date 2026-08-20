@@ -17,7 +17,7 @@ class _MarkSeen implements IMarkOnboardingSeen {
 void main() {
   blocTest<OnboardingBloc, OnboardingState>(
     'next on the last slide marks onboarding seen and goes to login',
-    build: () => OnboardingBloc(markOnboardingSeen: _MarkSeen()),
+    build: () => OnboardingBloc(_MarkSeen()),
     act: (bloc) async {
       bloc.add(const OnboardingNextPressed());
       bloc.add(const OnboardingNextPressed());
@@ -30,7 +30,7 @@ void main() {
 
   blocTest<OnboardingBloc, OnboardingState>(
     'skip marks onboarding seen and goes to login',
-    build: () => OnboardingBloc(markOnboardingSeen: _MarkSeen()),
+    build: () => OnboardingBloc(_MarkSeen()),
     act: (bloc) => bloc.add(const OnboardingSkipPressed()),
     expect: () => [const OnboardingState(goToLogin: true)],
   );

@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/mark_onboarding_seen.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_event.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_slides.dart';
@@ -26,9 +25,7 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OnboardingBloc(
-        markOnboardingSeen: _DeferredMarkOnboardingSeen(),
-      ),
+      create: (_) => getIt<OnboardingBloc>(),
       child: const _OnboardingView(),
     );
   }
@@ -423,13 +420,5 @@ class _OnboardingFooter extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-final class _DeferredMarkOnboardingSeen implements IMarkOnboardingSeen {
-  @override
-  Future<void> call() async {
-    final useCase = await getIt.getAsync<IMarkOnboardingSeen>();
-    return useCase();
   }
 }

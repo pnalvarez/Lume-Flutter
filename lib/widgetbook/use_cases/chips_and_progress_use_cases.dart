@@ -3,6 +3,7 @@ import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
 import 'package:lume_design_system/molecules/chips/chip_picker.dart';
 import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
+import 'package:lume_design_system/molecules/chips/selectable_chip_group.dart';
 import 'package:lume_design_system/molecules/chips/status_chip.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
@@ -78,6 +79,62 @@ Widget selectableChipStates(BuildContext context) {
       ),
     ),
   );
+}
+
+@widgetbook.UseCase(name: 'Multi-select with select all', type: SelectableChipGroup)
+Widget selectableChipGroupInteractive(BuildContext context) {
+  return const Scaffold(
+    body: Padding(
+      padding: EdgeInsets.all(24),
+      child: _SelectableChipGroupDemo(),
+    ),
+  );
+}
+
+class _SelectableChipGroupDemo extends StatefulWidget {
+  const _SelectableChipGroupDemo();
+
+  @override
+  State<_SelectableChipGroupDemo> createState() =>
+      _SelectableChipGroupDemoState();
+}
+
+class _SelectableChipGroupDemoState extends State<_SelectableChipGroupDemo> {
+  static const _options = [
+    SelectableChipOption(id: 1, label: 'História'),
+    SelectableChipOption(id: 2, label: 'Ciência'),
+    SelectableChipOption(id: 3, label: 'Cultura'),
+    SelectableChipOption(id: 4, label: 'Esporte'),
+  ];
+
+  var _selected = <int>{1, 3};
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableChipGroup<int>(
+      options: _options,
+      selectedIds: _selected,
+      onToggle: (id) {
+        setState(() {
+          if (_selected.contains(id)) {
+            _selected = {..._selected}..remove(id);
+          } else {
+            _selected = {..._selected, id};
+          }
+        });
+      },
+      selectAllLabel: 'Selecionar todas',
+      onSelectAllToggled: () {
+        setState(() {
+          if (_selected.length == _options.length) {
+            _selected = {};
+          } else {
+            _selected = {for (final option in _options) option.id};
+          }
+        });
+      },
+    );
+  }
 }
 
 @widgetbook.UseCase(name: 'Interactive', type: StepProgressBar)

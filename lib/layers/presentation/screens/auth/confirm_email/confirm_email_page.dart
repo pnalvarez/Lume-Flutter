@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_bloc.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_event.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_state.dart';
@@ -24,10 +24,8 @@ class ConfirmEmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ConfirmEmailBloc(
-        resendConfirmationEmail: getIt<IResendConfirmationEmail>(),
-        email: email,
-      ),
+      create: (_) => getIt<ConfirmEmailBloc>()
+        ..add(ConfirmEmailStarted(email: email)),
       child: _ConfirmEmailView(initialEmail: email),
     );
   }
@@ -62,12 +60,32 @@ class _ConfirmEmailViewState extends State<_ConfirmEmailView> {
     final cs = Theme.of(context).colorScheme;
 
     return BlocListener<ConfirmEmailBloc, ConfirmEmailState>(
-      listenWhen: (previous, current) => previous.notice != current.notice,
+      listenWhen: (previous, current) =>
+          previous.notice != current.notice ||
+          previous.destination != current.destination,
       listener: (context, state) {
         final notice = state.notice;
-        if (notice == null) return;
-        showAuthSnackBar(context, notice, isError: state.isError);
-        context.read<ConfirmEmailBloc>().add(const ConfirmEmailNoticeHandled());
+        if (notice != null) {
+          showAuthSnackBar(context, notice, isError: state.isError);
+          context.read<ConfirmEmailBloc>().add(
+            const ConfirmEmailNoticeHandled(),
+          );
+        }
+        final destination = state.destination;
+        if (destination == null) return;
+        context.read<ConfirmEmailBloc>().add(
+          const ConfirmEmailNavigationHandled(),
+        );
+        // Defer navigation so the bloc isn't disposed mid-emit.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          switch (destination) {
+            case ConfirmEmailDestination.home:
+              context.router.replaceAll([const HomeRoute()]);
+            case ConfirmEmailDestination.selectCategory:
+              context.router.replaceAll([const SelectCategoryRoute()]);
+          }
+        });
       },
       child: Scaffold(
         backgroundColor: cs.surface,

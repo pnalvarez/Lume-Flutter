@@ -21,6 +21,7 @@ final class StorageClient implements IStorageClient {
   final SharedPreferences _preferences;
 
   @factoryMethod
+  @preResolve
   static Future<StorageClient> create() async {
     final preferences = await SharedPreferences.getInstance();
     return StorageClient(preferences);

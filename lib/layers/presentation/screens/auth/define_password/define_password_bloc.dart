@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
@@ -7,16 +8,14 @@ import 'package:lume/layers/presentation/screens/auth/define_password/define_pas
 import 'package:lume/layers/presentation/screens/auth/define_password/define_password_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
+@injectable
 final class DefinePasswordBloc
     extends Bloc<DefinePasswordEvent, DefinePasswordState> {
-  DefinePasswordBloc({
-    required IRestoreSession restoreSession,
-    required IUpdatePassword updatePassword,
-    required IClearPasswordRecovery clearPasswordRecovery,
-  }) : _restoreSession = restoreSession,
-       _updatePassword = updatePassword,
-       _clearPasswordRecovery = clearPasswordRecovery,
-       super(const DefinePasswordState()) {
+  DefinePasswordBloc(
+    this._restoreSession,
+    this._updatePassword,
+    this._clearPasswordRecovery,
+  ) : super(const DefinePasswordState()) {
     on<DefinePasswordStarted>(_onStarted);
     on<DefinePasswordChanged>(_onPasswordChanged);
     on<DefinePasswordConfirmChanged>(_onConfirmChanged);

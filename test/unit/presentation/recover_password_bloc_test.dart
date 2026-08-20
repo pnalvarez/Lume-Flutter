@@ -17,7 +17,7 @@ class _Request implements IRequestPasswordRecovery {
 void main() {
   blocTest<RecoverPasswordBloc, RecoverPasswordState>(
     'submit sends the recovery email and marks sent',
-    build: () => RecoverPasswordBloc(requestPasswordRecovery: _Request()),
+    build: () => RecoverPasswordBloc(_Request()),
     act: (bloc) {
       bloc
         ..add(const RecoverPasswordEmailChanged('ada@example.com'))

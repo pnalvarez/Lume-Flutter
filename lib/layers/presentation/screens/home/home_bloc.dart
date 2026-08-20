@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/home/home_event.dart';
 import 'package:lume/layers/presentation/screens/home/home_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
+@injectable
 final class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc({required ISignOut signOut})
-      : _signOut = signOut,
-        super(const HomeState()) {
+  HomeBloc(this._signOut) : super(const HomeState()) {
     on<HomeSignOutPressed>(_onSignOutPressed);
     on<HomeNavigationHandled>(_onNavigationHandled);
   }

@@ -1,15 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lume/layers/domain/usecases/request_password_recovery.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_event.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
+@injectable
 final class RecoverPasswordBloc
     extends Bloc<RecoverPasswordEvent, RecoverPasswordState> {
-  RecoverPasswordBloc({
-    required IRequestPasswordRecovery requestPasswordRecovery,
-  }) : _requestPasswordRecovery = requestPasswordRecovery,
-       super(const RecoverPasswordState()) {
+  RecoverPasswordBloc(this._requestPasswordRecovery)
+    : super(const RecoverPasswordState()) {
     on<RecoverPasswordEmailChanged>(_onEmailChanged);
     on<RecoverPasswordSubmitted>(_onSubmitted);
     on<RecoverPasswordNoticeHandled>(_onNoticeHandled);

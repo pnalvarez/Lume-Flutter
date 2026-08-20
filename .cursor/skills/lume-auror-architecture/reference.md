@@ -8,10 +8,12 @@ None currently. Prefer fixing leaks over adding allowlist entries.
 
 ## Preferred new-code patterns
 
-- Register every use case with `@Injectable(as: IFoo)`; pages only `getIt<IFoo>()`.
+- Register every use case with `@Injectable(as: IFoo)`.
+- Screen blocs are `@injectable`; pages only `getIt<FooBloc>()` (no use-case wiring in the page).
 - Keep `GameType` (or equivalent) in **domain**; data maps to it (converter / wire value in data).
 - Mappers that touch `*Data` live under `layers/data/mappers/`.
 - Do not add `*_repository_impl.dart`; impl name matches the interface minus `I`.
+- Prefer `@preResolve` for async singletons (e.g. `SharedPreferences`) so page `getIt` stays sync.
 
 ## Button matrix (Lume)
 

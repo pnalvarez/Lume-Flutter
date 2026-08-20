@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
-import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
@@ -23,10 +21,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LoginBloc(
-        signInWithEmail: getIt<ISignInWithEmail>(),
-        signUpWithEmail: getIt<ISignUpWithEmail>(),
-      ),
+      create: (_) => getIt<LoginBloc>(),
       child: const _LoginView(),
     );
   }
@@ -48,13 +43,29 @@ class _LoginViewState extends State<_LoginView> {
     super.initState();
     _email = TextEditingController();
     _password = TextEditingController();
+    _email.addListener(_syncCredentialsFromControllers);
+    _password.addListener(_syncCredentialsFromControllers);
   }
 
   @override
   void dispose() {
+    _email.removeListener(_syncCredentialsFromControllers);
+    _password.removeListener(_syncCredentialsFromControllers);
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  void _syncCredentialsFromControllers() {
+    if (!mounted) return;
+    final bloc = context.read<LoginBloc>();
+    final state = bloc.state;
+    if (state.email != _email.text) {
+      bloc.add(LoginEmailChanged(_email.text));
+    }
+    if (state.password != _password.text) {
+      bloc.add(LoginPasswordChanged(_password.text));
+    }
   }
 
   @override
@@ -76,7 +87,9 @@ class _LoginViewState extends State<_LoginView> {
         context.read<LoginBloc>().add(const LoginNavigationHandled());
         switch (destination) {
           case LoginDestination.home:
-            context.router.replace(const HomeRoute());
+            context.router.replaceAll([const HomeRoute()]);
+          case LoginDestination.selectCategory:
+            context.router.replaceAll([const SelectCategoryRoute()]);
           case LoginDestination.confirmEmail:
             context.router.push(ConfirmEmailRoute(email: state.email.trim()));
           case LoginDestination.recoverPassword:
@@ -135,6 +148,7 @@ class _LoginViewState extends State<_LoginView> {
                   isEnabled: state.canSubmit,
                   isExpanded: true,
                   onPressed: () {
+                    _syncCredentialsFromControllers();
                     context.read<LoginBloc>().add(const LoginSubmitted());
                   },
                 ),

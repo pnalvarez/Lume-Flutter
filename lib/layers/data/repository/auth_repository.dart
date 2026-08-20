@@ -41,9 +41,12 @@ final class AuthRepository implements IAuthRepository {
   }) async {
     final snapshot = await _dataSource.signIn(email: email, password: password);
     await _session.restore();
+    // Password login must not keep a stale recovery gate from an earlier
+    // deep link; recovery links set the flag via [AuthChangeKind.passwordRecovery].
+    _session.clearPasswordRecovery();
     return AuthMapper.toDomainOrThrow(
       _session.session ?? snapshot,
-      isPasswordRecovery: _session.isPasswordRecovery,
+      isPasswordRecovery: false,
     );
   }
 

@@ -34,6 +34,8 @@ const String confirmEmailBodySuffix =
 const String confirmEmailResend = 'Reenviar email de confirmação';
 const String confirmEmailResending = 'Reenviando...';
 const String confirmEmailResentNotice = 'Email de confirmação reenviado.';
+const String confirmEmailSuccessNotice =
+    'Email confirmado! Entrando no Lume...';
 
 // --- Recover password -------------------------------------------------------
 
@@ -108,7 +110,16 @@ const String homeTitle = 'Home';
 const String homeAuthenticatedMessage = 'Você está autenticado.';
 const String homeSignOut = 'Sair';
 
-// --- Categories -------------------------------------------------------------
+// --- Select category --------------------------------------------------------
 
-const String categoriesTitle = 'Categorias';
-const String categoriesPlaceholder = 'Escolha de categorias';
+const String selectCategoryTitle = 'O que você quer aprender?';
+const String selectCategorySubtitle =
+    'Escolha os temas que mais te interessam. Você pode mudar depois.';
+const String selectCategorySelectAll = 'Selecionar tudo';
+const String selectCategoryCta = 'Começar agora';
+const String selectCategoryLoadError =
+    'Não foi possível carregar as categorias. Tente novamente.';
+const String selectCategoryRetry = 'Tentar novamente';
+const String selectCategorySaveError = 'Erro ao salvar preferências';
+const String selectCategorySessionExpired =
+    'Sessão expirada. Faça login novamente.';

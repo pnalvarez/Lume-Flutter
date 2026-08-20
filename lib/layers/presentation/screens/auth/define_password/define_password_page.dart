@@ -4,9 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
-import 'package:lume/layers/domain/usecases/restore_session.dart';
-import 'package:lume/layers/domain/usecases/update_password.dart';
 import 'package:lume/layers/presentation/screens/auth/define_password/define_password_bloc.dart';
 import 'package:lume/layers/presentation/screens/auth/define_password/define_password_event.dart';
 import 'package:lume/layers/presentation/screens/auth/define_password/define_password_state.dart';
@@ -26,11 +23,8 @@ class DefinePasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => DefinePasswordBloc(
-        restoreSession: getIt<IRestoreSession>(),
-        updatePassword: getIt<IUpdatePassword>(),
-        clearPasswordRecovery: getIt<IClearPasswordRecovery>(),
-      )..add(const DefinePasswordStarted()),
+      create: (_) =>
+          getIt<DefinePasswordBloc>()..add(const DefinePasswordStarted()),
       child: const _DefinePasswordView(),
     );
   }
@@ -78,9 +72,9 @@ class _DefinePasswordViewState extends State<_DefinePasswordView> {
         );
         switch (destination) {
           case DefinePasswordDestination.home:
-            context.router.replace(const HomeRoute());
+            context.router.replaceAll([const HomeRoute()]);
           case DefinePasswordDestination.recoverPassword:
-            context.router.replace(const RecoverPasswordRoute());
+            context.router.replaceAll([const RecoverPasswordRoute()]);
         }
       },
       child: AuthScaffold(

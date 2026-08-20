@@ -1,19 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/errors/auth_failure.dart';
+import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
+@injectable
 final class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc({
-    required ISignInWithEmail signInWithEmail,
-    required ISignUpWithEmail signUpWithEmail,
-  }) : _signInWithEmail = signInWithEmail,
-       _signUpWithEmail = signUpWithEmail,
-       super(const LoginState()) {
+  LoginBloc(
+    this._signInWithEmail,
+    this._signUpWithEmail,
+    this._hasSelectedCategories,
+  ) : super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginModeToggled>(_onModeToggled);
@@ -25,6 +27,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   final ISignInWithEmail _signInWithEmail;
   final ISignUpWithEmail _signUpWithEmail;
+  final IHasSelectedCategories _hasSelectedCategories;
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
     emit(state.copyWith(email: event.email, clearError: true));
@@ -74,7 +77,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(
           state.copyWith(
             isSubmitting: false,
-            destination: LoginDestination.home,
+            destination: LoginDestination.selectCategory,
           ),
         );
         return;
@@ -84,9 +87,8 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         email: state.email.trim(),
         password: state.password,
       );
-      emit(
-        state.copyWith(isSubmitting: false, destination: LoginDestination.home),
-      );
+      final destination = await _destinationAfterSignIn();
+      emit(state.copyWith(isSubmitting: false, destination: destination));
     } on AuthEmailNotConfirmedFailure {
       emit(
         state.copyWith(
@@ -102,6 +104,18 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
           errorMessage: authFailureMessage(error),
         ),
       );
+    }
+  }
+
+  /// Web: no prefs → categories; prefs present or prefs check fails → home.
+  Future<LoginDestination> _destinationAfterSignIn() async {
+    try {
+      final hasSelected = await _hasSelectedCategories(forceRefresh: true);
+      return hasSelected
+          ? LoginDestination.home
+          : LoginDestination.selectCategory;
+    } on Object {
+      return LoginDestination.home;
     }
   }
 

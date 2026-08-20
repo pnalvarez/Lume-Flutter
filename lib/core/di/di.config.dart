@@ -68,19 +68,35 @@ import 'package:lume/layers/domain/usecases/sign_in_with_email.dart' as _i566;
 import 'package:lume/layers/domain/usecases/sign_out.dart' as _i96;
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart' as _i627;
 import 'package:lume/layers/domain/usecases/update_password.dart' as _i326;
+import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_bloc.dart'
+    as _i1007;
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_bloc.dart'
+    as _i145;
+import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart'
+    as _i1057;
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_bloc.dart'
+    as _i193;
+import 'package:lume/layers/presentation/screens/home/home_bloc.dart' as _i774;
+import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart'
+    as _i928;
+import 'package:lume/layers/presentation/screens/select_category/select_category_bloc.dart'
+    as _i572;
+import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart'
+    as _i185;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appNavigationModule = _$AppNavigationModule();
     final coreAuthModule = _$CoreAuthModule();
     gh.lazySingleton<_i754.AppConfig>(() => _i754.AppConfig.fromEnvironment());
-    gh.lazySingletonAsync<_i433.IStorageClient>(
+    await gh.lazySingletonAsync<_i433.IStorageClient>(
       () => _i433.StorageClient.create(),
+      preResolve: true,
     );
     gh.lazySingleton<_i427.IAuthService>(() => _i427.AuthService());
     gh.factory<_i434.IAuthDataSource>(
@@ -109,9 +125,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i665.IObserveAuthState>(
       () => _i665.ObserveAuthState(gh<_i451.IAuthRepository>()),
     );
-    gh.factoryAsync<_i588.IOnboardingRepository>(
-      () async =>
-          _i842.OnboardingRepository(await getAsync<_i433.IStorageClient>()),
+    gh.factory<_i588.IOnboardingRepository>(
+      () => _i842.OnboardingRepository(gh<_i433.IStorageClient>()),
     );
     gh.lazySingleton<_i101.IApiClient>(
       () => _i101.ApiClient.fromInjection(
@@ -119,14 +134,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i325.IAuthTokenProvider>(),
       ),
     );
-    gh.factoryAsync<_i547.IGameDataSource>(
-      () async => _i547.GameDataSource(
+    gh.factory<_i547.IGameDataSource>(
+      () => _i547.GameDataSource(
         gh<_i101.IApiClient>(),
-        await getAsync<_i433.IStorageClient>(),
+        gh<_i433.IStorageClient>(),
       ),
     );
-    gh.factoryAsync<_i131.IGameRepository>(
-      () async => _i448.GameRepository(await getAsync<_i547.IGameDataSource>()),
+    gh.factory<_i131.IGameRepository>(
+      () => _i448.GameRepository(gh<_i547.IGameDataSource>()),
     );
     gh.factory<_i329.IClearPasswordRecovery>(
       () => _i329.ClearPasswordRecovery(gh<_i451.IAuthRepository>()),
@@ -137,93 +152,124 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i683.IResendConfirmationEmail>(
       () => _i683.ResendConfirmationEmail(gh<_i451.IAuthRepository>()),
     );
-    gh.factoryAsync<_i167.IMarkOnboardingSeen>(
-      () async => _i167.MarkOnboardingSeen(
-        await getAsync<_i588.IOnboardingRepository>(),
-      ),
+    gh.factory<_i167.IMarkOnboardingSeen>(
+      () => _i167.MarkOnboardingSeen(gh<_i588.IOnboardingRepository>()),
     );
     gh.factory<_i326.IUpdatePassword>(
       () => _i326.UpdatePassword(gh<_i451.IAuthRepository>()),
     );
-    gh.factoryAsync<_i281.IHasSeenOnboarding>(
-      () async => _i281.HasSeenOnboarding(
-        await getAsync<_i588.IOnboardingRepository>(),
-      ),
+    gh.factory<_i281.IHasSeenOnboarding>(
+      () => _i281.HasSeenOnboarding(gh<_i588.IOnboardingRepository>()),
     );
     gh.factory<_i96.ISignOut>(() => _i96.SignOut(gh<_i451.IAuthRepository>()));
     gh.factory<_i102.IRequestPasswordRecovery>(
       () => _i102.RequestPasswordRecovery(gh<_i451.IAuthRepository>()),
     );
+    gh.factory<_i193.RecoverPasswordBloc>(
+      () => _i193.RecoverPasswordBloc(gh<_i102.IRequestPasswordRecovery>()),
+    );
     gh.factory<_i566.ISignInWithEmail>(
       () => _i566.SignInWithEmail(gh<_i451.IAuthRepository>()),
     );
-    gh.factoryAsync<_i874.ICategoryPreferenceDataSource>(
-      () async => _i874.CategoryPreferenceDataSource(
+    gh.factory<_i874.ICategoryPreferenceDataSource>(
+      () => _i874.CategoryPreferenceDataSource(
         gh<_i101.IApiClient>(),
-        await getAsync<_i433.IStorageClient>(),
+        gh<_i433.IStorageClient>(),
       ),
     );
-    gh.factoryAsync<_i527.IProfileDataSource>(
-      () async => _i527.ProfileDataSource(
+    gh.factory<_i145.DefinePasswordBloc>(
+      () => _i145.DefinePasswordBloc(
+        gh<_i341.IRestoreSession>(),
+        gh<_i326.IUpdatePassword>(),
+        gh<_i329.IClearPasswordRecovery>(),
+      ),
+    );
+    gh.factory<_i527.IProfileDataSource>(
+      () => _i527.ProfileDataSource(
         gh<_i101.IApiClient>(),
-        await getAsync<_i433.IStorageClient>(),
+        gh<_i433.IStorageClient>(),
       ),
     );
-    gh.factoryAsync<_i777.ICategoryPreferenceRepository>(
-      () async => _i680.CategoryPreferenceRepository(
-        await getAsync<_i874.ICategoryPreferenceDataSource>(),
+    gh.factory<_i777.ICategoryPreferenceRepository>(
+      () => _i680.CategoryPreferenceRepository(
+        gh<_i874.ICategoryPreferenceDataSource>(),
       ),
     );
-    gh.factoryAsync<_i739.ITrailDataSource>(
-      () async => _i739.TrailDataSource(
+    gh.factory<_i739.ITrailDataSource>(
+      () => _i739.TrailDataSource(
         gh<_i101.IApiClient>(),
-        await getAsync<_i433.IStorageClient>(),
+        gh<_i433.IStorageClient>(),
       ),
     );
-    gh.factoryAsync<_i155.IProfileRepository>(
-      () async =>
-          _i1072.ProfileRepository(await getAsync<_i527.IProfileDataSource>()),
+    gh.factory<_i155.IProfileRepository>(
+      () => _i1072.ProfileRepository(gh<_i527.IProfileDataSource>()),
     );
-    gh.factoryAsync<_i97.IGetSubmoduleGames>(
-      () async =>
-          _i97.GetSubmoduleGames(await getAsync<_i131.IGameRepository>()),
+    gh.factory<_i774.HomeBloc>(() => _i774.HomeBloc(gh<_i96.ISignOut>()));
+    gh.factory<_i97.IGetSubmoduleGames>(
+      () => _i97.GetSubmoduleGames(gh<_i131.IGameRepository>()),
     );
-    gh.factoryAsync<_i587.ISaveCategoryPreferences>(
-      () async => _i587.SaveCategoryPreferences(
-        await getAsync<_i777.ICategoryPreferenceRepository>(),
+    gh.factory<_i587.ISaveCategoryPreferences>(
+      () => _i587.SaveCategoryPreferences(
+        gh<_i777.ICategoryPreferenceRepository>(),
       ),
     );
-    gh.factoryAsync<_i976.IGetCategoriesWithPreferences>(
-      () async => _i976.GetCategoriesWithPreferences(
-        await getAsync<_i777.ICategoryPreferenceRepository>(),
+    gh.factory<_i976.IGetCategoriesWithPreferences>(
+      () => _i976.GetCategoriesWithPreferences(
+        gh<_i777.ICategoryPreferenceRepository>(),
       ),
     );
-    gh.factoryAsync<_i188.IGetProfile>(
-      () async => _i188.GetProfile(await getAsync<_i155.IProfileRepository>()),
+    gh.factory<_i928.OnboardingBloc>(
+      () => _i928.OnboardingBloc(gh<_i167.IMarkOnboardingSeen>()),
     );
-    gh.factoryAsync<_i314.ITrailRepository>(
-      () async =>
-          _i406.TrailRepository(await getAsync<_i739.ITrailDataSource>()),
+    gh.factory<_i188.IGetProfile>(
+      () => _i188.GetProfile(gh<_i155.IProfileRepository>()),
     );
-    gh.factoryAsync<_i37.IGetTrailBootstrap>(
-      () async =>
-          _i37.GetTrailBootstrap(await getAsync<_i314.ITrailRepository>()),
+    gh.factory<_i314.ITrailRepository>(
+      () => _i406.TrailRepository(gh<_i739.ITrailDataSource>()),
     );
-    gh.factoryAsync<_i254.IHasSelectedCategories>(
-      () async => _i254.HasSelectedCategories(
-        await getAsync<_i976.IGetCategoriesWithPreferences>(),
+    gh.factory<_i37.IGetTrailBootstrap>(
+      () => _i37.GetTrailBootstrap(gh<_i314.ITrailRepository>()),
+    );
+    gh.factory<_i572.SelectCategoryBloc>(
+      () => _i572.SelectCategoryBloc(
+        gh<_i976.IGetCategoriesWithPreferences>(),
+        gh<_i587.ISaveCategoryPreferences>(),
       ),
     );
-    gh.factoryAsync<_i729.IGetGameTrails>(
-      () async => _i729.GetGameTrails(await getAsync<_i314.ITrailRepository>()),
+    gh.factory<_i254.IHasSelectedCategories>(
+      () => _i254.HasSelectedCategories(
+        gh<_i976.IGetCategoriesWithPreferences>(),
+      ),
     );
-    gh.factoryAsync<_i718.ISavePairProgress>(
-      () async =>
-          _i718.SavePairProgress(await getAsync<_i314.ITrailRepository>()),
+    gh.factory<_i1007.ConfirmEmailBloc>(
+      () => _i1007.ConfirmEmailBloc(
+        gh<_i683.IResendConfirmationEmail>(),
+        gh<_i665.IObserveAuthState>(),
+        gh<_i254.IHasSelectedCategories>(),
+      ),
     );
-    gh.factoryAsync<_i1046.IGetTrailProgress>(
-      () async =>
-          _i1046.GetTrailProgress(await getAsync<_i314.ITrailRepository>()),
+    gh.factory<_i729.IGetGameTrails>(
+      () => _i729.GetGameTrails(gh<_i314.ITrailRepository>()),
+    );
+    gh.factory<_i718.ISavePairProgress>(
+      () => _i718.SavePairProgress(gh<_i314.ITrailRepository>()),
+    );
+    gh.factory<_i1046.IGetTrailProgress>(
+      () => _i1046.GetTrailProgress(gh<_i314.ITrailRepository>()),
+    );
+    gh.factory<_i185.SplashBloc>(
+      () => _i185.SplashBloc(
+        gh<_i341.IRestoreSession>(),
+        gh<_i281.IHasSeenOnboarding>(),
+        gh<_i254.IHasSelectedCategories>(),
+      ),
+    );
+    gh.factory<_i1057.LoginBloc>(
+      () => _i1057.LoginBloc(
+        gh<_i566.ISignInWithEmail>(),
+        gh<_i627.ISignUpWithEmail>(),
+        gh<_i254.IHasSelectedCategories>(),
+      ),
     );
     return this;
   }

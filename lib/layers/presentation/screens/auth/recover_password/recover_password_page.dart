@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/request_password_recovery.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_bloc.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_event.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
@@ -22,9 +21,7 @@ class RecoverPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => RecoverPasswordBloc(
-        requestPasswordRecovery: getIt<IRequestPasswordRecovery>(),
-      ),
+      create: (_) => getIt<RecoverPasswordBloc>(),
       child: const _RecoverPasswordView(),
     );
   }

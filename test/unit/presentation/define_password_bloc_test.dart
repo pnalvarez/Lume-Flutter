@@ -45,9 +45,9 @@ void main() {
   blocTest<DefinePasswordBloc, DefinePasswordState>(
     'starts ready when a recovery session exists',
     build: () => DefinePasswordBloc(
-      restoreSession: _Restore(session),
-      updatePassword: _Update(),
-      clearPasswordRecovery: _Clear(),
+      _Restore(session),
+      _Update(),
+      _Clear(),
     ),
     act: (bloc) => bloc.add(const DefinePasswordStarted()),
     expect: () => [
@@ -62,9 +62,9 @@ void main() {
   blocTest<DefinePasswordBloc, DefinePasswordState>(
     'starts invalid when there is no session',
     build: () => DefinePasswordBloc(
-      restoreSession: _Restore(null),
-      updatePassword: _Update(),
-      clearPasswordRecovery: _Clear(),
+      _Restore(null),
+      _Update(),
+      _Clear(),
     ),
     act: (bloc) => bloc.add(const DefinePasswordStarted()),
     expect: () => [
@@ -79,9 +79,9 @@ void main() {
   blocTest<DefinePasswordBloc, DefinePasswordState>(
     'submit updates the password and goes home',
     build: () => DefinePasswordBloc(
-      restoreSession: _Restore(session),
-      updatePassword: _Update(),
-      clearPasswordRecovery: _Clear(),
+      _Restore(session),
+      _Update(),
+      _Clear(),
     ),
     seed: () => const DefinePasswordState(
       status: DefinePasswordStatus.ready,

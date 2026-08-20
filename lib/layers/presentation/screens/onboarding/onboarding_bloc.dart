@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:lume/layers/domain/usecases/mark_onboarding_seen.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_event.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_slides.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_state.dart';
 
+@injectable
 final class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
-  OnboardingBloc({required IMarkOnboardingSeen markOnboardingSeen})
-      : _markOnboardingSeen = markOnboardingSeen,
-        super(const OnboardingState()) {
+  OnboardingBloc(this._markOnboardingSeen) : super(const OnboardingState()) {
     on<OnboardingPageChanged>(_onPageChanged);
     on<OnboardingNextPressed>(_onNextPressed);
     on<OnboardingBackPressed>(_onBackPressed);

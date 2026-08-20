@@ -12,39 +12,23 @@
 import 'package:auto_route/auto_route.dart' as _i9;
 import 'package:flutter/material.dart' as _i10;
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_page.dart'
-    as _i2;
-import 'package:lume/layers/presentation/screens/auth/define_password/define_password_page.dart'
-    as _i3;
-import 'package:lume/layers/presentation/screens/auth/login/login_page.dart'
-    as _i5;
-import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_page.dart'
-    as _i7;
-import 'package:lume/layers/presentation/screens/category_preferences/category_preferences_page.dart'
     as _i1;
-import 'package:lume/layers/presentation/screens/home/home_page.dart' as _i4;
-import 'package:lume/layers/presentation/screens/onboarding/onboarding_page.dart'
+import 'package:lume/layers/presentation/screens/auth/define_password/define_password_page.dart'
+    as _i2;
+import 'package:lume/layers/presentation/screens/auth/login/login_page.dart'
+    as _i4;
+import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_page.dart'
     as _i6;
+import 'package:lume/layers/presentation/screens/home/home_page.dart' as _i3;
+import 'package:lume/layers/presentation/screens/onboarding/onboarding_page.dart'
+    as _i5;
+import 'package:lume/layers/presentation/screens/select_category/select_category_page.dart'
+    as _i7;
 import 'package:lume/layers/presentation/screens/splash/splash_page.dart'
     as _i8;
 
 /// generated route for
-/// [_i1.CategoryPreferencesPage]
-class CategoryPreferencesRoute extends _i9.PageRouteInfo<void> {
-  const CategoryPreferencesRoute({List<_i9.PageRouteInfo>? children})
-    : super(CategoryPreferencesRoute.name, initialChildren: children);
-
-  static const String name = 'CategoryPreferencesRoute';
-
-  static _i9.PageInfo page = _i9.PageInfo(
-    name,
-    builder: (data) {
-      return const _i1.CategoryPreferencesPage();
-    },
-  );
-}
-
-/// generated route for
-/// [_i2.ConfirmEmailPage]
+/// [_i1.ConfirmEmailPage]
 class ConfirmEmailRoute extends _i9.PageRouteInfo<ConfirmEmailRouteArgs> {
   ConfirmEmailRoute({
     _i10.Key? key,
@@ -64,7 +48,7 @@ class ConfirmEmailRoute extends _i9.PageRouteInfo<ConfirmEmailRouteArgs> {
       final args = data.argsAs<ConfirmEmailRouteArgs>(
         orElse: () => const ConfirmEmailRouteArgs(),
       );
-      return _i2.ConfirmEmailPage(key: args.key, email: args.email);
+      return _i1.ConfirmEmailPage(key: args.key, email: args.email);
     },
   );
 }
@@ -93,7 +77,7 @@ class ConfirmEmailRouteArgs {
 }
 
 /// generated route for
-/// [_i3.DefinePasswordPage]
+/// [_i2.DefinePasswordPage]
 class DefinePasswordRoute extends _i9.PageRouteInfo<void> {
   const DefinePasswordRoute({List<_i9.PageRouteInfo>? children})
     : super(DefinePasswordRoute.name, initialChildren: children);
@@ -103,13 +87,13 @@ class DefinePasswordRoute extends _i9.PageRouteInfo<void> {
   static _i9.PageInfo page = _i9.PageInfo(
     name,
     builder: (data) {
-      return const _i3.DefinePasswordPage();
+      return const _i2.DefinePasswordPage();
     },
   );
 }
 
 /// generated route for
-/// [_i4.HomePage]
+/// [_i3.HomePage]
 class HomeRoute extends _i9.PageRouteInfo<void> {
   const HomeRoute({List<_i9.PageRouteInfo>? children})
     : super(HomeRoute.name, initialChildren: children);
@@ -119,13 +103,13 @@ class HomeRoute extends _i9.PageRouteInfo<void> {
   static _i9.PageInfo page = _i9.PageInfo(
     name,
     builder: (data) {
-      return const _i4.HomePage();
+      return const _i3.HomePage();
     },
   );
 }
 
 /// generated route for
-/// [_i5.LoginPage]
+/// [_i4.LoginPage]
 class LoginRoute extends _i9.PageRouteInfo<void> {
   const LoginRoute({List<_i9.PageRouteInfo>? children})
     : super(LoginRoute.name, initialChildren: children);
@@ -135,13 +119,13 @@ class LoginRoute extends _i9.PageRouteInfo<void> {
   static _i9.PageInfo page = _i9.PageInfo(
     name,
     builder: (data) {
-      return const _i5.LoginPage();
+      return const _i4.LoginPage();
     },
   );
 }
 
 /// generated route for
-/// [_i6.OnboardingPage]
+/// [_i5.OnboardingPage]
 class OnboardingRoute extends _i9.PageRouteInfo<void> {
   const OnboardingRoute({List<_i9.PageRouteInfo>? children})
     : super(OnboardingRoute.name, initialChildren: children);
@@ -151,13 +135,13 @@ class OnboardingRoute extends _i9.PageRouteInfo<void> {
   static _i9.PageInfo page = _i9.PageInfo(
     name,
     builder: (data) {
-      return const _i6.OnboardingPage();
+      return const _i5.OnboardingPage();
     },
   );
 }
 
 /// generated route for
-/// [_i7.RecoverPasswordPage]
+/// [_i6.RecoverPasswordPage]
 class RecoverPasswordRoute extends _i9.PageRouteInfo<void> {
   const RecoverPasswordRoute({List<_i9.PageRouteInfo>? children})
     : super(RecoverPasswordRoute.name, initialChildren: children);
@@ -167,7 +151,23 @@ class RecoverPasswordRoute extends _i9.PageRouteInfo<void> {
   static _i9.PageInfo page = _i9.PageInfo(
     name,
     builder: (data) {
-      return const _i7.RecoverPasswordPage();
+      return const _i6.RecoverPasswordPage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i7.SelectCategoryPage]
+class SelectCategoryRoute extends _i9.PageRouteInfo<void> {
+  const SelectCategoryRoute({List<_i9.PageRouteInfo>? children})
+    : super(SelectCategoryRoute.name, initialChildren: children);
+
+  static const String name = 'SelectCategoryRoute';
+
+  static _i9.PageInfo page = _i9.PageInfo(
+    name,
+    builder: (data) {
+      return const _i7.SelectCategoryPage();
     },
   );
 }

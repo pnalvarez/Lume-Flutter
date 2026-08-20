@@ -4,6 +4,7 @@ import 'package:lume/core/errors/auth_failure.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/models/auth/auth_sign_up_result.dart';
 import 'package:lume/layers/domain/models/auth/auth_user.dart';
+import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
@@ -41,14 +42,35 @@ class _SignUp implements ISignUpWithEmail {
   }) async => result;
 }
 
-LoginBloc _bloc(_SignIn signIn, _SignUp signUp) {
-  return LoginBloc(signInWithEmail: signIn, signUpWithEmail: signUp);
+class _HasSelected implements IHasSelectedCategories {
+  _HasSelected(this.value, {this.error});
+
+  final bool value;
+  final Object? error;
+
+  @override
+  Future<bool> call({bool forceRefresh = false}) async {
+    if (error != null) throw error!;
+    return value;
+  }
+}
+
+LoginBloc _bloc(
+  _SignIn signIn,
+  _SignUp signUp, {
+  IHasSelectedCategories? hasSelected,
+}) {
+  return LoginBloc(
+    signIn,
+    signUp,
+    hasSelected ?? _HasSelected(true),
+  );
 }
 
 void main() {
   blocTest<LoginBloc, LoginState>(
-    'successful sign-in goes home',
-    build: () => _bloc(_SignIn(), _SignUp()),
+    'successful sign-in with categories goes home',
+    build: () => _bloc(_SignIn(), _SignUp(), hasSelected: _HasSelected(true)),
     act: (bloc) {
       bloc
         ..add(const LoginEmailChanged('a@b.c'))
@@ -62,6 +84,26 @@ void main() {
         (s) => s.destination,
         'destination',
         LoginDestination.home,
+      ),
+    ],
+  );
+
+  blocTest<LoginBloc, LoginState>(
+    'successful sign-in without categories goes to select category',
+    build: () => _bloc(_SignIn(), _SignUp(), hasSelected: _HasSelected(false)),
+    act: (bloc) {
+      bloc
+        ..add(const LoginEmailChanged('a@b.c'))
+        ..add(const LoginPasswordChanged('secret1'))
+        ..add(const LoginSubmitted());
+    },
+    skip: 2,
+    expect: () => [
+      isA<LoginState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<LoginState>().having(
+        (s) => s.destination,
+        'destination',
+        LoginDestination.selectCategory,
       ),
     ],
   );
@@ -106,6 +148,34 @@ void main() {
         (s) => s.destination,
         'destination',
         LoginDestination.confirmEmail,
+      ),
+    ],
+  );
+
+  blocTest<LoginBloc, LoginState>(
+    'confirmed sign-up goes to select category',
+    build: () => _bloc(
+      _SignIn(),
+      _SignUp()
+        ..result = const AuthSignUpResult(
+          email: 'a@b.c',
+          needsEmailConfirmation: false,
+        ),
+    ),
+    act: (bloc) {
+      bloc
+        ..add(const LoginModeToggled())
+        ..add(const LoginEmailChanged('a@b.c'))
+        ..add(const LoginPasswordChanged('secret1'))
+        ..add(const LoginSubmitted());
+    },
+    skip: 3,
+    expect: () => [
+      isA<LoginState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<LoginState>().having(
+        (s) => s.destination,
+        'destination',
+        LoginDestination.selectCategory,
       ),
     ],
   );

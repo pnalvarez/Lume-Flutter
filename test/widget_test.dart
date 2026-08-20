@@ -10,7 +10,9 @@ import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
+import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
+import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_page.dart';
 import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/lume_logo.dart';
@@ -28,13 +30,26 @@ class _PendingHasSeenOnboarding implements IHasSeenOnboarding {
   Future<bool> call() => Completer<bool>().future;
 }
 
+class _PendingHasSelectedCategories implements IHasSelectedCategories {
+  @override
+  Future<bool> call({bool forceRefresh = false}) => Completer<bool>().future;
+}
+
 void main() {
   setUp(() async {
     await getIt.reset();
     getIt
       ..registerFactory<IRestoreSession>(_PendingRestoreSession.new)
-      ..registerFactoryAsync<IHasSeenOnboarding>(
-        () async => _PendingHasSeenOnboarding(),
+      ..registerFactory<IHasSeenOnboarding>(_PendingHasSeenOnboarding.new)
+      ..registerFactory<IHasSelectedCategories>(
+        _PendingHasSelectedCategories.new,
+      )
+      ..registerFactory<SplashBloc>(
+        () => SplashBloc(
+          getIt<IRestoreSession>(),
+          getIt<IHasSeenOnboarding>(),
+          getIt<IHasSelectedCategories>(),
+        ),
       );
   });
 

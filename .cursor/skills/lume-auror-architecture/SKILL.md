@@ -63,7 +63,8 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - Mapper in **data**: `FooMapper.toDomain`
 - Screen: `@RoutePage()` `FooPage` → `BlocProvider` → private `_*View`
 - Bloc: `{feature}_bloc.dart` + `_event.dart` + `_state.dart` (hand-written `@immutable`, not Freezed)
-- Blocs are **not** injectable; construct in the page with `getIt<IUseCase>()`
+- Blocs are `@injectable`; pages only `getIt<FooBloc>()` (pass route args via start events, not `@factoryParam`)
+- Do not wire use cases in the page; inject them into the bloc via DI
 - `getIt` only in `*_page.dart` (and `bootstrap` / `di`)
 - Blocs must not import `auto_route`; navigation via state flags + `BlocListener`
 

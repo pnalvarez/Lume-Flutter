@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/app/navigation/auth_gate.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
-import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_event.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_state.dart';
@@ -19,10 +17,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SplashBloc(
-        restoreSession: getIt<IRestoreSession>(),
-        hasSeenOnboarding: _DeferredHasSeenOnboarding(),
-      )..add(const SplashStarted()),
+      create: (_) => getIt<SplashBloc>()..add(const SplashStarted()),
       child: const _SplashView(),
     );
   }
@@ -37,7 +32,7 @@ class _SplashView extends StatelessWidget {
       listenWhen: (previous, current) => current is SplashReady,
       listener: (context, state) {
         final destination = (state as SplashReady).destination;
-        context.router.replace(_routeFor(destination));
+        context.router.replaceAll([_routeFor(destination)]);
       },
       child: const Scaffold(
         backgroundColor: Colors.white,
@@ -54,13 +49,6 @@ PageRouteInfo<void> _routeFor(SplashDestination destination) {
     SplashDestination.onboarding => const OnboardingRoute(),
     SplashDestination.login => const LoginRoute(),
     SplashDestination.home => const HomeRoute(),
+    SplashDestination.selectCategory => const SelectCategoryRoute(),
   };
-}
-
-final class _DeferredHasSeenOnboarding implements IHasSeenOnboarding {
-  @override
-  Future<bool> call() async {
-    final useCase = await getIt.getAsync<IHasSeenOnboarding>();
-    return useCase();
-  }
 }

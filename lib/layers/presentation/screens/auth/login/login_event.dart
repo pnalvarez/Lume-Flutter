@@ -2,7 +2,13 @@ import 'package:flutter/foundation.dart';
 
 enum LoginMode { login, signup }
 
-enum LoginDestination { home, confirmEmail, recoverPassword, onboarding }
+enum LoginDestination {
+  home,
+  selectCategory,
+  confirmEmail,
+  recoverPassword,
+  onboarding,
+}
 
 @immutable
 sealed class LoginEvent {

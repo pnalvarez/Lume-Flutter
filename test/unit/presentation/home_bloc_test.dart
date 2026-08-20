@@ -17,7 +17,7 @@ class _SignOut implements ISignOut {
 void main() {
   blocTest<HomeBloc, HomeState>(
     'sign out goes to login',
-    build: () => HomeBloc(signOut: _SignOut()),
+    build: () => HomeBloc(_SignOut()),
     act: (bloc) => bloc.add(const HomeSignOutPressed()),
     expect: () => [
       const HomeState(isSigningOut: true),

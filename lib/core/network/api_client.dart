@@ -36,7 +36,7 @@ abstract interface class IApiClient {
     Map<String, String> headers = const {},
   });
 
-  /// POST `{baseUrl}/rpc/{name}` with JSON [params].
+  /// POST `{baseUrl}rpc/{name}` with JSON [params].
   ///
   /// The authenticated user comes from the JWT interceptor, not from [params].
   Future<T> rpc<T>(
@@ -63,6 +63,11 @@ final class ApiClient implements IApiClient {
       );
 
   /// Production wiring: timeouts, JSON headers, and optional interceptors.
+  ///
+  /// [baseUrl] may be the Supabase project origin (`https://xxx.supabase.co`)
+  /// or an explicit PostgREST root (`…/rest/v1/`). Dio concatenates
+  /// `baseUrl + path` as strings, so the origin alone would turn `rpc/…` into
+  /// `….supabase.corpc/…`.
   factory ApiClient.create({
     required String baseUrl,
     String? apiKey,
@@ -73,7 +78,7 @@ final class ApiClient implements IApiClient {
   }) {
     final dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl,
+        baseUrl: normalizeRestBaseUrl(baseUrl),
         connectTimeout: connectTimeout,
         receiveTimeout: receiveTimeout,
         headers: const {
@@ -94,6 +99,19 @@ final class ApiClient implements IApiClient {
     }
 
     return ApiClient(dio: dio);
+  }
+
+  /// Ensures a trailing `/rest/v1/` so relative `rpc/{name}` paths resolve.
+  @visibleForTesting
+  static String normalizeRestBaseUrl(String baseUrl) {
+    var normalized = baseUrl.trim();
+    while (normalized.endsWith('/')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    if (normalized.endsWith('/rest/v1')) {
+      return '$normalized/';
+    }
+    return '$normalized/rest/v1/';
   }
 
   final Dio _dio;
