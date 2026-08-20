@@ -42,6 +42,8 @@ import 'package:lume/layers/domain/repository/onboarding_repository.dart'
     as _i588;
 import 'package:lume/layers/domain/repository/profile_repository.dart' as _i155;
 import 'package:lume/layers/domain/repository/trail_repository.dart' as _i314;
+import 'package:lume/layers/domain/usecases/clear_password_recovery.dart'
+    as _i329;
 import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart'
     as _i976;
 import 'package:lume/layers/domain/usecases/get_game_trails.dart' as _i729;
@@ -125,6 +127,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factoryAsync<_i131.IGameRepository>(
       () async => _i448.GameRepository(await getAsync<_i547.IGameDataSource>()),
+    );
+    gh.factory<_i329.IClearPasswordRecovery>(
+      () => _i329.ClearPasswordRecovery(gh<_i451.IAuthRepository>()),
     );
     gh.factory<_i341.IRestoreSession>(
       () => _i341.RestoreSession(gh<_i451.IAuthRepository>()),

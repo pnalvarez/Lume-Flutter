@@ -51,7 +51,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 
 - Presentation → `layers/data`, `package:dio`, `package:supabase_flutter`
 - Data → `package:flutter`, Dio/Supabase directly, `presentation`
-- Domain → `layers/data` (Lume has three legacy leaks; do not add more — see script allowlist)
+- Domain → `layers/data` (no allowlisted leaks; keep it that way)
 - Supabase outside `lib/core/auth/auth_service.dart` and `lib/bootstrap.dart` (Lume)
 - Dio outside `lib/core/network/**` (Lume)
 

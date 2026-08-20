@@ -74,13 +74,12 @@ class _HomeView extends StatelessWidget {
                       type: LumeButtonType.outlined,
                       isExpanded: true,
                       isLoading: state.isSigningOut,
-                      onPressed: state.isSigningOut
-                          ? null
-                          : () {
-                              context.read<HomeBloc>().add(
-                                const HomeSignOutPressed(),
-                              );
-                            },
+                      isEnabled: !state.isSigningOut,
+                      onPressed: () {
+                        context.read<HomeBloc>().add(
+                          const HomeSignOutPressed(),
+                        );
+                      },
                     ),
                   ],
                 );

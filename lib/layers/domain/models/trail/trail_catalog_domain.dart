@@ -1,6 +1,6 @@
-import 'package:lume/layers/data/models/game_type.dart';
 import 'package:lume/layers/domain/models/category/category_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
+import 'package:lume/layers/domain/models/trail_game/game_type.dart';
 
 /// Full trail catalog snapshot with embedded progress.
 class TrailBootstrapDomain {

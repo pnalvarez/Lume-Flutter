@@ -1,6 +1,6 @@
 import 'package:lume/layers/data/models/trail_catalog_data.dart';
 import 'package:lume/layers/data/models/trail_progress_data.dart';
-import 'package:lume/layers/domain/mappers/trail_game_mapper.dart';
+import 'package:lume/layers/data/mappers/trail_game_mapper.dart';
 import 'package:lume/layers/domain/models/game/game_trail_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';

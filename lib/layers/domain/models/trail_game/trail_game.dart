@@ -1,5 +1,5 @@
 import 'package:lume/layers/domain/models/trail_game/trail_game_values.dart';
-import 'package:lume/layers/data/models/game_type.dart';
+import 'package:lume/layers/domain/models/trail_game/game_type.dart';
 
 /// Parsed trail game ready for presentation routing.
 sealed class TrailGameDomain {

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/layers/data/models/game_data.dart';
-import 'package:lume/layers/data/models/game_type.dart';
-import 'package:lume/layers/domain/mappers/trail_game_mapper.dart';
+import 'package:lume/layers/domain/models/trail_game/game_type.dart';
+import 'package:lume/layers/data/mappers/trail_game_mapper.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game_values.dart';
 

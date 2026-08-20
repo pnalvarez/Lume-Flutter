@@ -9,6 +9,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final Widget? trailing;
   final IconData backIcon;
+  final String? backTooltip;
 
   const PageHeader({
     super.key,
@@ -16,6 +17,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.trailing,
     this.backIcon = Icons.arrow_back_rounded,
+    this.backTooltip,
   });
 
   @override
@@ -41,7 +43,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
                 icon: backIcon,
                 onPressed: onBack,
                 size: LumeIconButtonSize.sm,
-                tooltip: 'Back',
+                tooltip: backTooltip,
               )
             else
               const SizedBox(width: AppSpacings.s),

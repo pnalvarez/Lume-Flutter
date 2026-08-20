@@ -12,9 +12,6 @@ note() { violations+=("$1"); fail=1; }
 
 # Allowlisted domain → data leaks (do not add files here without a migration).
 domain_data_allowlist='
-lib/layers/domain/mappers/trail_game_mapper.dart
-lib/layers/domain/models/trail/trail_catalog_domain.dart
-lib/layers/domain/models/trail_game/trail_game.dart
 '
 
 is_allowlisted() {

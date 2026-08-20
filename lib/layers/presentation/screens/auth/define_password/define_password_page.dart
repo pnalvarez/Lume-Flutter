@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/repository/auth_repository.dart';
 import 'package:lume/layers/domain/usecases/clear_password_recovery.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/domain/usecases/update_password.dart';
@@ -30,7 +29,7 @@ class DefinePasswordPage extends StatelessWidget {
       create: (_) => DefinePasswordBloc(
         restoreSession: getIt<IRestoreSession>(),
         updatePassword: getIt<IUpdatePassword>(),
-        clearPasswordRecovery: ClearPasswordRecovery(getIt<IAuthRepository>()),
+        clearPasswordRecovery: getIt<IClearPasswordRecovery>(),
       )..add(const DefinePasswordStarted()),
       child: const _DefinePasswordView(),
     );
