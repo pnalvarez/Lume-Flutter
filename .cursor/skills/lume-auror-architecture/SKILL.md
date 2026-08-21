@@ -85,6 +85,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
   - Login / define password → `AuthScaffold`
   - Confirm email / recover password → `ScreenHeader` + `Scaffold`
   - Authenticated shells → `PageHeader` as `appBar`
+- **Screen bodies + Widgetbook:** every product screen exposes a Bloc-free `*Body` (state + callbacks; no GetIt / AutoRoute / feature Bloc). Catalog it under Widgetbook path `[Lume]/[Screens]/…` with the main visual states. See `.cursor/rules/widgetbook-screens.mdc`.
 
 ## Data (Lume)
 

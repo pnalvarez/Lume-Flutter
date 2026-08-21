@@ -30,9 +30,14 @@ class AppRouter extends RootStackRouter {
           guards: [authGuard],
         ),
         AutoRoute(
-          page: HomeRoute.page,
-          path: '/home',
+          page: DashboardRoute.page,
+          path: '/dashboard',
           guards: [authGuard],
+          children: [
+            AutoRoute(page: HomeRoute.page, path: 'home', initial: true),
+            AutoRoute(page: GamesRoute.page, path: 'games'),
+            AutoRoute(page: ProgressRoute.page, path: 'progress'),
+          ],
         ),
       ];
 }

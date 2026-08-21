@@ -8,15 +8,15 @@ import 'package:lume/layers/presentation/screens/dashboard/dashboard_state.dart'
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeholder.dart';
 
 @RoutePage()
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ProgressPage extends StatelessWidget {
+  const ProgressPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DashboardBloc, DashboardState>(
       builder: (context, state) {
         return DashboardTabPlaceholder(
-          title: dashboardTabTrail,
+          title: dashboardTabProgress,
           isSigningOut: state.isSigningOut,
           onSignOut: () {
             context.read<DashboardBloc>().add(const DashboardSignOutPressed());

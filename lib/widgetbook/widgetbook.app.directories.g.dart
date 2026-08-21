@@ -28,6 +28,8 @@ import 'package:lume/widgetbook/use_cases/navigation_use_cases.dart'
     as _lume_widgetbook_use_cases_navigation_use_cases;
 import 'package:lume/widgetbook/use_cases/progress_bar_use_cases.dart'
     as _lume_widgetbook_use_cases_progress_bar_use_cases;
+import 'package:lume/widgetbook/use_cases/screens_use_cases.dart'
+    as _lume_widgetbook_use_cases_screens_use_cases;
 import 'package:lume/widgetbook/use_cases/stat_chip_use_cases.dart'
     as _lume_widgetbook_use_cases_stat_chip_use_cases;
 import 'package:lume/widgetbook/use_cases/tiles_and_loader_use_cases.dart'
@@ -39,6 +41,176 @@ import 'package:lume/widgetbook/use_cases/typography_use_cases.dart'
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 
 final directories = <_widgetbook.WidgetbookNode>[
+  _widgetbook.WidgetbookCategory(
+    name: 'Lume',
+    children: [
+      _widgetbook.WidgetbookCategory(
+        name: 'Screens',
+        children: [
+          _widgetbook.WidgetbookFolder(
+            name: 'Confirm email',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'ConfirmEmailBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Default',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .confirmEmailDefault,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Resending',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .confirmEmailResending,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Dashboard',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'DashboardBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Shell with Trilha',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .dashboardShellTrail,
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookComponent(
+                name: 'DashboardTabPlaceholder',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Tab placeholder',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .dashboardTabPlaceholder,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Define password',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'DefinePasswordBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Checking',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .definePasswordChecking,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Invalid link',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .definePasswordInvalid,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Ready',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .definePasswordReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Login',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'LoginBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Sign in',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .loginSignIn,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Sign up',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .loginSignUp,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Submitting',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .loginSubmitting,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Onboarding',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'OnboardingBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Slide 1',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .onboardingSlide1,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Slide 2 (last)',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .onboardingSlide2,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Recover password',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'RecoverPasswordBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Email sent',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .recoverPasswordSent,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Request form',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .recoverPasswordForm,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Select category',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'SelectCategoryBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Error',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .selectCategoryError,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Loading',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .selectCategoryLoading,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Ready',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .selectCategoryReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  ),
   _widgetbook.WidgetbookFolder(
     name: 'molecules',
     children: [
@@ -143,6 +315,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Selected and unselected',
                 builder: _lume_widgetbook_use_cases_chips_and_progress_use_cases
                     .selectableChipStates,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'SelectableChipGroup',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Multi-select with select all',
+                builder: _lume_widgetbook_use_cases_chips_and_progress_use_cases
+                    .selectableChipGroupInteractive,
               ),
             ],
           ),

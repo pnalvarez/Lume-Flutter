@@ -19,9 +19,9 @@ Widget bottomNavInteractive(BuildContext context) {
       selectedIndex: selected,
       onSelected: (_) {},
       items: const [
-        BottomNavItem(icon: Icons.route_rounded, label: 'Path'),
-        BottomNavItem(icon: Icons.sports_esports_rounded, label: 'Play'),
-        BottomNavItem(icon: Icons.bar_chart_rounded, label: 'Stats'),
+        BottomNavItem(icon: Icons.home_rounded, label: 'Trilha'),
+        BottomNavItem(icon: Icons.sports_esports_rounded, label: 'Jogos'),
+        BottomNavItem(icon: Icons.bar_chart_rounded, label: 'Progresso'),
       ],
     ),
   );
