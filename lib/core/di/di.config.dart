@@ -76,7 +76,8 @@ import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart'
     as _i1057;
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_bloc.dart'
     as _i193;
-import 'package:lume/layers/presentation/screens/home/home_bloc.dart' as _i774;
+import 'package:lume/layers/presentation/screens/dashboard/dashboard_bloc.dart'
+    as _i950;
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart'
     as _i928;
 import 'package:lume/layers/presentation/screens/select_category/select_category_bloc.dart'
@@ -204,7 +205,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i155.IProfileRepository>(
       () => _i1072.ProfileRepository(gh<_i527.IProfileDataSource>()),
     );
-    gh.factory<_i774.HomeBloc>(() => _i774.HomeBloc(gh<_i96.ISignOut>()));
+    gh.factory<_i950.DashboardBloc>(
+      () => _i950.DashboardBloc(gh<_i96.ISignOut>()),
+    );
     gh.factory<_i97.IGetSubmoduleGames>(
       () => _i97.GetSubmoduleGames(gh<_i131.IGameRepository>()),
     );

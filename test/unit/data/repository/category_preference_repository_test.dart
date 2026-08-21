@@ -14,21 +14,24 @@ void main() {
     sut = CategoryPreferenceRepository(dataSource);
   });
 
-  test('getCategoriesWithPreferences maps to CategoryPreferencesDomain', () async {
-    when(
-      dataSource.fetchCategoriesWithPreferences(forceRefresh: false),
-    ).thenAnswer(
-      (_) async => CategoryPreferencesData.fromJson({
-        'categories': [
-          {'id': 1, 'name': 'History'},
-        ],
-        'selected_ids': [1],
-      }),
-    );
+  test(
+    'getCategoriesWithPreferences maps to CategoryPreferencesDomain',
+    () async {
+      when(
+        dataSource.fetchCategoriesWithPreferences(forceRefresh: false),
+      ).thenAnswer(
+        (_) async => CategoryPreferencesData.fromJson({
+          'categories': [
+            {'id': 1, 'name': 'History'},
+          ],
+          'selected_ids': [1],
+        }),
+      );
 
-    final domain = await sut.getCategoriesWithPreferences();
+      final domain = await sut.getCategoriesWithPreferences();
 
-    expect(domain.categories.single.name, 'History');
-    expect(domain.selectedIds, [1]);
-  });
+      expect(domain.categories.single.name, 'History');
+      expect(domain.selectedIds, [1]);
+    },
+  );
 }

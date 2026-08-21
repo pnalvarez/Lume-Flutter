@@ -3,10 +3,7 @@ import 'package:lume/core/auth/auth_session_provider.dart';
 
 /// In-memory [IAuthSessionProvider] for widget and unit tests.
 class FakeAuthSessionProvider implements IAuthSessionProvider {
-  FakeAuthSessionProvider({
-    this.session,
-    this.isPasswordRecovery = false,
-  });
+  FakeAuthSessionProvider({this.session, this.isPasswordRecovery = false});
 
   @override
   AuthSessionSnapshot? session;

@@ -3,10 +3,7 @@ import 'package:lume/layers/presentation/screens/onboarding/onboarding_slides.da
 
 @immutable
 final class OnboardingState {
-  const OnboardingState({
-    this.index = 0,
-    this.goToLogin = false,
-  });
+  const OnboardingState({this.index = 0, this.goToLogin = false});
 
   final int index;
   final bool goToLogin;
@@ -14,10 +11,7 @@ final class OnboardingState {
   bool get isFirst => index <= 0;
   bool get isLast => index >= onboardingSlides.length - 1;
 
-  OnboardingState copyWith({
-    int? index,
-    bool? goToLogin,
-  }) {
+  OnboardingState copyWith({int? index, bool? goToLogin}) {
     return OnboardingState(
       index: index ?? this.index,
       goToLogin: goToLogin ?? this.goToLogin,

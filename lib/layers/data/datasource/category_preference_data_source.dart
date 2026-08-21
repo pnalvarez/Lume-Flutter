@@ -17,7 +17,8 @@ abstract interface class ICategoryPreferenceDataSource {
 }
 
 @Injectable(as: ICategoryPreferenceDataSource)
-final class CategoryPreferenceDataSource implements ICategoryPreferenceDataSource {
+final class CategoryPreferenceDataSource
+    implements ICategoryPreferenceDataSource {
   CategoryPreferenceDataSource(this._apiClient, this._storage);
 
   final IApiClient _apiClient;

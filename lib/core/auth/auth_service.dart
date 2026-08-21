@@ -49,8 +49,7 @@ final class AuthService implements IAuthService {
 
   final SupabaseClient? _clientOverride;
 
-  GoTrueClient get _auth =>
-      (_clientOverride ?? Supabase.instance.client).auth;
+  GoTrueClient get _auth => (_clientOverride ?? Supabase.instance.client).auth;
 
   @override
   AuthSessionSnapshot? get currentSession => _mapSession(_auth.currentSession);
@@ -205,14 +204,12 @@ AuthFailure _mapAuthException(
 }) {
   final code = error.code;
   final message = error.message.toLowerCase();
-  final unconfirmed = code == 'email_not_confirmed' ||
+  final unconfirmed =
+      code == 'email_not_confirmed' ||
       code == 'phone_not_confirmed' ||
       message.contains('email not confirmed');
   if (unconfirmed) {
-    return AuthEmailNotConfirmedFailure(
-      message: error.message,
-      cause: error,
-    );
+    return AuthEmailNotConfirmedFailure(message: error.message, cause: error);
   }
   return AuthOperationFailure(
     operation: operation,

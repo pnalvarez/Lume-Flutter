@@ -30,16 +30,16 @@ class LumeIconButton extends StatelessWidget {
   });
 
   double get _side => switch (size) {
-        LumeIconButtonSize.sm => AppSizes.touchMin * 0.75, // 36
-        LumeIconButtonSize.md => AppSizes.touchMin, // 48
-        LumeIconButtonSize.lg => AppSizes.touchComfort, // 56
-      };
+    LumeIconButtonSize.sm => AppSizes.touchMin * 0.75, // 36
+    LumeIconButtonSize.md => AppSizes.touchMin, // 48
+    LumeIconButtonSize.lg => AppSizes.touchComfort, // 56
+  };
 
   double get _iconSize => switch (size) {
-        LumeIconButtonSize.sm => AppSizes.iconS,
-        LumeIconButtonSize.md => AppSizes.iconM,
-        LumeIconButtonSize.lg => AppSizes.iconL,
-      };
+    LumeIconButtonSize.sm => AppSizes.iconS,
+    LumeIconButtonSize.md => AppSizes.iconM,
+    LumeIconButtonSize.lg => AppSizes.iconL,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -48,25 +48,28 @@ class LumeIconButton extends StatelessWidget {
 
     final (Color bg, Color fg, BorderSide? side) = switch (variant) {
       LumeIconButtonVariant.filled => (
-          backgroundColor ?? cs.primary,
-          iconColor ?? cs.onPrimary,
-          null,
-        ),
+        backgroundColor ?? cs.primary,
+        iconColor ?? cs.onPrimary,
+        null,
+      ),
       LumeIconButtonVariant.outline => (
-          Colors.transparent,
-          iconColor ?? cs.primary,
-          BorderSide(color: cs.primary),
-        ),
+        Colors.transparent,
+        iconColor ?? cs.primary,
+        BorderSide(color: cs.primary),
+      ),
       LumeIconButtonVariant.ghost => (
-          Colors.transparent,
-          iconColor ?? cs.onSurface,
-          null,
-        ),
+        Colors.transparent,
+        iconColor ?? cs.onSurface,
+        null,
+      ),
     };
 
     final button = Material(
       color: bg,
-      shape: RoundedRectangleBorder(borderRadius: radius, side: side ?? BorderSide.none),
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: side ?? BorderSide.none,
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onPressed,

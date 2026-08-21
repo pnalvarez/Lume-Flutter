@@ -21,6 +21,8 @@ void main() {
     final result = await sut.call();
 
     expect(result, expected);
-    verify(repository.getCategoriesWithPreferences(forceRefresh: false)).called(1);
+    verify(
+      repository.getCategoriesWithPreferences(forceRefresh: false),
+    ).called(1);
   });
 }

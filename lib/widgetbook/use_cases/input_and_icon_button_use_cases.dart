@@ -7,8 +7,10 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(name: 'Default', type: InputField)
 Widget inputFieldDefault(BuildContext context) {
   final label = context.knobs.string(label: 'Label', initialValue: 'Email');
-  final placeholder =
-      context.knobs.string(label: 'Placeholder', initialValue: 'voce@email.com');
+  final placeholder = context.knobs.string(
+    label: 'Placeholder',
+    initialValue: 'voce@email.com',
+  );
   final error = context.knobs.string(label: 'Error', initialValue: '');
   final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
 

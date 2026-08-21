@@ -124,11 +124,7 @@ void main() {
           {'id': 'd1', 'text': 'Right'},
         ],
         'pairs': [
-          {
-            'left_id': 'e1',
-            'right_id': 'd1',
-            'explanation': 'Match.',
-          },
+          {'left_id': 'e1', 'right_id': 'd1', 'explanation': 'Match.'},
         ],
       }),
     );
@@ -156,11 +152,7 @@ void main() {
   test('parse throws when game_payload is missing', () {
     expect(
       () => TrailGameMapper.parse(
-        const GameItemData(
-          pairId: 1,
-          sortOrder: 1,
-          gameType: GameType.whoAmI,
-        ),
+        const GameItemData(pairId: 1, sortOrder: 1, gameType: GameType.whoAmI),
       ),
       throwsFormatException,
     );

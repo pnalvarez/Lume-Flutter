@@ -37,12 +37,16 @@ class LumeBadge extends StatelessWidget {
     final themed = switch (variant) {
       LumeBadgeVariant.primary => (cs.primary, cs.onPrimary, null as Color?),
       LumeBadgeVariant.secondary => (
-          cs.secondaryContainer,
-          cs.onSecondaryContainer,
-          null,
-        ),
+        cs.secondaryContainer,
+        cs.onSecondaryContainer,
+        null,
+      ),
       LumeBadgeVariant.destructive => (cs.error, cs.onError, null),
-      LumeBadgeVariant.outline => (Colors.transparent, cs.onSurface, cs.outline),
+      LumeBadgeVariant.outline => (
+        Colors.transparent,
+        cs.onSurface,
+        cs.outline,
+      ),
       LumeBadgeVariant.accent => (cs.tertiary, cs.onTertiary, null),
     };
 

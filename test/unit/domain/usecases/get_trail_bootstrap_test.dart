@@ -21,7 +21,9 @@ void main() {
         ),
       ],
     );
-    when(repository.getBootstrap(forceRefresh: false)).thenAnswer((_) async => expected);
+    when(
+      repository.getBootstrap(forceRefresh: false),
+    ).thenAnswer((_) async => expected);
 
     final result = await sut.call();
 

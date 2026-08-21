@@ -81,11 +81,7 @@ void main() {
     },
     skip: 2,
     expect: () => [
-      isA<SelectCategoryState>().having(
-        (s) => s.selectedIds,
-        'selected',
-        {1},
-      ),
+      isA<SelectCategoryState>().having((s) => s.selectedIds, 'selected', {1}),
       isA<SelectCategoryState>().having((s) => s.isSaving, 'saving', true),
       isA<SelectCategoryState>().having(
         (s) => s.destination,
@@ -100,7 +96,10 @@ void main() {
     build: () => _bloc(
       _GetCategories(),
       _SaveCategories()
-        ..error = const ApiHttpException(statusCode: 401, message: 'unauthorized'),
+        ..error = const ApiHttpException(
+          statusCode: 401,
+          message: 'unauthorized',
+        ),
     ),
     act: (bloc) async {
       bloc.add(const SelectCategoryStarted());

@@ -29,7 +29,11 @@ final class ProfileDataSource implements IProfileDataSource {
 
     final raw = await _apiClient.rpc<Map<String, dynamic>>('get_profile');
     final data = ProfileData.fromJson(asJsonMap(raw));
-    await _storage.writeObject(CacheKeys.profile, data, (value) => value.toJson());
+    await _storage.writeObject(
+      CacheKeys.profile,
+      data,
+      (value) => value.toJson(),
+    );
     return data;
   }
 }

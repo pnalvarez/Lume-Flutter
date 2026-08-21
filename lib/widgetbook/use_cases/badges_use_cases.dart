@@ -28,8 +28,10 @@ Widget lumeBadgeAll(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Custom colors', type: LumeBadge)
 Widget lumeBadgeCustomColors(BuildContext context) {
-  final label =
-      context.knobs.string(label: 'Label', initialValue: 'Aprendendo');
+  final label = context.knobs.string(
+    label: 'Label',
+    initialValue: 'Aprendendo',
+  );
   return Scaffold(
     body: Padding(
       padding: const EdgeInsets.all(24),
@@ -54,7 +56,9 @@ Widget lumeBadgeCustomColors(BuildContext context) {
           LumeBadge(
             label: 'Revisão',
             leadingIcon: Icons.refresh_rounded,
-            backgroundColor: AppColors.Secondary.secondary.withValues(alpha: 0.12),
+            backgroundColor: AppColors.Secondary.secondary.withValues(
+              alpha: 0.12,
+            ),
             foregroundColor: AppColors.Secondary.secondary,
             borderColor: AppColors.Secondary.secondary.withValues(alpha: 0.3),
           ),
@@ -67,8 +71,10 @@ Widget lumeBadgeCustomColors(BuildContext context) {
 @widgetbook.UseCase(name: 'Interactive', type: AmountBadge)
 Widget amountBadgeInteractive(BuildContext context) {
   final text = context.knobs.string(label: 'Text', initialValue: '+15 XP');
-  final secondary =
-      context.knobs.string(label: 'Secondary', initialValue: 'Quiz concluído');
+  final secondary = context.knobs.string(
+    label: 'Secondary',
+    initialValue: 'Quiz concluído',
+  );
 
   return Scaffold(
     body: Center(

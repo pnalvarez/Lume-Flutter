@@ -30,11 +30,7 @@ enum LumeButtonType {
 }
 
 /// Button size.
-enum LumeButtonSize {
-  sm,
-  md,
-  lg,
-}
+enum LumeButtonSize { sm, md, lg }
 
 /// Lume design system button.
 ///
@@ -54,6 +50,7 @@ class LumeButton extends StatelessWidget {
   final LumeButtonSize size;
   final bool isLoading;
   final bool isEnabled;
+
   /// When true, the button fills the available width.
   final bool isExpanded;
   final Widget? leadingIcon;
@@ -81,28 +78,28 @@ class LumeButton extends StatelessWidget {
     final effectiveOnPressed = !visuallyEnabled
         ? null
         : isLoading
-            ? () {}
-            : onPressed;
+        ? () {}
+        : onPressed;
 
     final style = _buildStyle(colors);
     final content = _buildContent(colors);
 
     Widget button = switch (type) {
       LumeButtonType.link || LumeButtonType.text => TextButton(
-          onPressed: effectiveOnPressed,
-          style: style,
-          child: content,
-        ),
+        onPressed: effectiveOnPressed,
+        style: style,
+        child: content,
+      ),
       LumeButtonType.outlined => OutlinedButton(
-          onPressed: effectiveOnPressed,
-          style: style,
-          child: content,
-        ),
+        onPressed: effectiveOnPressed,
+        style: style,
+        child: content,
+      ),
       LumeButtonType.elevated => ElevatedButton(
-          onPressed: effectiveOnPressed,
-          style: style,
-          child: content,
-        ),
+        onPressed: effectiveOnPressed,
+        style: style,
+        child: content,
+      ),
     };
 
     if (isLoading) {
@@ -129,22 +126,24 @@ class LumeButton extends StatelessWidget {
     };
 
     final radius = BorderRadius.circular(AppRadius.l);
-    final compactRadius =
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.s));
+    final compactRadius = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.s),
+    );
     final filledRadius = RoundedRectangleBorder(borderRadius: radius);
 
     return switch (type) {
       LumeButtonType.elevated => ElevatedButton.styleFrom(
-          backgroundColor: colors.fill,
-          foregroundColor: colors.onFill,
-          disabledBackgroundColor: colors.disabledFill,
-          disabledForegroundColor: colors.disabledOnFill,
-          elevation: 0,
-          shape: filledRadius,
-          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
-          textStyle: _textStyle,
-        ),
-      LumeButtonType.outlined => OutlinedButton.styleFrom(
+        backgroundColor: colors.fill,
+        foregroundColor: colors.onFill,
+        disabledBackgroundColor: colors.disabledFill,
+        disabledForegroundColor: colors.disabledOnFill,
+        elevation: 0,
+        shape: filledRadius,
+        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
+        textStyle: _textStyle,
+      ),
+      LumeButtonType.outlined =>
+        OutlinedButton.styleFrom(
           foregroundColor: colors.accent,
           disabledForegroundColor: colors.disabledAccent,
           shape: filledRadius,
@@ -159,22 +158,19 @@ class LumeButton extends StatelessWidget {
           }),
         ),
       LumeButtonType.text => TextButton.styleFrom(
-          foregroundColor: colors.accent,
-          disabledForegroundColor: colors.disabledAccent,
-          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
-          textStyle: _textStyle,
-          shape: filledRadius,
-        ),
+        foregroundColor: colors.accent,
+        disabledForegroundColor: colors.disabledAccent,
+        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
+        textStyle: _textStyle,
+        shape: filledRadius,
+      ),
       LumeButtonType.link => TextButton.styleFrom(
-          foregroundColor: colors.accent,
-          disabledForegroundColor: colors.disabledAccent,
-          padding: EdgeInsets.symmetric(
-            horizontal: hPad / 2,
-            vertical: vPad / 2,
-          ),
-          textStyle: _textStyle,
-          shape: compactRadius,
-        ),
+        foregroundColor: colors.accent,
+        disabledForegroundColor: colors.disabledAccent,
+        padding: EdgeInsets.symmetric(horizontal: hPad / 2, vertical: vPad / 2),
+        textStyle: _textStyle,
+        shape: compactRadius,
+      ),
     };
   }
 
@@ -206,7 +202,10 @@ class LumeButton extends StatelessWidget {
         ),
       );
       if (!isExpanded) return spinner;
-      return SizedBox(width: double.infinity, child: Center(child: spinner));
+      return SizedBox(
+        width: double.infinity,
+        child: Center(child: spinner),
+      );
     }
 
     if (leadingIcon == null && trailingIcon == null) return Text(label);
@@ -249,32 +248,32 @@ class _TraitColors {
 
     return switch (trait) {
       LumeButtonTrait.brand => _TraitColors(
-          fill: cs.primary,
-          onFill: cs.onPrimary,
-          accent: cs.primary,
-          disabledFill: disabledFill,
-          disabledOnFill: muted,
-          disabledAccent: muted,
-          disabledBorder: disabledBorder,
-        ),
+        fill: cs.primary,
+        onFill: cs.onPrimary,
+        accent: cs.primary,
+        disabledFill: disabledFill,
+        disabledOnFill: muted,
+        disabledAccent: muted,
+        disabledBorder: disabledBorder,
+      ),
       LumeButtonTrait.secondary => _TraitColors(
-          fill: cs.secondary,
-          onFill: cs.onSecondary,
-          accent: cs.secondary,
-          disabledFill: disabledFill,
-          disabledOnFill: muted,
-          disabledAccent: muted,
-          disabledBorder: disabledBorder,
-        ),
+        fill: cs.secondary,
+        onFill: cs.onSecondary,
+        accent: cs.secondary,
+        disabledFill: disabledFill,
+        disabledOnFill: muted,
+        disabledAccent: muted,
+        disabledBorder: disabledBorder,
+      ),
       LumeButtonTrait.destructive => _TraitColors(
-          fill: cs.error,
-          onFill: cs.onError,
-          accent: cs.onError,
-          disabledFill: disabledFill,
-          disabledOnFill: muted,
-          disabledAccent: muted,
-          disabledBorder: disabledBorder,
-        ),
+        fill: cs.error,
+        onFill: cs.onError,
+        accent: cs.onError,
+        disabledFill: disabledFill,
+        disabledOnFill: muted,
+        disabledAccent: muted,
+        disabledBorder: disabledBorder,
+      ),
     };
   }
 }

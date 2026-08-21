@@ -64,11 +64,8 @@ void main() {
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
     'seeds email and keeps waiting until a confirmed session arrives',
-    build: () => ConfirmEmailBloc(
-      resend,
-      _Observe(sessions),
-      _HasSelected(false),
-    ),
+    build: () =>
+        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(false)),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -89,11 +86,8 @@ void main() {
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
     'confirmed session with categories goes home',
-    build: () => ConfirmEmailBloc(
-      resend,
-      _Observe(sessions),
-      _HasSelected(true),
-    ),
+    build: () =>
+        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(true)),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -112,11 +106,8 @@ void main() {
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
     'resend works while waiting for confirmation',
-    build: () => ConfirmEmailBloc(
-      resend,
-      _Observe(sessions),
-      _HasSelected(false),
-    ),
+    build: () =>
+        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(false)),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -125,7 +116,11 @@ void main() {
     },
     expect: () => [
       isA<ConfirmEmailState>().having((s) => s.email, 'email', 'a@b.c'),
-      isA<ConfirmEmailState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<ConfirmEmailState>().having(
+        (s) => s.isSubmitting,
+        'submitting',
+        true,
+      ),
       isA<ConfirmEmailState>()
           .having((s) => s.isSubmitting, 'submitting', false)
           .having((s) => s.notice, 'notice', confirmEmailResentNotice),

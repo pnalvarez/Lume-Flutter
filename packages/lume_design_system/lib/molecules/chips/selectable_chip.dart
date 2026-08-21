@@ -34,7 +34,9 @@ class SelectableChip extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: _kSelectableChipMinHeight),
+          constraints: const BoxConstraints(
+            minHeight: _kSelectableChipMinHeight,
+          ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(

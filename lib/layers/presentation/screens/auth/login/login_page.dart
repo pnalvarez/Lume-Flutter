@@ -2,17 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
-import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
+import 'package:lume/layers/presentation/screens/auth/login/login_body.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
-import 'package:lume/layers/presentation/shared/auth_scaffold.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
-import 'package:lume_design_system/atoms/spacing/spacings.dart';
-import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
-import 'package:lume_design_system/molecules/buttons/lume_button.dart';
-import 'package:lume_design_system/molecules/input_fields/input_field.dart';
 
 @RoutePage()
 class LoginPage extends StatelessWidget {
@@ -27,46 +22,8 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class _LoginView extends StatefulWidget {
+class _LoginView extends StatelessWidget {
   const _LoginView();
-
-  @override
-  State<_LoginView> createState() => _LoginViewState();
-}
-
-class _LoginViewState extends State<_LoginView> {
-  late final TextEditingController _email;
-  late final TextEditingController _password;
-
-  @override
-  void initState() {
-    super.initState();
-    _email = TextEditingController();
-    _password = TextEditingController();
-    _email.addListener(_syncCredentialsFromControllers);
-    _password.addListener(_syncCredentialsFromControllers);
-  }
-
-  @override
-  void dispose() {
-    _email.removeListener(_syncCredentialsFromControllers);
-    _password.removeListener(_syncCredentialsFromControllers);
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
-  }
-
-  void _syncCredentialsFromControllers() {
-    if (!mounted) return;
-    final bloc = context.read<LoginBloc>();
-    final state = bloc.state;
-    if (state.email != _email.text) {
-      bloc.add(LoginEmailChanged(_email.text));
-    }
-    if (state.password != _password.text) {
-      bloc.add(LoginPasswordChanged(_password.text));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +44,7 @@ class _LoginViewState extends State<_LoginView> {
         context.read<LoginBloc>().add(const LoginNavigationHandled());
         switch (destination) {
           case LoginDestination.home:
-            context.router.replaceAll([const HomeRoute()]);
+            context.router.replaceAll([const DashboardRoute()]);
           case LoginDestination.selectCategory:
             context.router.replaceAll([const SelectCategoryRoute()]);
           case LoginDestination.confirmEmail:
@@ -98,100 +55,30 @@ class _LoginViewState extends State<_LoginView> {
             context.router.push(const OnboardingRoute());
         }
       },
-      child: AuthScaffold(
-        subtitle: loginSubtitle,
-        child: BlocBuilder<LoginBloc, LoginState>(
-          builder: (context, state) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                InputField(
-                  controller: _email,
-                  placeholder: authEmailPlaceholder,
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    context.read<LoginBloc>().add(LoginEmailChanged(value));
-                  },
-                ),
-                const SizedBox(height: AppSpacings.m),
-                InputField(
-                  controller: _password,
-                  placeholder: loginPasswordPlaceholder,
-                  obscureText: true,
-                  onChanged: (value) {
-                    context.read<LoginBloc>().add(LoginPasswordChanged(value));
-                  },
-                ),
-                if (state.mode == LoginMode.login) ...[
-                  const SizedBox(height: AppSpacings.s),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: LumeButton(
-                      label: loginForgotPassword,
-                      type: LumeButtonType.text,
-                      size: LumeButtonSize.sm,
-                      onPressed: () {
-                        context.read<LoginBloc>().add(
-                          const LoginForgotPasswordPressed(),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppSpacings.m),
-                LumeButton(
-                  label: state.mode == LoginMode.login
-                      ? loginCtaSignIn
-                      : loginCtaSignUp,
-                  size: LumeButtonSize.lg,
-                  isLoading: state.isSubmitting,
-                  isEnabled: state.canSubmit,
-                  isExpanded: true,
-                  onPressed: () {
-                    _syncCredentialsFromControllers();
-                    context.read<LoginBloc>().add(const LoginSubmitted());
-                  },
-                ),
-                const SizedBox(height: AppSpacings.l),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text(
-                      state.mode == LoginMode.login
-                          ? loginFooterNoAccountPrompt
-                          : loginFooterHasAccountPrompt,
-                      style: typ.body4Light.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    LumeButton(
-                      label: state.mode == LoginMode.login
-                          ? loginFooterNoAccountAction
-                          : loginFooterHasAccountAction,
-                      type: LumeButtonType.link,
-                      size: LumeButtonSize.sm,
-                      onPressed: () {
-                        context.read<LoginBloc>().add(const LoginModeToggled());
-                      },
-                    ),
-                  ],
-                ),
-                LumeButton(
-                  label: loginWhatIsLume,
-                  trait: LumeButtonTrait.secondary,
-                  type: LumeButtonType.link,
-                  size: LumeButtonSize.sm,
-                  onPressed: () {
-                    context.read<LoginBloc>().add(
-                      const LoginWhatIsLumePressed(),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-        ),
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          return LoginBody(
+            state: state,
+            onEmailChanged: (value) {
+              context.read<LoginBloc>().add(LoginEmailChanged(value));
+            },
+            onPasswordChanged: (value) {
+              context.read<LoginBloc>().add(LoginPasswordChanged(value));
+            },
+            onSubmit: () {
+              context.read<LoginBloc>().add(const LoginSubmitted());
+            },
+            onForgotPassword: () {
+              context.read<LoginBloc>().add(const LoginForgotPasswordPressed());
+            },
+            onToggleMode: () {
+              context.read<LoginBloc>().add(const LoginModeToggled());
+            },
+            onWhatIsLume: () {
+              context.read<LoginBloc>().add(const LoginWhatIsLumePressed());
+            },
+          );
+        },
       ),
     );
   }

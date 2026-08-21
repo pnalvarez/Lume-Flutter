@@ -38,8 +38,7 @@ class InputField extends StatelessWidget {
     this.minLines,
   });
 
-  bool get _hasError =>
-      errorMessage != null && errorMessage!.trim().isNotEmpty;
+  bool get _hasError => errorMessage != null && errorMessage!.trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -98,10 +97,7 @@ class InputField extends StatelessWidget {
         ),
         if (_hasError) ...[
           const SizedBox(height: AppSpacings.xs),
-          Text(
-            errorMessage!,
-            style: typ.tagXS.copyWith(color: cs.error),
-          ),
+          Text(errorMessage!, style: typ.tagXS.copyWith(color: cs.error)),
         ],
       ],
     );

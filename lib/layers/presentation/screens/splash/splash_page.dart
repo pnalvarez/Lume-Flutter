@@ -36,9 +36,7 @@ class _SplashView extends StatelessWidget {
       },
       child: const Scaffold(
         backgroundColor: Colors.white,
-        body: Center(
-          child: LumeLogo(size: 200),
-        ),
+        body: Center(child: LumeLogo(size: 200)),
       ),
     );
   }
@@ -48,7 +46,7 @@ PageRouteInfo<void> _routeFor(SplashDestination destination) {
   return switch (destination) {
     SplashDestination.onboarding => const OnboardingRoute(),
     SplashDestination.login => const LoginRoute(),
-    SplashDestination.home => const HomeRoute(),
+    SplashDestination.home => const DashboardRoute(),
     SplashDestination.selectCategory => const SelectCategoryRoute(),
   };
 }

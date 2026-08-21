@@ -23,9 +23,7 @@ class SessionTimer extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final fg = urgent ? cs.error : cs.onSurface;
-    final bg = urgent
-        ? cs.errorContainer
-        : cs.surfaceContainerLow;
+    final bg = urgent ? cs.errorContainer : cs.surfaceContainerLow;
 
     return Container(
       padding: const EdgeInsets.symmetric(

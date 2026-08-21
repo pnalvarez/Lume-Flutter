@@ -33,21 +33,21 @@ class PathNode extends StatelessWidget {
     final accent = accentColor ?? cs.primary;
     final (Color bg, Color fg, Color ring) = switch (state) {
       PathNodeState.locked => (
-          cs.surfaceContainerHigh,
-          cs.onSurfaceVariant.withValues(alpha: 0.5),
-          cs.outline,
-        ),
+        cs.surfaceContainerHigh,
+        cs.onSurfaceVariant.withValues(alpha: 0.5),
+        cs.outline,
+      ),
       PathNodeState.idle => (
-          cs.surfaceContainerLowest,
-          cs.onSurface,
-          cs.outline,
-        ),
+        cs.surfaceContainerLowest,
+        cs.onSurface,
+        cs.outline,
+      ),
       PathNodeState.active => (accent, cs.onPrimary, accent),
       PathNodeState.done => (
-          cs.secondaryContainer,
-          cs.onSecondaryContainer,
-          cs.secondary,
-        ),
+        cs.secondaryContainer,
+        cs.onSecondaryContainer,
+        cs.secondary,
+      ),
     };
 
     final enabled = state != PathNodeState.locked && onTap != null;
@@ -65,7 +65,8 @@ class PathNode extends StatelessWidget {
             child: SizedBox.square(
               dimension: _nodeSize,
               child: Center(
-                child: child ??
+                child:
+                    child ??
                     Icon(
                       switch (state) {
                         PathNodeState.locked => Icons.lock_rounded,

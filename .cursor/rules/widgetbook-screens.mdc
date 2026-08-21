@@ -1,0 +1,28 @@
+---
+description: Every new Lume @RoutePage screen must ship a Bloc-free *Body and Widgetbook [Screens] use cases
+globs: lib/layers/presentation/screens/**/*.dart
+alwaysApply: false
+---
+
+# Widgetbook screens (Lume)
+
+When you create or significantly change an app screen under `lib/layers/presentation/screens/`:
+
+1. **Split UI into a `*Body`** next to the page (`foo_body.dart`).
+   - Props: state (or explicit fields) + callbacks only.
+   - **No** `getIt`, `auto_route`, `Bloc` / `BlocBuilder` / `context.read` of feature blocs inside the body.
+   - Page owns `@RoutePage`, `BlocProvider`, `BlocListener` (navigation / snackbars), and wires the body.
+
+2. **Add Widgetbook use cases** in `lib/widgetbook/use_cases/screens_use_cases.dart` (or a sibling `*_screens_use_cases.dart` under that folder):
+   - `@widgetbook.UseCase(path: '[Lume]/[Screens]/<Name>', name: '<state>', type: FooBody)`
+   - Fake / sample state, no-op callbacks, no DI.
+   - Cover the main visual states (default, loading, error, empty, submitting) when they exist.
+
+3. **Regenerate** Widgetbook directories after adding annotations:
+   ```bash
+   dart run build_runner build
+   ```
+
+4. Do **not** mount `*Page` widgets in Widgetbook when they require GetIt or the router.
+
+Existing reference: `LoginBody` + entries under `[Lume] > [Screens] > Login`.

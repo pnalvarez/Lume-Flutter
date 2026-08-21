@@ -20,16 +20,16 @@ class CircularLoader extends StatelessWidget {
   });
 
   double get _dimension => switch (size) {
-        CircularLoaderSize.sm => AppSizes.iconS,
-        CircularLoaderSize.md => AppSizes.iconL,
-        CircularLoaderSize.lg => AppSizes.iconXl + 8,
-      };
+    CircularLoaderSize.sm => AppSizes.iconS,
+    CircularLoaderSize.md => AppSizes.iconL,
+    CircularLoaderSize.lg => AppSizes.iconXl + 8,
+  };
 
   double get _stroke => switch (size) {
-        CircularLoaderSize.sm => 2,
-        CircularLoaderSize.md => 2.5,
-        CircularLoaderSize.lg => 3,
-      };
+    CircularLoaderSize.sm => 2,
+    CircularLoaderSize.md => 2.5,
+    CircularLoaderSize.lg => 3,
+  };
 
   @override
   Widget build(BuildContext context) {

@@ -104,9 +104,11 @@ const String onboardingSlide2Body =
 const String onboardingSlide2Alt =
     'Ilustração de gamificação com barra de XP, troféu e estrelas';
 
-// --- Home -------------------------------------------------------------------
+// --- Dashboard / home chrome ------------------------------------------------
 
-const String homeTitle = 'Home';
+const String dashboardTabTrail = 'Trilha';
+const String dashboardTabGames = 'Jogos';
+const String dashboardTabProgress = 'Progresso';
 const String homeAuthenticatedMessage = 'Você está autenticado.';
 const String homeSignOut = 'Sair';
 

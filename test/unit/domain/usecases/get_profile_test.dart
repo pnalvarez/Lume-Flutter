@@ -14,7 +14,9 @@ void main() {
       email: 'ada@example.com',
       fullName: 'Ada',
     );
-    when(repository.getProfile(forceRefresh: false)).thenAnswer((_) async => expected);
+    when(
+      repository.getProfile(forceRefresh: false),
+    ).thenAnswer((_) async => expected);
 
     final result = await sut.call();
 
@@ -26,7 +28,9 @@ void main() {
     final repository = MockIProfileRepository();
     final sut = GetProfile(repository);
     const expected = ProfileDomain(id: 'user-1');
-    when(repository.getProfile(forceRefresh: true)).thenAnswer((_) async => expected);
+    when(
+      repository.getProfile(forceRefresh: true),
+    ).thenAnswer((_) async => expected);
 
     final result = await sut.call(forceRefresh: true);
 

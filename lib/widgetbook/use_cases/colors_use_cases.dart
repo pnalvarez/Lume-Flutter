@@ -85,8 +85,8 @@ class _ColorSwatch extends StatelessWidget {
         '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
     final onColor =
         ThemeData.estimateBrightnessForColor(color) == Brightness.light
-            ? Colors.black87
-            : Colors.white;
+        ? Colors.black87
+        : Colors.white;
     return Container(
       height: 64,
       decoration: BoxDecoration(
@@ -97,8 +97,10 @@ class _ColorSwatch extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(name,
-              style: TextStyle(color: onColor, fontWeight: FontWeight.w600)),
+          Text(
+            name,
+            style: TextStyle(color: onColor, fontWeight: FontWeight.w600),
+          ),
           Text(hex, style: TextStyle(color: onColor, fontSize: 12)),
         ],
       ),

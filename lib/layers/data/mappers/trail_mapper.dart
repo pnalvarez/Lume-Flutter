@@ -31,7 +31,8 @@ abstract final class TrailMapper {
           toLevelProgressDomain(progress),
       ],
       pairProgress: [
-        for (final progress in data.pairProgress) toPairProgressDomain(progress),
+        for (final progress in data.pairProgress)
+          toPairProgressDomain(progress),
       ],
     );
   }
@@ -43,7 +44,8 @@ abstract final class TrailMapper {
           toLevelProgressDomain(progress),
       ],
       pairProgress: [
-        for (final progress in data.pairProgress) toPairProgressDomain(progress),
+        for (final progress in data.pairProgress)
+          toPairProgressDomain(progress),
       ],
     );
   }

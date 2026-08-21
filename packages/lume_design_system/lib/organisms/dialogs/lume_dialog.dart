@@ -123,13 +123,14 @@ class CelebrationDialog extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
-                        colors: [
-                          iconBackground ?? cs.tertiary,
-                          cs.secondary,
-                        ],
+                        colors: [iconBackground ?? cs.tertiary, cs.secondary],
                       ),
                     ),
-                    child: Icon(icon, color: cs.onPrimary, size: AppSizes.iconL),
+                    child: Icon(
+                      icon,
+                      color: cs.onPrimary,
+                      size: AppSizes.iconL,
+                    ),
                   ),
                 const SizedBox(height: AppSpacings.m),
                 Text(

@@ -73,7 +73,9 @@ class _ChipPickerPill extends StatelessWidget {
 
     return Material(
       color: bg,
-      borderRadius: BorderRadius.circular(AppRadius.full(_kChipPickerMinHeight)),
+      borderRadius: BorderRadius.circular(
+        AppRadius.full(_kChipPickerMinHeight),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

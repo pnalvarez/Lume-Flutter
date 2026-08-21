@@ -45,11 +45,7 @@ class _HasSelected implements IHasSelectedCategories {
 
 AuthSession _confirmedSession() {
   return const AuthSession(
-    user: AuthUser(
-      id: 'user-1',
-      email: 'a@b.c',
-      isEmailConfirmed: true,
-    ),
+    user: AuthUser(id: 'user-1', email: 'a@b.c', isEmailConfirmed: true),
     isPasswordRecovery: false,
   );
 }
@@ -57,22 +53,16 @@ AuthSession _confirmedSession() {
 void main() {
   blocTest<SplashBloc, SplashState>(
     'goes to onboarding when there is no session and onboarding is unseen',
-    build: () => SplashBloc(
-      _Restore(null),
-      _HasSeen(false),
-      _HasSelected(false),
-    ),
+    build: () =>
+        SplashBloc(_Restore(null), _HasSeen(false), _HasSelected(false)),
     act: (bloc) => bloc.add(const SplashStarted()),
     expect: () => [const SplashReady(SplashDestination.onboarding)],
   );
 
   blocTest<SplashBloc, SplashState>(
     'goes to login when onboarding was already seen',
-    build: () => SplashBloc(
-      _Restore(null),
-      _HasSeen(true),
-      _HasSelected(false),
-    ),
+    build: () =>
+        SplashBloc(_Restore(null), _HasSeen(true), _HasSelected(false)),
     act: (bloc) => bloc.add(const SplashStarted()),
     expect: () => [const SplashReady(SplashDestination.login)],
   );

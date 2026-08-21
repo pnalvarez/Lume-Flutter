@@ -23,10 +23,7 @@ void main() {
         params: anyNamed('params'),
         headers: anyNamed('headers'),
       ),
-    ).thenAnswer((_) async => {
-          'id': 'user-1',
-          'full_name': 'Ada',
-        });
+    ).thenAnswer((_) async => {'id': 'user-1', 'full_name': 'Ada'});
 
     final data = await sut.fetchProfile();
 
@@ -35,22 +32,22 @@ void main() {
     verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
   });
 
-  test('fetchProfile returns cached profile without calling RPC again', () async {
-    when(
-      apiClient.rpc<Map<String, dynamic>>(
-        'get_profile',
-        params: anyNamed('params'),
-        headers: anyNamed('headers'),
-      ),
-    ).thenAnswer((_) async => {
-          'id': 'user-1',
-          'full_name': 'Ada',
-        });
+  test(
+    'fetchProfile returns cached profile without calling RPC again',
+    () async {
+      when(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_profile',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async => {'id': 'user-1', 'full_name': 'Ada'});
 
-    await sut.fetchProfile();
-    final cached = await sut.fetchProfile();
+      await sut.fetchProfile();
+      final cached = await sut.fetchProfile();
 
-    expect(cached.fullName, 'Ada');
-    verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
-  });
+      expect(cached.fullName, 'Ada');
+      verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
+    },
+  );
 }

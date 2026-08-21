@@ -28,7 +28,9 @@ final class SelectCategoryBloc
     SelectCategoryStarted event,
     Emitter<SelectCategoryState> emit,
   ) async {
-    emit(state.copyWith(status: SelectCategoryStatus.loading, clearError: true));
+    emit(
+      state.copyWith(status: SelectCategoryStatus.loading, clearError: true),
+    );
     try {
       final preferences = await _getCategoriesWithPreferences(
         forceRefresh: true,

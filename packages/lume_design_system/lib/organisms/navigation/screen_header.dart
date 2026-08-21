@@ -51,18 +51,18 @@ class ScreenHeader extends StatelessWidget {
             ],
           ),
           if (title.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacings.l,
-              AppSpacings.s,
-              0,
-              0,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacings.l,
+                AppSpacings.s,
+                0,
+                0,
+              ),
+              child: Text(
+                title,
+                style: typ.headlineXs.copyWith(color: cs.onSurface),
+              ),
             ),
-            child: Text(
-              title,
-              style: typ.headlineXs.copyWith(color: cs.onSurface),
-            ),
-          ),
         ],
       ),
     );

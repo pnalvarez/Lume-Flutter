@@ -7,10 +7,7 @@ import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
 /// One option in a [SelectableChipGroup].
 @immutable
 class SelectableChipOption<T> {
-  const SelectableChipOption({
-    required this.id,
-    required this.label,
-  });
+  const SelectableChipOption({required this.id, required this.label});
 
   final T id;
   final String label;
@@ -83,9 +80,7 @@ class SelectableChipGroup<T> extends StatelessWidget {
                 Expanded(
                   child: Text(
                     selectAllLabel!,
-                    style: typ.body3Light.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
                   ),
                 ),
               ],

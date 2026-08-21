@@ -8,10 +8,7 @@ abstract interface class IAuthRepository {
 
   Future<AuthSession?> restore();
 
-  Future<AuthSession> signIn({
-    required String email,
-    required String password,
-  });
+  Future<AuthSession> signIn({required String email, required String password});
 
   Future<AuthSignUpResult> signUp({
     required String email,

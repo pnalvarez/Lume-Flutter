@@ -13,10 +13,7 @@ void main() {
   });
 
   test('fromWire throws on legacy Portuguese slugs', () {
-    expect(
-      () => GameType.fromWire('batalha'),
-      throwsA(isA<FormatException>()),
-    );
+    expect(() => GameType.fromWire('batalha'), throwsA(isA<FormatException>()));
     expect(
       () => GameType.fromWire('quem-sou-eu'),
       throwsA(isA<FormatException>()),
