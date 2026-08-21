@@ -27,8 +27,9 @@ abstract final class TrailGameMapper {
     };
   }
 
-  static List<TrailGameDomain> parseAll(Iterable<GameItemData> items) =>
-      [for (final item in items) parse(item)];
+  static List<TrailGameDomain> parseAll(Iterable<GameItemData> items) => [
+    for (final item in items) parse(item),
+  ];
 
   static LightningQuizGameDomain _parseLightningQuiz(
     GameItemData item,
@@ -233,8 +234,10 @@ abstract final class TrailGameMapper {
     }
     return [
       for (final item in value)
-        if (item is String) item
-        else throw FormatException('Expected string items at $key'),
+        if (item is String)
+          item
+        else
+          throw FormatException('Expected string items at $key'),
     ];
   }
 
@@ -258,8 +261,8 @@ extension SubmoduleGamesDataTrailGames on SubmoduleGamesData {
 
 extension GameTrailDataTrailGames on GameTrailData {
   List<TrailGameDomain> get trailGameDomains => [
-        for (final level in levels)
-          for (final submodule in level.submodules)
-            ...TrailGameMapper.parseAll(submodule.games),
-      ];
+    for (final level in levels)
+      for (final submodule in level.submodules)
+        ...TrailGameMapper.parseAll(submodule.games),
+  ];
 }

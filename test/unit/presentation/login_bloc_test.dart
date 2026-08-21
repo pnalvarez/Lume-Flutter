@@ -60,11 +60,7 @@ LoginBloc _bloc(
   _SignUp signUp, {
   IHasSelectedCategories? hasSelected,
 }) {
-  return LoginBloc(
-    signIn,
-    signUp,
-    hasSelected ?? _HasSelected(true),
-  );
+  return LoginBloc(signIn, signUp, hasSelected ?? _HasSelected(true));
 }
 
 void main() {

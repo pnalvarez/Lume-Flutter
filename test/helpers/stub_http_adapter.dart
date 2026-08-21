@@ -7,7 +7,8 @@ final class StubHttpAdapter implements HttpClientAdapter {
   final Future<ResponseBody> Function(
     RequestOptions options,
     Stream<List<int>>? requestStream,
-  ) onFetch;
+  )
+  onFetch;
 
   @override
   void close({bool force = false}) {}

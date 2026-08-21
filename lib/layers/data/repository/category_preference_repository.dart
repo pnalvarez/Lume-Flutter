@@ -5,7 +5,8 @@ import 'package:lume/layers/domain/models/category/category_preferences_domain.d
 import 'package:lume/layers/domain/repository/category_preference_repository.dart';
 
 @Injectable(as: ICategoryPreferenceRepository)
-final class CategoryPreferenceRepository implements ICategoryPreferenceRepository {
+final class CategoryPreferenceRepository
+    implements ICategoryPreferenceRepository {
   CategoryPreferenceRepository(this._dataSource);
 
   final ICategoryPreferenceDataSource _dataSource;

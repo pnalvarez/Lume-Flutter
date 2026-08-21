@@ -4,10 +4,7 @@ part 'category_data.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CategoryData {
-  const CategoryData({
-    required this.id,
-    required this.name,
-  });
+  const CategoryData({required this.id, required this.name});
 
   final int id;
   final String name;

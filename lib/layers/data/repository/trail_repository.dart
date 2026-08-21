@@ -4,7 +4,8 @@ import 'package:lume/layers/data/mappers/trail_mapper.dart';
 import 'package:lume/layers/domain/models/game/game_trail_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
-import 'package:lume/layers/domain/repository/trail_repository.dart' show ITrailRepository;
+import 'package:lume/layers/domain/repository/trail_repository.dart'
+    show ITrailRepository;
 
 @Injectable(as: ITrailRepository)
 final class TrailRepository implements ITrailRepository {

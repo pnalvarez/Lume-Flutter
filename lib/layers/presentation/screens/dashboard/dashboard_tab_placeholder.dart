@@ -28,16 +28,11 @@ class DashboardTabPlaceholder extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title,
-                style: typ.headlineS.copyWith(color: cs.onSurface),
-              ),
+              Text(title, style: typ.headlineS.copyWith(color: cs.onSurface)),
               const SizedBox(height: AppSpacings.s),
               Text(
                 homeAuthenticatedMessage,
-                style: typ.body3Light.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
+                style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacings.xl2),

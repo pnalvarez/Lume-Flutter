@@ -13,10 +13,7 @@ class SignInWithEmail implements ISignInWithEmail {
   final IAuthRepository _repository;
 
   @override
-  Future<AuthSession> call({
-    required String email,
-    required String password,
-  }) {
+  Future<AuthSession> call({required String email, required String password}) {
     return _repository.signIn(email: email, password: password);
   }
 }

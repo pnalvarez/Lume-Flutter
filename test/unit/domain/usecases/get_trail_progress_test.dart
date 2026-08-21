@@ -10,9 +10,13 @@ void main() {
     final repository = MockITrailRepository();
     final sut = GetTrailProgress(repository);
     const expected = TrailProgressDomain(
-      pairProgress: [PairProgressDomain(pairId: 4, completed: true, scorePct: 80)],
+      pairProgress: [
+        PairProgressDomain(pairId: 4, completed: true, scorePct: 80),
+      ],
     );
-    when(repository.getProgress(forceRefresh: false)).thenAnswer((_) async => expected);
+    when(
+      repository.getProgress(forceRefresh: false),
+    ).thenAnswer((_) async => expected);
 
     final result = await sut.call();
 

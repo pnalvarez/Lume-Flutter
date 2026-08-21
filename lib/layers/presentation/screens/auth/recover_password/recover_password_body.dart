@@ -143,10 +143,7 @@ class _RequestForm extends StatelessWidget {
 }
 
 class _SentContent extends StatelessWidget {
-  const _SentContent({
-    required this.email,
-    required this.onGoToLogin,
-  });
+  const _SentContent({required this.email, required this.onGoToLogin});
 
   final String email;
   final VoidCallback onGoToLogin;

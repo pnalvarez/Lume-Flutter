@@ -7,7 +7,8 @@ Widget typoHeadlines(BuildContext context) =>
     const _TypographyCatalog(group: 'Headlines');
 
 @widgetbook.UseCase(name: 'Body', type: _TypographyCatalog)
-Widget typoBody(BuildContext context) => const _TypographyCatalog(group: 'Body');
+Widget typoBody(BuildContext context) =>
+    const _TypographyCatalog(group: 'Body');
 
 @widgetbook.UseCase(name: 'Labels & Tags', type: _TypographyCatalog)
 Widget typoLabels(BuildContext context) =>

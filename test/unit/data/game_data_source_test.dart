@@ -17,15 +17,17 @@ void main() {
     sut = GameDataSource(apiClient, storage);
   });
 
-  test('fetchSubmoduleGames posts p_submodule_id and parses SubmoduleGamesData',
-      () async {
-    when(
-      apiClient.rpc<Map<String, dynamic>>(
-        'get_submodule_games',
-        params: anyNamed('params'),
-        headers: anyNamed('headers'),
-      ),
-    ).thenAnswer((_) async => {
+  test(
+    'fetchSubmoduleGames posts p_submodule_id and parses SubmoduleGamesData',
+    () async {
+      when(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_submodule_games',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => {
           'id': 9,
           'title': 'Preview',
           'sort_order': 1,
@@ -43,18 +45,20 @@ void main() {
               },
             },
           ],
-        });
+        },
+      );
 
-    final data = await sut.fetchSubmoduleGames(submoduleId: 9);
+      final data = await sut.fetchSubmoduleGames(submoduleId: 9);
 
-    expect(data.id, 9);
-    expect(data.title, 'Preview');
-    expect(data.games.single.gameType, GameType.whoAmI);
-    verify(
-      apiClient.rpc<Map<String, dynamic>>(
-        'get_submodule_games',
-        params: {'p_submodule_id': 9},
-      ),
-    ).called(1);
-  });
+      expect(data.id, 9);
+      expect(data.title, 'Preview');
+      expect(data.games.single.gameType, GameType.whoAmI);
+      verify(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_submodule_games',
+          params: {'p_submodule_id': 9},
+        ),
+      ).called(1);
+    },
+  );
 }

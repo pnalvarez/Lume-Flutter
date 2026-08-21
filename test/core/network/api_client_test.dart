@@ -19,7 +19,8 @@ void main() {
     Future<ResponseBody> Function(
       RequestOptions options,
       Stream<List<int>>? requestStream,
-    ) onFetch, {
+    )
+    onFetch, {
     List<Interceptor> interceptors = const [],
   }) {
     final dio = Dio(BaseOptions(baseUrl: baseUrl));
@@ -35,9 +36,11 @@ void main() {
         expect(options.path, 'modulos');
         expect(options.queryParameters['select'], '*');
         expect(options.headers['Prefer'], 'return=representation');
-        return jsonResponse(jsonEncode([
-          {'id': 1, 'nome': 'História'},
-        ]));
+        return jsonResponse(
+          jsonEncode([
+            {'id': 1, 'nome': 'História'},
+          ]),
+        );
       });
 
       final data = await client.get<List<dynamic>>(
@@ -58,7 +61,9 @@ void main() {
         return jsonResponse(jsonEncode({'modulos': []}));
       });
 
-      final data = await client.rpc<Map<String, dynamic>>('get_trail_bootstrap');
+      final data = await client.rpc<Map<String, dynamic>>(
+        'get_trail_bootstrap',
+      );
 
       expect(data['modulos'], isEmpty);
     });
@@ -209,32 +214,37 @@ void main() {
       );
     });
 
-    test('create + rpc does not smash supabase.co into supabase.corpc', () async {
-      final tokens = MockIAuthTokenProvider();
-      when(tokens.accessToken).thenReturn(null);
+    test(
+      'create + rpc does not smash supabase.co into supabase.corpc',
+      () async {
+        final tokens = MockIAuthTokenProvider();
+        when(tokens.accessToken).thenReturn(null);
 
-      late final RequestOptions captured;
-      final dio = Dio(
-        BaseOptions(
-          baseUrl: ApiClient.normalizeRestBaseUrl(
-            'https://mizgtuwtuaculchwizkm.supabase.co',
+        late final RequestOptions captured;
+        final dio = Dio(
+          BaseOptions(
+            baseUrl: ApiClient.normalizeRestBaseUrl(
+              'https://mizgtuwtuaculchwizkm.supabase.co',
+            ),
           ),
-        ),
-      );
-      dio.httpClientAdapter = StubHttpAdapter((options, _) async {
-        captured = options;
-        return jsonResponse(jsonEncode({'selected_ids': <int>[]}));
-      });
-      final client = ApiClient(dio: dio);
+        );
+        dio.httpClientAdapter = StubHttpAdapter((options, _) async {
+          captured = options;
+          return jsonResponse(jsonEncode({'selected_ids': <int>[]}));
+        });
+        final client = ApiClient(dio: dio);
 
-      await client.rpc<Map<String, dynamic>>('get_categories_with_preferences');
+        await client.rpc<Map<String, dynamic>>(
+          'get_categories_with_preferences',
+        );
 
-      expect(
-        captured.uri.toString(),
-        'https://mizgtuwtuaculchwizkm.supabase.co/rest/v1/rpc/'
-        'get_categories_with_preferences',
-      );
-    });
+        expect(
+          captured.uri.toString(),
+          'https://mizgtuwtuaculchwizkm.supabase.co/rest/v1/rpc/'
+          'get_categories_with_preferences',
+        );
+      },
+    );
   });
 
   group('AuthInterceptor', () {
@@ -242,13 +252,10 @@ void main() {
       final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn('jwt-123');
 
-      final client = clientWith(
-        (options, _) async {
-          expect(options.headers['Authorization'], 'Bearer jwt-123');
-          return jsonResponse('[]');
-        },
-        interceptors: [AuthInterceptor(tokens)],
-      );
+      final client = clientWith((options, _) async {
+        expect(options.headers['Authorization'], 'Bearer jwt-123');
+        return jsonResponse('[]');
+      }, interceptors: [AuthInterceptor(tokens)]);
 
       await client.get<dynamic>(endpoint: 'modulos');
       verify(tokens.accessToken).called(1);
@@ -258,58 +265,48 @@ void main() {
       final tokens = MockIAuthTokenProvider();
       when(tokens.accessToken).thenReturn(null);
 
-      final client = clientWith(
-        (options, _) async {
-          expect(options.headers.containsKey('Authorization'), isFalse);
-          return jsonResponse('[]');
-        },
-        interceptors: [AuthInterceptor(tokens)],
-      );
+      final client = clientWith((options, _) async {
+        expect(options.headers.containsKey('Authorization'), isFalse);
+        return jsonResponse('[]');
+      }, interceptors: [AuthInterceptor(tokens)]);
 
       await client.get<dynamic>(endpoint: 'modulos');
     });
 
-    test('does not overwrite an Authorization header already on the request',
-        () async {
-      final tokens = MockIAuthTokenProvider();
-      when(tokens.accessToken).thenReturn('interceptor-token');
+    test(
+      'does not overwrite an Authorization header already on the request',
+      () async {
+        final tokens = MockIAuthTokenProvider();
+        when(tokens.accessToken).thenReturn('interceptor-token');
 
-      final client = clientWith(
-        (options, _) async {
+        final client = clientWith((options, _) async {
           expect(options.headers['Authorization'], 'Bearer request-token');
           return jsonResponse('[]');
-        },
-        interceptors: [AuthInterceptor(tokens)],
-      );
+        }, interceptors: [AuthInterceptor(tokens)]);
 
-      await client.get<dynamic>(
-        endpoint: 'modulos',
-        headers: const {'Authorization': 'Bearer request-token'},
-      );
-    });
+        await client.get<dynamic>(
+          endpoint: 'modulos',
+          headers: const {'Authorization': 'Bearer request-token'},
+        );
+      },
+    );
   });
 
   group('SupabaseHeadersInterceptor', () {
     test('attaches apikey when missing', () async {
-      final client = clientWith(
-        (options, _) async {
-          expect(options.headers['apikey'], 'anon-key');
-          return jsonResponse('[]');
-        },
-        interceptors: [SupabaseHeadersInterceptor(apiKey: 'anon-key')],
-      );
+      final client = clientWith((options, _) async {
+        expect(options.headers['apikey'], 'anon-key');
+        return jsonResponse('[]');
+      }, interceptors: [SupabaseHeadersInterceptor(apiKey: 'anon-key')]);
 
       await client.get<dynamic>(endpoint: 'modulos');
     });
 
     test('does not overwrite an existing apikey', () async {
-      final client = clientWith(
-        (options, _) async {
-          expect(options.headers['apikey'], 'override');
-          return jsonResponse('[]');
-        },
-        interceptors: [SupabaseHeadersInterceptor(apiKey: 'anon-key')],
-      );
+      final client = clientWith((options, _) async {
+        expect(options.headers['apikey'], 'override');
+        return jsonResponse('[]');
+      }, interceptors: [SupabaseHeadersInterceptor(apiKey: 'anon-key')]);
 
       await client.get<dynamic>(
         endpoint: 'modulos',

@@ -27,11 +27,8 @@ class StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final accent = _accent(state, cs);
-    final borderColor = Color.lerp(
-          cs.outline.withValues(alpha: 0.65),
-          accent,
-          0.42,
-        ) ??
+    final borderColor =
+        Color.lerp(cs.outline.withValues(alpha: 0.65), accent, 0.42) ??
         cs.outline;
 
     return Container(
@@ -63,10 +60,10 @@ class StatusChip extends StatelessWidget {
   }
 
   Color _accent(StatusChipState state, ColorScheme cs) => switch (state) {
-        StatusChipState.success => AppColors.Success.success,
-        StatusChipState.neutral => cs.onSurfaceVariant,
-        StatusChipState.error => AppColors.Error.onError,
-        StatusChipState.warning => AppColors.Accent.accent,
-        StatusChipState.primary => cs.primary,
-      };
+    StatusChipState.success => AppColors.Success.success,
+    StatusChipState.neutral => cs.onSurfaceVariant,
+    StatusChipState.error => AppColors.Error.onError,
+    StatusChipState.warning => AppColors.Accent.accent,
+    StatusChipState.primary => cs.primary,
+  };
 }

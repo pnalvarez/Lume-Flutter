@@ -14,7 +14,9 @@ Widget progressBarInteractive(BuildContext context) {
   final label = context.knobs.string(label: 'Label', initialValue: 'Progress');
 
   final showPct = context.knobs.boolean(
-      label: 'Show percentage', initialValue: true);
+    label: 'Show percentage',
+    initialValue: true,
+  );
   final height = context.knobs.double.slider(
     label: 'Height',
     initialValue: 10,

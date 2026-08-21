@@ -23,12 +23,14 @@ void main() {
         params: anyNamed('params'),
         headers: anyNamed('headers'),
       ),
-    ).thenAnswer((_) async => {
-          'categories': [
-            {'id': 1, 'name': 'History'},
-          ],
-          'selected_ids': [1],
-        });
+    ).thenAnswer(
+      (_) async => {
+        'categories': [
+          {'id': 1, 'name': 'History'},
+        ],
+        'selected_ids': [1],
+      },
+    );
 
     final data = await sut.fetchCategoriesWithPreferences();
 
@@ -46,7 +48,11 @@ void main() {
         params: anyNamed('params'),
         headers: anyNamed('headers'),
       ),
-    ).thenAnswer((_) async => {'selected_ids': [2, 3]});
+    ).thenAnswer(
+      (_) async => {
+        'selected_ids': [2, 3],
+      },
+    );
 
     final data = await sut.saveCategoryPreferences(categoryIds: const [2, 3]);
 
@@ -54,7 +60,9 @@ void main() {
     verify(
       apiClient.rpc<Map<String, dynamic>>(
         'save_category_preferences',
-        params: {'p_category_ids': [2, 3]},
+        params: {
+          'p_category_ids': [2, 3],
+        },
       ),
     ).called(1);
   });

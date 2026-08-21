@@ -11,11 +11,7 @@ sealed class AuthFailure implements Exception {
 
 /// Sign-in rejected because the email has not been confirmed.
 final class AuthEmailNotConfirmedFailure extends AuthFailure {
-  const AuthEmailNotConfirmedFailure({
-    super.message,
-    super.cause,
-    this.email,
-  });
+  const AuthEmailNotConfirmedFailure({super.message, super.cause, this.email});
 
   final String? email;
 }

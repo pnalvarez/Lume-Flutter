@@ -61,10 +61,7 @@ class _ConfirmEmailBodyState extends State<ConfirmEmailBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ScreenHeader(
-              backTooltip: authBack,
-              onBack: widget.onBack,
-            ),
+            ScreenHeader(backTooltip: authBack, onBack: widget.onBack),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(

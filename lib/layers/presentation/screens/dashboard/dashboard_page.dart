@@ -41,11 +41,7 @@ class _DashboardView extends StatelessWidget {
         }
       },
       child: AutoTabsRouter(
-        routes: const [
-          HomeRoute(),
-          GamesRoute(),
-          ProgressRoute(),
-        ],
+        routes: const [HomeRoute(), GamesRoute(), ProgressRoute()],
         builder: (context, child) {
           final tabsRouter = AutoTabsRouter.of(context);
           return DashboardBody(

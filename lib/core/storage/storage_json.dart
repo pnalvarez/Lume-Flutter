@@ -49,9 +49,6 @@ extension StorageClientJson on IStorageClient {
     List<T> values,
     Map<String, dynamic> Function(T value) toJson,
   ) async {
-    await write(
-      key,
-      jsonEncode([for (final value in values) toJson(value)]),
-    );
+    await write(key, jsonEncode([for (final value in values) toJson(value)]));
   }
 }

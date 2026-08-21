@@ -96,11 +96,7 @@ ThemeData lumeLightTheme() {
       linearTrackColor: cs.surfaceContainerHigh,
       linearMinHeight: 8,
     ),
-    dividerTheme: DividerThemeData(
-      color: cs.outline,
-      thickness: 1,
-      space: 1,
-    ),
+    dividerTheme: DividerThemeData(color: cs.outline, thickness: 1, space: 1),
     snackBarTheme: SnackBarThemeData(
       backgroundColor: cs.inverseSurface,
       contentTextStyle: typ.body4Light.copyWith(color: cs.onInverseSurface),
@@ -180,11 +176,7 @@ ThemeData lumeDarkTheme() {
       linearTrackColor: cs.surfaceContainerHigh,
       linearMinHeight: 8,
     ),
-    dividerTheme: DividerThemeData(
-      color: cs.outline,
-      thickness: 1,
-      space: 1,
-    ),
+    dividerTheme: DividerThemeData(color: cs.outline, thickness: 1, space: 1),
   );
 }
 

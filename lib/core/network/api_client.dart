@@ -55,12 +55,11 @@ final class ApiClient implements IApiClient {
   factory ApiClient.fromInjection(
     AppConfig config,
     IAuthTokenProvider tokenProvider,
-  ) =>
-      ApiClient.create(
-        baseUrl: config.supabaseUrl,
-        apiKey: config.supabaseAnonKey,
-        tokenProvider: tokenProvider,
-      );
+  ) => ApiClient.create(
+    baseUrl: config.supabaseUrl,
+    apiKey: config.supabaseAnonKey,
+    tokenProvider: tokenProvider,
+  );
 
   /// Production wiring: timeouts, JSON headers, and optional interceptors.
   ///
@@ -129,10 +128,7 @@ final class ApiClient implements IApiClient {
         endpoint,
         data: body,
         queryParameters: queryParameters,
-        options: Options(
-          method: method.verb,
-          headers: headers,
-        ),
+        options: Options(method: method.verb, headers: headers),
       );
 
       final statusCode = response.statusCode ?? 0;
@@ -210,20 +206,25 @@ ApiException _mapDioException(DioException error) {
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
     DioExceptionType.receiveTimeout ||
-    DioExceptionType.transformTimeout =>
-      ApiTimeoutException(message: error.message, cause: error),
-    DioExceptionType.connectionError ||
-    DioExceptionType.badCertificate =>
+    DioExceptionType.transformTimeout => ApiTimeoutException(
+      message: error.message,
+      cause: error,
+    ),
+    DioExceptionType.connectionError || DioExceptionType.badCertificate =>
       ApiNetworkException(message: error.message, cause: error),
-    DioExceptionType.cancel =>
-      ApiCancelledException(message: error.message, cause: error),
+    DioExceptionType.cancel => ApiCancelledException(
+      message: error.message,
+      cause: error,
+    ),
     DioExceptionType.badResponse => ApiHttpException(
-        statusCode: error.response?.statusCode ?? 0,
-        message: error.message ?? 'HTTP ${error.response?.statusCode}',
-        data: error.response?.data,
-        cause: error,
-      ),
-    DioExceptionType.unknown =>
-      ApiUnknownException(message: error.message, cause: error),
+      statusCode: error.response?.statusCode ?? 0,
+      message: error.message ?? 'HTTP ${error.response?.statusCode}',
+      data: error.response?.data,
+      cause: error,
+    ),
+    DioExceptionType.unknown => ApiUnknownException(
+      message: error.message,
+      cause: error,
+    ),
   };
 }

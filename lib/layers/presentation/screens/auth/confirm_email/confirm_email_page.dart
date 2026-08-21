@@ -18,8 +18,8 @@ class ConfirmEmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<ConfirmEmailBloc>()
-        ..add(ConfirmEmailStarted(email: email)),
+      create: (_) =>
+          getIt<ConfirmEmailBloc>()..add(ConfirmEmailStarted(email: email)),
       child: const _ConfirmEmailView(),
     );
   }

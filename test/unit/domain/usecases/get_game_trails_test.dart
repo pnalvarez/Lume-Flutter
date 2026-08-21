@@ -10,14 +10,11 @@ void main() {
     final repository = MockITrailRepository();
     final sut = GetGameTrails(repository);
     const expected = [
-      GameTrailDomain(
-        id: 1,
-        title: 'History',
-        sortOrder: 1,
-        emoji: '📜',
-      ),
+      GameTrailDomain(id: 1, title: 'History', sortOrder: 1, emoji: '📜'),
     ];
-    when(repository.getGameTrails(forceRefresh: false)).thenAnswer((_) async => expected);
+    when(
+      repository.getGameTrails(forceRefresh: false),
+    ).thenAnswer((_) async => expected);
 
     final result = await sut.call();
 

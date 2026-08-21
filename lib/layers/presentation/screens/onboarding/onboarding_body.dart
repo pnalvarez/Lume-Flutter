@@ -76,11 +76,7 @@ class OnboardingBody extends StatelessWidget {
                 },
               ),
             ),
-            _OnboardingFooter(
-              index: index,
-              isLast: isLast,
-              onNext: onNext,
-            ),
+            _OnboardingFooter(index: index, isLast: isLast, onNext: onNext),
           ],
         ),
       ),
@@ -364,10 +360,7 @@ class _OnboardingFooter extends StatelessWidget {
             isExpanded: true,
             trailingIcon: isLast
                 ? null
-                : Icon(
-                    Icons.chevron_right_rounded,
-                    color: cs.onPrimary,
-                  ),
+                : Icon(Icons.chevron_right_rounded, color: cs.onPrimary),
             onPressed: onNext,
           ),
         ],

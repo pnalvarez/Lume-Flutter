@@ -23,9 +23,9 @@ void main() {
   test('is false when no categories are selected', () async {
     final getPreferences = MockIGetCategoriesWithPreferences();
     final sut = HasSelectedCategories(getPreferences);
-    when(getPreferences.call()).thenAnswer(
-      (_) async => const CategoryPreferencesDomain(),
-    );
+    when(
+      getPreferences.call(),
+    ).thenAnswer((_) async => const CategoryPreferencesDomain());
 
     expect(await sut.call(), isFalse);
   });

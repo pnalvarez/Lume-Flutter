@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 /// Debug logger that never prints access tokens, API keys, or cookies in full.
 final class SanitizingLogInterceptor extends Interceptor {
   SanitizingLogInterceptor({void Function(String message)? logPrint})
-      : _logPrint = logPrint ?? debugPrint;
+    : _logPrint = logPrint ?? debugPrint;
 
   final void Function(String message) _logPrint;
 
@@ -39,7 +39,10 @@ final class SanitizingLogInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     final buffer = StringBuffer()
       ..writeln(
         '<-- ${response.statusCode} ${response.requestOptions.method} '

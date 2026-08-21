@@ -107,10 +107,7 @@ Widget confirmEmailDefault(BuildContext context) {
 )
 Widget confirmEmailResending(BuildContext context) {
   return ConfirmEmailBody(
-    state: const ConfirmEmailState(
-      email: 'demo@lume.app',
-      isSubmitting: true,
-    ),
+    state: const ConfirmEmailState(email: 'demo@lume.app', isSubmitting: true),
     onBack: _noop,
     onEmailChanged: _noopString,
     onResend: _noop,
@@ -141,10 +138,7 @@ Widget recoverPasswordForm(BuildContext context) {
 )
 Widget recoverPasswordSent(BuildContext context) {
   return RecoverPasswordBody(
-    state: const RecoverPasswordState(
-      email: 'demo@lume.app',
-      sent: true,
-    ),
+    state: const RecoverPasswordState(email: 'demo@lume.app', sent: true),
     onBack: _noop,
     onEmailChanged: _noopString,
     onSubmit: _noop,
@@ -161,9 +155,7 @@ Widget recoverPasswordSent(BuildContext context) {
 )
 Widget definePasswordChecking(BuildContext context) {
   return DefinePasswordBody(
-    state: const DefinePasswordState(
-      status: DefinePasswordStatus.checking,
-    ),
+    state: const DefinePasswordState(status: DefinePasswordStatus.checking),
     onPasswordChanged: _noopString,
     onConfirmChanged: _noopString,
     onSubmit: _noop,
@@ -345,11 +337,7 @@ Widget dashboardShellTrail(BuildContext context) {
     min: 0,
     max: 2,
   );
-  final titles = [
-    dashboardTabTrail,
-    dashboardTabGames,
-    dashboardTabProgress,
-  ];
+  final titles = [dashboardTabTrail, dashboardTabGames, dashboardTabProgress];
   return DashboardBody(
     selectedIndex: selected,
     onTabSelected: _noopInt,

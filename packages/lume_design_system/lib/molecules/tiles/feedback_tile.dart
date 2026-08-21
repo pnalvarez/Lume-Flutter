@@ -75,16 +75,16 @@ class FeedbackTile extends StatelessWidget {
   ({Color accent, IconData icon}) _style(FeedbackTileState state) =>
       switch (state) {
         FeedbackTileState.success => (
-            accent: AppColors.Success.onSuccess,
-            icon: Icons.check_circle_rounded,
-          ),
+          accent: AppColors.Success.onSuccess,
+          icon: Icons.check_circle_rounded,
+        ),
         FeedbackTileState.warning => (
-            accent: AppColors.Accent.onAccent,
-            icon: Icons.warning_amber_rounded,
-          ),
+          accent: AppColors.Accent.onAccent,
+          icon: Icons.warning_amber_rounded,
+        ),
         FeedbackTileState.error => (
-            accent: AppColors.Error.onError,
-            icon: Icons.cancel_rounded,
-          ),
+          accent: AppColors.Error.onError,
+          icon: Icons.cancel_rounded,
+        ),
       };
 }

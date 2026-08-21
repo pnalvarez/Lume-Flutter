@@ -65,7 +65,10 @@ Widget buttonInteractive(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             LumeButton(
-              label: context.knobs.string(label: 'Label', initialValue: 'Continuar'),
+              label: context.knobs.string(
+                label: 'Label',
+                initialValue: 'Continuar',
+              ),
               trait: context.knobs.object.dropdown(
                 label: 'Trait',
                 options: LumeButtonTrait.values,
@@ -84,9 +87,18 @@ Widget buttonInteractive(BuildContext context) {
                 labelBuilder: (s) => s.name,
                 initialOption: LumeButtonSize.md,
               ),
-              isLoading: context.knobs.boolean(label: 'Loading', initialValue: false),
-              isEnabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
-              isExpanded: context.knobs.boolean(label: 'Expanded', initialValue: true),
+              isLoading: context.knobs.boolean(
+                label: 'Loading',
+                initialValue: false,
+              ),
+              isEnabled: context.knobs.boolean(
+                label: 'Enabled',
+                initialValue: true,
+              ),
+              isExpanded: context.knobs.boolean(
+                label: 'Expanded',
+                initialValue: true,
+              ),
               onPressed: () {},
             ),
           ],
@@ -249,21 +261,14 @@ Widget buttonExpanded(BuildContext context) {
             style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
           const SizedBox(height: 8),
-          LumeButton(
-            label: 'Continuar',
-            isExpanded: true,
-            onPressed: () {},
-          ),
+          LumeButton(label: 'Continuar', isExpanded: true, onPressed: () {}),
           const SizedBox(height: 24),
           const Text(
             'isExpanded: false',
             style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
           const SizedBox(height: 8),
-          LumeButton(
-            label: 'Continuar',
-            onPressed: () {},
-          ),
+          LumeButton(label: 'Continuar', onPressed: () {}),
         ],
       ),
     ),

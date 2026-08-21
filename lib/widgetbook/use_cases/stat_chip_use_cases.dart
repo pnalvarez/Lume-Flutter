@@ -16,11 +16,19 @@ Widget statChipShowcase(BuildContext context) {
         children: [
           StatChip(icon: Icons.bolt_rounded, label: label, value: value),
           const SizedBox(height: 12),
-          const StatChip(icon: Icons.local_fire_department_rounded, label: 'Streak', value: '7d'),
+          const StatChip(
+            icon: Icons.local_fire_department_rounded,
+            label: 'Streak',
+            value: '7d',
+          ),
           const SizedBox(height: 12),
           const StatChip(icon: Icons.star_rounded, label: 'Level', value: '14'),
           const SizedBox(height: 12),
-          const StatChip(icon: Icons.timeline_rounded, label: 'Cards', value: '243'),
+          const StatChip(
+            icon: Icons.timeline_rounded,
+            label: 'Cards',
+            value: '243',
+          ),
         ],
       ),
     ),

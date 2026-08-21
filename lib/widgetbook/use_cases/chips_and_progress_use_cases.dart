@@ -50,14 +50,8 @@ Widget chipPickerInteractive(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Selected and unselected', type: SelectableChip)
 Widget selectableChipStates(BuildContext context) {
-  final selected = context.knobs.boolean(
-    label: 'Selected',
-    initialValue: true,
-  );
-  final label = context.knobs.string(
-    label: 'Label',
-    initialValue: 'História',
-  );
+  final selected = context.knobs.boolean(label: 'Selected', initialValue: true);
+  final label = context.knobs.string(label: 'Label', initialValue: 'História');
   return Scaffold(
     body: Padding(
       padding: const EdgeInsets.all(24),
@@ -65,11 +59,7 @@ Widget selectableChipStates(BuildContext context) {
         spacing: 8,
         runSpacing: 8,
         children: [
-          SelectableChip(
-            label: label,
-            selected: selected,
-            onPressed: () {},
-          ),
+          SelectableChip(label: label, selected: selected, onPressed: () {}),
           SelectableChip(
             label: 'Filosofia',
             selected: !selected,
@@ -81,7 +71,10 @@ Widget selectableChipStates(BuildContext context) {
   );
 }
 
-@widgetbook.UseCase(name: 'Multi-select with select all', type: SelectableChipGroup)
+@widgetbook.UseCase(
+  name: 'Multi-select with select all',
+  type: SelectableChipGroup,
+)
 Widget selectableChipGroupInteractive(BuildContext context) {
   return const Scaffold(
     body: Padding(
@@ -167,8 +160,10 @@ Widget progressBarWithLeading(BuildContext context) {
     min: 0,
     max: 1,
   );
-  final label =
-      context.knobs.string(label: 'Badge label', initialValue: 'Aprendendo');
+  final label = context.knobs.string(
+    label: 'Badge label',
+    initialValue: 'Aprendendo',
+  );
 
   return Scaffold(
     body: Padding(

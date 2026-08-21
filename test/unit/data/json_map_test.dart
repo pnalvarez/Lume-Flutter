@@ -9,13 +9,10 @@ void main() {
   });
 
   test('parseJsonList maps each object with fromJson', () {
-    final items = parseJsonList(
-      [
-        {'id': 1},
-        {'id': 2},
-      ],
-      (json) => json['id'] as int,
-    );
+    final items = parseJsonList([
+      {'id': 1},
+      {'id': 2},
+    ], (json) => json['id'] as int);
 
     expect(items, [1, 2]);
   });

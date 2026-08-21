@@ -36,9 +36,7 @@ class _SplashView extends StatelessWidget {
       },
       child: const Scaffold(
         backgroundColor: Colors.white,
-        body: Center(
-          child: LumeLogo(size: 200),
-        ),
+        body: Center(child: LumeLogo(size: 200)),
       ),
     );
   }

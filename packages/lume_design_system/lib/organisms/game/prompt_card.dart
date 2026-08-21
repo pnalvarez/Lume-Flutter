@@ -9,12 +9,7 @@ class PromptCard extends StatelessWidget {
   final String? eyebrow;
   final Widget? media;
 
-  const PromptCard({
-    super.key,
-    required this.text,
-    this.eyebrow,
-    this.media,
-  });
+  const PromptCard({super.key, required this.text, this.eyebrow, this.media});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +45,10 @@ class PromptCard extends StatelessWidget {
           ],
           Text(
             text,
-            style: typ.body2Semibold.copyWith(color: cs.onSurface, height: 1.35),
+            style: typ.body2Semibold.copyWith(
+              color: cs.onSurface,
+              height: 1.35,
+            ),
           ),
         ],
       ),

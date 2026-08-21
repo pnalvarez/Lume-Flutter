@@ -73,14 +73,10 @@ class _OnboardingViewState extends State<_OnboardingView> {
             index: state.index,
             isLast: state.isLast,
             onSkip: () {
-              context.read<OnboardingBloc>().add(
-                const OnboardingSkipPressed(),
-              );
+              context.read<OnboardingBloc>().add(const OnboardingSkipPressed());
             },
             onNext: () {
-              context.read<OnboardingBloc>().add(
-                const OnboardingNextPressed(),
-              );
+              context.read<OnboardingBloc>().add(const OnboardingNextPressed());
             },
             onPageChanged: (index) {
               context.read<OnboardingBloc>().add(OnboardingPageChanged(index));

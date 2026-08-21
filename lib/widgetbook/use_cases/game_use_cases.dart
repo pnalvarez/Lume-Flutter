@@ -29,11 +29,31 @@ Widget choiceGroupStates(BuildContext context) {
       child: ChoiceGroup(
         onSelected: (_) {},
         options: const [
-          ChoiceOption(id: '1', label: 'Idle option', state: ChoiceVisualState.idle),
-          ChoiceOption(id: '2', label: 'Selected', state: ChoiceVisualState.selected),
-          ChoiceOption(id: '3', label: 'Positive', state: ChoiceVisualState.positive),
-          ChoiceOption(id: '4', label: 'Negative', state: ChoiceVisualState.negative),
-          ChoiceOption(id: '5', label: 'Disabled', state: ChoiceVisualState.disabled),
+          ChoiceOption(
+            id: '1',
+            label: 'Idle option',
+            state: ChoiceVisualState.idle,
+          ),
+          ChoiceOption(
+            id: '2',
+            label: 'Selected',
+            state: ChoiceVisualState.selected,
+          ),
+          ChoiceOption(
+            id: '3',
+            label: 'Positive',
+            state: ChoiceVisualState.positive,
+          ),
+          ChoiceOption(
+            id: '4',
+            label: 'Negative',
+            state: ChoiceVisualState.negative,
+          ),
+          ChoiceOption(
+            id: '5',
+            label: 'Disabled',
+            state: ChoiceVisualState.disabled,
+          ),
         ],
       ),
     ),
@@ -42,10 +62,11 @@ Widget choiceGroupStates(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Interactive', type: SessionTimer)
 Widget sessionTimerInteractive(BuildContext context) {
-  final display =
-      context.knobs.string(label: 'Display', initialValue: '00:45');
+  final display = context.knobs.string(label: 'Display', initialValue: '00:45');
   final urgent = context.knobs.boolean(label: 'Urgent', initialValue: false);
   return Scaffold(
-    body: Center(child: SessionTimer(display: display, urgent: urgent)),
+    body: Center(
+      child: SessionTimer(display: display, urgent: urgent),
+    ),
   );
 }

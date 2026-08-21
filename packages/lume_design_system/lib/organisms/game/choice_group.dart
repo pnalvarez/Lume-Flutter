@@ -25,11 +25,7 @@ class ChoiceGroup extends StatelessWidget {
   final List<ChoiceOption> options;
   final ValueChanged<String>? onSelected;
 
-  const ChoiceGroup({
-    super.key,
-    required this.options,
-    this.onSelected,
-  });
+  const ChoiceGroup({super.key, required this.options, this.onSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -60,30 +56,30 @@ class _ChoiceRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final (Color bg, Color border, Color fg) = switch (option.state) {
       ChoiceVisualState.idle => (
-          cs.surfaceContainerLowest,
-          cs.outline,
-          cs.onSurface,
-        ),
+        cs.surfaceContainerLowest,
+        cs.outline,
+        cs.onSurface,
+      ),
       ChoiceVisualState.selected => (
-          cs.primaryContainer,
-          cs.primary,
-          cs.onPrimaryContainer,
-        ),
+        cs.primaryContainer,
+        cs.primary,
+        cs.onPrimaryContainer,
+      ),
       ChoiceVisualState.positive => (
-          AppColors.Success.successContainer,
-          AppColors.Success.success,
-          AppColors.Success.onSuccess,
-        ),
+        AppColors.Success.successContainer,
+        AppColors.Success.success,
+        AppColors.Success.onSuccess,
+      ),
       ChoiceVisualState.negative => (
-          AppColors.Error.errorContainer,
-          AppColors.Error.error,
-          AppColors.Error.onError,
-        ),
+        AppColors.Error.errorContainer,
+        AppColors.Error.error,
+        AppColors.Error.onError,
+      ),
       ChoiceVisualState.disabled => (
-          cs.surfaceContainerLow,
-          cs.outline.withValues(alpha: 0.5),
-          cs.onSurface.withValues(alpha: 0.38),
-        ),
+        cs.surfaceContainerLow,
+        cs.outline.withValues(alpha: 0.5),
+        cs.onSurface.withValues(alpha: 0.38),
+      ),
     };
 
     final radius = BorderRadius.circular(AppRadius.l);

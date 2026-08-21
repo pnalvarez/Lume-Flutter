@@ -5,10 +5,7 @@ import 'package:lume/app/navigation/app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen|Tab|Page,Route')
 class AppRouter extends RootStackRouter {
-  AppRouter({
-    required this.authGuard,
-    required this.recoveryGuard,
-  });
+  AppRouter({required this.authGuard, required this.recoveryGuard});
 
   final AuthGuard authGuard;
   final RecoveryGuard recoveryGuard;
@@ -18,26 +15,26 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-        AutoRoute(page: SplashRoute.page, path: '/', initial: true),
-        AutoRoute(page: OnboardingRoute.page, path: '/onboarding'),
-        AutoRoute(page: LoginRoute.page, path: '/login'),
-        AutoRoute(page: ConfirmEmailRoute.page, path: '/confirm-email'),
-        AutoRoute(page: RecoverPasswordRoute.page, path: '/recover-password'),
-        AutoRoute(page: DefinePasswordRoute.page, path: '/define-password'),
-        AutoRoute(
-          page: SelectCategoryRoute.page,
-          path: '/select-category',
-          guards: [authGuard],
-        ),
-        AutoRoute(
-          page: DashboardRoute.page,
-          path: '/dashboard',
-          guards: [authGuard],
-          children: [
-            AutoRoute(page: HomeRoute.page, path: 'home', initial: true),
-            AutoRoute(page: GamesRoute.page, path: 'games'),
-            AutoRoute(page: ProgressRoute.page, path: 'progress'),
-          ],
-        ),
-      ];
+    AutoRoute(page: SplashRoute.page, path: '/', initial: true),
+    AutoRoute(page: OnboardingRoute.page, path: '/onboarding'),
+    AutoRoute(page: LoginRoute.page, path: '/login'),
+    AutoRoute(page: ConfirmEmailRoute.page, path: '/confirm-email'),
+    AutoRoute(page: RecoverPasswordRoute.page, path: '/recover-password'),
+    AutoRoute(page: DefinePasswordRoute.page, path: '/define-password'),
+    AutoRoute(
+      page: SelectCategoryRoute.page,
+      path: '/select-category',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: DashboardRoute.page,
+      path: '/dashboard',
+      guards: [authGuard],
+      children: [
+        AutoRoute(page: HomeRoute.page, path: 'home', initial: true),
+        AutoRoute(page: GamesRoute.page, path: 'games'),
+        AutoRoute(page: ProgressRoute.page, path: 'progress'),
+      ],
+    ),
+  ];
 }

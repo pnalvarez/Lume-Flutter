@@ -38,7 +38,9 @@ final class TrailDataSource implements ITrailDataSource {
       if (cached != null) return cached;
     }
 
-    final raw = await _apiClient.rpc<Map<String, dynamic>>('get_trail_bootstrap');
+    final raw = await _apiClient.rpc<Map<String, dynamic>>(
+      'get_trail_bootstrap',
+    );
     final data = TrailBootstrapData.fromJson(asJsonMap(raw));
     await _storage.writeObject(
       CacheKeys.trailBootstrap,
@@ -58,7 +60,9 @@ final class TrailDataSource implements ITrailDataSource {
       if (cached != null) return cached;
     }
 
-    final raw = await _apiClient.rpc<Map<String, dynamic>>('get_trail_progress');
+    final raw = await _apiClient.rpc<Map<String, dynamic>>(
+      'get_trail_progress',
+    );
     final data = TrailProgressData.fromJson(asJsonMap(raw));
     await _storage.writeObject(
       CacheKeys.trailProgress,
