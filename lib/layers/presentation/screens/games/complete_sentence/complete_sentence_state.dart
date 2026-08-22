@@ -73,9 +73,7 @@ final class CompleteSentenceState {
   @override
   int get hashCode => Object.hash(
     game,
-    Object.hashAll(
-      selections.entries.map((e) => Object.hash(e.key, e.value)),
-    ),
+    Object.hashAll(selections.entries.map((e) => Object.hash(e.key, e.value))),
     answered,
     isCorrect,
     finished,

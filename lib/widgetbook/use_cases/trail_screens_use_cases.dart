@@ -328,11 +328,7 @@ Widget submodulePlaying(BuildContext context) {
   type: SubmoduleCompleteBody,
 )
 Widget submoduleCompleted(BuildContext context) {
-  return SubmoduleCompleteBody(
-    correctCount: 2,
-    total: 2,
-    onBackToTrail: _noop,
-  );
+  return SubmoduleCompleteBody(correctCount: 2, total: 2, onBackToTrail: _noop);
 }
 
 // --- Shared choice chrome ---------------------------------------------------

@@ -12,11 +12,8 @@ import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 
 @injectable
 final class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc(
-    this._getGameTrails,
-    this._getTrailProgress,
-    this._getProfile,
-  ) : super(const HomeState()) {
+  HomeBloc(this._getGameTrails, this._getTrailProgress, this._getProfile)
+    : super(const HomeState()) {
     on<HomeStarted>(_onStarted);
     on<HomeTrailPressed>(_onTrailPressed);
     on<HomeNavigationHandled>(_onNavigationHandled);

@@ -407,4 +407,3 @@ Widget trailHomeLoading(BuildContext context) {
     onTrailPressed: _noopInt,
   );
 }
-

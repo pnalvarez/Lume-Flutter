@@ -30,7 +30,8 @@ const String trailSessionCompleteBodyPrefix = 'Você acertou ';
 const String trailSessionCompleteBodyMiddle = ' de ';
 const String trailSessionCompleteBodySuffix = ' jogos.';
 const String trailSessionBackToTrail = 'Voltar para a trilha';
-const String trailSessionLoadError = 'Não foi possível carregar este submódulo.';
+const String trailSessionLoadError =
+    'Não foi possível carregar este submódulo.';
 const String trailSessionSaveError =
     'Não foi possível salvar seu progresso. Tente novamente.';
 const String trailSessionRetry = 'Tentar novamente';

@@ -46,10 +46,7 @@ class PromptCard extends StatelessWidget {
           ],
           Text(
             text,
-            style: typ.body3Semibold.copyWith(
-              color: cs.onSurface,
-              height: 1.4,
-            ),
+            style: typ.body3Semibold.copyWith(color: cs.onSurface, height: 1.4),
           ),
         ],
       ),

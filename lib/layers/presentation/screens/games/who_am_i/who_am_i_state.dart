@@ -62,12 +62,6 @@ final class WhoAmIState {
       other.finished == finished;
 
   @override
-  int get hashCode => Object.hash(
-    game,
-    answer,
-    hintsVisible,
-    answered,
-    isCorrect,
-    finished,
-  );
+  int get hashCode =>
+      Object.hash(game, answer, hintsVisible, answered, isCorrect, finished);
 }

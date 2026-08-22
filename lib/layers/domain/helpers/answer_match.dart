@@ -129,7 +129,9 @@ abstract final class AnswerMatch {
 
   static bool fuzzyEq(String a, String b) {
     if (a == b) return true;
-    if (a.length >= 4 && b.length >= 4 && (a.startsWith(b) || b.startsWith(a))) {
+    if (a.length >= 4 &&
+        b.length >= 4 &&
+        (a.startsWith(b) || b.startsWith(a))) {
       return true;
     }
     final maxLen = a.length > b.length ? a.length : b.length;

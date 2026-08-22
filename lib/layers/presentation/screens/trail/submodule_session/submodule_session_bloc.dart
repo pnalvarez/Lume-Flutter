@@ -9,10 +9,8 @@ import 'package:lume/layers/presentation/screens/trail/submodule_session/submodu
 @injectable
 final class SubmoduleSessionBloc
     extends Bloc<SubmoduleSessionEvent, SubmoduleSessionState> {
-  SubmoduleSessionBloc(
-    this._getSubmoduleGames,
-    this._savePairProgress,
-  ) : super(const SubmoduleSessionState()) {
+  SubmoduleSessionBloc(this._getSubmoduleGames, this._savePairProgress)
+    : super(const SubmoduleSessionState()) {
     on<SubmoduleSessionStarted>(_onStarted);
     on<SubmoduleSessionPreviewContinue>(_onPreviewContinue);
     on<SubmoduleSessionGameFinished>(_onGameFinished);
@@ -171,10 +169,7 @@ final class SubmoduleSessionBloc
 
     try {
       for (final entry in state.pairScores.entries) {
-        await _savePairProgress(
-          pairId: entry.key,
-          scorePct: entry.value,
-        );
+        await _savePairProgress(pairId: entry.key, scorePct: entry.value);
       }
       emit(
         state.copyWith(

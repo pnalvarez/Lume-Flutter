@@ -31,10 +31,7 @@ class TrailDetailBody extends StatelessWidget {
     return Scaffold(
       // Soft brand wash behind the list — white cards and slate headers pop.
       backgroundColor: AppColors.Primary.primaryLight,
-      appBar: PageHeader(
-        title: state.headerTitle,
-        onBack: onBack,
-      ),
+      appBar: PageHeader(title: state.headerTitle, onBack: onBack),
       body: switch (state.status) {
         TrailDetailStatus.loading => const Center(child: CircularLoader()),
         TrailDetailStatus.error => Padding(
@@ -66,10 +63,7 @@ class TrailDetailBody extends StatelessWidget {
 }
 
 class _ReadyContent extends StatelessWidget {
-  const _ReadyContent({
-    required this.levels,
-    required this.onSubmodulePressed,
-  });
+  const _ReadyContent({required this.levels, required this.onSubmodulePressed});
 
   final List<TrailDetailLevelUi> levels;
   final ValueChanged<int> onSubmodulePressed;
@@ -194,10 +188,7 @@ class _LevelContainer extends StatelessWidget {
 }
 
 class _SubmoduleCard extends StatelessWidget {
-  const _SubmoduleCard({
-    required this.submodule,
-    required this.onTap,
-  });
+  const _SubmoduleCard({required this.submodule, required this.onTap});
 
   final TrailDetailSubmoduleRowUi submodule;
   final VoidCallback onTap;
@@ -208,8 +199,7 @@ class _SubmoduleCard extends StatelessWidget {
     final statusLabel = submodule.isCompleted
         ? trailDetailSubmoduleDone
         : trailDetailSubmoduleTodo;
-    final gamesLabel =
-        '${submodule.gamesCount} $trailDetailGamesCountSuffix';
+    final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
     final accent = submodule.isCompleted ? cs.secondary : cs.primary;
 
     return Material(

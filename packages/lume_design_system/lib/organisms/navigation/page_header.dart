@@ -52,9 +52,7 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
             right: AppSpacings.l,
           ),
           decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: cs.outlineVariant),
-            ),
+            border: Border(bottom: BorderSide(color: cs.outlineVariant)),
           ),
           child: Row(
             children: [
@@ -68,7 +66,8 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
               else
                 const SizedBox(width: AppSpacings.s),
               Expanded(
-                child: titleWidget ??
+                child:
+                    titleWidget ??
                     Text(
                       title,
                       style: typ.body3Semibold,

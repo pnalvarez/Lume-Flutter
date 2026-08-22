@@ -50,9 +50,7 @@ class _ConnectionsPlayState extends State<ConnectionsPlay> {
               context.read<ConnectionsBloc>().add(ConnectionsLeftSelected(id));
             },
             onRightSelected: (id) {
-              context.read<ConnectionsBloc>().add(
-                ConnectionsRightSelected(id),
-              );
+              context.read<ConnectionsBloc>().add(ConnectionsRightSelected(id));
             },
             onSubmit: () {
               context.read<ConnectionsBloc>().add(const ConnectionsSubmit());

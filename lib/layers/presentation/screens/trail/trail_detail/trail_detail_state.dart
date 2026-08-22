@@ -48,10 +48,7 @@ final class TrailDetailSubmoduleRowUi {
 
 @immutable
 final class TrailDetailLevelUi {
-  const TrailDetailLevelUi({
-    required this.title,
-    required this.submodules,
-  });
+  const TrailDetailLevelUi({required this.title, required this.submodules});
 
   final String title;
   final List<TrailDetailSubmoduleRowUi> submodules;

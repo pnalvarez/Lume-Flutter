@@ -50,9 +50,7 @@ class _TrueOrMythPlayState extends State<TrueOrMythPlay> {
               context.read<TrueOrMythBloc>().add(TrueOrMythOptionSelected(id));
             },
             onNext: () {
-              context.read<TrueOrMythBloc>().add(
-                const TrueOrMythNextPressed(),
-              );
+              context.read<TrueOrMythBloc>().add(const TrueOrMythNextPressed());
             },
           );
         },

@@ -131,10 +131,7 @@ class _LetterChip extends StatelessWidget {
           width: 36,
           height: 36,
           child: Center(
-            child: Text(
-              letter,
-              style: typ.body3Semibold.copyWith(color: fg),
-            ),
+            child: Text(letter, style: typ.body3Semibold.copyWith(color: fg)),
           ),
         ),
       ),

@@ -17,7 +17,9 @@ abstract final class TrailProgressCalculator {
     required Set<int> completedPairs,
   }) {
     if (submodule.games.isEmpty) return false;
-    return submodule.games.every((game) => completedPairs.contains(game.pairId));
+    return submodule.games.every(
+      (game) => completedPairs.contains(game.pairId),
+    );
   }
 
   static int completedSubmoduleCount({

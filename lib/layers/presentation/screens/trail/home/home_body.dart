@@ -30,7 +30,9 @@ class HomeBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: cs.surface,
       body: switch (state.status) {
-        HomeStatus.loading => const SafeArea(child: Center(child: CircularLoader())),
+        HomeStatus.loading => const SafeArea(
+          child: Center(child: CircularLoader()),
+        ),
         HomeStatus.error => SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacings.xl2),
@@ -197,11 +199,7 @@ class _TrailCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 22,
-                  color: cs.primary,
-                ),
+                Icon(Icons.chevron_right_rounded, size: 22, color: cs.primary),
               ],
             ),
           ),

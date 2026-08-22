@@ -32,7 +32,8 @@ final class ConnectionsBloc extends Bloc<ConnectionsEvent, ConnectionsState> {
     final leftId = state.selectedLeftId;
     if (state.game == null || state.answered || leftId == null) return;
 
-    final next = Map<String, String>.from(state.links)..[leftId] = event.rightId;
+    final next = Map<String, String>.from(state.links)
+      ..[leftId] = event.rightId;
     emit(state.copyWith(links: next, clearSelectedLeft: true));
   }
 

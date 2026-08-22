@@ -9,10 +9,8 @@ import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail
 
 @injectable
 final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
-  TrailDetailBloc(
-    this._getGameTrails,
-    this._getTrailProgress,
-  ) : super(const TrailDetailState()) {
+  TrailDetailBloc(this._getGameTrails, this._getTrailProgress)
+    : super(const TrailDetailState()) {
     on<TrailDetailStarted>(_onStarted);
     on<TrailDetailSubmodulePressed>(_onSubmodulePressed);
     on<TrailDetailBackPressed>(_onBackPressed);
@@ -102,11 +100,6 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
     TrailDetailNavigationHandled event,
     Emitter<TrailDetailState> emit,
   ) {
-    emit(
-      state.copyWith(
-        clearSelectedSubmodule: true,
-        goBack: false,
-      ),
-    );
+    emit(state.copyWith(clearSelectedSubmodule: true, goBack: false));
   }
 }

@@ -42,4 +42,3 @@ class TimelineBody extends StatelessWidget {
     );
   }
 }
-

@@ -26,9 +26,9 @@ final class MysteriousWordBloc
   ) {
     if (state.game == null || state.answered) return;
 
-    final letter = AnswerMatch.normalizeText(event.letter)
-        .toUpperCase()
-        .replaceAll(RegExp('[^A-Z]'), '');
+    final letter = AnswerMatch.normalizeText(
+      event.letter,
+    ).toUpperCase().replaceAll(RegExp('[^A-Z]'), '');
     if (letter.length != 1) return;
     if (state.guessedLetters.contains(letter)) return;
 
@@ -36,8 +36,7 @@ final class MysteriousWordBloc
     final word = state.normalizedWord;
     final hit = word.contains(letter);
     final wrongCount = hit ? state.wrongCount : state.wrongCount + 1;
-    final won = word.isNotEmpty &&
-        word.split('').every(nextGuessed.contains);
+    final won = word.isNotEmpty && word.split('').every(nextGuessed.contains);
     final lost = wrongCount >= MysteriousWordState.maxWrong;
 
     emit(

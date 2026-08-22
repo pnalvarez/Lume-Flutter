@@ -17,8 +17,8 @@ class TrailDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<TrailDetailBloc>()
-        ..add(TrailDetailStarted(trailId: trailId)),
+      create: (_) =>
+          getIt<TrailDetailBloc>()..add(TrailDetailStarted(trailId: trailId)),
       child: _TrailDetailView(trailId: trailId),
     );
   }

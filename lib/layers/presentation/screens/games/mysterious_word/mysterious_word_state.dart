@@ -28,9 +28,9 @@ final class MysteriousWordState {
   /// Uppercase A–Z letters only, accents stripped.
   String get normalizedWord {
     final raw = game?.word ?? '';
-    return AnswerMatch.normalizeText(raw)
-        .toUpperCase()
-        .replaceAll(RegExp('[^A-Z]'), '');
+    return AnswerMatch.normalizeText(
+      raw,
+    ).toUpperCase().replaceAll(RegExp('[^A-Z]'), '');
   }
 
   String get maskedWord {

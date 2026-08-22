@@ -6,10 +6,7 @@ sealed class TrailDetailEvent {
 }
 
 final class TrailDetailStarted extends TrailDetailEvent {
-  const TrailDetailStarted({
-    required this.trailId,
-    this.forceRefresh = false,
-  });
+  const TrailDetailStarted({required this.trailId, this.forceRefresh = false});
 
   final int trailId;
   final bool forceRefresh;

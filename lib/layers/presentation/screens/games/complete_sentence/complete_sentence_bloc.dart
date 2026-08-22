@@ -44,7 +44,10 @@ final class CompleteSentenceBloc
     emit(state.copyWith(answered: true, isCorrect: correct));
   }
 
-  void _onNext(CompleteSentenceNext event, Emitter<CompleteSentenceState> emit) {
+  void _onNext(
+    CompleteSentenceNext event,
+    Emitter<CompleteSentenceState> emit,
+  ) {
     if (!state.answered || state.finished) return;
     emit(state.copyWith(finished: true));
   }

@@ -26,10 +26,7 @@ class SubmoduleSessionPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<SubmoduleSessionBloc>()
         ..add(
-          SubmoduleSessionStarted(
-            trailId: trailId,
-            submoduleId: submoduleId,
-          ),
+          SubmoduleSessionStarted(trailId: trailId, submoduleId: submoduleId),
         ),
       child: const _SubmoduleSessionShell(),
     );
@@ -50,9 +47,7 @@ class _SubmoduleSessionShellState extends State<_SubmoduleSessionShell> {
 
   void _requestExit() {
     if (_allowPop) return;
-    context.read<SubmoduleSessionBloc>().add(
-      const SubmoduleSessionAbandoned(),
-    );
+    context.read<SubmoduleSessionBloc>().add(const SubmoduleSessionAbandoned());
   }
 
   void _finishExit() {

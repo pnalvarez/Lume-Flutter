@@ -41,10 +41,7 @@ class FloatingNotice extends StatelessWidget {
     return SafeArea(
       child: Align(
         alignment: alignment,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: child,
-        ),
+        child: Padding(padding: const EdgeInsets.all(16), child: child),
       ),
     );
   }
