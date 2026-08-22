@@ -105,6 +105,9 @@ class _GameAnswerChromeState extends State<GameAnswerChrome> {
             builder: (dialogContext) => LumeButton(
               label: trailGameFeedbackDismiss,
               type: LumeButtonType.outlined,
+              trait: widget.isCorrect
+                  ? LumeButtonTrait.success
+                  : LumeButtonTrait.destructive,
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
           ),
