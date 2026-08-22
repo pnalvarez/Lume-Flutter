@@ -104,7 +104,7 @@ class _ChoiceRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   option.label,
-                  style: typ.body3Medium.copyWith(color: fg),
+                  style: typ.body4Medium.copyWith(color: fg),
                 ),
               ),
               if (option.state == ChoiceVisualState.positive)

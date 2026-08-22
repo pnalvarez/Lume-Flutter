@@ -3,9 +3,15 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:flutter/material.dart';
 
-/// Simple page header: optional back action, title, optional trailing.
+/// Simple page header: optional back action, title (or [titleWidget]), optional
+/// trailing.
+///
+/// Safe to use as [Scaffold.appBar]: respects the status-bar / notch inset
+/// via [SafeArea]. [preferredSize] includes the top inset so Scaffold reserves
+/// enough space.
 class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final Widget? titleWidget;
   final VoidCallback? onBack;
   final Widget? trailing;
   final IconData backIcon;
@@ -13,15 +19,22 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
   const PageHeader({
     super.key,
-    required this.title,
+    this.title = '',
+    this.titleWidget,
     this.onBack,
     this.trailing,
     this.backIcon = Icons.arrow_back_rounded,
     this.backTooltip,
   });
 
+  static const double toolbarHeight = 56;
+
   @override
-  Size get preferredSize => const Size.fromHeight(56);
+  Size get preferredSize {
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final topInset = view.padding.top / view.devicePixelRatio;
+    return Size.fromHeight(toolbarHeight + topInset);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +42,42 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
 
     return Material(
       color: cs.surface,
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: AppSpacings.s,
-          left: AppSpacings.s,
-          right: AppSpacings.l,
-          bottom: AppSpacings.s,
-        ),
-        child: Row(
-          children: [
-            if (onBack != null)
-              LumeIconButton(
-                icon: backIcon,
-                onPressed: onBack,
-                size: LumeIconButtonSize.sm,
-                tooltip: backTooltip,
-              )
-            else
-              const SizedBox(width: AppSpacings.s),
-            Expanded(
-              child: Text(
-                title,
-                style: typ.subtitleM.copyWith(color: cs.onSurface),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      elevation: 0,
+      child: SafeArea(
+        bottom: false,
+        child: Container(
+          height: toolbarHeight,
+          padding: const EdgeInsets.only(
+            left: AppSpacings.s,
+            right: AppSpacings.l,
+          ),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: cs.outlineVariant)),
+          ),
+          child: Row(
+            children: [
+              if (onBack != null)
+                LumeIconButton(
+                  icon: backIcon,
+                  onPressed: onBack,
+                  size: LumeIconButtonSize.sm,
+                  tooltip: backTooltip,
+                )
+              else
+                const SizedBox(width: AppSpacings.s),
+              Expanded(
+                child:
+                    titleWidget ??
+                    Text(
+                      title,
+                      style: typ.body3Semibold,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
               ),
-            ),
-            ?trailing,
-          ],
+              ?trailing,
+            ],
+          ),
         ),
       ),
     );

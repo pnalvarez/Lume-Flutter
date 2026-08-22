@@ -1,4 +1,3 @@
-import 'package:lume_design_system/atoms/motion/motion.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:flutter/material.dart';
@@ -6,15 +5,7 @@ import 'package:flutter/material.dart';
 /// Horizontal progress bar with optional header content and percentage.
 ///
 /// [value] must be in [0.0, 1.0]. Colors and labels are provided by the caller.
-///
-/// ```dart
-/// LumeProgressBar(
-///   value: 0.65,
-///   leading: LumeBadge(label: 'In progress', ...),
-///   fillColor: accent,
-///   trackColor: accentLight,
-/// )
-/// ```
+/// No animation — value updates instantly to avoid rebuild loops.
 class LumeProgressBar extends StatelessWidget {
   /// Progress in [0.0, 1.0].
   final double value;
@@ -55,6 +46,7 @@ class LumeProgressBar extends StatelessWidget {
     final effectiveFill = fillColor ?? cs.primary;
     final effectiveTrack = trackColor ?? cs.surfaceContainerHigh;
     final hasHeader = leading != null || label != null || showPercentage;
+    final clamped = value.clamp(0.0, 1.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +69,7 @@ class LumeProgressBar extends StatelessWidget {
                   const SizedBox.shrink(),
                 if (showPercentage)
                   Text(
-                    '${(value * 100).round()}%',
+                    '${(clamped * 100).round()}%',
                     style: typ.tagS.copyWith(color: cs.onSurface),
                   ),
               ],
@@ -85,17 +77,12 @@ class LumeProgressBar extends StatelessWidget {
           ),
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadius.full(height)),
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: value),
-            duration: AppMotion.slow,
-            curve: AppMotion.bounceOut,
-            builder: (context, animated, _) => LinearProgressIndicator(
-              value: animated,
-              minHeight: height,
-              backgroundColor: effectiveTrack,
-              valueColor: AlwaysStoppedAnimation(effectiveFill),
-              borderRadius: BorderRadius.circular(AppRadius.full(height)),
-            ),
+          child: LinearProgressIndicator(
+            value: clamped,
+            minHeight: height,
+            backgroundColor: effectiveTrack,
+            valueColor: AlwaysStoppedAnimation(effectiveFill),
+            borderRadius: BorderRadius.circular(AppRadius.full(height)),
           ),
         ),
       ],

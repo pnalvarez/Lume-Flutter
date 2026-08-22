@@ -86,7 +86,7 @@ class ContentCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: typ.subtitleS.copyWith(color: cs.onSurface),
+                      style: typ.body3Semibold.copyWith(color: cs.onSurface),
                     ),
                     if (description != null && description!.isNotEmpty) ...[
                       const SizedBox(height: AppSpacings.xs),

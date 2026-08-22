@@ -16,6 +16,8 @@ import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeho
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_body.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_body.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
+import 'package:lume/layers/presentation/screens/trail/home/home_body.dart';
+import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
@@ -362,5 +364,46 @@ Widget dashboardTabPlaceholder(BuildContext context) {
     ),
     isSigningOut: context.knobs.boolean(label: 'Signing out'),
     onSignOut: _noop,
+  );
+}
+
+// --- Trail home -------------------------------------------------------------
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Trail Home',
+  name: 'Ready',
+  type: HomeBody,
+)
+Widget trailHomeReady(BuildContext context) {
+  return HomeBody(
+    state: const HomeState(
+      status: HomeStatus.ready,
+      greetingName: 'Pedro',
+      trails: [
+        HomeTrailCardUi(
+          trailId: 1,
+          title: 'História do Brasil',
+          emoji: '🇧🇷',
+          completedSubmodules: 2,
+          totalSubmodules: 8,
+          progressPercent: 25,
+        ),
+      ],
+    ),
+    onRetry: _noop,
+    onTrailPressed: _noopInt,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Trail Home',
+  name: 'Loading',
+  type: HomeBody,
+)
+Widget trailHomeLoading(BuildContext context) {
+  return HomeBody(
+    state: const HomeState(),
+    onRetry: _noop,
+    onTrailPressed: _noopInt,
   );
 }

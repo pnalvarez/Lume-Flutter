@@ -34,6 +34,8 @@ import 'package:lume/widgetbook/use_cases/stat_chip_use_cases.dart'
     as _lume_widgetbook_use_cases_stat_chip_use_cases;
 import 'package:lume/widgetbook/use_cases/tiles_and_loader_use_cases.dart'
     as _lume_widgetbook_use_cases_tiles_and_loader_use_cases;
+import 'package:lume/widgetbook/use_cases/trail_screens_use_cases.dart'
+    as _lume_widgetbook_use_cases_trail_screens_use_cases;
 import 'package:lume/widgetbook/use_cases/trail_use_cases.dart'
     as _lume_widgetbook_use_cases_trail_use_cases;
 import 'package:lume/widgetbook/use_cases/typography_use_cases.dart'
@@ -112,6 +114,173 @@ final directories = <_widgetbook.WidgetbookNode>[
                     name: 'Ready',
                     builder: _lume_widgetbook_use_cases_screens_use_cases
                         .definePasswordReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Games]',
+            children: [
+              _widgetbook.WidgetbookFolder(
+                name: 'Battle of Curiosities',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'BattleOfCuriositiesBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .battleIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Complete Sentence',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'CompleteSentenceBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .completeSentenceIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Connections',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'ConnectionsBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Playing',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .connectionsPlaying,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Lightning Quiz',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'LightningQuizBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Answered correct',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .lightningQuizCorrect,
+                      ),
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .lightningQuizIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Mysterious Word',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'MysteriousWordBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Playing',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .mysteriousWordPlaying,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Shared',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'ChoiceGameBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Choice answered',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .choiceGameAnswered,
+                      ),
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Choice idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .choiceGameIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Timeline',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'TimelineBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .timelineIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'True or Myth',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'TrueOrMythBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Idle',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .trueOrMythIdle,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              _widgetbook.WidgetbookFolder(
+                name: 'Who Am I',
+                children: [
+                  _widgetbook.WidgetbookComponent(
+                    name: 'WhoAmIBody',
+                    useCases: [
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Answered',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .whoAmIAnswered,
+                      ),
+                      _widgetbook.WidgetbookUseCase(
+                        name: 'Playing',
+                        builder:
+                            _lume_widgetbook_use_cases_trail_screens_use_cases
+                                .whoAmIPlaying,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -207,6 +376,116 @@ final directories = <_widgetbook.WidgetbookNode>[
               ),
             ],
           ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Submodule Complete',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'SubmoduleCompleteBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Default',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .submoduleCompleted,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Submodule Play',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'SubmodulePlayBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Playing',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .submodulePlaying,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Submodule Preview',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'SubmodulePreviewBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Default',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .submodulePreview,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Error',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .submodulePreviewError,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Loading',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .submodulePreviewLoading,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Trail Detail',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'TrailDetailBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Error',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .trailDetailError,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Loading',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .trailDetailLoading,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Ready',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .trailDetailReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
+            name: 'Trail Home',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'HomeBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Empty',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .trailHomeEmpty,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Error',
+                    builder: _lume_widgetbook_use_cases_trail_screens_use_cases
+                        .trailHomeError,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Loading',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .trailHomeLoading,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Ready',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .trailHomeReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     ],
@@ -274,6 +553,11 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Sizes',
                 builder:
                     _lume_widgetbook_use_cases_button_use_cases.buttonSizes,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Success trait',
+                builder: _lume_widgetbook_use_cases_button_use_cases
+                    .buttonSuccessTrait,
               ),
               _widgetbook.WidgetbookUseCase(
                 name: 'With icons',
@@ -456,6 +740,11 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Celebration',
                 builder: _lume_widgetbook_use_cases_feedback_dialog_use_cases
                     .celebrationDialogDefault,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Dialog tones',
+                builder: _lume_widgetbook_use_cases_feedback_dialog_use_cases
+                    .lumeDialogTones,
               ),
             ],
           ),

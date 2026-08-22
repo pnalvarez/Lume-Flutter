@@ -1,10 +1,10 @@
-import 'package:lume_design_system/atoms/motion/motion.dart';
 import 'package:lume_design_system/molecules/badges/amount_badge.dart';
 import 'package:flutter/material.dart';
 
 /// Floating notice aligned to the top (toast-style).
 ///
 /// Fully parametric — typically wraps an [AmountBadge] or any child.
+/// No entrance animation (avoids Tween rebuild loops).
 class FloatingNotice extends StatelessWidget {
   final Widget child;
   final Alignment alignment;
@@ -41,22 +41,7 @@ class FloatingNotice extends StatelessWidget {
     return SafeArea(
       child: Align(
         alignment: alignment,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: 1),
-            duration: AppMotion.normal,
-            curve: AppMotion.decelerate,
-            builder: (context, t, child) => Opacity(
-              opacity: t,
-              child: Transform.translate(
-                offset: Offset(0, -8 * (1 - t)),
-                child: child,
-              ),
-            ),
-            child: child,
-          ),
-        ),
+        child: Padding(padding: const EdgeInsets.all(16), child: child),
       ),
     );
   }

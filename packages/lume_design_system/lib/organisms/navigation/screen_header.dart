@@ -60,7 +60,7 @@ class ScreenHeader extends StatelessWidget {
               ),
               child: Text(
                 title,
-                style: typ.headlineXs.copyWith(color: cs.onSurface),
+                style: typ.body2Semibold.copyWith(color: cs.onSurface),
               ),
             ),
         ],

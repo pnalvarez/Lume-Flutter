@@ -108,6 +108,39 @@ Widget buttonInteractive(BuildContext context) {
   );
 }
 
+@widgetbook.UseCase(name: 'Success trait', type: LumeButton)
+Widget buttonSuccessTrait(BuildContext context) {
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final type in LumeButtonType.values) ...[
+            Text(
+              type.name,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 8),
+            LumeButton(
+              label: 'Confirmar · success',
+              trait: LumeButtonTrait.success,
+              type: type,
+              isExpanded: true,
+              onPressed: () {},
+            ),
+            const SizedBox(height: 16),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
 @widgetbook.UseCase(name: 'Disabled', type: LumeButton)
 Widget buttonDisabled(BuildContext context) {
   return Scaffold(

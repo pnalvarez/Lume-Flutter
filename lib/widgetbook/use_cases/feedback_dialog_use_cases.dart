@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
+import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
+import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
 import 'package:lume_design_system/organisms/feedback/floating_notice.dart';
 import 'package:lume_design_system/organisms/feedback/result_banner.dart';
@@ -30,6 +32,49 @@ Widget resultBannerTones(BuildContext context) {
         ),
         actionLabel: 'Continue',
         onAction: () {},
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Dialog tones', type: CelebrationDialog)
+Widget lumeDialogTones(BuildContext context) {
+  final tone = context.knobs.object.dropdown(
+    label: 'Tone',
+    options: LumeDialogTone.values,
+    labelBuilder: (t) => t.name,
+    initialOption: LumeDialogTone.positive,
+  );
+
+  return Scaffold(
+    body: Center(
+      child: LumeButton(
+        label: 'Abrir diálogo (${tone.name})',
+        trait: buttonTraitForDialogTone(tone),
+        onPressed: () {
+          showLumeDialog<void>(
+            context: context,
+            tone: tone,
+            title: switch (tone) {
+              LumeDialogTone.neutral => 'Atenção',
+              LumeDialogTone.positive => 'Acertou!',
+              LumeDialogTone.negative => 'Não foi dessa vez',
+            },
+            content: Text(
+              'Explicação de exemplo para o tom ${tone.name}.',
+              style: typ.body4Light,
+            ),
+            actions: [
+              Builder(
+                builder: (dialogContext) => LumeButton(
+                  label: 'Entendi',
+                  type: LumeButtonType.outlined,
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     ),
   );

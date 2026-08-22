@@ -78,12 +78,36 @@ import 'package:lume/layers/presentation/screens/auth/recover_password/recover_p
     as _i193;
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_bloc.dart'
     as _i950;
+import 'package:lume/layers/presentation/screens/games/battle_of_curiosities/battle_of_curiosities_bloc.dart'
+    as _i200;
+import 'package:lume/layers/presentation/screens/games/complete_sentence/complete_sentence_bloc.dart'
+    as _i651;
+import 'package:lume/layers/presentation/screens/games/connections/connections_bloc.dart'
+    as _i817;
+import 'package:lume/layers/presentation/screens/games/game_play_factory.dart'
+    as _i519;
+import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_bloc.dart'
+    as _i186;
+import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_bloc.dart'
+    as _i43;
+import 'package:lume/layers/presentation/screens/games/timeline/timeline_bloc.dart'
+    as _i190;
+import 'package:lume/layers/presentation/screens/games/true_or_myth/true_or_myth_bloc.dart'
+    as _i480;
+import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_bloc.dart'
+    as _i511;
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_bloc.dart'
     as _i928;
 import 'package:lume/layers/presentation/screens/select_category/select_category_bloc.dart'
     as _i572;
 import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart'
     as _i185;
+import 'package:lume/layers/presentation/screens/trail/home/home_bloc.dart'
+    as _i420;
+import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart'
+    as _i1058;
+import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail_bloc.dart'
+    as _i348;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -94,12 +118,23 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final appNavigationModule = _$AppNavigationModule();
     final coreAuthModule = _$CoreAuthModule();
+    gh.factory<_i200.BattleOfCuriositiesBloc>(
+      () => _i200.BattleOfCuriositiesBloc(),
+    );
+    gh.factory<_i651.CompleteSentenceBloc>(() => _i651.CompleteSentenceBloc());
+    gh.factory<_i817.ConnectionsBloc>(() => _i817.ConnectionsBloc());
+    gh.factory<_i186.LightningQuizBloc>(() => _i186.LightningQuizBloc());
+    gh.factory<_i43.MysteriousWordBloc>(() => _i43.MysteriousWordBloc());
+    gh.factory<_i190.TimelineBloc>(() => _i190.TimelineBloc());
+    gh.factory<_i480.TrueOrMythBloc>(() => _i480.TrueOrMythBloc());
+    gh.factory<_i511.WhoAmIBloc>(() => _i511.WhoAmIBloc());
     gh.lazySingleton<_i754.AppConfig>(() => _i754.AppConfig.fromEnvironment());
     await gh.lazySingletonAsync<_i433.IStorageClient>(
       () => _i433.StorageClient.create(),
       preResolve: true,
     );
     gh.lazySingleton<_i427.IAuthService>(() => _i427.AuthService());
+    gh.factory<_i519.IGamePlayFactory>(() => _i519.GamePlayFactory());
     gh.factory<_i434.IAuthDataSource>(
       () => _i434.AuthDataSource(gh<_i427.IAuthService>()),
     );
@@ -267,11 +302,30 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i254.IHasSelectedCategories>(),
       ),
     );
+    gh.factory<_i348.TrailDetailBloc>(
+      () => _i348.TrailDetailBloc(
+        gh<_i729.IGetGameTrails>(),
+        gh<_i1046.IGetTrailProgress>(),
+      ),
+    );
     gh.factory<_i1057.LoginBloc>(
       () => _i1057.LoginBloc(
         gh<_i566.ISignInWithEmail>(),
         gh<_i627.ISignUpWithEmail>(),
         gh<_i254.IHasSelectedCategories>(),
+      ),
+    );
+    gh.factory<_i1058.SubmoduleSessionBloc>(
+      () => _i1058.SubmoduleSessionBloc(
+        gh<_i97.IGetSubmoduleGames>(),
+        gh<_i718.ISavePairProgress>(),
+      ),
+    );
+    gh.factory<_i420.HomeBloc>(
+      () => _i420.HomeBloc(
+        gh<_i729.IGetGameTrails>(),
+        gh<_i1046.IGetTrailProgress>(),
+        gh<_i188.IGetProfile>(),
       ),
     );
     return this;

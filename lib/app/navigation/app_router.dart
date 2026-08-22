@@ -36,5 +36,10 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: ProgressRoute.page, path: 'progress'),
       ],
     ),
+    AutoRoute(page: TrailDetailRoute.page, path: '/trail/:trailId'),
+    AutoRoute(
+      page: SubmoduleSessionRoute.page,
+      path: '/trail/:trailId/submodule/:submoduleId',
+    ),
   ];
 }

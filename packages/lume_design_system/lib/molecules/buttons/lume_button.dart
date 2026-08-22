@@ -1,3 +1,4 @@
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:flutter/material.dart';
@@ -9,6 +10,9 @@ enum LumeButtonTrait {
 
   /// Strong companion blue (`ColorScheme.secondary`).
   secondary,
+
+  /// Positive / confirm (`AppColors.Success`).
+  success,
 
   /// Danger / irreversible (`ColorScheme.error`).
   destructive,
@@ -260,6 +264,15 @@ class _TraitColors {
         fill: cs.secondary,
         onFill: cs.onSecondary,
         accent: cs.secondary,
+        disabledFill: disabledFill,
+        disabledOnFill: muted,
+        disabledAccent: muted,
+        disabledBorder: disabledBorder,
+      ),
+      LumeButtonTrait.success => _TraitColors(
+        fill: AppColors.Success.success,
+        onFill: AppColors.Success.onSuccess,
+        accent: AppColors.Success.onSuccess,
         disabledFill: disabledFill,
         disabledOnFill: muted,
         disabledAccent: muted,

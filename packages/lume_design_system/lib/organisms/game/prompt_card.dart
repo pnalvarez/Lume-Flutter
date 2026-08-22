@@ -1,3 +1,4 @@
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
@@ -19,7 +20,7 @@ class PromptCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacings.xl),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerLowest,
+        color: AppColors.Primary.primaryLight,
         borderRadius: BorderRadius.circular(AppRadius.xl2),
         border: Border.all(color: cs.outline),
       ),
@@ -45,10 +46,7 @@ class PromptCard extends StatelessWidget {
           ],
           Text(
             text,
-            style: typ.body2Semibold.copyWith(
-              color: cs.onSurface,
-              height: 1.35,
-            ),
+            style: typ.body3Semibold.copyWith(color: cs.onSurface, height: 1.4),
           ),
         ],
       ),

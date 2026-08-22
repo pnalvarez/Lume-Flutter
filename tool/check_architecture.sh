@@ -107,12 +107,12 @@ $hits"
   fi
 done < <(find lib/layers/presentation -name '*.dart' -print0)
 
-# getIt in presentation only in *_page.dart
+# getIt in presentation only in *_page.dart / game play factory (composition root)
 while IFS= read -r -d '' file; do
   rel="${file#"$ROOT/"}"
   base="$(basename "$rel")"
   case "$base" in
-    *_page.dart) continue ;;
+    *_page.dart|game_play_factory.dart) continue ;;
   esac
   if grep -q 'getIt<' "$file"; then
     note "SHOULD FIX: getIt belongs in *_page.dart, not $rel"
@@ -127,6 +127,26 @@ while IFS= read -r -d '' file; do
   $rel"
   fi
 done < <(find lib/layers/presentation -name '*_bloc.dart' -print0)
+
+# bodies must not own visual/selection decision helpers — put them on *_state.dart
+while IFS= read -r -d '' file; do
+  rel="${file#"$ROOT/"}"
+  hits="$(
+    {
+      grep -nE \
+        '(ChoiceVisualState|ConnectionsChipVisual|MysteriousLetterVisual)[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*[[:space:]]*\(' \
+        "$file" || true
+      grep -nE \
+        '[[:space:]](_visualState|_blankOptionState|_leftVisual|_rightVisual|_letterVisual)[[:space:]]*\(' \
+        "$file" || true
+    } | sort -u | head -n 5
+  )"
+  if [[ -n "$hits" ]]; then
+    note "SHOULD FIX: visual/selection decision logic belongs on *_state.dart (or the bloc), not in *_body.dart
+  $rel
+$hits"
+  fi
+done < <(find lib/layers/presentation -name '*_body.dart' -print0)
 
 if (( fail )); then
   echo

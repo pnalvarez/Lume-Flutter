@@ -137,6 +137,11 @@ class _SurfacePalette {
   /// Cards — white
   final Color surfaceContainerLowest = const Color(0xFFFFFFFF);
 
+  /// Grouped panel behind nested cards (e.g. trail level shells).
+  /// Cooler and a step deeper than [AppColors.Primary.primaryLight] so white
+  /// inner cards and the page wash both read clearly.
+  final Color onContainer = const Color(0xFFC2DBEE);
+
   /// Muted tinted surfaces — `hsl(210 65% 95%)` → #EBF3FB
   final Color surfaceContainerLow = const Color(0xFFEBF3FB);
 
