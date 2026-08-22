@@ -48,6 +48,20 @@ void main() {
       expect(back, isTrue);
     });
 
+    testWidgets('PageHeader prefers titleWidget over title', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          PageHeader(
+            title: 'Hidden',
+            titleWidget: const Text('Custom slot'),
+            onBack: () {},
+          ),
+        ),
+      );
+      expect(find.text('Custom slot'), findsOneWidget);
+      expect(find.text('Hidden'), findsNothing);
+    });
+
     testWidgets('ScreenHeader shows title below back', (tester) async {
       var back = false;
       await tester.pumpWidget(

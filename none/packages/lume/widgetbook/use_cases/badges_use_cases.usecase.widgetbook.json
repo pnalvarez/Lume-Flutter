@@ -1,0 +1,33 @@
+[{
+  "name": "lumeBadgeAll",
+  "designLink": null,
+  "useCaseName": "All variants",
+  "importStatement": "package:lume/widgetbook/use_cases/badges_use_cases.dart",
+  "componentName": "LumeBadge",
+  "componentImportStatement": "package:lume_design_system/molecules/badges/lume_badge.dart",
+  "navPath": "molecules/badges",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "lumeBadgeCustomColors",
+  "designLink": null,
+  "useCaseName": "Custom colors",
+  "importStatement": "package:lume/widgetbook/use_cases/badges_use_cases.dart",
+  "componentName": "LumeBadge",
+  "componentImportStatement": "package:lume_design_system/molecules/badges/lume_badge.dart",
+  "navPath": "molecules/badges",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "amountBadgeInteractive",
+  "designLink": null,
+  "useCaseName": "Interactive",
+  "importStatement": "package:lume/widgetbook/use_cases/badges_use_cases.dart",
+  "componentName": "AmountBadge",
+  "componentImportStatement": "package:lume_design_system/molecules/badges/amount_badge.dart",
+  "navPath": "molecules/badges",
+  "cloudExclude": false,
+  "knobsConfigs": null
+}]

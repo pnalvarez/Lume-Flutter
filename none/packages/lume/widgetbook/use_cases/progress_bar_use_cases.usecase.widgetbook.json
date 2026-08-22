@@ -1,0 +1,22 @@
+[{
+  "name": "progressBarInteractive",
+  "designLink": null,
+  "useCaseName": "Interactive",
+  "importStatement": "package:lume/widgetbook/use_cases/progress_bar_use_cases.dart",
+  "componentName": "LumeProgressBar",
+  "componentImportStatement": "package:lume_design_system/molecules/progress/lume_progress_bar.dart",
+  "navPath": "molecules/progress",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "progressBarMultiple",
+  "designLink": null,
+  "useCaseName": "Multiple bars",
+  "importStatement": "package:lume/widgetbook/use_cases/progress_bar_use_cases.dart",
+  "componentName": "LumeProgressBar",
+  "componentImportStatement": "package:lume_design_system/molecules/progress/lume_progress_bar.dart",
+  "navPath": "molecules/progress",
+  "cloudExclude": false,
+  "knobsConfigs": null
+}]

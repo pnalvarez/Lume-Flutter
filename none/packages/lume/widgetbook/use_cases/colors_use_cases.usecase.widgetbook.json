@@ -1,0 +1,22 @@
+[{
+  "name": "colorBrandAndSemantic",
+  "designLink": null,
+  "useCaseName": "Brand & Semantic",
+  "importStatement": "package:lume/widgetbook/use_cases/colors_use_cases.dart",
+  "componentName": "_ColorCatalog",
+  "componentImportStatement": "package:lume/widgetbook/use_cases/colors_use_cases.dart",
+  "navPath": "widgetbook/use_cases",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "colorExtra",
+  "designLink": null,
+  "useCaseName": "Extra & Spectrum",
+  "importStatement": "package:lume/widgetbook/use_cases/colors_use_cases.dart",
+  "componentName": "_ColorCatalog",
+  "componentImportStatement": "package:lume/widgetbook/use_cases/colors_use_cases.dart",
+  "navPath": "widgetbook/use_cases",
+  "cloudExclude": false,
+  "knobsConfigs": null
+}]

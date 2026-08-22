@@ -86,6 +86,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
   - Confirm email / recover password → `ScreenHeader` + `Scaffold`
   - Authenticated shells → `PageHeader` as `appBar`
 - **Screen bodies + Widgetbook:** every product screen exposes a Bloc-free `*Body` (state + callbacks; no GetIt / AutoRoute / feature Bloc). Catalog it under Widgetbook path `[Lume]/[Screens]/…` with the main visual states. See `.cursor/rules/widgetbook-screens.mdc`.
+- **Bodies stay dumb:** no feature decision logic in `*_body.dart` / widgets. Selection correctness, `ChoiceVisualState` (and similar chip visuals), enablement flags (`canSubmit`, `allLinked`, …), sorted/filtered game lists, and prompt assembly belong on `*_state.dart` (getters / helpers) or the bloc. Bodies only compose UI from state + callbacks. Nested private *widgets* for layout/styling are fine; private *methods* that decide game/UI state are not.
 
 ## Data (Lume)
 
@@ -101,7 +102,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 
 ## CI
 
-`tool/check_architecture.sh` is the GitHub **Architecture** job. It cannot run this skill (no AI on Actions). It only greps **import and placement** rules. You still apply judgment here.
+`tool/check_architecture.sh` is the GitHub **Architecture** job. It cannot run this skill (no AI on Actions). It only greps **import and placement** rules (including dumb `*_body.dart` visual helpers). You still apply judgment here.
 
 ## More
 

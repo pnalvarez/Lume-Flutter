@@ -1,0 +1,66 @@
+[{
+  "name": "statusChipAll",
+  "designLink": null,
+  "useCaseName": "All states",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "StatusChip",
+  "componentImportStatement": "package:lume_design_system/molecules/chips/status_chip.dart",
+  "navPath": "molecules/chips",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "chipPickerInteractive",
+  "designLink": null,
+  "useCaseName": "Interactive",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "ChipPicker",
+  "componentImportStatement": "package:lume_design_system/molecules/chips/chip_picker.dart",
+  "navPath": "molecules/chips",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "selectableChipStates",
+  "designLink": null,
+  "useCaseName": "Selected and unselected",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "SelectableChip",
+  "componentImportStatement": "package:lume_design_system/molecules/chips/selectable_chip.dart",
+  "navPath": "molecules/chips",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "selectableChipGroupInteractive",
+  "designLink": null,
+  "useCaseName": "Multi-select with select all",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "SelectableChipGroup",
+  "componentImportStatement": "package:lume_design_system/molecules/chips/selectable_chip_group.dart",
+  "navPath": "molecules/chips",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "stepProgressInteractive",
+  "designLink": null,
+  "useCaseName": "Interactive",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "StepProgressBar",
+  "componentImportStatement": "package:lume_design_system/molecules/progress/step_progress_bar.dart",
+  "navPath": "molecules/progress",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "progressBarWithLeading",
+  "designLink": null,
+  "useCaseName": "With leading badge",
+  "importStatement": "package:lume/widgetbook/use_cases/chips_and_progress_use_cases.dart",
+  "componentName": "LumeProgressBar",
+  "componentImportStatement": "package:lume_design_system/molecules/progress/lume_progress_bar.dart",
+  "navPath": "molecules/progress",
+  "cloudExclude": false,
+  "knobsConfigs": null
+}]

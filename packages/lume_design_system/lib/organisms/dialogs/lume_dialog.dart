@@ -1,3 +1,4 @@
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
@@ -6,31 +7,110 @@ import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:flutter/material.dart';
 
+/// Visual tone for [showLumeDialog] (background + optional title icon).
+enum LumeDialogTone { neutral, positive, negative }
+
+/// Maps [LumeDialogTone] → [LumeButtonTrait] for dialog actions.
+LumeButtonTrait buttonTraitForDialogTone(LumeDialogTone tone) => switch (tone) {
+  LumeDialogTone.neutral => LumeButtonTrait.brand,
+  LumeDialogTone.positive => LumeButtonTrait.success,
+  LumeDialogTone.negative => LumeButtonTrait.destructive,
+};
+
 /// Shows a themed modal dialog. Returns the value passed to [Navigator.pop].
+///
+/// Any [LumeButton] in [actions] gets a trait from [tone]:
+/// neutral→brand, positive→success, negative→destructive.
 Future<T?> showLumeDialog<T>({
   required BuildContext context,
   required String title,
   required Widget content,
   List<Widget>? actions,
   bool barrierDismissible = true,
+  bool useRootNavigator = true,
+  LumeDialogTone tone = LumeDialogTone.neutral,
 }) {
   final cs = Theme.of(context).colorScheme;
+  final style = _dialogToneStyle(tone, cs);
+  final actionTrait = buttonTraitForDialogTone(tone);
+
   return showDialog<T>(
     context: context,
+    useRootNavigator: useRootNavigator,
     barrierDismissible: barrierDismissible,
     builder: (ctx) => AlertDialog(
-      backgroundColor: cs.surfaceContainerLowest,
+      backgroundColor: style.background,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.xl2),
-        side: BorderSide(color: cs.outline),
+        side: BorderSide(color: style.border),
       ),
-      title: Text(title, style: typ.subtitleM.copyWith(color: cs.onSurface)),
+      title: Row(
+        children: [
+          if (style.icon != null) ...[
+            Icon(style.icon, color: style.iconColor, size: 28),
+            const SizedBox(width: AppSpacings.s),
+          ],
+          Expanded(
+            child: Text(
+              title,
+              style: typ.body2Semibold.copyWith(color: cs.onSurface),
+            ),
+          ),
+        ],
+      ),
       content: content,
-      actions: actions,
+      actions: actions
+          ?.map((action) => _actionWithDialogTrait(action, actionTrait))
+          .toList(),
     ),
   );
 }
+
+Widget _actionWithDialogTrait(Widget action, LumeButtonTrait trait) {
+  // Builder wrappers (common for Navigator.pop) — unwrap one level.
+  if (action is Builder) {
+    return Builder(
+      builder: (context) =>
+          _actionWithDialogTrait(action.builder(context), trait),
+    );
+  }
+  if (action is! LumeButton) return action;
+  return LumeButton(
+    label: action.label,
+    onPressed: action.onPressed,
+    trait: trait,
+    type: action.type,
+    size: action.size,
+    isLoading: action.isLoading,
+    isEnabled: action.isEnabled,
+    isExpanded: action.isExpanded,
+    leadingIcon: action.leadingIcon,
+    trailingIcon: action.trailingIcon,
+  );
+}
+
+({Color background, Color border, IconData? icon, Color? iconColor})
+_dialogToneStyle(LumeDialogTone tone, ColorScheme cs) => switch (tone) {
+  LumeDialogTone.neutral => (
+    background: cs.surfaceContainerLowest,
+    border: cs.outline,
+    icon: null,
+    iconColor: null,
+  ),
+  LumeDialogTone.positive => (
+    background: AppColors.Success.successContainer,
+    border: AppColors.Success.success.withValues(alpha: 0.55),
+    icon: Icons.check_circle_rounded,
+    iconColor: AppColors.Success.onSuccess,
+  ),
+  LumeDialogTone.negative => (
+    background: AppColors.Error.errorContainer,
+    border: AppColors.Error.error.withValues(alpha: 0.55),
+    icon: Icons.cancel_rounded,
+    iconColor: AppColors.Error.onError,
+  ),
+};
 
 /// Centered celebration / confirm sheet with icon well, copy and CTA.
 ///

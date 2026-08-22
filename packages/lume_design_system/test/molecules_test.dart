@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/amount_badge.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
@@ -70,6 +71,23 @@ void main() {
       expect(
         button.style?.textStyle?.resolve({})?.decoration,
         TextDecoration.underline,
+      );
+    });
+
+    testWidgets('success trait uses success fill', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          LumeButton(
+            label: 'Confirmar',
+            trait: LumeButtonTrait.success,
+            onPressed: () {},
+          ),
+        ),
+      );
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      expect(
+        button.style?.backgroundColor?.resolve({}),
+        AppColors.Success.success,
       );
     });
 

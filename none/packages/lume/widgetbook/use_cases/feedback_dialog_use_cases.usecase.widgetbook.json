@@ -1,0 +1,44 @@
+[{
+  "name": "resultBannerTones",
+  "designLink": null,
+  "useCaseName": "Tones",
+  "importStatement": "package:lume/widgetbook/use_cases/feedback_dialog_use_cases.dart",
+  "componentName": "ResultBanner",
+  "componentImportStatement": "package:lume_design_system/organisms/feedback/result_banner.dart",
+  "navPath": "organisms/feedback",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "lumeDialogTones",
+  "designLink": null,
+  "useCaseName": "Dialog tones",
+  "importStatement": "package:lume/widgetbook/use_cases/feedback_dialog_use_cases.dart",
+  "componentName": "CelebrationDialog",
+  "componentImportStatement": "package:lume_design_system/organisms/dialogs/lume_dialog.dart",
+  "navPath": "organisms/dialogs",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "floatingNoticeAmount",
+  "designLink": null,
+  "useCaseName": "Amount",
+  "importStatement": "package:lume/widgetbook/use_cases/feedback_dialog_use_cases.dart",
+  "componentName": "FloatingNotice",
+  "componentImportStatement": "package:lume_design_system/organisms/feedback/floating_notice.dart",
+  "navPath": "organisms/feedback",
+  "cloudExclude": false,
+  "knobsConfigs": null
+},
+{
+  "name": "celebrationDialogDefault",
+  "designLink": null,
+  "useCaseName": "Celebration",
+  "importStatement": "package:lume/widgetbook/use_cases/feedback_dialog_use_cases.dart",
+  "componentName": "CelebrationDialog",
+  "componentImportStatement": "package:lume_design_system/organisms/dialogs/lume_dialog.dart",
+  "navPath": "organisms/dialogs",
+  "cloudExclude": false,
+  "knobsConfigs": null
+}]

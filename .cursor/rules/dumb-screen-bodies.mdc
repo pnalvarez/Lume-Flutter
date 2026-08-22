@@ -1,0 +1,20 @@
+---
+description: Keep feature decision logic out of screen bodies; put it on state/bloc
+globs: lib/layers/presentation/**/*_body.dart
+alwaysApply: false
+---
+
+# Dumb screen bodies
+
+`*_body.dart` widgets take **state + callbacks** only. They must not decide game/UI outcomes.
+
+**Put on `*_state.dart` (getters/helpers) or the bloc:**
+
+- `ChoiceVisualState` / chip visual mapping
+- Enablement flags (`canSubmit`, `allLinked`, `canRevealMore`, …)
+- Sorted/filtered domain lists used for flow
+- Prompt assembly from game fields
+
+**OK in bodies:** compose widgets, map state enums to colors/layout, nested private widgets for chrome.
+
+Mechanical CI: `tool/check_architecture.sh` (Architecture job).
