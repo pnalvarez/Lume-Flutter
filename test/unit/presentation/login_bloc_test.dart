@@ -43,7 +43,7 @@ class _SignUp implements ISignUpWithEmail {
 }
 
 class _HasSelected implements IHasSelectedCategories {
-  _HasSelected(this.value, {this.error});
+  _HasSelected(this.value) : error = null;
 
   final bool value;
   final Object? error;
@@ -60,7 +60,11 @@ LoginBloc _bloc(
   _SignUp signUp, {
   IHasSelectedCategories? hasSelected,
 }) {
-  return LoginBloc(signIn, signUp, hasSelected ?? _HasSelected(true));
+  return LoginBloc(
+    signIn,
+    signUp,
+    hasSelected ?? _HasSelected(true),
+  );
 }
 
 void main() {

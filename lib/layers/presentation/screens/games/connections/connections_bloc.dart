@@ -9,6 +9,7 @@ final class ConnectionsBloc extends Bloc<ConnectionsEvent, ConnectionsState> {
     on<ConnectionsStarted>(_onStarted);
     on<ConnectionsLeftSelected>(_onLeftSelected);
     on<ConnectionsRightSelected>(_onRightSelected);
+    on<ConnectionsUndoLast>(_onUndoLast);
     on<ConnectionsSubmit>(_onSubmit);
     on<ConnectionsNext>(_onNext);
   }
@@ -32,9 +33,45 @@ final class ConnectionsBloc extends Bloc<ConnectionsEvent, ConnectionsState> {
     final leftId = state.selectedLeftId;
     if (state.game == null || state.answered || leftId == null) return;
 
-    final next = Map<String, String>.from(state.links)
-      ..[leftId] = event.rightId;
-    emit(state.copyWith(links: next, clearSelectedLeft: true));
+    final nextLinks = Map<String, String>.from(state.links);
+
+    // A right item can only belong to one pair.
+    nextLinks.removeWhere(
+      (key, value) => value == event.rightId && key != leftId,
+    );
+    nextLinks[leftId] = event.rightId;
+
+    final nextOrder = state.linkOrder
+        .where(nextLinks.containsKey)
+        .toList(growable: true);
+    if (!nextOrder.contains(leftId)) {
+      nextOrder.add(leftId);
+    }
+
+    emit(
+      state.copyWith(
+        links: nextLinks,
+        linkOrder: nextOrder,
+        clearSelectedLeft: true,
+      ),
+    );
+  }
+
+  void _onUndoLast(
+    ConnectionsUndoLast event,
+    Emitter<ConnectionsState> emit,
+  ) {
+    if (!state.canUndoLast) return;
+    final lastLeft = state.linkOrder.last;
+    final nextLinks = Map<String, String>.from(state.links)..remove(lastLeft);
+    final nextOrder = List<String>.from(state.linkOrder)..removeLast();
+    emit(
+      state.copyWith(
+        links: nextLinks,
+        linkOrder: nextOrder,
+        clearSelectedLeft: true,
+      ),
+    );
   }
 
   void _onSubmit(ConnectionsSubmit event, Emitter<ConnectionsState> emit) {

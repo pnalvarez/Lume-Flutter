@@ -142,6 +142,8 @@ abstract final class TrailGameMapper {
       pairId: item.pairId,
       sortOrder: item.sortOrder,
       conceptId: item.conceptId,
+      title: _optionalString(payload, 'title') ?? 'Conexões',
+      subtitle: _optionalString(payload, 'subtitle') ?? '',
       leftColumn: _parseConnectionItems(payload, 'left_column'),
       rightColumn: _parseConnectionItems(payload, 'right_column'),
       pairs: _parseConnectionPairs(payload),

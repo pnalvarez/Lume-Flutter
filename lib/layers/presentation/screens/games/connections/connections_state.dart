@@ -9,6 +9,7 @@ final class ConnectionsState {
     this.game,
     this.selectedLeftId,
     this.links = const {},
+    this.linkOrder = const [],
     this.answered = false,
     this.isCorrect = false,
     this.finished = false,
@@ -16,7 +17,12 @@ final class ConnectionsState {
 
   final ConnectionsGameDomain? game;
   final String? selectedLeftId;
+
+  /// leftId → rightId.
   final Map<String, String> links;
+
+  /// leftIds in the order pairs were made (drives pair badge numbers).
+  final List<String> linkOrder;
   final bool answered;
   final bool isCorrect;
   final bool finished;
@@ -28,6 +34,23 @@ final class ConnectionsState {
   }
 
   bool get canSelectRight => !answered && selectedLeftId != null;
+
+  bool get canUndoLast => !answered && linkOrder.isNotEmpty;
+
+  /// 1-based pair index for a left item, or null if not linked.
+  int? pairNumberForLeft(String leftId) {
+    final index = linkOrder.indexOf(leftId);
+    if (index < 0) return null;
+    return index + 1;
+  }
+
+  /// 1-based pair index for a right item, or null if not linked.
+  int? pairNumberForRight(String rightId) {
+    for (var i = 0; i < linkOrder.length; i++) {
+      if (links[linkOrder[i]] == rightId) return i + 1;
+    }
+    return null;
+  }
 
   ConnectionsChipVisual leftVisual(String id) {
     if (answered) {
@@ -72,16 +95,17 @@ final class ConnectionsState {
     String? selectedLeftId,
     bool clearSelectedLeft = false,
     Map<String, String>? links,
+    List<String>? linkOrder,
     bool? answered,
     bool? isCorrect,
     bool? finished,
   }) {
     return ConnectionsState(
       game: game ?? this.game,
-      selectedLeftId: clearSelectedLeft
-          ? null
-          : (selectedLeftId ?? this.selectedLeftId),
+      selectedLeftId:
+          clearSelectedLeft ? null : (selectedLeftId ?? this.selectedLeftId),
       links: links ?? this.links,
+      linkOrder: linkOrder ?? this.linkOrder,
       answered: answered ?? this.answered,
       isCorrect: isCorrect ?? this.isCorrect,
       finished: finished ?? this.finished,
@@ -94,6 +118,7 @@ final class ConnectionsState {
       other.game == game &&
       other.selectedLeftId == selectedLeftId &&
       mapEquals(other.links, links) &&
+      listEquals(other.linkOrder, linkOrder) &&
       other.answered == answered &&
       other.isCorrect == isCorrect &&
       other.finished == finished;
@@ -103,6 +128,7 @@ final class ConnectionsState {
     game,
     selectedLeftId,
     Object.hashAll(links.entries.map((e) => Object.hash(e.key, e.value))),
+    Object.hashAll(linkOrder),
     answered,
     isCorrect,
     finished,

@@ -20,16 +20,30 @@ const String trailDetailRetry = 'Tentar novamente';
 const String trailDetailEmpty = 'Esta trilha ainda não tem submódulos.';
 const String trailDetailSubmoduleDone = 'Concluído';
 const String trailDetailSubmoduleTodo = 'Disponível';
+const String trailDetailSubmoduleLocked = 'Bloqueado';
 const String trailDetailGamesCountSuffix = 'jogos';
 
 // --- Submodule session ------------------------------------------------------
 
 const String trailPreviewContinue = 'Prosseguir';
-const String trailSessionCompleteTitle = 'Submódulo concluído!';
+const String trailSessionCompleteTitle = 'Você concluiu\no submódulo';
 const String trailSessionCompleteBodyPrefix = 'Você acertou ';
 const String trailSessionCompleteBodyMiddle = ' de ';
 const String trailSessionCompleteBodySuffix = ' jogos.';
+
+String trailSessionCompleteScore({
+  required int correctCount,
+  required int total,
+}) =>
+    '$trailSessionCompleteBodyPrefix$correctCount'
+    '$trailSessionCompleteBodyMiddle$total'
+    '$trailSessionCompleteBodySuffix';
 const String trailSessionBackToTrail = 'Voltar para a trilha';
+const String trailSessionLeaveTitle = 'Sair do submódulo?';
+const String trailSessionLeaveBody =
+    'Se sair agora, você perderá o progresso deste submódulo.';
+const String trailSessionLeaveConfirm = 'Sair';
+const String trailSessionLeaveCancel = 'Continuar';
 const String trailSessionLoadError =
     'Não foi possível carregar este submódulo.';
 const String trailSessionSaveError =
@@ -59,3 +73,4 @@ const String trailGameHint = 'Dica';
 const String trailGameRevealHint = 'Revelar dica';
 const String trailGameAnswerPlaceholder = 'Sua resposta';
 const String trailGameLivesLeft = 'vidas';
+const String trailGameUndoLastPair = 'Desfazer último par';

@@ -5,11 +5,18 @@ import 'package:lume/layers/presentation/screens/games/game_play_factory.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_play_body.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
+import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_leave_confirm.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
 
 /// Play step hosted by [SubmoduleSessionPage] (not a nested route).
 class SubmodulePlayView extends StatelessWidget {
   const SubmodulePlayView({super.key});
+
+  Future<void> _onAbandoned(BuildContext context) async {
+    final leave = await confirmLeaveSubmoduleSession(context);
+    if (!leave || !context.mounted) return;
+    context.read<SubmoduleSessionBloc>().add(const SubmoduleSessionAbandoned());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +60,7 @@ class SubmodulePlayView extends StatelessWidget {
           isSaving: isSaving,
           errorMessage: errorMessage,
           gameSlot: gameSlot,
-          onAbandoned: () {
-            context.read<SubmoduleSessionBloc>().add(
-              const SubmoduleSessionAbandoned(),
-            );
-          },
+          onAbandoned: () => _onAbandoned(context),
           onRetry: () {
             if (state.canRetrySave) {
               context.read<SubmoduleSessionBloc>().add(

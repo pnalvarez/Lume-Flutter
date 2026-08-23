@@ -52,11 +52,16 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
       final completedPairs = TrailProgressCalculator.completedPairIds(
         progress.pairProgress,
       );
+      final lockedSubmoduleIds = TrailProgressCalculator.lockedSubmoduleIds(
+        trail: trail,
+        completedPairs: completedPairs,
+      );
       final levels = [
         for (final level in trail.levels)
           TrailDetailLevelUi.fromDomain(
             level: level,
             completedPairs: completedPairs,
+            lockedSubmoduleIds: lockedSubmoduleIds,
           ),
       ];
 
@@ -86,6 +91,7 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
     TrailDetailSubmodulePressed event,
     Emitter<TrailDetailState> emit,
   ) {
+    if (state.isSubmoduleLocked(event.submoduleId)) return;
     emit(state.copyWith(selectedSubmoduleId: event.submoduleId));
   }
 

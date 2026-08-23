@@ -120,6 +120,8 @@ const _sampleWord = MysteriousWordGameDomain(
 const _sampleConnections = ConnectionsGameDomain(
   pairId: 8,
   sortOrder: 8,
+  title: 'Tarefas da IA',
+  subtitle: 'Associe cada termo à função correspondente.',
   leftColumn: [
     ConnectionItemDomain(id: 'l1', text: '1822'),
     ConnectionItemDomain(id: 'l2', text: '1888'),
@@ -206,12 +208,14 @@ Widget trailDetailReady(BuildContext context) {
         ),
         TrailDetailLevelUi(
           title: 'Nível 2 — Império',
+          isLocked: true,
           submodules: [
             TrailDetailSubmoduleRowUi(
               id: 12,
               title: 'Independência',
               gamesCount: 4,
               isCompleted: false,
+              isLocked: true,
             ),
           ],
         ),
@@ -580,10 +584,12 @@ Widget connectionsPlaying(BuildContext context) {
       state: const ConnectionsState(
         game: _sampleConnections,
         selectedLeftId: 'l1',
-        links: {'l2': 'r2'},
+        links: {'l2': 'r2', 'l3': 'r3'},
+        linkOrder: ['l2', 'l3'],
       ),
       onLeftSelected: _noopString,
       onRightSelected: _noopString,
+      onUndoLast: _noop,
       onSubmit: _noop,
       onNext: _noop,
     ),

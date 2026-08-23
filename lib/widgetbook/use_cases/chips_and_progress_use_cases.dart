@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
+import 'package:lume_design_system/molecules/chips/badge_chip.dart';
 import 'package:lume_design_system/molecules/chips/chip_picker.dart';
 import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
 import 'package:lume_design_system/molecules/chips/selectable_chip_group.dart';
@@ -9,6 +10,75 @@ import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
+
+@widgetbook.UseCase(name: 'With pair badge', type: BadgeChip)
+Widget badgeChipWithNumber(BuildContext context) {
+  final label = context.knobs.string(
+    label: 'Label',
+    initialValue: 'Classificação',
+  );
+  final badge = context.knobs.string(label: 'Badge', initialValue: '1');
+  final showBadge = context.knobs.boolean(
+    label: 'Show badge',
+    initialValue: true,
+  );
+  final cs = Theme.of(context).colorScheme;
+
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          BadgeChip(
+            label: label,
+            backgroundColor: cs.secondaryContainer,
+            borderColor: cs.secondary,
+            foregroundColor: cs.onSecondaryContainer,
+            badgeLabel: showBadge ? badge : null,
+            badgeBackgroundColor: cs.secondary,
+            badgeForegroundColor: cs.onSecondary,
+            onTap: () {},
+          ),
+          const SizedBox(height: 16),
+          BadgeChip(
+            label: 'Estimar um valor futuro',
+            backgroundColor: cs.surfaceContainerLowest,
+            borderColor: cs.outline,
+            foregroundColor: cs.onSurface,
+            onTap: () {},
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: BadgeChip(
+                  label: 'Previsão',
+                  backgroundColor: cs.secondaryContainer,
+                  borderColor: cs.secondary,
+                  foregroundColor: cs.onSecondaryContainer,
+                  badgeLabel: '1',
+                  onTap: () {},
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: BadgeChip(
+                  label: 'Estimar um valor futuro',
+                  backgroundColor: cs.secondaryContainer,
+                  borderColor: cs.secondary,
+                  foregroundColor: cs.onSecondaryContainer,
+                  badgeLabel: '1',
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 @widgetbook.UseCase(name: 'All states', type: StatusChip)
 Widget statusChipAll(BuildContext context) {

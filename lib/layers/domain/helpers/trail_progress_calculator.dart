@@ -60,4 +60,23 @@ abstract final class TrailProgressCalculator {
     );
     return ((done / total) * 100).round();
   }
+
+  /// Submodules after the first incomplete one (in trail order) stay locked.
+  static Set<int> lockedSubmoduleIds({
+    required GameTrailDomain trail,
+    required Set<int> completedPairs,
+  }) {
+    final locked = <int>{};
+    var unlockNext = true;
+    for (final level in trail.levels) {
+      for (final submodule in level.submodules) {
+        if (!unlockNext) locked.add(submodule.id);
+        unlockNext = isSubmoduleCompleted(
+          submodule: submodule,
+          completedPairs: completedPairs,
+        );
+      }
+    }
+    return locked;
+  }
 }

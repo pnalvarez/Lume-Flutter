@@ -24,6 +24,10 @@ final class ConnectionsRightSelected extends ConnectionsEvent {
   final String rightId;
 }
 
+final class ConnectionsUndoLast extends ConnectionsEvent {
+  const ConnectionsUndoLast();
+}
+
 final class ConnectionsSubmit extends ConnectionsEvent {
   const ConnectionsSubmit();
 }

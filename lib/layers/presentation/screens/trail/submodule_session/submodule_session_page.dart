@@ -7,6 +7,7 @@ import 'package:lume/layers/presentation/screens/trail/submodule_session/submodu
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_preview_page.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
+import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_leave_confirm.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
 
 /// Owns [SubmoduleSessionBloc] and swaps preview / play / complete views.
@@ -44,9 +45,19 @@ class _SubmoduleSessionShellState extends State<_SubmoduleSessionShell> {
   /// When true, [PopScope] allows the route to leave without re-entering
   /// [onPopInvokedWithResult] (avoids abandon → maybePop → abandon loops).
   bool _allowPop = false;
+  bool _leaveConfirmVisible = false;
 
-  void _requestExit() {
-    if (_allowPop) return;
+  Future<void> _requestExit() async {
+    if (_allowPop || _leaveConfirmVisible) return;
+
+    final stage = context.read<SubmoduleSessionBloc>().state.stage;
+    if (stage == SubmoduleSessionStage.playing) {
+      _leaveConfirmVisible = true;
+      final leave = await confirmLeaveSubmoduleSession(context);
+      _leaveConfirmVisible = false;
+      if (!leave || !mounted) return;
+    }
+
     context.read<SubmoduleSessionBloc>().add(const SubmoduleSessionAbandoned());
   }
 

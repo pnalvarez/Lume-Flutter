@@ -125,10 +125,18 @@ final class ConnectionsGameDomain extends TrailGameDomain {
     required super.pairId,
     required super.sortOrder,
     super.conceptId,
+    required this.title,
+    required this.subtitle,
     required this.leftColumn,
     required this.rightColumn,
     required this.pairs,
   }) : super(gameType: GameType.connections);
+
+  /// Short label (PromptCard eyebrow), e.g. "Tarefas da IA".
+  final String title;
+
+  /// Instruction under the title (PromptCard body).
+  final String subtitle;
 
   final List<ConnectionItemDomain> leftColumn;
   final List<ConnectionItemDomain> rightColumn;

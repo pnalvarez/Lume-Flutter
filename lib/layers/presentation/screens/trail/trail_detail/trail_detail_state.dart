@@ -12,16 +12,19 @@ final class TrailDetailSubmoduleRowUi {
     required this.title,
     required this.gamesCount,
     required this.isCompleted,
+    this.isLocked = false,
   });
 
   final int id;
   final String title;
   final int gamesCount;
   final bool isCompleted;
+  final bool isLocked;
 
   factory TrailDetailSubmoduleRowUi.fromDomain({
     required GameTrailSubmoduleDomain submodule,
     required Set<int> completedPairs,
+    required bool isLocked,
   }) {
     return TrailDetailSubmoduleRowUi(
       id: submodule.id,
@@ -31,6 +34,7 @@ final class TrailDetailSubmoduleRowUi {
         submodule: submodule,
         completedPairs: completedPairs,
       ),
+      isLocked: isLocked,
     );
   }
 
@@ -40,32 +44,45 @@ final class TrailDetailSubmoduleRowUi {
       other.id == id &&
       other.title == title &&
       other.gamesCount == gamesCount &&
-      other.isCompleted == isCompleted;
+      other.isCompleted == isCompleted &&
+      other.isLocked == isLocked;
 
   @override
-  int get hashCode => Object.hash(id, title, gamesCount, isCompleted);
+  int get hashCode =>
+      Object.hash(id, title, gamesCount, isCompleted, isLocked);
 }
 
 @immutable
 final class TrailDetailLevelUi {
-  const TrailDetailLevelUi({required this.title, required this.submodules});
+  const TrailDetailLevelUi({
+    required this.title,
+    required this.submodules,
+    this.isLocked = false,
+  });
 
   final String title;
   final List<TrailDetailSubmoduleRowUi> submodules;
 
+  /// True when the previous level is unfinished (first submodule locked).
+  final bool isLocked;
+
   factory TrailDetailLevelUi.fromDomain({
     required GameTrailLevelDomain level,
     required Set<int> completedPairs,
+    required Set<int> lockedSubmoduleIds,
   }) {
+    final submodules = [
+      for (final submodule in level.submodules)
+        TrailDetailSubmoduleRowUi.fromDomain(
+          submodule: submodule,
+          completedPairs: completedPairs,
+          isLocked: lockedSubmoduleIds.contains(submodule.id),
+        ),
+    ];
     return TrailDetailLevelUi(
       title: level.title,
-      submodules: [
-        for (final submodule in level.submodules)
-          TrailDetailSubmoduleRowUi.fromDomain(
-            submodule: submodule,
-            completedPairs: completedPairs,
-          ),
-      ],
+      submodules: submodules,
+      isLocked: submodules.isNotEmpty && submodules.first.isLocked,
     );
   }
 
@@ -73,10 +90,11 @@ final class TrailDetailLevelUi {
   bool operator ==(Object other) =>
       other is TrailDetailLevelUi &&
       other.title == title &&
+      other.isLocked == isLocked &&
       listEquals(other.submodules, submodules);
 
   @override
-  int get hashCode => Object.hash(title, Object.hashAll(submodules));
+  int get hashCode => Object.hash(title, isLocked, Object.hashAll(submodules));
 }
 
 @immutable
@@ -105,6 +123,15 @@ final class TrailDetailState {
     final trimmed = title.trim();
     if (trimmed.isEmpty) return emoji;
     return '$emoji $trimmed';
+  }
+
+  bool isSubmoduleLocked(int submoduleId) {
+    for (final level in levels) {
+      for (final submodule in level.submodules) {
+        if (submodule.id == submoduleId) return submodule.isLocked;
+      }
+    }
+    return true;
   }
 
   TrailDetailState copyWith({

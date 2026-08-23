@@ -39,7 +39,7 @@ class SubmodulePreviewBody extends StatelessWidget {
     return SubmoduleSessionChrome(
       progressValue: progressValue,
       onBack: onAbandoned,
-      body: switch ((isLoading, errorMessage)) {
+      child: switch ((isLoading, errorMessage)) {
         (true, _) => const Center(child: CircularLoader()),
         (_, final String message) => Padding(
           padding: const EdgeInsets.all(AppSpacings.xl2),

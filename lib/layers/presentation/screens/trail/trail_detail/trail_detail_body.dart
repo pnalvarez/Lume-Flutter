@@ -3,6 +3,7 @@ import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail_state.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
+import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
@@ -122,66 +123,85 @@ class _LevelContainer extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     // Friendlier mid blue — brighter than slate, softer than brand primary.
-    final levelHeader = AppColors.Secondary.secondary;
+    final levelHeader = level.isLocked
+        ? cs.surfaceContainerHighest
+        : AppColors.Secondary.secondary;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.Surface.onContainer,
-        borderRadius: BorderRadius.circular(AppRadius.xl2),
-        border: Border.all(color: cs.outline),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.Surface.onSurface.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacings.l,
-              vertical: AppSpacings.m,
+    return Opacity(
+      opacity: level.isLocked ? 0.72 : 1,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.Surface.onContainer,
+          borderRadius: BorderRadius.circular(AppRadius.xl2),
+          border: Border.all(color: cs.outline),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.Surface.onSurface.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
             ),
-            color: levelHeader,
-            child: Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: cs.onPrimary.withValues(alpha: 0.9),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: AppSpacings.s),
-                Expanded(
-                  child: Text(
-                    level.title,
-                    style: typ.body4Semibold.copyWith(color: cs.onPrimary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacings.m),
-            child: Column(
-              children: [
-                for (var i = 0; i < level.submodules.length; i++) ...[
-                  if (i > 0) const SizedBox(height: AppSpacings.s),
-                  _SubmoduleCard(
-                    submodule: level.submodules[i],
-                    onTap: () => onSubmodulePressed(level.submodules[i].id),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacings.l,
+                vertical: AppSpacings.m,
+              ),
+              color: levelHeader,
+              child: Row(
+                children: [
+                  if (level.isLocked)
+                    Icon(
+                      Icons.lock_rounded,
+                      size: AppSizes.iconXs,
+                      color: cs.onSurfaceVariant,
+                    )
+                  else
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: cs.onPrimary.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  const SizedBox(width: AppSpacings.s),
+                  Expanded(
+                    child: Text(
+                      level.title,
+                      style: typ.body4Semibold.copyWith(
+                        color: level.isLocked
+                            ? cs.onSurfaceVariant
+                            : cs.onPrimary,
+                      ),
+                    ),
                   ),
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(AppSpacings.m),
+              child: Column(
+                children: [
+                  for (var i = 0; i < level.submodules.length; i++) ...[
+                    if (i > 0) const SizedBox(height: AppSpacings.s),
+                    _SubmoduleCard(
+                      submodule: level.submodules[i],
+                      onTap: level.submodules[i].isLocked
+                          ? null
+                          : () =>
+                                onSubmodulePressed(level.submodules[i].id),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,19 +211,29 @@ class _SubmoduleCard extends StatelessWidget {
   const _SubmoduleCard({required this.submodule, required this.onTap});
 
   final TrailDetailSubmoduleRowUi submodule;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final statusLabel = submodule.isCompleted
+    final locked = submodule.isLocked;
+    final statusLabel = locked
+        ? trailDetailSubmoduleLocked
+        : submodule.isCompleted
         ? trailDetailSubmoduleDone
         : trailDetailSubmoduleTodo;
     final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
-    final accent = submodule.isCompleted ? cs.secondary : cs.primary;
+    final accent = locked
+        ? cs.onSurfaceVariant
+        : submodule.isCompleted
+        ? cs.secondary
+        : cs.primary;
+    final cardColor = locked
+        ? cs.surfaceContainerHigh
+        : cs.surfaceContainerLowest;
 
     return Material(
-      color: cs.surfaceContainerLowest,
+      color: cardColor,
       elevation: 0,
       borderRadius: BorderRadius.circular(AppRadius.l),
       child: InkWell(
@@ -211,16 +241,18 @@ class _SubmoduleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.l),
         child: Ink(
           decoration: BoxDecoration(
-            color: cs.surfaceContainerLowest,
+            color: cardColor,
             borderRadius: BorderRadius.circular(AppRadius.l),
             border: Border.all(color: cs.outlineVariant),
-            boxShadow: [
-              BoxShadow(
-                color: cs.onSurface.withValues(alpha: 0.04),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
+            boxShadow: locked
+                ? null
+                : [
+                    BoxShadow(
+                      color: cs.onSurface.withValues(alpha: 0.04),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
           ),
           child: IntrinsicHeight(
             child: Row(
@@ -252,7 +284,9 @@ class _SubmoduleCard extends StatelessWidget {
                               Text(
                                 submodule.title,
                                 style: typ.body3Semibold.copyWith(
-                                  color: cs.onSurface,
+                                  color: locked
+                                      ? cs.onSurfaceVariant
+                                      : cs.onSurface,
                                 ),
                               ),
                               const SizedBox(height: AppSpacings.xs),
@@ -267,11 +301,17 @@ class _SubmoduleCard extends StatelessWidget {
                           ),
                         ),
                         Icon(
-                          submodule.isCompleted
+                          locked
+                              ? Icons.lock_rounded
+                              : submodule.isCompleted
                               ? Icons.check_circle_rounded
                               : Icons.chevron_right_rounded,
                           size: 22,
-                          color: accent,
+                          color: locked
+                              ? cs.onSurfaceVariant
+                              : submodule.isCompleted
+                              ? AppColors.Success.onSuccess
+                              : accent,
                         ),
                       ],
                     ),
