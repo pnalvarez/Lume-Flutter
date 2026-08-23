@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_state.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
+import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
@@ -25,6 +27,7 @@ class MysteriousWordBody extends StatelessWidget {
     if (game == null) return const SizedBox.shrink();
 
     final cs = Theme.of(context).colorScheme;
+    final hint = game.hint.trim();
 
     return GameAnswerChrome(
       answered: state.answered,
@@ -39,11 +42,13 @@ class MysteriousWordBody extends StatelessWidget {
             text: game.description,
             eyebrow: trailGameTypeMysteriousWord,
           ),
-          const SizedBox(height: AppSpacings.m),
-          Text(
-            '$trailGameHint: ${game.hint}',
-            style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
-          ),
+          if (hint.isNotEmpty) ...[
+            const SizedBox(height: AppSpacings.m),
+            Text(
+              '$trailGameHint: $hint',
+              style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ],
           const SizedBox(height: AppSpacings.l),
           Text(
             state.maskedWord,
@@ -54,11 +59,7 @@ class MysteriousWordBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacings.m),
-          Text(
-            '${state.livesLeft} $trailGameLivesLeft',
-            textAlign: TextAlign.center,
-            style: typ.tagS.copyWith(color: cs.onSurfaceVariant),
-          ),
+          _LivesRow(livesLeft: state.livesLeft),
           const SizedBox(height: AppSpacings.l),
           Wrap(
             spacing: AppSpacings.s,
@@ -76,6 +77,31 @@ class MysteriousWordBody extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LivesRow extends StatelessWidget {
+  const _LivesRow({required this.livesLeft});
+
+  final int livesLeft;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < MysteriousWordState.maxWrong; i++) ...[
+          if (i > 0) const SizedBox(width: AppSpacings.xs),
+          Icon(
+            i < livesLeft
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
+            size: AppSizes.iconS,
+            color: AppColors.Extra.pinkDeep,
+          ),
+        ],
+      ],
     );
   }
 }

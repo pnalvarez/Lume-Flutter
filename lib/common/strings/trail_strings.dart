@@ -72,5 +72,4 @@ const String trailGamePartial = 'Parcial';
 const String trailGameHint = 'Dica';
 const String trailGameRevealHint = 'Revelar dica';
 const String trailGameAnswerPlaceholder = 'Sua resposta';
-const String trailGameLivesLeft = 'vidas';
 const String trailGameUndoLastPair = 'Desfazer último par';

@@ -264,6 +264,9 @@ class _ExtraPalette {
   /// `hsl(340 70% 96%)` → #FCEEF3
   final Color pinkLight = const Color(0xFFFCEEF3);
 
+  /// Saturated red–pink for icons (e.g. lives) — `hsl(348 72% 62%)` → #E85C7A
+  final Color pinkDeep = const Color(0xFFE85C7A);
+
   /// `hsl(180 35% 78%)` → #A8D4D4
   final Color teal = const Color(0xFFA8D4D4);
 

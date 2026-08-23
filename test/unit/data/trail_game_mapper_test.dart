@@ -86,7 +86,7 @@ void main() {
       item(GameType.mysteriousWord, {
         'word': 'format',
         'description': 'Output structure.',
-        'hint': 'Starts with F.',
+        'hint': 'Shape of the answer before you adapt it.',
         'explanation': 'Format matters.',
       }),
     );

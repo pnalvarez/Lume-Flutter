@@ -113,7 +113,7 @@ const _sampleWord = MysteriousWordGameDomain(
   sortOrder: 7,
   word: 'IMPÉRIO',
   description: 'Regime político após a Independência.',
-  hint: 'Começa com I',
+  hint: 'Foi liderado por Dom Pedro I e Dom Pedro II.',
   explanation: 'O Império durou de 1822 a 1889.',
 );
 
