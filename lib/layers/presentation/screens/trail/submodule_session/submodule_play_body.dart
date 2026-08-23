@@ -32,7 +32,7 @@ class SubmodulePlayBody extends StatelessWidget {
     return SubmoduleSessionChrome(
       progressValue: progressValue,
       onBack: onAbandoned,
-      body: switch ((isSaving, errorMessage)) {
+      child: switch ((isSaving, errorMessage)) {
         (true, _) => const Center(child: CircularLoader()),
         (_, final String message) => Padding(
           padding: const EdgeInsets.all(AppSpacings.xl2),

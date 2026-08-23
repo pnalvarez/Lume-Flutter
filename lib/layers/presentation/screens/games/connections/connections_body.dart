@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/games/connections/connections_state.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
-import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
-import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
+import 'package:lume_design_system/molecules/chips/badge_chip.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 
 class ConnectionsBody extends StatelessWidget {
@@ -14,6 +13,7 @@ class ConnectionsBody extends StatelessWidget {
     required this.state,
     required this.onLeftSelected,
     required this.onRightSelected,
+    required this.onUndoLast,
     required this.onSubmit,
     required this.onNext,
   });
@@ -21,6 +21,7 @@ class ConnectionsBody extends StatelessWidget {
   final ConnectionsState state;
   final ValueChanged<String> onLeftSelected;
   final ValueChanged<String> onRightSelected;
+  final VoidCallback onUndoLast;
   final VoidCallback onSubmit;
   final VoidCallback onNext;
 
@@ -37,9 +38,13 @@ class ConnectionsBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: AppSpacings.m),
-          const PromptCard(
-            text: trailGameTypeConnections,
-            eyebrow: trailGameTypeConnections,
+          PromptCard(
+            eyebrow: game.title.isNotEmpty
+                ? game.title
+                : trailGameTypeConnections,
+            text: game.subtitle.isNotEmpty
+                ? game.subtitle
+                : trailGameTypeConnections,
           ),
           const SizedBox(height: AppSpacings.l),
           Row(
@@ -49,9 +54,10 @@ class ConnectionsBody extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final item in game.leftColumn) ...[
-                      _ConnectionChip(
+                      _ConnectionsBadgeChip(
                         label: item.text,
                         visual: state.leftVisual(item.id),
+                        pairNumber: state.pairNumberForLeft(item.id),
                         onTap: state.answered
                             ? null
                             : () => onLeftSelected(item.id),
@@ -66,9 +72,10 @@ class ConnectionsBody extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final item in game.rightColumn) ...[
-                      _ConnectionChip(
+                      _ConnectionsBadgeChip(
                         label: item.text,
                         visual: state.rightVisual(item.id),
+                        pairNumber: state.pairNumberForRight(item.id),
                         onTap: state.canSelectRight
                             ? () => onRightSelected(item.id)
                             : null,
@@ -83,6 +90,15 @@ class ConnectionsBody extends StatelessWidget {
           if (!state.answered) ...[
             const SizedBox(height: AppSpacings.m),
             LumeButton(
+              label: trailGameUndoLastPair,
+              type: LumeButtonType.outlined,
+              trait: LumeButtonTrait.secondary,
+              isExpanded: true,
+              isEnabled: state.canUndoLast,
+              onPressed: onUndoLast,
+            ),
+            const SizedBox(height: AppSpacings.s),
+            LumeButton(
               label: trailGameSubmit,
               isExpanded: true,
               isEnabled: state.allLinked,
@@ -95,15 +111,17 @@ class ConnectionsBody extends StatelessWidget {
   }
 }
 
-class _ConnectionChip extends StatelessWidget {
-  const _ConnectionChip({
+class _ConnectionsBadgeChip extends StatelessWidget {
+  const _ConnectionsBadgeChip({
     required this.label,
     required this.visual,
+    required this.pairNumber,
     required this.onTap,
   });
 
   final String label;
   final ConnectionsChipVisual visual;
+  final int? pairNumber;
   final VoidCallback? onTap;
 
   @override
@@ -137,30 +155,15 @@ class _ConnectionChip extends StatelessWidget {
       ),
     };
 
-    final radius = BorderRadius.circular(AppRadius.l);
-
-    return Material(
-      color: bg,
-      shape: RoundedRectangleBorder(
-        borderRadius: radius,
-        side: BorderSide(color: border, width: 1.5),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacings.m,
-            vertical: AppSpacings.m,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: typ.body3Medium.copyWith(color: fg),
-          ),
-        ),
-      ),
+    return BadgeChip(
+      label: label,
+      backgroundColor: bg,
+      borderColor: border,
+      foregroundColor: fg,
+      badgeLabel: pairNumber?.toString(),
+      badgeBackgroundColor: cs.secondary,
+      badgeForegroundColor: cs.onSecondary,
+      onTap: onTap,
     );
   }
 }

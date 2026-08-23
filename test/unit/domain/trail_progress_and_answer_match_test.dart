@@ -106,5 +106,27 @@ void main() {
         50,
       );
     });
+
+    test('locks later submodules until the previous one is completed', () {
+      expect(
+        TrailProgressCalculator.lockedSubmoduleIds(
+          trail: trail,
+          completedPairs: const {},
+        ),
+        {101},
+      );
+
+      final firstDone = TrailProgressCalculator.completedPairIds(const [
+        PairProgressDomain(pairId: 1, completed: true),
+        PairProgressDomain(pairId: 2, completed: true),
+      ]);
+      expect(
+        TrailProgressCalculator.lockedSubmoduleIds(
+          trail: trail,
+          completedPairs: firstDone,
+        ),
+        isEmpty,
+      );
+    });
   });
 }

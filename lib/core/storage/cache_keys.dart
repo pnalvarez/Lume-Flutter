@@ -7,5 +7,5 @@ abstract final class CacheKeys {
   static const gameTrails = 'cache:game_trails';
 
   static String submoduleGames(int submoduleId) =>
-      'cache:submodule_games:$submoduleId';
+      'cache:submodule_games:v2:$submoduleId';
 }

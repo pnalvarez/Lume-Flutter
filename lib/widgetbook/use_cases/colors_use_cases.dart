@@ -63,6 +63,7 @@ class _ColorCatalog extends StatelessWidget {
     ('Lavender Dark', AppColors.Extra.lavenderDark),
     ('Pink', AppColors.Extra.pink),
     ('Pink Light', AppColors.Extra.pinkLight),
+    ('Pink Deep', AppColors.Extra.pinkDeep),
     ('Teal', AppColors.Extra.teal),
     ('Teal Light', AppColors.Extra.tealLight),
     ('Slate', AppColors.Extra.slate),

@@ -583,6 +583,16 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'chips',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'BadgeChip',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'With pair badge',
+                builder: _lume_widgetbook_use_cases_chips_and_progress_use_cases
+                    .badgeChipWithNumber,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'ChipPicker',
             useCases: [
               _widgetbook.WidgetbookUseCase(

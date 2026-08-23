@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
 import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_state.dart';
+import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
@@ -73,9 +74,20 @@ class _WhoAmIBodyState extends State<WhoAmIBody> {
           const SizedBox(height: AppSpacings.l),
           for (var i = 0; i < visibleHints.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacings.s),
-            Text(
-              '$trailGameHint ${i + 1}: ${visibleHints[i]}',
-              style: typ.body3Light.copyWith(color: cs.onSurface),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacings.m,
+                vertical: AppSpacings.s,
+              ),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(AppRadius.l),
+              ),
+              child: Text(
+                '$trailGameHint ${i + 1}: ${visibleHints[i]}',
+                style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
+              ),
             ),
           ],
           if (state.canRevealMore) ...[

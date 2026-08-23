@@ -9,12 +9,12 @@ class SubmoduleSessionChrome extends StatelessWidget {
     super.key,
     required this.progressValue,
     required this.onBack,
-    required this.body,
+    required this.child,
   });
 
   final double progressValue;
   final VoidCallback onBack;
-  final Widget body;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class SubmoduleSessionChrome extends StatelessWidget {
           ),
         ),
       ),
-      body: body,
+      body: child,
     );
   }
 }

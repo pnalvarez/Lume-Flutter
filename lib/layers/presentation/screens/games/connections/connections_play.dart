@@ -52,6 +52,9 @@ class _ConnectionsPlayState extends State<ConnectionsPlay> {
             onRightSelected: (id) {
               context.read<ConnectionsBloc>().add(ConnectionsRightSelected(id));
             },
+            onUndoLast: () {
+              context.read<ConnectionsBloc>().add(const ConnectionsUndoLast());
+            },
             onSubmit: () {
               context.read<ConnectionsBloc>().add(const ConnectionsSubmit());
             },

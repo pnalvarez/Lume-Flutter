@@ -86,7 +86,7 @@ void main() {
       item(GameType.mysteriousWord, {
         'word': 'format',
         'description': 'Output structure.',
-        'hint': 'Starts with F.',
+        'hint': 'Shape of the answer before you adapt it.',
         'explanation': 'Format matters.',
       }),
     );
@@ -117,6 +117,8 @@ void main() {
   test('parse maps connections payload', () {
     final game = TrailGameMapper.parse(
       item(GameType.connections, {
+        'title': 'Tarefas da IA',
+        'subtitle': 'Associe cada termo à função correspondente.',
         'left_column': [
           {'id': 'e1', 'text': 'Left'},
         ],
@@ -131,6 +133,8 @@ void main() {
 
     expect(game, isA<ConnectionsGameDomain>());
     final connections = game as ConnectionsGameDomain;
+    expect(connections.title, 'Tarefas da IA');
+    expect(connections.subtitle, 'Associe cada termo à função correspondente.');
     expect(connections.pairs.single.leftId, 'e1');
   });
 
