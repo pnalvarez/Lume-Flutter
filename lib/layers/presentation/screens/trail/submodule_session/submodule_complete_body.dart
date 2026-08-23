@@ -39,63 +39,63 @@ class SubmoduleCompleteBody extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                      SvgPicture.asset(
-                        AppIcons.trophy,
-                        package: 'lume_design_system',
-                        width: AppSizes.mediaWellL,
-                        height: AppSizes.mediaWellL,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.Accent.accent,
-                          BlendMode.srcIn,
+                        SvgPicture.asset(
+                          AppIcons.trophy,
+                          package: 'lume_design_system',
+                          width: AppSizes.mediaWellL,
+                          height: AppSizes.mediaWellL,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.Accent.accent,
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacings.l),
-                      Text.rich(
-                        TextSpan(
-                          style: typ.headlineS.copyWith(color: cs.onSurface),
-                          children: [
-                            const TextSpan(text: trailSessionCompleteTitle),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  left: AppSpacings.xs,
-                                ),
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.Success.onSuccess,
-                                    shape: BoxShape.circle,
+                        const SizedBox(height: AppSpacings.l),
+                        Text.rich(
+                          TextSpan(
+                            style: typ.headlineS.copyWith(color: cs.onSurface),
+                            children: [
+                              const TextSpan(text: trailSessionCompleteTitle),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: AppSpacings.xs,
                                   ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(AppSpacings.xs),
-                                    child: Icon(
-                                      Icons.check_rounded,
-                                      size: AppSizes.iconXs,
-                                      color: Colors.white,
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.Success.onSuccess,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(AppSpacings.xs),
+                                      child: Icon(
+                                        Icons.check_rounded,
+                                        size: AppSizes.iconXs,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacings.s),
-                      Text(
-                        trailSessionCompleteScore(
-                          correctCount: correctCount,
-                          total: total,
+                        const SizedBox(height: AppSpacings.s),
+                        Text(
+                          trailSessionCompleteScore(
+                            correctCount: correctCount,
+                            total: total,
+                          ),
+                          textAlign: TextAlign.center,
+                          style: typ.body3Light.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                        style: typ.body3Light.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               ),
               LumeButton(
                 label: trailSessionBackToTrail,

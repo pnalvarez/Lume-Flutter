@@ -57,10 +57,7 @@ final class ConnectionsBloc extends Bloc<ConnectionsEvent, ConnectionsState> {
     );
   }
 
-  void _onUndoLast(
-    ConnectionsUndoLast event,
-    Emitter<ConnectionsState> emit,
-  ) {
+  void _onUndoLast(ConnectionsUndoLast event, Emitter<ConnectionsState> emit) {
     if (!state.canUndoLast) return;
     final lastLeft = state.linkOrder.last;
     final nextLinks = Map<String, String>.from(state.links)..remove(lastLeft);

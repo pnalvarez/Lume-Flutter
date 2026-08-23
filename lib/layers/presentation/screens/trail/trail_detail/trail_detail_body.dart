@@ -193,8 +193,7 @@ class _LevelContainer extends StatelessWidget {
                       submodule: level.submodules[i],
                       onTap: level.submodules[i].isLocked
                           ? null
-                          : () =>
-                                onSubmodulePressed(level.submodules[i].id),
+                          : () => onSubmodulePressed(level.submodules[i].id),
                     ),
                   ],
                 ],

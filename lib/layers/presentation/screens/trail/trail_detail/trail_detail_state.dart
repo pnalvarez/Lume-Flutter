@@ -48,8 +48,7 @@ final class TrailDetailSubmoduleRowUi {
       other.isLocked == isLocked;
 
   @override
-  int get hashCode =>
-      Object.hash(id, title, gamesCount, isCompleted, isLocked);
+  int get hashCode => Object.hash(id, title, gamesCount, isCompleted, isLocked);
 }
 
 @immutable

@@ -102,8 +102,9 @@ final class ConnectionsState {
   }) {
     return ConnectionsState(
       game: game ?? this.game,
-      selectedLeftId:
-          clearSelectedLeft ? null : (selectedLeftId ?? this.selectedLeftId),
+      selectedLeftId: clearSelectedLeft
+          ? null
+          : (selectedLeftId ?? this.selectedLeftId),
       links: links ?? this.links,
       linkOrder: linkOrder ?? this.linkOrder,
       answered: answered ?? this.answered,
