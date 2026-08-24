@@ -9,6 +9,7 @@ import 'package:lume_design_system/organisms/game/session_timer.dart';
 import 'package:lume_design_system/organisms/navigation/bottom_nav_bar.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 import 'package:lume_design_system/organisms/navigation/screen_header.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 import 'package:lume_design_system/organisms/trail/content_card.dart';
 import 'package:lume_design_system/organisms/trail/path_node.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
@@ -101,6 +102,90 @@ void main() {
         _wrap(const PathNode(state: PathNodeState.active, label: 'Level 1')),
       );
       expect(find.text('Level 1'), findsOneWidget);
+    });
+  });
+
+  group('ListItem', () {
+    testWidgets('renders title and handles tap', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        _wrap(
+          ListItem(
+            onTap: () => tapped = true,
+            input: IconTitleDescriptionInput(
+              leadingIcon: Icons.star,
+              title: 'Row title',
+              description: 'Row body',
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Row title'), findsOneWidget);
+      expect(find.text('Row body'), findsOneWidget);
+      await tester.tap(find.text('Row title'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('disabled ignores tap', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        _wrap(
+          ListItem(
+            isEnabled: false,
+            onTap: () => tapped = true,
+            input: TextInput(text: 'Disabled row'),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Disabled row'));
+      expect(tapped, isFalse);
+    });
+
+    testWidgets('header children nests submodule rows', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        _wrap(
+          ListItem(
+            padding: EdgeInsets.zero,
+            input: HeaderChildrenInput(
+              title: 'Level',
+              children: [
+                ListItem(
+                  onTap: () => tapped = true,
+                  input: TitleCaptionTrailingInput(
+                    title: 'Child',
+                    caption: '4 games',
+                    trailingIcon: Icons.chevron_right_rounded,
+                    showAccentBar: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Level'), findsOneWidget);
+      expect(find.text('Child'), findsOneWidget);
+      await tester.tap(find.text('Child'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('leading caption progress shows bar caption', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          ListItem(
+            trait: ListItemTrait.brand,
+            input: LeadingTitleCaptionInput(
+              leading: const Text('🧠'),
+              title: 'Trail',
+              caption: '1/4',
+              progress: 0.25,
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Trail'), findsOneWidget);
+      expect(find.text('1/4'), findsOneWidget);
     });
   });
 

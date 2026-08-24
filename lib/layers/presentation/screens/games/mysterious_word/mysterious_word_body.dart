@@ -8,6 +8,7 @@ import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
 class MysteriousWordBody extends StatelessWidget {
   const MysteriousWordBody({
@@ -44,9 +45,10 @@ class MysteriousWordBody extends StatelessWidget {
           ),
           if (hint.isNotEmpty) ...[
             const SizedBox(height: AppSpacings.m),
-            Text(
-              '$trailGameHint: $hint',
-              style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
+            ListItem(
+              trait: ListItemTrait.neutral,
+              isExpanded: true,
+              input: TextInput(label: '$trailGameHint: ', text: hint),
             ),
           ],
           const SizedBox(height: AppSpacings.l),

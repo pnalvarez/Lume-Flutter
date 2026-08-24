@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
 import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_state.dart';
-import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
-import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
 class WhoAmIBody extends StatefulWidget {
   const WhoAmIBody({
@@ -58,7 +57,6 @@ class _WhoAmIBodyState extends State<WhoAmIBody> {
     final game = state.game;
     if (game == null) return const SizedBox.shrink();
 
-    final cs = Theme.of(context).colorScheme;
     final visibleHints = state.visibleHints;
 
     return GameAnswerChrome(
@@ -74,19 +72,12 @@ class _WhoAmIBodyState extends State<WhoAmIBody> {
           const SizedBox(height: AppSpacings.l),
           for (var i = 0; i < visibleHints.length; i++) ...[
             if (i > 0) const SizedBox(height: AppSpacings.s),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacings.m,
-                vertical: AppSpacings.s,
-              ),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(AppRadius.l),
-              ),
-              child: Text(
-                '$trailGameHint ${i + 1}: ${visibleHints[i]}',
-                style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
+            ListItem(
+              trait: ListItemTrait.neutral,
+              isExpanded: true,
+              input: TextInput(
+                label: '$trailGameHint ${i + 1}: ',
+                text: visibleHints[i],
               ),
             ),
           ],

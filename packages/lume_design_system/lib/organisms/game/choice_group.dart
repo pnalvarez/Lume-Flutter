@@ -1,8 +1,7 @@
-import 'package:lume_design_system/atoms/colors/colors.dart';
+import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
-import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
-import 'package:flutter/material.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
 /// Visual state for a choice row (no domain meaning).
 enum ChoiceVisualState { idle, selected, positive, negative, disabled }
@@ -20,7 +19,7 @@ class ChoiceOption {
   });
 }
 
-/// Vertical list of tappable choice rows.
+/// Vertical list of tappable choice rows, each backed by [ListItem].
 class ChoiceGroup extends StatelessWidget {
   final List<ChoiceOption> options;
   final ValueChanged<String>? onSelected;
@@ -53,68 +52,32 @@ class _ChoiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final (Color bg, Color border, Color fg) = switch (option.state) {
-      ChoiceVisualState.idle => (
-        cs.surfaceContainerLowest,
-        cs.outline,
-        cs.onSurface,
-      ),
-      ChoiceVisualState.selected => (
-        cs.primaryContainer,
-        cs.primary,
-        cs.onPrimaryContainer,
-      ),
+    final (trait, isSelected, isEnabled, trailing) = switch (option.state) {
+      ChoiceVisualState.idle => (ListItemTrait.neutral, false, true, null),
+      ChoiceVisualState.selected => (ListItemTrait.brand, true, true, null),
       ChoiceVisualState.positive => (
-        AppColors.Success.successContainer,
-        AppColors.Success.success,
-        AppColors.Success.onSuccess,
+        ListItemTrait.success,
+        false,
+        true,
+        Icons.check_circle_rounded,
       ),
       ChoiceVisualState.negative => (
-        AppColors.Error.errorContainer,
-        AppColors.Error.error,
-        AppColors.Error.onError,
+        ListItemTrait.destructive,
+        false,
+        true,
+        Icons.cancel_rounded,
       ),
-      ChoiceVisualState.disabled => (
-        cs.surfaceContainerLow,
-        cs.outline.withValues(alpha: 0.5),
-        cs.onSurface.withValues(alpha: 0.38),
-      ),
+      ChoiceVisualState.disabled => (ListItemTrait.neutral, false, false, null),
     };
 
-    final radius = BorderRadius.circular(AppRadius.l);
-
-    return Material(
-      color: bg,
-      shape: RoundedRectangleBorder(
-        borderRadius: radius,
-        side: BorderSide(color: border, width: 1.5),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacings.l,
-            vertical: AppSpacings.m,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  option.label,
-                  style: typ.body4Medium.copyWith(color: fg),
-                ),
-              ),
-              if (option.state == ChoiceVisualState.positive)
-                Icon(Icons.check_circle_rounded, color: fg, size: 20),
-              if (option.state == ChoiceVisualState.negative)
-                Icon(Icons.cancel_rounded, color: fg, size: 20),
-            ],
-          ),
-        ),
-      ),
+    return ListItem(
+      trait: trait,
+      isSelected: isSelected,
+      isEnabled: isEnabled,
+      isExpanded: true,
+      borderRadius: AppRadius.l,
+      onTap: onTap,
+      input: TextInput(text: option.label, trailingIcon: trailing),
     );
   }
 }

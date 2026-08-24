@@ -7,7 +7,7 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
-import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
 /// Trail home chrome. No Bloc, router, or GetIt — safe for Widgetbook.
 class HomeBody extends StatelessWidget {
@@ -117,9 +117,22 @@ class HomeBody extends StatelessWidget {
                     )
                   else
                     for (final trail in state.trails) ...[
-                      _TrailCard(
-                        trail: trail,
+                      ListItem(
+                        trait: ListItemTrait.brand,
+                        borderRadius: AppRadius.xl,
+                        showShadow: true,
                         onTap: () => onTrailPressed(trail.trailId),
+                        input: LeadingTitleCaptionInput(
+                          leading: Text(
+                            trail.emoji,
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                          title: trail.title,
+                          caption: trail.progressPercent == 0
+                              ? '${trail.totalSubmodules} $trailHomeSubmodulesLabel'
+                              : '${trail.completedSubmodules}/${trail.totalSubmodules} $trailHomeSubmodulesLabel · ${trail.progressPercent}%',
+                          progress: trail.progressPercent / 100,
+                        ),
                       ),
                       const SizedBox(height: AppSpacings.m),
                     ],
@@ -129,82 +142,6 @@ class HomeBody extends StatelessWidget {
           ],
         ),
       },
-    );
-  }
-}
-
-class _TrailCard extends StatelessWidget {
-  const _TrailCard({required this.trail, required this.onTap});
-
-  final HomeTrailCardUi trail;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final caption = trail.progressPercent == 0
-        ? '${trail.totalSubmodules} $trailHomeSubmodulesLabel'
-        : '${trail.completedSubmodules}/${trail.totalSubmodules} $trailHomeSubmodulesLabel · ${trail.progressPercent}%';
-
-    return Material(
-      color: cs.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: cs.primaryContainer),
-            boxShadow: [
-              BoxShadow(
-                color: cs.primary.withValues(alpha: 0.06),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacings.l,
-              vertical: AppSpacings.m,
-            ),
-            child: Row(
-              children: [
-                Text(trail.emoji, style: const TextStyle(fontSize: 22)),
-                const SizedBox(width: AppSpacings.m),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trail.title,
-                        style: typ.body3Semibold.copyWith(color: cs.onSurface),
-                      ),
-                      const SizedBox(height: AppSpacings.xs),
-                      Text(
-                        caption,
-                        style: typ.tagS.copyWith(
-                          color: cs.secondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacings.s),
-                      LumeProgressBar(
-                        value: trail.progressPercent / 100,
-                        height: 4,
-                        showPercentage: false,
-                        fillColor: cs.primary,
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.chevron_right_rounded, size: 22, color: cs.primary),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
