@@ -17,14 +17,27 @@ final class SubmoduleSessionStarted extends SubmoduleSessionEvent {
   final bool forceRefresh;
 }
 
-final class SubmoduleSessionPreviewContinue extends SubmoduleSessionEvent {
-  const SubmoduleSessionPreviewContinue();
+/// Buffers a round score from [GamesPage] via the save callback (no network yet).
+final class SubmoduleSessionRoundScored extends SubmoduleSessionEvent {
+  const SubmoduleSessionRoundScored({
+    required this.pairId,
+    required this.scorePct,
+  });
+
+  final int pairId;
+  final int scorePct;
 }
 
-final class SubmoduleSessionGameFinished extends SubmoduleSessionEvent {
-  const SubmoduleSessionGameFinished(this.correct);
+/// Flushes buffered pair scores after the games sequence finishes.
+final class SubmoduleSessionGamesCompleted extends SubmoduleSessionEvent {
+  const SubmoduleSessionGamesCompleted({required this.correctCount});
 
-  final bool correct;
+  final int correctCount;
+}
+
+/// User left the games sequence without finishing — discard buffered scores.
+final class SubmoduleSessionGamesCancelled extends SubmoduleSessionEvent {
+  const SubmoduleSessionGamesCancelled();
 }
 
 final class SubmoduleSessionRetrySave extends SubmoduleSessionEvent {

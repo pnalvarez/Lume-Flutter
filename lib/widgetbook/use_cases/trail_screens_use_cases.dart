@@ -7,6 +7,9 @@ import 'package:lume/layers/presentation/screens/games/complete_sentence/complet
 import 'package:lume/layers/presentation/screens/games/complete_sentence/complete_sentence_state.dart';
 import 'package:lume/layers/presentation/screens/games/connections/connections_body.dart';
 import 'package:lume/layers/presentation/screens/games/connections/connections_state.dart';
+import 'package:lume/layers/presentation/screens/games/game_round.dart';
+import 'package:lume/layers/presentation/screens/games/games_body.dart';
+import 'package:lume/layers/presentation/screens/games/games_state.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_body.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_state.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_body.dart';
@@ -21,7 +24,6 @@ import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_state.d
 import 'package:lume/layers/presentation/screens/trail/home/home_body.dart';
 import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_complete_body.dart';
-import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_play_body.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_preview_body.dart';
 import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail_body.dart';
 import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail_state.dart';
@@ -309,20 +311,65 @@ Widget submodulePreviewError(BuildContext context) {
 }
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Submodule Play',
-  name: 'Playing',
-  type: SubmodulePlayBody,
+  path: '[Lume]/[Screens]/Games',
+  name: 'Playing quiz',
+  type: GamesBody,
 )
-Widget submodulePlaying(BuildContext context) {
-  return SubmodulePlayBody(
-    progressValue: 0.25,
-    gameSlot: LightningQuizBody(
-      state: const LightningQuizState(game: _sampleQuiz),
-      onOptionSelected: _noopString,
-      onNext: _noop,
+Widget gamesPlayingQuiz(BuildContext context) {
+  return GamesBody(
+    state: GamesState.initial(
+      rounds: const [
+        GameRound(id: '1', game: _sampleQuiz),
+        GameRound(id: '2', game: _sampleTimeline),
+      ],
     ),
     onAbandoned: _noop,
     onRetry: _noop,
+    onChoiceSelected: _noopString,
+    onWhoAmIAnswerChanged: _noopString,
+    onWhoAmIRevealHint: _noop,
+    onWhoAmISubmit: _noop,
+    onBlankSelected: _noopBlank,
+    onCompleteSentenceSubmit: _noop,
+    onConnectionsLeftSelected: _noopString,
+    onConnectionsRightSelected: _noopString,
+    onConnectionsUndoLast: _noop,
+    onConnectionsSubmit: _noop,
+    onMysteriousWordLetterPressed: _noopString,
+    onNext: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games',
+  name: 'Progress mid-sequence',
+  type: GamesBody,
+)
+Widget gamesProgressMid(BuildContext context) {
+  return GamesBody(
+    state: const GamesState(
+      rounds: [
+        GameRound(id: '1', game: _sampleQuiz),
+        GameRound(id: '2', game: _sampleTimeline),
+        GameRound(id: '3', game: _sampleQuiz),
+      ],
+      currentIndex: 1,
+      completedCount: 1,
+    ),
+    onAbandoned: _noop,
+    onRetry: _noop,
+    onChoiceSelected: _noopString,
+    onWhoAmIAnswerChanged: _noopString,
+    onWhoAmIRevealHint: _noop,
+    onWhoAmISubmit: _noop,
+    onBlankSelected: _noopBlank,
+    onCompleteSentenceSubmit: _noop,
+    onConnectionsLeftSelected: _noopString,
+    onConnectionsRightSelected: _noopString,
+    onConnectionsUndoLast: _noop,
+    onConnectionsSubmit: _noop,
+    onMysteriousWordLetterPressed: _noopString,
+    onNext: _noop,
   );
 }
 

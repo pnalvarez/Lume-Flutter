@@ -4,10 +4,10 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
 
-/// Asks whether to leave the submodule and discard in-session progress.
+/// Asks whether to leave the games sequence and discard in-session progress.
 ///
 /// Returns `true` when the user confirms leave.
-Future<bool> confirmLeaveSubmoduleSession(BuildContext context) async {
+Future<bool> confirmLeaveGamesSequence(BuildContext context) async {
   final cs = Theme.of(context).colorScheme;
   final confirmed = await showLumeDialog<bool>(
     context: context,
@@ -34,5 +34,5 @@ Future<bool> confirmLeaveSubmoduleSession(BuildContext context) async {
       ),
     ],
   );
-  return confirmed == true;
+  return confirmed ?? false;
 }

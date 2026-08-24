@@ -4,6 +4,7 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
 import 'package:lume_design_system/organisms/feedback/floating_notice.dart';
+import 'package:lume_design_system/organisms/feedback/lume_loading_overlay.dart';
 import 'package:lume_design_system/organisms/feedback/result_banner.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
@@ -116,6 +117,36 @@ Widget celebrationDialogDefault(BuildContext context) {
         actionLabel: 'Continue',
         onAction: () {},
         onClose: () {},
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Inline', type: LumeLoadingOverlay)
+Widget lumeLoadingOverlayInline(BuildContext context) {
+  return const Scaffold(
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        Center(child: Text('Page content')),
+        LumeLoadingOverlay(),
+      ],
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Global', type: LumeLoadingOverlay)
+Widget lumeLoadingOverlayGlobal(BuildContext context) {
+  return Scaffold(
+    body: Center(
+      child: LumeButton(
+        label: 'Mostrar overlay global',
+        onPressed: () {
+          showLumeLoadingOverlay(context);
+          Future<void>.delayed(const Duration(seconds: 2), () {
+            hideLumeLoadingOverlay();
+          });
+        },
       ),
     ),
   );

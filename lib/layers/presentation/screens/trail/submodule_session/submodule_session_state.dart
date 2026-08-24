@@ -3,7 +3,7 @@ import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 
 enum SubmoduleSessionStatus { loading, ready, saving, error }
 
-enum SubmoduleSessionStage { preview, playing, completed }
+enum SubmoduleSessionStage { preview, completed }
 
 @immutable
 final class SubmoduleSessionState {
@@ -17,7 +17,6 @@ final class SubmoduleSessionState {
     this.preview = '',
     this.imageUrl,
     this.games = const [],
-    this.currentIndex = 0,
     this.correctCount = 0,
     this.pairScores = const {},
     this.errorMessage,
@@ -33,30 +32,20 @@ final class SubmoduleSessionState {
   final String preview;
   final String? imageUrl;
   final List<TrailGameDomain> games;
-  final int currentIndex;
   final int correctCount;
   final Map<int, int> pairScores;
   final String? errorMessage;
   final bool goBackToTrail;
 
-  TrailGameDomain? get currentGame {
-    if (currentIndex < 0 || currentIndex >= games.length) return null;
-    return games[currentIndex];
-  }
-
-  /// Progress in [0.0, 1.0] for the session chrome bar.
-  /// Preview is 0; while playing, advances with the current game (1-based).
+  /// Preview stays at 0; complete is 1. Mid-sequence progress lives on GamesPage.
   double get progressValue {
     if (stage == SubmoduleSessionStage.completed) return 1.0;
-    if (stage == SubmoduleSessionStage.preview || games.isEmpty) return 0.0;
-    return ((currentIndex + 1) / games.length).clamp(0.0, 1.0);
+    return 0.0;
   }
 
-  /// True when all in-memory pair scores exist and the last flush failed.
   bool get canRetrySave =>
       status == SubmoduleSessionStatus.error &&
-      stage == SubmoduleSessionStage.playing &&
-      games.isNotEmpty &&
+      pairScores.isNotEmpty &&
       pairScores.length == games.length;
 
   SubmoduleSessionState copyWith({
@@ -69,7 +58,6 @@ final class SubmoduleSessionState {
     String? preview,
     String? imageUrl,
     List<TrailGameDomain>? games,
-    int? currentIndex,
     int? correctCount,
     Map<int, int>? pairScores,
     String? errorMessage,
@@ -89,7 +77,6 @@ final class SubmoduleSessionState {
       preview: preview ?? this.preview,
       imageUrl: clearImageUrl ? null : imageUrl ?? this.imageUrl,
       games: games ?? this.games,
-      currentIndex: currentIndex ?? this.currentIndex,
       correctCount: correctCount ?? this.correctCount,
       pairScores: clearPairScores ? const {} : pairScores ?? this.pairScores,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
@@ -109,7 +96,6 @@ final class SubmoduleSessionState {
       other.preview == preview &&
       other.imageUrl == imageUrl &&
       listEquals(other.games, games) &&
-      other.currentIndex == currentIndex &&
       other.correctCount == correctCount &&
       mapEquals(other.pairScores, pairScores) &&
       other.errorMessage == errorMessage &&
@@ -126,7 +112,6 @@ final class SubmoduleSessionState {
     preview,
     imageUrl,
     Object.hashAll(games),
-    currentIndex,
     correctCount,
     Object.hashAll(pairScores.entries),
     errorMessage,

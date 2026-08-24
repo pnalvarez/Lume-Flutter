@@ -456,10 +456,7 @@ const _sampleHubGames = [
 )
 Widget gamesHubReady(BuildContext context) {
   return GamesHubBody(
-    state: const GamesHubState(
-      status: GamesHubStatus.ready,
-      games: _sampleHubGames,
-    ),
+    state: const GamesHubState(isInitialLoading: false, games: _sampleHubGames),
     onRetry: _noop,
     onGamePressed: _noopString,
     onArcadePressed: _noop,
@@ -488,8 +485,8 @@ Widget gamesHubLoading(BuildContext context) {
 Widget gamesHubError(BuildContext context) {
   return GamesHubBody(
     state: const GamesHubState(
-      status: GamesHubStatus.error,
-      errorMessage: 'Não foi possível carregar os jogos.',
+      isInitialLoading: false,
+      initialErrorMessage: 'Não foi possível carregar os jogos.',
     ),
     onRetry: _noop,
     onGamePressed: _noopString,
@@ -504,7 +501,21 @@ Widget gamesHubError(BuildContext context) {
 )
 Widget gamesHubEmpty(BuildContext context) {
   return GamesHubBody(
-    state: const GamesHubState(status: GamesHubStatus.ready),
+    state: const GamesHubState(isInitialLoading: false),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
+  name: 'Fetching round',
+  type: GamesHubBody,
+)
+Widget gamesHubFetchingRound(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(isInitialLoading: false, games: _sampleHubGames),
     onRetry: _noop,
     onGamePressed: _noopString,
     onArcadePressed: _noop,

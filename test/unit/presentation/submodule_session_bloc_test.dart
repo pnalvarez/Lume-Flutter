@@ -68,30 +68,29 @@ void main() {
     });
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
-      'does not persist until all games finish',
+      'buffers round scores without persisting until games completed',
       build: () => SubmoduleSessionBloc(_GetGames(), save),
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(const SubmoduleSessionPreviewContinue());
-        bloc.add(const SubmoduleSessionGameFinished(true));
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
       },
       wait: const Duration(milliseconds: 10),
-      verify: (_) {
+      verify: (bloc) {
         expect(save.calls, isEmpty);
+        expect(bloc.state.pairScores[10], 100);
       },
     );
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
-      'flushes all pair scores only after the last game',
+      'flushes all pair scores only after games completed',
       build: () => SubmoduleSessionBloc(_GetGames(), save),
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(const SubmoduleSessionPreviewContinue());
-        bloc.add(const SubmoduleSessionGameFinished(true));
-        await Future<void>.delayed(Duration.zero);
-        bloc.add(const SubmoduleSessionGameFinished(false));
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 11, scorePct: 0));
+        bloc.add(const SubmoduleSessionGamesCompleted(correctCount: 1));
       },
       wait: const Duration(milliseconds: 20),
       verify: (bloc) {
@@ -103,14 +102,29 @@ void main() {
     );
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
+      'games cancelled discards memory without saving',
+      build: () => SubmoduleSessionBloc(_GetGames(), save),
+      act: (bloc) async {
+        bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
+        bloc.add(const SubmoduleSessionGamesCancelled());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(save.calls, isEmpty);
+        expect(bloc.state.pairScores, isEmpty);
+        expect(bloc.state.stage, SubmoduleSessionStage.preview);
+      },
+    );
+
+    blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'abandon discards memory without saving',
       build: () => SubmoduleSessionBloc(_GetGames(), save),
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(const SubmoduleSessionPreviewContinue());
-        bloc.add(const SubmoduleSessionGameFinished(true));
-        await Future<void>.delayed(Duration.zero);
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
         bloc.add(const SubmoduleSessionAbandoned());
       },
       wait: const Duration(milliseconds: 20),

@@ -32,7 +32,7 @@ class AppRouter extends RootStackRouter {
       guards: [authGuard],
       children: [
         AutoRoute(page: HomeRoute.page, path: 'home', initial: true),
-        AutoRoute(page: GamesRoute.page, path: 'games'),
+        AutoRoute(page: GamesHubRoute.page, path: 'games'),
         AutoRoute(page: ProgressRoute.page, path: 'progress'),
       ],
     ),
@@ -41,5 +41,6 @@ class AppRouter extends RootStackRouter {
       page: SubmoduleSessionRoute.page,
       path: '/trail/:trailId/submodule/:submoduleId',
     ),
+    AutoRoute(page: GamesRoute.page, path: '/games/play'),
   ];
 }

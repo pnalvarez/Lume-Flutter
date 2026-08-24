@@ -12,11 +12,19 @@ final class GamesHubStarted extends GamesHubEvent {
 }
 
 final class GamesHubGamePressed extends GamesHubEvent {
-  const GamesHubGamePressed(this.gameId);
+  const GamesHubGamePressed(this.gameSlug);
 
-  final String gameId;
+  final String gameSlug;
 }
 
 final class GamesHubArcadePressed extends GamesHubEvent {
   const GamesHubArcadePressed();
+}
+
+final class GamesHubNavigationHandled extends GamesHubEvent {
+  const GamesHubNavigationHandled();
+}
+
+final class GamesHubGameRoundErrorDismissed extends GamesHubEvent {
+  const GamesHubGameRoundErrorDismissed();
 }

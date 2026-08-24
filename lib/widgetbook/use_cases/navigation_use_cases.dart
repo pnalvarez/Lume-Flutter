@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/organisms/navigation/bottom_nav_bar.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 import 'package:lume_design_system/organisms/navigation/screen_header.dart';
@@ -32,6 +33,24 @@ Widget pageHeaderDefault(BuildContext context) {
   final title = context.knobs.string(label: 'Title', initialValue: 'Session');
   return Scaffold(
     appBar: PageHeader(title: title, onBack: () {}),
+    body: const SizedBox.shrink(),
+  );
+}
+
+@widgetbook.UseCase(name: 'Progress with close', type: PageHeader)
+Widget pageHeaderProgressWithClose(BuildContext context) {
+  return Scaffold(
+    appBar: PageHeader(
+      titleWidget: const Padding(
+        padding: EdgeInsets.only(right: 8),
+        child: LinearProgressIndicator(value: 0.4, minHeight: 8),
+      ),
+      trailing: LumeIconButton(
+        icon: Icons.close_rounded,
+        onPressed: () {},
+        size: LumeIconButtonSize.sm,
+      ),
+    ),
     body: const SizedBox.shrink(),
   );
 }
