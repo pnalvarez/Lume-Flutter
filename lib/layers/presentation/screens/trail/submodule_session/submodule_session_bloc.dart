@@ -12,8 +12,9 @@ final class SubmoduleSessionBloc
   SubmoduleSessionBloc(this._getSubmoduleGames, this._savePairProgress)
     : super(const SubmoduleSessionState()) {
     on<SubmoduleSessionStarted>(_onStarted);
-    on<SubmoduleSessionPreviewContinue>(_onPreviewContinue);
-    on<SubmoduleSessionGameFinished>(_onGameFinished);
+    on<SubmoduleSessionRoundScored>(_onRoundScored);
+    on<SubmoduleSessionGamesCompleted>(_onGamesCompleted);
+    on<SubmoduleSessionGamesCancelled>(_onGamesCancelled);
     on<SubmoduleSessionRetrySave>(_onRetrySave);
     on<SubmoduleSessionAbandoned>(_onAbandoned);
     on<SubmoduleSessionBackToTrailPressed>(_onBackToTrailPressed);
@@ -33,7 +34,6 @@ final class SubmoduleSessionBloc
         stage: SubmoduleSessionStage.preview,
         trailId: event.trailId,
         submoduleId: event.submoduleId,
-        currentIndex: 0,
         correctCount: 0,
         clearPairScores: true,
         clearError: true,
@@ -69,7 +69,6 @@ final class SubmoduleSessionBloc
           preview: data.preview,
           imageUrl: data.imageUrl,
           games: data.games,
-          currentIndex: 0,
           correctCount: 0,
           clearPairScores: true,
           clearError: true,
@@ -85,68 +84,36 @@ final class SubmoduleSessionBloc
     }
   }
 
-  void _onPreviewContinue(
-    SubmoduleSessionPreviewContinue event,
+  void _onRoundScored(
+    SubmoduleSessionRoundScored event,
     Emitter<SubmoduleSessionState> emit,
   ) {
-    if (state.status != SubmoduleSessionStatus.ready) return;
-    if (state.stage != SubmoduleSessionStage.preview) return;
-    if (state.games.isEmpty) {
-      emit(
-        state.copyWith(
-          status: SubmoduleSessionStatus.error,
-          errorMessage: trailSessionEmptyGames,
-        ),
-      );
-      return;
-    }
-
-    emit(
-      state.copyWith(
-        stage: SubmoduleSessionStage.playing,
-        currentIndex: 0,
-        clearError: true,
-      ),
-    );
+    final nextScores = Map<int, int>.from(state.pairScores)
+      ..[event.pairId] = event.scorePct;
+    emit(state.copyWith(pairScores: nextScores, clearError: true));
   }
 
-  Future<void> _onGameFinished(
-    SubmoduleSessionGameFinished event,
+  Future<void> _onGamesCompleted(
+    SubmoduleSessionGamesCompleted event,
     Emitter<SubmoduleSessionState> emit,
   ) async {
-    if (state.stage != SubmoduleSessionStage.playing) return;
-    if (state.status != SubmoduleSessionStatus.ready) return;
+    emit(state.copyWith(correctCount: event.correctCount, clearError: true));
+    await _flushPairScores(emit);
+  }
 
-    final game = state.currentGame;
-    if (game == null) return;
-
-    final scorePct = event.correct ? 100 : 0;
-    final nextScores = Map<int, int>.from(state.pairScores)
-      ..[game.pairId] = scorePct;
-    final nextCorrect = state.correctCount + (event.correct ? 1 : 0);
-    final isLast = state.currentIndex >= state.games.length - 1;
-
-    if (!isLast) {
-      emit(
-        state.copyWith(
-          pairScores: nextScores,
-          correctCount: nextCorrect,
-          currentIndex: state.currentIndex + 1,
-          clearError: true,
-        ),
-      );
-      return;
-    }
-
-    // ALL-OR-NOTHING: flush only after every game in this session finished.
+  void _onGamesCancelled(
+    SubmoduleSessionGamesCancelled event,
+    Emitter<SubmoduleSessionState> emit,
+  ) {
     emit(
       state.copyWith(
-        pairScores: nextScores,
-        correctCount: nextCorrect,
+        correctCount: 0,
+        clearPairScores: true,
         clearError: true,
+        stage: SubmoduleSessionStage.preview,
+        status: SubmoduleSessionStatus.ready,
       ),
     );
-    await _flushPairScores(emit);
   }
 
   Future<void> _onRetrySave(
@@ -162,7 +129,6 @@ final class SubmoduleSessionBloc
     emit(
       state.copyWith(
         status: SubmoduleSessionStatus.saving,
-        stage: SubmoduleSessionStage.playing,
         clearError: true,
       ),
     );
@@ -182,7 +148,7 @@ final class SubmoduleSessionBloc
       emit(
         state.copyWith(
           status: SubmoduleSessionStatus.error,
-          stage: SubmoduleSessionStage.playing,
+          stage: SubmoduleSessionStage.preview,
           errorMessage: trailSessionSaveError,
         ),
       );
@@ -193,10 +159,8 @@ final class SubmoduleSessionBloc
     SubmoduleSessionAbandoned event,
     Emitter<SubmoduleSessionState> emit,
   ) {
-    // Discard in-memory attempt; submodule stays incomplete on the server.
     emit(
       state.copyWith(
-        currentIndex: 0,
         correctCount: 0,
         clearPairScores: true,
         clearError: true,

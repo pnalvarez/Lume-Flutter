@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lume/layers/domain/helpers/answer_match.dart';
+import 'package:lume/layers/domain/models/game_play/mysterious_word_play.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 
 enum MysteriousLetterVisual { idle, correct, missed }
@@ -15,7 +16,7 @@ final class MysteriousWordState {
     this.finished = false,
   });
 
-  static const maxWrong = 6;
+  static const maxWrong = MysteriousWordRules.maxWrong;
   static const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
   final MysteriousWordGameDomain? game;
