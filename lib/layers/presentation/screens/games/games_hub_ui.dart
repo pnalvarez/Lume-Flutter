@@ -146,8 +146,7 @@ class _GamesHubArcadeButtonState extends State<GamesHubArcadeButton>
   @override
   void initState() {
     super.initState();
-    _shine = AnimationController(vsync: this, duration: _shinePeriod)
-      ..repeat();
+    _shine = AnimationController(vsync: this, duration: _shinePeriod)..repeat();
   }
 
   @override
@@ -196,21 +195,24 @@ class _GamesHubArcadeButtonState extends State<GamesHubArcadeButton>
                   child: AnimatedBuilder(
                     animation: _shine,
                     builder: (context, _) {
-                      final pulse = (math.sin(_shine.value * math.pi * 2) + 1) / 2;
-                      final mid = Color.lerp(pinkDeep, pink, 0.35 + pulse * 0.45)!;
-                      final highlight = Color.lerp(pink, pinkLight, 0.35 + pulse * 0.4)!;
+                      final pulse =
+                          (math.sin(_shine.value * math.pi * 2) + 1) / 2;
+                      final mid = Color.lerp(
+                        pinkDeep,
+                        pink,
+                        0.35 + pulse * 0.45,
+                      )!;
+                      final highlight = Color.lerp(
+                        pink,
+                        pinkLight,
+                        0.35 + pulse * 0.4,
+                      )!;
                       return DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment(-1.2 + _shine.value * 2.4, -0.8),
                             end: Alignment(0.2 + _shine.value * 2.4, 1.0),
-                            colors: [
-                              pinkDeep,
-                              mid,
-                              highlight,
-                              mid,
-                              pinkDeep,
-                            ],
+                            colors: [pinkDeep, mid, highlight, mid, pinkDeep],
                             stops: const [0.0, 0.28, 0.5, 0.72, 1.0],
                           ),
                         ),

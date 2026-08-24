@@ -13,9 +13,7 @@ Widget _wrap(Widget child) => MaterialApp(
 void main() {
   group('ShimmerBox', () {
     testWidgets('builds with explicit size', (tester) async {
-      await tester.pumpWidget(
-        _wrap(const ShimmerBox(width: 120, height: 24)),
-      );
+      await tester.pumpWidget(_wrap(const ShimmerBox(width: 120, height: 24)));
 
       expect(find.byType(ShimmerBox), findsOneWidget);
       expect(find.byType(Shimmer), findsOneWidget);
@@ -27,12 +25,7 @@ void main() {
 
     testWidgets('expands when width is null', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const SizedBox(
-            width: 200,
-            child: ShimmerBox(height: 10),
-          ),
-        ),
+        _wrap(const SizedBox(width: 200, child: ShimmerBox(height: 10))),
       );
 
       final box = tester.getSize(find.byType(ShimmerBox));
@@ -42,13 +35,7 @@ void main() {
 
     testWidgets('supports circle shape', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const ShimmerBox(
-            width: 40,
-            height: 40,
-            shape: BoxShape.circle,
-          ),
-        ),
+        _wrap(const ShimmerBox(width: 40, height: 40, shape: BoxShape.circle)),
       );
 
       final container = tester.widget<Container>(
@@ -75,9 +62,7 @@ void main() {
       expect(find.byType(DisplayAsLoader), findsOneWidget);
       expect(find.byType(Shimmer), findsOneWidget);
       expect(
-        find.byWidgetPredicate(
-          (w) => w is Visibility && w.visible == false,
-        ),
+        find.byWidgetPredicate((w) => w is Visibility && w.visible == false),
         findsOneWidget,
       );
 
@@ -88,12 +73,7 @@ void main() {
 
     testWidgets('shows child when disabled', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const DisplayAsLoader(
-            enabled: false,
-            child: Text('Ready'),
-          ),
-        ),
+        _wrap(const DisplayAsLoader(enabled: false, child: Text('Ready'))),
       );
 
       expect(find.text('Ready'), findsOneWidget);

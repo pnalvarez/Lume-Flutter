@@ -96,11 +96,7 @@ Widget shimmerBoxSizes(BuildContext context) {
         const SizedBox(height: AppSpacings.m),
         Row(
           children: [
-            const ShimmerBox(
-              width: 48,
-              height: 48,
-              shape: BoxShape.circle,
-            ),
+            const ShimmerBox(width: 48, height: 48, shape: BoxShape.circle),
             const SizedBox(width: AppSpacings.m),
             Expanded(
               child: ShimmerBox(
@@ -173,7 +169,9 @@ Widget displayAsLoaderMatchChild(BuildContext context) {
                 child: Container(
                   height: 56,
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacings.m),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacings.m,
+                  ),
                   decoration: BoxDecoration(
                     color: cs.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(AppRadius.l),
@@ -190,7 +188,10 @@ Widget displayAsLoaderMatchChild(BuildContext context) {
   );
 }
 
-@widgetbook.UseCase(name: 'Loading screen (multi-size cells)', type: DisplayAsLoader)
+@widgetbook.UseCase(
+  name: 'Loading screen (multi-size cells)',
+  type: DisplayAsLoader,
+)
 Widget displayAsLoaderLoadingScreen(BuildContext context) {
   final cs = Theme.of(context).colorScheme;
   final cardRadius = BorderRadius.circular(AppRadius.xl);
@@ -262,10 +263,7 @@ Widget displayAsLoaderLoadingScreen(BuildContext context) {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 2,
-                child: fakeCard(height: 160, label: 'Tall'),
-              ),
+              Expanded(flex: 2, child: fakeCard(height: 160, label: 'Tall')),
               const SizedBox(width: AppSpacings.m),
               Expanded(
                 child: Column(

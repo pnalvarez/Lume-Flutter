@@ -18,7 +18,9 @@ void main() {
     expect(parseHexColor(''), isNull);
   });
 
-  testWidgets('loading state shows section and arcade shimmers', (tester) async {
+  testWidgets('loading state shows section and arcade shimmers', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: lumeLightTheme(),
