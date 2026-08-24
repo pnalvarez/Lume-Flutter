@@ -80,9 +80,7 @@ class _SubmoduleSessionShellState extends State<_SubmoduleSessionShell> {
               previous.status != current.status,
           builder: (context, state) {
             if (state.status == SubmoduleSessionStatus.saving) {
-              return const Scaffold(
-                body: Center(child: CircularLoader()),
-              );
+              return const Scaffold(body: Center(child: CircularLoader()));
             }
             return switch (state.stage) {
               SubmoduleSessionStage.preview => const SubmodulePreviewView(),

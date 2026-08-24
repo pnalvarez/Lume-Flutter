@@ -57,9 +57,7 @@ final class GamesCompleteSentenceUi {
   final Map<int, String> selections;
 
   GamesCompleteSentenceUi copyWith({Map<int, String>? selections}) {
-    return GamesCompleteSentenceUi(
-      selections: selections ?? this.selections,
-    );
+    return GamesCompleteSentenceUi(selections: selections ?? this.selections);
   }
 
   @override

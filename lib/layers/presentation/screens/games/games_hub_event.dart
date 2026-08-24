@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:lume/layers/presentation/screens/games/game_round.dart';
 
 @immutable
 sealed class GamesHubEvent {
@@ -24,16 +23,6 @@ final class GamesHubArcadePressed extends GamesHubEvent {
 
 final class GamesHubNavigationHandled extends GamesHubEvent {
   const GamesHubNavigationHandled();
-}
-
-final class GamesHubRoundCompleted extends GamesHubEvent {
-  const GamesHubRoundCompleted(this.result);
-
-  final GamesSequenceResult result;
-}
-
-final class GamesHubRoundCompleteDismissed extends GamesHubEvent {
-  const GamesHubRoundCompleteDismissed();
 }
 
 final class GamesHubGameRoundErrorDismissed extends GamesHubEvent {

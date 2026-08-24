@@ -193,12 +193,8 @@ final class GamesState {
       correctCount: correctCount ?? this.correctCount,
       answered: resetPlayFields ? false : (answered ?? this.answered),
       isCorrect: resetPlayFields ? false : (isCorrect ?? this.isCorrect),
-      choice: resetPlayFields
-          ? const GamesChoiceUi()
-          : (choice ?? this.choice),
-      whoAmI: resetPlayFields
-          ? const GamesWhoAmIUi()
-          : (whoAmI ?? this.whoAmI),
+      choice: resetPlayFields ? const GamesChoiceUi() : (choice ?? this.choice),
+      whoAmI: resetPlayFields ? const GamesWhoAmIUi() : (whoAmI ?? this.whoAmI),
       completeSentence: resetPlayFields
           ? const GamesCompleteSentenceUi()
           : (completeSentence ?? this.completeSentence),

@@ -12,7 +12,6 @@ final class GamesHubState {
     this.initialErrorMessage,
     this.gameRoundErrorMessage,
     this.openPlayRounds,
-    this.roundCompleteResult,
   });
 
   /// Catalog skeleton while hub games load.
@@ -27,9 +26,6 @@ final class GamesHubState {
 
   /// Set after a successful round fetch; cleared when navigation is handled.
   final List<GameRound>? openPlayRounds;
-
-  /// Shown on the hub after [GamesRoute] pops with a result.
-  final GamesSequenceResult? roundCompleteResult;
 
   List<GamesHubCardUi> get generalGames => [
     for (final game in games)
@@ -48,11 +44,9 @@ final class GamesHubState {
     String? initialErrorMessage,
     String? gameRoundErrorMessage,
     List<GameRound>? openPlayRounds,
-    GamesSequenceResult? roundCompleteResult,
     bool clearInitialError = false,
     bool clearGameRoundError = false,
     bool clearOpenPlayRounds = false,
-    bool clearRoundCompleteResult = false,
   }) {
     return GamesHubState(
       isInitialLoading: isInitialLoading ?? this.isInitialLoading,
@@ -67,9 +61,6 @@ final class GamesHubState {
       openPlayRounds: clearOpenPlayRounds
           ? null
           : openPlayRounds ?? this.openPlayRounds,
-      roundCompleteResult: clearRoundCompleteResult
-          ? null
-          : roundCompleteResult ?? this.roundCompleteResult,
     );
   }
 
@@ -81,8 +72,7 @@ final class GamesHubState {
       listEquals(other.games, games) &&
       other.initialErrorMessage == initialErrorMessage &&
       other.gameRoundErrorMessage == gameRoundErrorMessage &&
-      listEquals(other.openPlayRounds, openPlayRounds) &&
-      other.roundCompleteResult == roundCompleteResult;
+      listEquals(other.openPlayRounds, openPlayRounds);
 
   @override
   int get hashCode => Object.hash(
@@ -92,6 +82,5 @@ final class GamesHubState {
     initialErrorMessage,
     gameRoundErrorMessage,
     openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
-    roundCompleteResult,
   );
 }

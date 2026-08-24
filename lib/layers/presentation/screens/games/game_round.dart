@@ -27,10 +27,7 @@ typedef GamesRoundSave =
 /// Result popped from [GamesPage] when the full sequence finishes successfully.
 @immutable
 final class GamesSequenceResult {
-  const GamesSequenceResult({
-    required this.correctCount,
-    required this.total,
-  });
+  const GamesSequenceResult({required this.correctCount, required this.total});
 
   final int correctCount;
   final int total;

@@ -63,8 +63,9 @@ class GamesBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isSaving = state.status == GamesStatus.saving;
-    final errorMessage =
-        state.status == GamesStatus.error ? state.errorMessage : null;
+    final errorMessage = state.status == GamesStatus.error
+        ? state.errorMessage
+        : null;
 
     return Scaffold(
       backgroundColor: cs.surface,

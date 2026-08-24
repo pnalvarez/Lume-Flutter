@@ -16,8 +16,6 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     on<GamesHubGamePressed>(_onGamePressed);
     on<GamesHubArcadePressed>(_onArcadePressed);
     on<GamesHubNavigationHandled>(_onNavigationHandled);
-    on<GamesHubRoundCompleted>(_onRoundCompleted);
-    on<GamesHubRoundCompleteDismissed>(_onRoundCompleteDismissed);
     on<GamesHubGameRoundErrorDismissed>(_onGameRoundErrorDismissed);
   }
 
@@ -28,12 +26,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     GamesHubStarted event,
     Emitter<GamesHubState> emit,
   ) async {
-    emit(
-      state.copyWith(
-        isInitialLoading: true,
-        clearInitialError: true,
-      ),
-    );
+    emit(state.copyWith(isInitialLoading: true, clearInitialError: true));
     try {
       final games = await _getHubGames(forceRefresh: event.forceRefresh);
       emit(
@@ -100,20 +93,6 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     Emitter<GamesHubState> emit,
   ) {
     emit(state.copyWith(clearOpenPlayRounds: true));
-  }
-
-  void _onRoundCompleted(
-    GamesHubRoundCompleted event,
-    Emitter<GamesHubState> emit,
-  ) {
-    emit(state.copyWith(roundCompleteResult: event.result));
-  }
-
-  void _onRoundCompleteDismissed(
-    GamesHubRoundCompleteDismissed event,
-    Emitter<GamesHubState> emit,
-  ) {
-    emit(state.copyWith(clearRoundCompleteResult: true));
   }
 
   void _onGameRoundErrorDismissed(

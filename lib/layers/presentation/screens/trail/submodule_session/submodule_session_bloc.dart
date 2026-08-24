@@ -127,10 +127,7 @@ final class SubmoduleSessionBloc
 
   Future<void> _flushPairScores(Emitter<SubmoduleSessionState> emit) async {
     emit(
-      state.copyWith(
-        status: SubmoduleSessionStatus.saving,
-        clearError: true,
-      ),
+      state.copyWith(status: SubmoduleSessionStatus.saving, clearError: true),
     );
 
     try {

@@ -2,10 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
-import 'package:lume/common/strings/games_hub_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/presentation/screens/games/game_round.dart';
-import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
@@ -64,21 +61,13 @@ class _GamesHubViewState extends State<_GamesHubView> {
 
             context.read<GamesHubBloc>().add(const GamesHubNavigationHandled());
 
-            final result = await context.router.push<GamesSequenceResult?>(
+            await context.router.push<void>(
               GamesRoute(
                 rounds: rounds,
                 onSaveRound: ({required roundId, required scorePct}) async {},
                 mode: GamesPlayMode.hub,
               ),
             );
-
-            if (!context.mounted) return;
-
-            if (result != null) {
-              context.read<GamesHubBloc>().add(
-                GamesHubRoundCompleted(result),
-              );
-            }
           },
         ),
         BlocListener<GamesHubBloc, GamesHubState>(
@@ -100,24 +89,6 @@ class _GamesHubViewState extends State<_GamesHubView> {
       ],
       child: BlocBuilder<GamesHubBloc, GamesHubState>(
         builder: (context, state) {
-          final complete = state.roundCompleteResult;
-
-          if (complete != null) {
-            return GamesCompleteBody(
-              title: gamesHubRoundCompleteTitle,
-              scoreText: gamesHubRoundCompleteScore(
-                correctCount: complete.correctCount,
-                total: complete.total,
-              ),
-              actionLabel: gamesHubRoundCompleteAction,
-              onAction: () {
-                context.read<GamesHubBloc>().add(
-                  const GamesHubRoundCompleteDismissed(),
-                );
-              },
-            );
-          }
-
           return GamesHubBody(
             state: state,
             onRetry: () {
@@ -126,14 +97,10 @@ class _GamesHubViewState extends State<_GamesHubView> {
               );
             },
             onGamePressed: (gameSlug) {
-              context.read<GamesHubBloc>().add(
-                GamesHubGamePressed(gameSlug),
-              );
+              context.read<GamesHubBloc>().add(GamesHubGamePressed(gameSlug));
             },
             onArcadePressed: () {
-              context.read<GamesHubBloc>().add(
-                const GamesHubArcadePressed(),
-              );
+              context.read<GamesHubBloc>().add(const GamesHubArcadePressed());
             },
           );
         },

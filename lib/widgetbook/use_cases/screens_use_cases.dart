@@ -456,10 +456,7 @@ const _sampleHubGames = [
 )
 Widget gamesHubReady(BuildContext context) {
   return GamesHubBody(
-    state: const GamesHubState(
-      isInitialLoading: false,
-      games: _sampleHubGames,
-    ),
+    state: const GamesHubState(isInitialLoading: false, games: _sampleHubGames),
     onRetry: _noop,
     onGamePressed: _noopString,
     onArcadePressed: _noop,
@@ -518,10 +515,7 @@ Widget gamesHubEmpty(BuildContext context) {
 )
 Widget gamesHubFetchingRound(BuildContext context) {
   return GamesHubBody(
-    state: const GamesHubState(
-      isInitialLoading: false,
-      games: _sampleHubGames,
-    ),
+    state: const GamesHubState(isInitialLoading: false, games: _sampleHubGames),
     onRetry: _noop,
     onGamePressed: _noopString,
     onArcadePressed: _noop,

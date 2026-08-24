@@ -65,10 +65,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     emit(GamesState.initial(rounds: event.rounds));
   }
 
-  void _onChoiceSelected(
-    GamesChoiceSelected event,
-    Emitter<GamesState> emit,
-  ) {
+  void _onChoiceSelected(GamesChoiceSelected event, Emitter<GamesState> emit) {
     if (state.answered) return;
 
     final outcome = switch (state.currentGame) {
@@ -96,7 +93,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
 
     emit(
       state.copyWith(
-        choice: state.choice.copyWith(selectedOptionId: outcome.selectedOptionId),
+        choice: state.choice.copyWith(
+          selectedOptionId: outcome.selectedOptionId,
+        ),
         answered: true,
         isCorrect: outcome.isCorrect,
       ),
@@ -121,7 +120,10 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   ) {
     final game = state.currentGame;
     if (game is! WhoAmIGameDomain || state.answered) return;
-    final outcome = _playWhoAmI.revealHint(current: _whoAmIPlayState, game: game);
+    final outcome = _playWhoAmI.revealHint(
+      current: _whoAmIPlayState,
+      game: game,
+    );
     if (outcome == null) return;
     emit(state.copyWith(whoAmI: _whoAmIUi(outcome.state)));
   }
@@ -152,11 +154,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       blankOrder: event.blankOrder,
       option: event.option,
     );
-    emit(
-      state.copyWith(
-        completeSentence: _completeSentenceUi(outcome.state),
-      ),
-    );
+    emit(state.copyWith(completeSentence: _completeSentenceUi(outcome.state)));
   }
 
   void _onCompleteSentenceSubmit(

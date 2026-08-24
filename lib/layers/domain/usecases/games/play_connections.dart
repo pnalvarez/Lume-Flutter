@@ -42,9 +42,7 @@ final class PlayConnections implements IPlayConnections {
     if (leftId == null) return null;
 
     final nextLinks = Map<String, String>.from(current.links);
-    nextLinks.removeWhere(
-      (key, value) => value == rightId && key != leftId,
-    );
+    nextLinks.removeWhere((key, value) => value == rightId && key != leftId);
     nextLinks[leftId] = rightId;
 
     final nextOrder = current.linkOrder

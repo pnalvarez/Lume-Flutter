@@ -73,9 +73,7 @@ void main() {
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(
-          const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100),
-        );
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
       },
       wait: const Duration(milliseconds: 10),
       verify: (bloc) {
@@ -90,9 +88,7 @@ void main() {
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(
-          const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100),
-        );
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
         bloc.add(const SubmoduleSessionRoundScored(pairId: 11, scorePct: 0));
         bloc.add(const SubmoduleSessionGamesCompleted(correctCount: 1));
       },
@@ -111,9 +107,7 @@ void main() {
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(
-          const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100),
-        );
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
         bloc.add(const SubmoduleSessionGamesCancelled());
       },
       wait: const Duration(milliseconds: 20),
@@ -130,9 +124,7 @@ void main() {
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
-        bloc.add(
-          const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100),
-        );
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
         bloc.add(const SubmoduleSessionAbandoned());
       },
       wait: const Duration(milliseconds: 20),
