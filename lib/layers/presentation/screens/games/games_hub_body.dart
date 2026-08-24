@@ -27,67 +27,67 @@ class GamesHubBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: cs.surface,
-      body: switch (state.status) {
-        GamesHubStatus.loading => const _GamesHubScroll(
-          listChildren: [GamesHubLoadingList()],
-        ),
-        GamesHubStatus.error => SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacings.xl2),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    state.errorMessage ?? gamesHubLoadError,
-                    textAlign: TextAlign.center,
-                    style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: AppSpacings.l),
-                  LumeButton(
-                    label: gamesHubRetry,
-                    type: LumeButtonType.outlined,
-                    trait: .destructive,
-                    onPressed: onRetry,
-                  ),
-                ],
-              ),
+    if (state.isInitialLoading) {
+      return const _GamesHubScroll(listChildren: [GamesHubLoadingList()]);
+    }
+
+    if (state.initialErrorMessage != null) {
+      return SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacings.xl2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  state.initialErrorMessage ?? gamesHubLoadError,
+                  textAlign: TextAlign.center,
+                  style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
+                ),
+                const SizedBox(height: AppSpacings.l),
+                LumeButton(
+                  label: gamesHubRetry,
+                  type: LumeButtonType.outlined,
+                  trait: .destructive,
+                  onPressed: onRetry,
+                ),
+              ],
             ),
           ),
         ),
-        GamesHubStatus.ready =>
-          state.games.isEmpty
-              ? const _GamesHubScroll(
-                  fillRemaining: true,
-                  listChildren: [GamesHubEmptyState()],
-                )
-              : _GamesHubScroll(
-                  listChildren: [
-                    if (state.generalGames.isNotEmpty) ...[
-                      GamesHubArcadeButton(onPressed: onArcadePressed),
-                      const SizedBox(height: AppSpacings.m),
-                      const GamesHubSectionTitle(gamesHubSectionGeneral),
-                      const SizedBox(height: AppSpacings.m),
-                      GamesHubGamesList(
-                        games: state.generalGames,
-                        onGamePressed: onGamePressed,
-                      ),
-                      const SizedBox(height: AppSpacings.xl2),
-                    ],
-                    if (state.visualGames.isNotEmpty) ...[
-                      const GamesHubSectionTitle(gamesHubSectionVisual),
-                      const SizedBox(height: AppSpacings.m),
-                      GamesHubGamesList(
-                        games: state.visualGames,
-                        onGamePressed: onGamePressed,
-                      ),
-                      const SizedBox(height: AppSpacings.xl2),
-                    ],
-                  ],
-                ),
-      },
+      );
+    }
+
+    if (state.games.isEmpty) {
+      return const _GamesHubScroll(
+        fillRemaining: true,
+        listChildren: [GamesHubEmptyState()],
+      );
+    }
+
+    return _GamesHubScroll(
+      listChildren: [
+        if (state.generalGames.isNotEmpty) ...[
+          GamesHubArcadeButton(onPressed: onArcadePressed),
+          const SizedBox(height: AppSpacings.m),
+          const GamesHubSectionTitle(gamesHubSectionGeneral),
+          const SizedBox(height: AppSpacings.m),
+          GamesHubGamesList(
+            games: state.generalGames,
+            onGamePressed: onGamePressed,
+          ),
+          const SizedBox(height: AppSpacings.xl2),
+        ],
+        if (state.visualGames.isNotEmpty) ...[
+          const GamesHubSectionTitle(gamesHubSectionVisual),
+          const SizedBox(height: AppSpacings.m),
+          GamesHubGamesList(
+            games: state.visualGames,
+            onGamePressed: onGamePressed,
+          ),
+          const SizedBox(height: AppSpacings.xl2),
+        ],
+      ],
     );
   }
 }

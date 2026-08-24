@@ -13,6 +13,7 @@ import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_body.da
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
+import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
@@ -22,7 +23,6 @@ class GamesBody extends StatelessWidget {
   const GamesBody({
     super.key,
     required this.state,
-    required this.onAbandoned,
     required this.onRetry,
     required this.onChoiceSelected,
     required this.onWhoAmIAnswerChanged,
@@ -36,11 +36,16 @@ class GamesBody extends StatelessWidget {
     required this.onConnectionsSubmit,
     required this.onMysteriousWordLetterPressed,
     required this.onNext,
+    this.useCloseTrailing = false,
+    this.onClose,
+    this.onAbandoned,
   });
 
   final GamesState state;
-  final VoidCallback onAbandoned;
   final VoidCallback onRetry;
+  final bool useCloseTrailing;
+  final VoidCallback? onClose;
+  final VoidCallback? onAbandoned;
   final ValueChanged<String> onChoiceSelected;
   final ValueChanged<String> onWhoAmIAnswerChanged;
   final VoidCallback onWhoAmIRevealHint;
@@ -64,9 +69,11 @@ class GamesBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: PageHeader(
-        onBack: onAbandoned,
+        onBack: useCloseTrailing ? null : onAbandoned,
         titleWidget: Padding(
-          padding: const EdgeInsets.only(right: AppSpacings.s),
+          padding: EdgeInsets.only(
+            right: useCloseTrailing ? AppSpacings.xs : AppSpacings.s,
+          ),
           child: LumeProgressBar(
             value: state.progressValue.clamp(0.0, 1.0),
             height: 8,
@@ -74,6 +81,13 @@ class GamesBody extends StatelessWidget {
             fillColor: cs.primary,
           ),
         ),
+        trailing: useCloseTrailing && onClose != null
+            ? LumeIconButton(
+                icon: Icons.close_rounded,
+                onPressed: onClose,
+                size: LumeIconButtonSize.sm,
+              )
+            : null,
       ),
       body: switch ((isSaving, errorMessage)) {
         (true, _) => const Center(child: CircularLoader()),

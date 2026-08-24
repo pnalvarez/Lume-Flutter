@@ -6,6 +6,7 @@ import 'package:lume/core/storage/storage_json.dart';
 import 'package:lume/layers/data/json_map.dart';
 import 'package:lume/layers/data/models/game_data.dart';
 import 'package:lume/layers/data/models/hub_game_data.dart';
+import 'package:lume/layers/data/models/hub_game_round_data.dart';
 
 /// Game catalog and trail submodule game payloads.
 abstract interface class IGameDataSource {
@@ -15,6 +16,11 @@ abstract interface class IGameDataSource {
   });
 
   Future<List<HubGameData>> fetchHubGames({bool forceRefresh = false});
+
+  Future<HubGameRoundData> fetchGameRound({
+    required String gameSlug,
+    int limit = 5,
+  });
 }
 
 @Injectable(as: IGameDataSource)
@@ -65,5 +71,17 @@ final class GameDataSource implements IGameDataSource {
       (value) => value.toJson(),
     );
     return data;
+  }
+
+  @override
+  Future<HubGameRoundData> fetchGameRound({
+    required String gameSlug,
+    int limit = 5,
+  }) async {
+    final raw = await _apiClient.rpc<Map<String, dynamic>>(
+      'get_game_round',
+      params: {'p_game_slug': gameSlug, 'p_limit': limit},
+    );
+    return HubGameRoundData.fromJson(asJsonMap(raw));
   }
 }

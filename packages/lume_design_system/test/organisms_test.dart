@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
+import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
 import 'package:lume_design_system/organisms/feedback/floating_notice.dart';
+import 'package:lume_design_system/organisms/feedback/lume_loading_overlay.dart';
 import 'package:lume_design_system/organisms/feedback/result_banner.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
@@ -61,6 +64,29 @@ void main() {
       );
       expect(find.text('Custom slot'), findsOneWidget);
       expect(find.text('Hidden'), findsNothing);
+    });
+
+    testWidgets('PageHeader shows progress title and close trailing', (
+      tester,
+    ) async {
+      var closed = false;
+      await tester.pumpWidget(
+        _wrap(
+          PageHeader(
+            titleWidget: const LinearProgressIndicator(value: 0.5),
+            trailing: LumeIconButton(
+              icon: Icons.close_rounded,
+              onPressed: () => closed = true,
+              size: LumeIconButtonSize.sm,
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back_rounded), findsNothing);
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      expect(closed, isTrue);
     });
 
     testWidgets('ScreenHeader shows title below back', (tester) async {
@@ -238,6 +264,42 @@ void main() {
     testWidgets('FloatingNotice shows child', (tester) async {
       await tester.pumpWidget(_wrap(FloatingNotice.amount(text: '+10 pts')));
       expect(find.text('+10 pts'), findsOneWidget);
+    });
+
+    testWidgets('LumeLoadingOverlay shows loader', (tester) async {
+      await tester.pumpWidget(_wrap(const LumeLoadingOverlay()));
+      expect(find.byType(CircularLoader), findsOneWidget);
+    });
+
+    testWidgets('showLumeLoadingOverlay inserts root overlay entry', (
+      tester,
+    ) async {
+      addTearDown(resetLumeLoadingOverlayForTest);
+
+      late BuildContext hostContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: lumeLightTheme(),
+          home: Builder(
+            builder: (context) {
+              hostContext = context;
+              return const Scaffold(body: SizedBox());
+            },
+          ),
+        ),
+      );
+
+      showLumeLoadingOverlay(hostContext);
+      await tester.pump();
+
+      expect(find.byType(LumeLoadingOverlay), findsOneWidget);
+      expect(isLumeLoadingOverlayVisible, isTrue);
+
+      hideLumeLoadingOverlay();
+      await tester.pump();
+
+      expect(find.byType(LumeLoadingOverlay), findsNothing);
+      expect(isLumeLoadingOverlayVisible, isFalse);
     });
 
     testWidgets('CelebrationDialog renders title', (tester) async {

@@ -1,20 +1,35 @@
 import 'package:flutter/foundation.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_card_ui.dart';
-
-enum GamesHubStatus { loading, ready, error }
 
 @immutable
 final class GamesHubState {
   const GamesHubState({
-    this.status = GamesHubStatus.loading,
+    this.isInitialLoading = true,
+    this.isLoadingGame = false,
     this.games = const [],
-    this.errorMessage,
+    this.initialErrorMessage,
+    this.gameRoundErrorMessage,
+    this.openPlayRounds,
+    this.roundCompleteResult,
   });
 
-  final GamesHubStatus status;
+  /// Catalog skeleton while hub games load.
+  final bool isInitialLoading;
+
+  /// Translucent overlay while a hub round is fetched.
+  final bool isLoadingGame;
+
   final List<GamesHubCardUi> games;
-  final String? errorMessage;
+  final String? initialErrorMessage;
+  final String? gameRoundErrorMessage;
+
+  /// Set after a successful round fetch; cleared when navigation is handled.
+  final List<GameRound>? openPlayRounds;
+
+  /// Shown on the hub after [GamesRoute] pops with a result.
+  final GamesSequenceResult? roundCompleteResult;
 
   List<GamesHubCardUi> get generalGames => [
     for (final game in games)
@@ -27,25 +42,56 @@ final class GamesHubState {
   ];
 
   GamesHubState copyWith({
-    GamesHubStatus? status,
+    bool? isInitialLoading,
+    bool? isLoadingGame,
     List<GamesHubCardUi>? games,
-    String? errorMessage,
-    bool clearError = false,
+    String? initialErrorMessage,
+    String? gameRoundErrorMessage,
+    List<GameRound>? openPlayRounds,
+    GamesSequenceResult? roundCompleteResult,
+    bool clearInitialError = false,
+    bool clearGameRoundError = false,
+    bool clearOpenPlayRounds = false,
+    bool clearRoundCompleteResult = false,
   }) {
     return GamesHubState(
-      status: status ?? this.status,
+      isInitialLoading: isInitialLoading ?? this.isInitialLoading,
+      isLoadingGame: isLoadingGame ?? this.isLoadingGame,
       games: games ?? this.games,
-      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
+      initialErrorMessage: clearInitialError
+          ? null
+          : initialErrorMessage ?? this.initialErrorMessage,
+      gameRoundErrorMessage: clearGameRoundError
+          ? null
+          : gameRoundErrorMessage ?? this.gameRoundErrorMessage,
+      openPlayRounds: clearOpenPlayRounds
+          ? null
+          : openPlayRounds ?? this.openPlayRounds,
+      roundCompleteResult: clearRoundCompleteResult
+          ? null
+          : roundCompleteResult ?? this.roundCompleteResult,
     );
   }
 
   @override
   bool operator ==(Object other) =>
       other is GamesHubState &&
-      other.status == status &&
+      other.isInitialLoading == isInitialLoading &&
+      other.isLoadingGame == isLoadingGame &&
       listEquals(other.games, games) &&
-      other.errorMessage == errorMessage;
+      other.initialErrorMessage == initialErrorMessage &&
+      other.gameRoundErrorMessage == gameRoundErrorMessage &&
+      listEquals(other.openPlayRounds, openPlayRounds) &&
+      other.roundCompleteResult == roundCompleteResult;
 
   @override
-  int get hashCode => Object.hash(status, Object.hashAll(games), errorMessage);
+  int get hashCode => Object.hash(
+    isInitialLoading,
+    isLoadingGame,
+    Object.hashAll(games),
+    initialErrorMessage,
+    gameRoundErrorMessage,
+    openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
+    roundCompleteResult,
+  );
 }

@@ -18,7 +18,7 @@ void main() {
     expect(parseHexColor(''), isNull);
   });
 
-  testWidgets('loading state shows section and arcade shimmers', (
+  testWidgets('initial loading shows section and arcade shimmers', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -34,7 +34,6 @@ void main() {
     );
 
     expect(find.byType(GamesHubLoadingList), findsOneWidget);
-    // 2 section titles + 4 cells + 1 arcade button
     expect(find.byType(DisplayAsLoader), findsNWidgets(7));
   });
 
@@ -43,7 +42,7 @@ void main() {
       MaterialApp(
         theme: lumeLightTheme(),
         home: GamesHubBody(
-          state: const GamesHubState(status: GamesHubStatus.ready),
+          state: const GamesHubState(isInitialLoading: false),
           onRetry: () {},
           onGamePressed: (_) {},
           onArcadePressed: () {},

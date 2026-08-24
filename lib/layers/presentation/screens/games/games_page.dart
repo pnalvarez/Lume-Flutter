@@ -2,12 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/presentation/screens/games/games_leave_confirm.dart';
-import 'package:lume/layers/presentation/screens/games/games_state.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
+import 'package:lume/layers/presentation/screens/games/games_leave_confirm.dart';
+import 'package:lume/layers/presentation/screens/games/games_state.dart';
+
+enum GamesPlayMode { trail, hub }
 
 /// Decoupled game-sequence screen. Callers pass [rounds] and [onSaveRound].
 @RoutePage()
@@ -16,23 +18,27 @@ class GamesPage extends StatelessWidget {
     super.key,
     required this.rounds,
     required this.onSaveRound,
+    this.mode = GamesPlayMode.trail,
   });
 
   final List<GameRound> rounds;
   final GamesRoundSave onSaveRound;
+  final GamesPlayMode mode;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<GamesBloc>()
         ..add(GamesStarted(rounds: rounds, onSaveRound: onSaveRound)),
-      child: const _GamesView(),
+      child: _GamesView(mode: mode),
     );
   }
 }
 
 class _GamesView extends StatefulWidget {
-  const _GamesView();
+  const _GamesView({required this.mode});
+
+  final GamesPlayMode mode;
 
   @override
   State<_GamesView> createState() => _GamesViewState();
@@ -41,6 +47,8 @@ class _GamesView extends StatefulWidget {
 class _GamesViewState extends State<_GamesView> {
   bool _allowPop = false;
   bool _leaveConfirmVisible = false;
+
+  bool get _isHub => widget.mode == GamesPlayMode.hub;
 
   Future<void> _requestExit() async {
     if (_allowPop || _leaveConfirmVisible) return;
@@ -100,7 +108,9 @@ class _GamesViewState extends State<_GamesView> {
           builder: (context, state) {
             return GamesBody(
               state: state,
-              onAbandoned: _requestExit,
+              useCloseTrailing: _isHub,
+              onClose: _requestExit,
+              onAbandoned: _isHub ? null : _requestExit,
               onRetry: () {
                 context.read<GamesBloc>().add(const GamesRetrySave());
               },

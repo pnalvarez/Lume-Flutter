@@ -45,7 +45,7 @@ class GamesHubGamesList extends StatelessWidget {
           if (i > 0) const SizedBox(height: AppSpacings.m),
           GamesHubGameCell(
             game: games[i],
-            onPressed: () => onGamePressed(games[i].id),
+            onPressed: () => onGamePressed(games[i].slug),
           ),
         ],
       ],
