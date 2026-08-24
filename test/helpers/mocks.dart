@@ -13,6 +13,7 @@ import 'package:lume/layers/domain/repository/profile_repository.dart';
 import 'package:lume/layers/domain/repository/trail_repository.dart';
 import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart';
 import 'package:lume/layers/domain/usecases/get_game_trails.dart';
+import 'package:lume/layers/domain/usecases/get_hub_games.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:lume/layers/domain/usecases/get_trail_bootstrap.dart';
@@ -39,6 +40,7 @@ import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
   MockSpec<IGetTrailBootstrap>(),
   MockSpec<IGetTrailProgress>(),
   MockSpec<IGetGameTrails>(),
+  MockSpec<IGetHubGames>(),
   MockSpec<ISavePairProgress>(),
   MockSpec<IGetSubmoduleGames>(),
 ])

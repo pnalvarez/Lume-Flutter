@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lume/common/strings/auth_strings.dart';
-import 'package:lume/layers/presentation/screens/dashboard/dashboard_bloc.dart';
-import 'package:lume/layers/presentation/screens/dashboard/dashboard_event.dart';
-import 'package:lume/layers/presentation/screens/dashboard/dashboard_state.dart';
-import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeholder.dart';
+import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
 
 @RoutePage()
 class GamesPage extends StatelessWidget {
@@ -13,13 +13,32 @@ class GamesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DashboardBloc, DashboardState>(
+    return BlocProvider(
+      create: (_) => getIt<GamesHubBloc>()..add(const GamesHubStarted()),
+      child: const _GamesView(),
+    );
+  }
+}
+
+class _GamesView extends StatelessWidget {
+  const _GamesView();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<GamesHubBloc, GamesHubState>(
       builder: (context, state) {
-        return DashboardTabPlaceholder(
-          title: dashboardTabGames,
-          isSigningOut: state.isSigningOut,
-          onSignOut: () {
-            context.read<DashboardBloc>().add(const DashboardSignOutPressed());
+        return GamesHubBody(
+          state: state,
+          onRetry: () {
+            context.read<GamesHubBloc>().add(
+              const GamesHubStarted(forceRefresh: true),
+            );
+          },
+          onGamePressed: (gameId) {
+            context.read<GamesHubBloc>().add(GamesHubGamePressed(gameId));
+          },
+          onArcadePressed: () {
+            context.read<GamesHubBloc>().add(const GamesHubArcadePressed());
           },
         );
       },

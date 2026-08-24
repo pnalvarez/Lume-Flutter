@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/layers/data/models/game_data.dart';
+import 'package:lume/layers/data/models/hub_game_data.dart';
 import 'package:lume/layers/data/repository/game_repository.dart';
+import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:mockito/mockito.dart';
 
@@ -47,5 +49,29 @@ void main() {
     verify(
       dataSource.fetchSubmoduleGames(submoduleId: 9, forceRefresh: false),
     ).called(1);
+  });
+
+  test('getHubGames maps catalog rows into HubGameDomain', () async {
+    when(dataSource.fetchHubGames(forceRefresh: false)).thenAnswer(
+      (_) async => [
+        HubGameData.fromJson({
+          'id': 'abc',
+          'slug': 'quiz_relampago',
+          'name': 'Quiz Relâmpago',
+          'description': 'Rápido',
+          'icon': 'Zap',
+          'color_hex': '#F5A623',
+          'hub_section': 'general',
+          'order_index': 1,
+        }),
+      ],
+    );
+
+    final games = await sut.getHubGames();
+
+    expect(games, hasLength(1));
+    expect(games.single.slug, 'quiz_relampago');
+    expect(games.single.hubSection, HubSection.general);
+    expect(games.single.colorHex, '#F5A623');
   });
 }

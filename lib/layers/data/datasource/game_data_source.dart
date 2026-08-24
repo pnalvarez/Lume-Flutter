@@ -5,13 +5,16 @@ import 'package:lume/core/storage/storage_client.dart';
 import 'package:lume/core/storage/storage_json.dart';
 import 'package:lume/layers/data/json_map.dart';
 import 'package:lume/layers/data/models/game_data.dart';
+import 'package:lume/layers/data/models/hub_game_data.dart';
 
-/// Game content loaded after a trail submodule preview.
+/// Game catalog and trail submodule game payloads.
 abstract interface class IGameDataSource {
   Future<SubmoduleGamesData> fetchSubmoduleGames({
     required int submoduleId,
     bool forceRefresh = false,
   });
+
+  Future<List<HubGameData>> fetchHubGames({bool forceRefresh = false});
 }
 
 @Injectable(as: IGameDataSource)
@@ -41,6 +44,26 @@ final class GameDataSource implements IGameDataSource {
     );
     final data = SubmoduleGamesData.fromJson(asJsonMap(raw));
     await _storage.writeObject(cacheKey, data, (value) => value.toJson());
+    return data;
+  }
+
+  @override
+  Future<List<HubGameData>> fetchHubGames({bool forceRefresh = false}) async {
+    if (!forceRefresh) {
+      final cached = await _storage.readList(
+        CacheKeys.hubGames,
+        HubGameData.fromJson,
+      );
+      if (cached.isNotEmpty) return cached;
+    }
+
+    final raw = await _apiClient.rpc<List<dynamic>>('get_hub_games');
+    final data = parseJsonList(raw, HubGameData.fromJson);
+    await _storage.writeList(
+      CacheKeys.hubGames,
+      data,
+      (value) => value.toJson(),
+    );
     return data;
   }
 }

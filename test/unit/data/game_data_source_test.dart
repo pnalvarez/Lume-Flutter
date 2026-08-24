@@ -61,4 +61,37 @@ void main() {
       ).called(1);
     },
   );
+
+  test(
+    'fetchHubGames posts get_hub_games and parses HubGameData list',
+    () async {
+      when(
+        apiClient.rpc<List<dynamic>>(
+          'get_hub_games',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => [
+          {
+            'id': 'abc',
+            'slug': 'quiz_relampago',
+            'name': 'Quiz Relâmpago',
+            'description': 'Rápido',
+            'icon': 'Zap',
+            'color_hex': '#F5A623',
+            'hub_section': 'general',
+            'order_index': 1,
+          },
+        ],
+      );
+
+      final data = await sut.fetchHubGames();
+
+      expect(data, hasLength(1));
+      expect(data.single.slug, 'quiz_relampago');
+      expect(data.single.colorHex, '#F5A623');
+      verify(apiClient.rpc<List<dynamic>>('get_hub_games')).called(1);
+    },
+  );
 }
