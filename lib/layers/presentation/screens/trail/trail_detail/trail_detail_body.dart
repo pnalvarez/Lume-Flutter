@@ -111,10 +111,7 @@ class _ReadyContent extends StatelessWidget {
 }
 
 class _LevelListItem extends StatelessWidget {
-  const _LevelListItem({
-    required this.level,
-    required this.onSubmodulePressed,
-  });
+  const _LevelListItem({required this.level, required this.onSubmodulePressed});
 
   final TrailDetailLevelUi level;
   final ValueChanged<int> onSubmodulePressed;

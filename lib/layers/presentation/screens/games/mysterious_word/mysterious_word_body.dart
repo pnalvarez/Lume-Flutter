@@ -48,10 +48,7 @@ class MysteriousWordBody extends StatelessWidget {
             ListItem(
               trait: ListItemTrait.neutral,
               isExpanded: true,
-              input: TextInput(
-                label: '$trailGameHint: ',
-                text: hint,
-              ),
+              input: TextInput(label: '$trailGameHint: ', text: hint),
             ),
           ],
           const SizedBox(height: AppSpacings.l),

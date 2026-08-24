@@ -53,18 +53,8 @@ class _ChoiceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (trait, isSelected, isEnabled, trailing) = switch (option.state) {
-      ChoiceVisualState.idle => (
-        ListItemTrait.neutral,
-        false,
-        true,
-        null,
-      ),
-      ChoiceVisualState.selected => (
-        ListItemTrait.brand,
-        true,
-        true,
-        null,
-      ),
+      ChoiceVisualState.idle => (ListItemTrait.neutral, false, true, null),
+      ChoiceVisualState.selected => (ListItemTrait.brand, true, true, null),
       ChoiceVisualState.positive => (
         ListItemTrait.success,
         false,
@@ -77,12 +67,7 @@ class _ChoiceRow extends StatelessWidget {
         true,
         Icons.cancel_rounded,
       ),
-      ChoiceVisualState.disabled => (
-        ListItemTrait.neutral,
-        false,
-        false,
-        null,
-      ),
+      ChoiceVisualState.disabled => (ListItemTrait.neutral, false, false, null),
     };
 
     return ListItem(
