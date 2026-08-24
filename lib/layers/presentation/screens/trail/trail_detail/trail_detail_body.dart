@@ -8,6 +8,7 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/organisms/list_item/list_item.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
 /// Trail detail chrome. No Bloc, router, or GetIt — safe for Widgetbook.
@@ -100,7 +101,7 @@ class _ReadyContent extends StatelessWidget {
       itemCount: visibleLevels.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacings.l),
       itemBuilder: (context, index) {
-        return _LevelContainer(
+        return _LevelListItem(
           level: visibleLevels[index],
           onSubmodulePressed: onSubmodulePressed,
         );
@@ -109,8 +110,8 @@ class _ReadyContent extends StatelessWidget {
   }
 }
 
-class _LevelContainer extends StatelessWidget {
-  const _LevelContainer({
+class _LevelListItem extends StatelessWidget {
+  const _LevelListItem({
     required this.level,
     required this.onSubmodulePressed,
   });
@@ -121,100 +122,54 @@ class _LevelContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final locked = level.isLocked;
 
-    // Friendlier mid blue — brighter than slate, softer than brand primary.
-    final levelHeader = level.isLocked
+    final headerBg = locked
         ? cs.surfaceContainerHighest
         : AppColors.Secondary.secondary;
+    final headerFg = locked ? cs.onSurfaceVariant : cs.onPrimary;
 
-    return Opacity(
-      opacity: level.isLocked ? 0.72 : 1,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.Surface.onContainer,
-          borderRadius: BorderRadius.circular(AppRadius.xl2),
-          border: Border.all(color: cs.outline),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.Surface.onSurface.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacings.l,
-                vertical: AppSpacings.m,
+    return ListItem(
+      trait: ListItemTrait.secondary,
+      isEnabled: !locked,
+      onTap: null,
+      padding: EdgeInsets.zero,
+      borderRadius: AppRadius.xl2,
+      showShadow: true,
+      input: HeaderChildrenInput(
+        title: level.title,
+        headerBackgroundColor: headerBg,
+        headerForegroundColor: headerFg,
+        leading: locked
+            ? Icon(
+                Icons.lock_rounded,
+                size: AppSizes.iconXs,
+                color: cs.onSurfaceVariant,
+              )
+            : Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: cs.onPrimary.withValues(alpha: 0.9),
+                  shape: BoxShape.circle,
+                ),
               ),
-              color: levelHeader,
-              child: Row(
-                children: [
-                  if (level.isLocked)
-                    Icon(
-                      Icons.lock_rounded,
-                      size: AppSizes.iconXs,
-                      color: cs.onSurfaceVariant,
-                    )
-                  else
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: cs.onPrimary.withValues(alpha: 0.9),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  const SizedBox(width: AppSpacings.s),
-                  Expanded(
-                    child: Text(
-                      level.title,
-                      style: typ.body4Semibold.copyWith(
-                        color: level.isLocked
-                            ? cs.onSurfaceVariant
-                            : cs.onPrimary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        children: [
+          for (final submodule in level.submodules)
+            _submoduleListItem(
+              submodule,
+              // Parent already dims the section when locked.
+              applyDisabledOpacity: !locked,
             ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacings.m),
-              child: Column(
-                children: [
-                  for (var i = 0; i < level.submodules.length; i++) ...[
-                    if (i > 0) const SizedBox(height: AppSpacings.s),
-                    _SubmoduleCard(
-                      submodule: level.submodules[i],
-                      onTap: level.submodules[i].isLocked
-                          ? null
-                          : () => onSubmodulePressed(level.submodules[i].id),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
-}
 
-class _SubmoduleCard extends StatelessWidget {
-  const _SubmoduleCard({required this.submodule, required this.onTap});
-
-  final TrailDetailSubmoduleRowUi submodule;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+  Widget _submoduleListItem(
+    TrailDetailSubmoduleRowUi submodule, {
+    required bool applyDisabledOpacity,
+  }) {
     final locked = submodule.isLocked;
     final statusLabel = locked
         ? trailDetailSubmoduleLocked
@@ -222,104 +177,30 @@ class _SubmoduleCard extends StatelessWidget {
         ? trailDetailSubmoduleDone
         : trailDetailSubmoduleTodo;
     final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
-    final accent = locked
-        ? cs.onSurfaceVariant
-        : submodule.isCompleted
-        ? cs.secondary
-        : cs.primary;
-    final cardColor = locked
-        ? cs.surfaceContainerHigh
-        : cs.surfaceContainerLowest;
 
-    return Material(
-      color: cardColor,
-      elevation: 0,
-      borderRadius: BorderRadius.circular(AppRadius.l),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.l),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(AppRadius.l),
-            border: Border.all(color: cs.outlineVariant),
-            boxShadow: locked
-                ? null
-                : [
-                    BoxShadow(
-                      color: cs.onSurface.withValues(alpha: 0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-          ),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  width: 4,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(AppRadius.l),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacings.m,
-                      AppSpacings.m,
-                      AppSpacings.l,
-                      AppSpacings.m,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                submodule.title,
-                                style: typ.body3Semibold.copyWith(
-                                  color: locked
-                                      ? cs.onSurfaceVariant
-                                      : cs.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacings.xs),
-                              Text(
-                                '$gamesLabel · $statusLabel',
-                                style: typ.tagS.copyWith(
-                                  color: accent,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          locked
-                              ? Icons.lock_rounded
-                              : submodule.isCompleted
-                              ? Icons.check_circle_rounded
-                              : Icons.chevron_right_rounded,
-                          size: 22,
-                          color: locked
-                              ? cs.onSurfaceVariant
-                              : submodule.isCompleted
-                              ? AppColors.Success.onSuccess
-                              : accent,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+    final trait = locked
+        ? ListItemTrait.neutral
+        : submodule.isCompleted
+        ? ListItemTrait.success
+        : ListItemTrait.brand;
+
+    final trailingIcon = locked
+        ? Icons.lock_rounded
+        : submodule.isCompleted
+        ? Icons.check_circle_rounded
+        : Icons.chevron_right_rounded;
+
+    return ListItem(
+      trait: trait,
+      isEnabled: applyDisabledOpacity ? !locked : true,
+      borderRadius: AppRadius.l,
+      onTap: locked ? null : () => onSubmodulePressed(submodule.id),
+      padding: EdgeInsets.zero,
+      input: TitleCaptionTrailingInput(
+        title: submodule.title,
+        caption: '$gamesLabel · $statusLabel',
+        trailingIcon: trailingIcon,
+        showAccentBar: true,
       ),
     );
   }

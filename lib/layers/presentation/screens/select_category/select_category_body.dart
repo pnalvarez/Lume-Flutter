@@ -70,20 +70,6 @@ class SelectCategoryBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: AppSpacings.l),
-                    const Center(
-                      child: LumeLogo(
-                        size: 72,
-                        variant: LumeLogoVariant.surface,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacings.m),
-                    Text(
-                      authBrandTitle,
-                      textAlign: TextAlign.center,
-                      style: typ.headlineL.copyWith(color: cs.onSurface),
-                    ),
-                    const SizedBox(height: AppSpacings.xl2),
                     Text(
                       selectCategoryTitle,
                       style: typ.headlineM.copyWith(color: cs.onSurface),

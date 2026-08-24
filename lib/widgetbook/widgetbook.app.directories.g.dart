@@ -24,6 +24,8 @@ import 'package:lume/widgetbook/use_cases/game_use_cases.dart'
     as _lume_widgetbook_use_cases_game_use_cases;
 import 'package:lume/widgetbook/use_cases/input_and_icon_button_use_cases.dart'
     as _lume_widgetbook_use_cases_input_and_icon_button_use_cases;
+import 'package:lume/widgetbook/use_cases/list_item_use_cases.dart'
+    as _lume_widgetbook_use_cases_list_item_use_cases;
 import 'package:lume/widgetbook/use_cases/navigation_use_cases.dart'
     as _lume_widgetbook_use_cases_navigation_use_cases;
 import 'package:lume/widgetbook/use_cases/progress_bar_use_cases.dart'
@@ -46,6 +48,56 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookCategory(
     name: 'Lume',
     children: [
+      _widgetbook.WidgetbookCategory(
+        name: 'Organisms',
+        children: [
+          _widgetbook.WidgetbookFolder(
+            name: 'ListItem',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'ListItem',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Disabled and selected',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemDisabledSelected,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Header with children',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemHeaderChildren,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Icon title description',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemIconTitleDescription,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Interactive',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemInteractive,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Leading title caption progress',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemLeadingTitleCaptionProgress,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Status CTA',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemStatusCta,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Title caption trailing',
+                    builder: _lume_widgetbook_use_cases_list_item_use_cases
+                        .listItemTitleCaptionTrailing,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
       _widgetbook.WidgetbookCategory(
         name: 'Screens',
         children: [
