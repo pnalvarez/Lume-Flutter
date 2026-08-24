@@ -39,8 +39,11 @@ migrate_working_dir/
 # Package test/build outputs
 packages/**/build/
 
-# Generated (auto_route, etc.)
+# Generated (auto_route, injectable, json_serializable, mockito, widgetbook)
 *.gr.dart
+*.g.dart
+*.mocks.dart
+**/di.config.dart
 
 # Symbolication related
 app.*.symbols
