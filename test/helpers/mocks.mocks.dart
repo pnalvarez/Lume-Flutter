@@ -11,17 +11,19 @@ import 'package:lume/core/network/api_response.dart' as _i13;
 import 'package:lume/core/network/http_method.dart' as _i14;
 import 'package:lume/core/storage/storage_client.dart' as _i17;
 import 'package:lume/layers/data/datasource/category_preference_data_source.dart'
-    as _i21;
+    as _i22;
 import 'package:lume/layers/data/datasource/game_data_source.dart' as _i19;
-import 'package:lume/layers/data/datasource/profile_data_source.dart' as _i20;
+import 'package:lume/layers/data/datasource/profile_data_source.dart' as _i21;
 import 'package:lume/layers/data/datasource/trail_data_source.dart' as _i18;
 import 'package:lume/layers/data/models/category_data.dart' as _i6;
 import 'package:lume/layers/data/models/game_data.dart' as _i4;
+import 'package:lume/layers/data/models/hub_game_data.dart' as _i20;
 import 'package:lume/layers/data/models/profile_data.dart' as _i5;
 import 'package:lume/layers/data/models/trail_progress_data.dart' as _i3;
 import 'package:lume/layers/domain/models/category/category_preferences_domain.dart'
     as _i8;
-import 'package:lume/layers/domain/models/game/game_trail_domain.dart' as _i25;
+import 'package:lume/layers/domain/models/game/game_trail_domain.dart' as _i26;
+import 'package:lume/layers/domain/models/game/hub_game_domain.dart' as _i28;
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart'
     as _i11;
 import 'package:lume/layers/domain/models/profile/profile_domain.dart' as _i7;
@@ -30,20 +32,21 @@ import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart'
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart'
     as _i10;
 import 'package:lume/layers/domain/repository/category_preference_repository.dart'
-    as _i23;
-import 'package:lume/layers/domain/repository/game_repository.dart' as _i26;
-import 'package:lume/layers/domain/repository/profile_repository.dart' as _i22;
-import 'package:lume/layers/domain/repository/trail_repository.dart' as _i24;
+    as _i24;
+import 'package:lume/layers/domain/repository/game_repository.dart' as _i27;
+import 'package:lume/layers/domain/repository/profile_repository.dart' as _i23;
+import 'package:lume/layers/domain/repository/trail_repository.dart' as _i25;
 import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart'
-    as _i28;
-import 'package:lume/layers/domain/usecases/get_game_trails.dart' as _i32;
-import 'package:lume/layers/domain/usecases/get_profile.dart' as _i27;
-import 'package:lume/layers/domain/usecases/get_submodule_games.dart' as _i34;
-import 'package:lume/layers/domain/usecases/get_trail_bootstrap.dart' as _i30;
-import 'package:lume/layers/domain/usecases/get_trail_progress.dart' as _i31;
+    as _i30;
+import 'package:lume/layers/domain/usecases/get_game_trails.dart' as _i34;
+import 'package:lume/layers/domain/usecases/get_hub_games.dart' as _i35;
+import 'package:lume/layers/domain/usecases/get_profile.dart' as _i29;
+import 'package:lume/layers/domain/usecases/get_submodule_games.dart' as _i37;
+import 'package:lume/layers/domain/usecases/get_trail_bootstrap.dart' as _i32;
+import 'package:lume/layers/domain/usecases/get_trail_progress.dart' as _i33;
 import 'package:lume/layers/domain/usecases/save_category_preferences.dart'
-    as _i29;
-import 'package:lume/layers/domain/usecases/save_pair_progress.dart' as _i33;
+    as _i31;
+import 'package:lume/layers/domain/usecases/save_pair_progress.dart' as _i36;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i15;
 
@@ -555,13 +558,30 @@ class MockIGameDataSource extends _i1.Mock implements _i19.IGameDataSource {
             ),
           )
           as _i2.Future<_i4.SubmoduleGamesData>);
+
+  @override
+  _i2.Future<List<_i20.HubGameData>> fetchHubGames({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchHubGames, [], {
+              #forceRefresh: forceRefresh,
+            }),
+            returnValue: _i2.Future<List<_i20.HubGameData>>.value(
+              <_i20.HubGameData>[],
+            ),
+            returnValueForMissingStub: _i2.Future<List<_i20.HubGameData>>.value(
+              <_i20.HubGameData>[],
+            ),
+          )
+          as _i2.Future<List<_i20.HubGameData>>);
 }
 
 /// A class which mocks [IProfileDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIProfileDataSource extends _i1.Mock
-    implements _i20.IProfileDataSource {
+    implements _i21.IProfileDataSource {
   @override
   _i2.Future<_i5.ProfileData> fetchProfile({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
@@ -590,7 +610,7 @@ class MockIProfileDataSource extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockICategoryPreferenceDataSource extends _i1.Mock
-    implements _i21.ICategoryPreferenceDataSource {
+    implements _i22.ICategoryPreferenceDataSource {
   @override
   _i2.Future<_i6.CategoryPreferencesData> fetchCategoriesWithPreferences({
     bool? forceRefresh = false,
@@ -652,7 +672,7 @@ class MockICategoryPreferenceDataSource extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIProfileRepository extends _i1.Mock
-    implements _i22.IProfileRepository {
+    implements _i23.IProfileRepository {
   @override
   _i2.Future<_i7.ProfileDomain> getProfile({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
@@ -681,7 +701,7 @@ class MockIProfileRepository extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockICategoryPreferenceRepository extends _i1.Mock
-    implements _i23.ICategoryPreferenceRepository {
+    implements _i24.ICategoryPreferenceRepository {
   @override
   _i2.Future<_i8.CategoryPreferencesDomain> getCategoriesWithPreferences({
     bool? forceRefresh = false,
@@ -742,7 +762,7 @@ class MockICategoryPreferenceRepository extends _i1.Mock
 /// A class which mocks [ITrailRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockITrailRepository extends _i1.Mock implements _i24.ITrailRepository {
+class MockITrailRepository extends _i1.Mock implements _i25.ITrailRepository {
   @override
   _i2.Future<_i9.TrailBootstrapDomain> getBootstrap({
     bool? forceRefresh = false,
@@ -796,22 +816,22 @@ class MockITrailRepository extends _i1.Mock implements _i24.ITrailRepository {
           as _i2.Future<_i10.TrailProgressDomain>);
 
   @override
-  _i2.Future<List<_i25.GameTrailDomain>> getGameTrails({
+  _i2.Future<List<_i26.GameTrailDomain>> getGameTrails({
     bool? forceRefresh = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getGameTrails, [], {
               #forceRefresh: forceRefresh,
             }),
-            returnValue: _i2.Future<List<_i25.GameTrailDomain>>.value(
-              <_i25.GameTrailDomain>[],
+            returnValue: _i2.Future<List<_i26.GameTrailDomain>>.value(
+              <_i26.GameTrailDomain>[],
             ),
             returnValueForMissingStub:
-                _i2.Future<List<_i25.GameTrailDomain>>.value(
-                  <_i25.GameTrailDomain>[],
+                _i2.Future<List<_i26.GameTrailDomain>>.value(
+                  <_i26.GameTrailDomain>[],
                 ),
           )
-          as _i2.Future<List<_i25.GameTrailDomain>>);
+          as _i2.Future<List<_i26.GameTrailDomain>>);
 
   @override
   _i2.Future<_i10.PairProgressDomain> savePairProgress({
@@ -849,7 +869,7 @@ class MockITrailRepository extends _i1.Mock implements _i24.ITrailRepository {
 /// A class which mocks [IGameRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockIGameRepository extends _i1.Mock implements _i26.IGameRepository {
+class MockIGameRepository extends _i1.Mock implements _i27.IGameRepository {
   @override
   _i2.Future<_i11.SubmoduleGamesDomain> getSubmoduleGames({
     required int? submoduleId,
@@ -881,12 +901,28 @@ class MockIGameRepository extends _i1.Mock implements _i26.IGameRepository {
                 ),
           )
           as _i2.Future<_i11.SubmoduleGamesDomain>);
+
+  @override
+  _i2.Future<List<_i28.HubGameDomain>> getHubGames({
+    bool? forceRefresh = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getHubGames, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<List<_i28.HubGameDomain>>.value(
+              <_i28.HubGameDomain>[],
+            ),
+            returnValueForMissingStub:
+                _i2.Future<List<_i28.HubGameDomain>>.value(
+                  <_i28.HubGameDomain>[],
+                ),
+          )
+          as _i2.Future<List<_i28.HubGameDomain>>);
 }
 
 /// A class which mocks [IGetProfile].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockIGetProfile extends _i1.Mock implements _i27.IGetProfile {
+class MockIGetProfile extends _i1.Mock implements _i29.IGetProfile {
   @override
   _i2.Future<_i7.ProfileDomain> call({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
@@ -911,7 +947,7 @@ class MockIGetProfile extends _i1.Mock implements _i27.IGetProfile {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIGetCategoriesWithPreferences extends _i1.Mock
-    implements _i28.IGetCategoriesWithPreferences {
+    implements _i30.IGetCategoriesWithPreferences {
   @override
   _i2.Future<_i8.CategoryPreferencesDomain> call({
     bool? forceRefresh = false,
@@ -939,7 +975,7 @@ class MockIGetCategoriesWithPreferences extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockISaveCategoryPreferences extends _i1.Mock
-    implements _i29.ISaveCategoryPreferences {
+    implements _i31.ISaveCategoryPreferences {
   @override
   _i2.Future<_i8.CategoryPreferencesDomain> call({
     required List<int>? categoryIds,
@@ -967,7 +1003,7 @@ class MockISaveCategoryPreferences extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIGetTrailBootstrap extends _i1.Mock
-    implements _i30.IGetTrailBootstrap {
+    implements _i32.IGetTrailBootstrap {
   @override
   _i2.Future<_i9.TrailBootstrapDomain> call({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
@@ -992,7 +1028,7 @@ class MockIGetTrailBootstrap extends _i1.Mock
 /// A class which mocks [IGetTrailProgress].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockIGetTrailProgress extends _i1.Mock implements _i31.IGetTrailProgress {
+class MockIGetTrailProgress extends _i1.Mock implements _i33.IGetTrailProgress {
   @override
   _i2.Future<_i10.TrailProgressDomain> call({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
@@ -1017,26 +1053,45 @@ class MockIGetTrailProgress extends _i1.Mock implements _i31.IGetTrailProgress {
 /// A class which mocks [IGetGameTrails].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockIGetGameTrails extends _i1.Mock implements _i32.IGetGameTrails {
+class MockIGetGameTrails extends _i1.Mock implements _i34.IGetGameTrails {
   @override
-  _i2.Future<List<_i25.GameTrailDomain>> call({bool? forceRefresh = false}) =>
+  _i2.Future<List<_i26.GameTrailDomain>> call({bool? forceRefresh = false}) =>
       (super.noSuchMethod(
             Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
-            returnValue: _i2.Future<List<_i25.GameTrailDomain>>.value(
-              <_i25.GameTrailDomain>[],
+            returnValue: _i2.Future<List<_i26.GameTrailDomain>>.value(
+              <_i26.GameTrailDomain>[],
             ),
             returnValueForMissingStub:
-                _i2.Future<List<_i25.GameTrailDomain>>.value(
-                  <_i25.GameTrailDomain>[],
+                _i2.Future<List<_i26.GameTrailDomain>>.value(
+                  <_i26.GameTrailDomain>[],
                 ),
           )
-          as _i2.Future<List<_i25.GameTrailDomain>>);
+          as _i2.Future<List<_i26.GameTrailDomain>>);
+}
+
+/// A class which mocks [IGetHubGames].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIGetHubGames extends _i1.Mock implements _i35.IGetHubGames {
+  @override
+  _i2.Future<List<_i28.HubGameDomain>> call({bool? forceRefresh = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {#forceRefresh: forceRefresh}),
+            returnValue: _i2.Future<List<_i28.HubGameDomain>>.value(
+              <_i28.HubGameDomain>[],
+            ),
+            returnValueForMissingStub:
+                _i2.Future<List<_i28.HubGameDomain>>.value(
+                  <_i28.HubGameDomain>[],
+                ),
+          )
+          as _i2.Future<List<_i28.HubGameDomain>>);
 }
 
 /// A class which mocks [ISavePairProgress].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockISavePairProgress extends _i1.Mock implements _i33.ISavePairProgress {
+class MockISavePairProgress extends _i1.Mock implements _i36.ISavePairProgress {
   @override
   _i2.Future<_i10.PairProgressDomain> call({
     required int? pairId,
@@ -1074,7 +1129,7 @@ class MockISavePairProgress extends _i1.Mock implements _i33.ISavePairProgress {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIGetSubmoduleGames extends _i1.Mock
-    implements _i34.IGetSubmoduleGames {
+    implements _i37.IGetSubmoduleGames {
   @override
   _i2.Future<_i11.SubmoduleGamesDomain> call({
     required int? submoduleId,

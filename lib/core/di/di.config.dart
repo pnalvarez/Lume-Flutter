@@ -47,6 +47,7 @@ import 'package:lume/layers/domain/usecases/clear_password_recovery.dart'
 import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart'
     as _i976;
 import 'package:lume/layers/domain/usecases/get_game_trails.dart' as _i729;
+import 'package:lume/layers/domain/usecases/get_hub_games.dart' as _i532;
 import 'package:lume/layers/domain/usecases/get_profile.dart' as _i188;
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart' as _i97;
 import 'package:lume/layers/domain/usecases/get_trail_bootstrap.dart' as _i37;
@@ -86,6 +87,8 @@ import 'package:lume/layers/presentation/screens/games/connections/connections_b
     as _i817;
 import 'package:lume/layers/presentation/screens/games/game_play_factory.dart'
     as _i519;
+import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart'
+    as _i13;
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_bloc.dart'
     as _i186;
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_bloc.dart'
@@ -213,6 +216,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i433.IStorageClient>(),
       ),
     );
+    gh.factory<_i532.IGetHubGames>(
+      () => _i532.GetHubGames(gh<_i131.IGameRepository>()),
+    );
     gh.factory<_i145.DefinePasswordBloc>(
       () => _i145.DefinePasswordBloc(
         gh<_i341.IRestoreSession>(),
@@ -258,6 +264,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i928.OnboardingBloc>(
       () => _i928.OnboardingBloc(gh<_i167.IMarkOnboardingSeen>()),
+    );
+    gh.factory<_i13.GamesHubBloc>(
+      () => _i13.GamesHubBloc(gh<_i532.IGetHubGames>()),
     );
     gh.factory<_i188.IGetProfile>(
       () => _i188.GetProfile(gh<_i155.IProfileRepository>()),

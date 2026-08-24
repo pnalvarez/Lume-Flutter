@@ -172,6 +172,36 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookFolder(
+            name: 'Games Hub',
+            children: [
+              _widgetbook.WidgetbookComponent(
+                name: 'GamesHubBody',
+                useCases: [
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Empty',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .gamesHubEmpty,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Error',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .gamesHubError,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Loading',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .gamesHubLoading,
+                  ),
+                  _widgetbook.WidgetbookUseCase(
+                    name: 'Ready',
+                    builder: _lume_widgetbook_use_cases_screens_use_cases
+                        .gamesHubReady,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookFolder(
             name: 'Games]',
             children: [
               _widgetbook.WidgetbookFolder(
@@ -722,6 +752,31 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Sizes',
                 builder: _lume_widgetbook_use_cases_tiles_and_loader_use_cases
                     .circularLoaderSizes,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'DisplayAsLoader',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Loading screen (multi-size cells)',
+                builder: _lume_widgetbook_use_cases_tiles_and_loader_use_cases
+                    .displayAsLoaderLoadingScreen,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Match child shape',
+                builder: _lume_widgetbook_use_cases_tiles_and_loader_use_cases
+                    .displayAsLoaderMatchChild,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'ShimmerBox',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Sizes',
+                builder: _lume_widgetbook_use_cases_tiles_and_loader_use_cases
+                    .shimmerBoxSizes,
               ),
             ],
           ),

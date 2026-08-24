@@ -11,8 +11,12 @@ import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_body.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
+import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_body.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeholder.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_card_ui.dart';
+import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_body.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_body.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
@@ -405,5 +409,104 @@ Widget trailHomeLoading(BuildContext context) {
     state: const HomeState(),
     onRetry: _noop,
     onTrailPressed: _noopInt,
+  );
+}
+
+// --- Games hub --------------------------------------------------------------
+
+const _sampleHubGames = [
+  GamesHubCardUi(
+    id: '1',
+    slug: 'quiz_relampago',
+    title: 'Quiz Relâmpago',
+    description: 'Perguntas rápidas de todas as trilhas',
+    colorHex: '#F5A623',
+    hubSection: HubSection.general,
+  ),
+  GamesHubCardUi(
+    id: '2',
+    slug: 'verdade_ou_mito',
+    title: 'Verdade ou Mito',
+    description: 'Acerte mitos populares em segundos',
+    colorHex: '#22C55E',
+    hubSection: HubSection.general,
+  ),
+  GamesHubCardUi(
+    id: '3',
+    slug: 'giro_pelo_mundo',
+    title: 'Giro pelo Mundo',
+    description: 'Explore o planeta, um desafio por vez',
+    colorHex: '#7BC8A4',
+    hubSection: HubSection.visual,
+  ),
+  GamesHubCardUi(
+    id: '4',
+    slug: 'galeria_conhecimento',
+    title: 'Galeria do Conhecimento',
+    description: 'Descubra as obras que moldaram o mundo',
+    colorHex: '#C4A6D6',
+    hubSection: HubSection.visual,
+  ),
+];
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
+  name: 'Ready',
+  type: GamesHubBody,
+)
+Widget gamesHubReady(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(
+      status: GamesHubStatus.ready,
+      games: _sampleHubGames,
+    ),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
+  name: 'Loading',
+  type: GamesHubBody,
+)
+Widget gamesHubLoading(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
+  name: 'Error',
+  type: GamesHubBody,
+)
+Widget gamesHubError(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(
+      status: GamesHubStatus.error,
+      errorMessage: 'Não foi possível carregar os jogos.',
+    ),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
+  name: 'Empty',
+  type: GamesHubBody,
+)
+Widget gamesHubEmpty(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(status: GamesHubStatus.ready),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
   );
 }
