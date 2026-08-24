@@ -57,34 +57,36 @@ class GamesHubBody extends StatelessWidget {
             ),
           ),
         ),
-        GamesHubStatus.ready => state.games.isEmpty
-            ? const _GamesHubScroll(
-                fillRemaining: true,
-                listChildren: [GamesHubEmptyState()],
-              )
-            : _GamesHubScroll(
-                listChildren: [
-                  if (state.generalGames.isNotEmpty) ...[
-                    const GamesHubSectionTitle(gamesHubSectionGeneral),
-                    const SizedBox(height: AppSpacings.m),
-                    GamesHubGamesList(
-                      games: state.generalGames,
-                      onGamePressed: onGamePressed,
-                    ),
-                    const SizedBox(height: AppSpacings.xl2),
+        GamesHubStatus.ready =>
+          state.games.isEmpty
+              ? const _GamesHubScroll(
+                  fillRemaining: true,
+                  listChildren: [GamesHubEmptyState()],
+                )
+              : _GamesHubScroll(
+                  listChildren: [
+                    if (state.generalGames.isNotEmpty) ...[
+                      GamesHubArcadeButton(onPressed: onArcadePressed),
+                      const SizedBox(height: AppSpacings.m),
+                      const GamesHubSectionTitle(gamesHubSectionGeneral),
+                      const SizedBox(height: AppSpacings.m),
+                      GamesHubGamesList(
+                        games: state.generalGames,
+                        onGamePressed: onGamePressed,
+                      ),
+                      const SizedBox(height: AppSpacings.xl2),
+                    ],
+                    if (state.visualGames.isNotEmpty) ...[
+                      const GamesHubSectionTitle(gamesHubSectionVisual),
+                      const SizedBox(height: AppSpacings.m),
+                      GamesHubGamesList(
+                        games: state.visualGames,
+                        onGamePressed: onGamePressed,
+                      ),
+                      const SizedBox(height: AppSpacings.xl2),
+                    ],
                   ],
-                  if (state.visualGames.isNotEmpty) ...[
-                    const GamesHubSectionTitle(gamesHubSectionVisual),
-                    const SizedBox(height: AppSpacings.m),
-                    GamesHubGamesList(
-                      games: state.visualGames,
-                      onGamePressed: onGamePressed,
-                    ),
-                    const SizedBox(height: AppSpacings.xl2),
-                  ],
-                  GamesHubArcadeButton(onPressed: onArcadePressed),
-                ],
-              ),
+                ),
       },
     );
   }
@@ -145,10 +147,7 @@ class _GamesHubScroll extends StatelessWidget {
           ),
         ),
         if (fillRemaining)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: listChildren.single,
-          )
+          SliverFillRemaining(hasScrollBody: false, child: listChildren.single)
         else
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(
