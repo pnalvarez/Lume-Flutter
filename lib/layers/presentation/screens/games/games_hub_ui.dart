@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
@@ -124,69 +126,190 @@ class GamesHubGameCell extends StatelessWidget {
 }
 
 /// Large arcade-mode CTA at the bottom of the hub.
-class GamesHubArcadeButton extends StatelessWidget {
+///
+/// Pink gradient surface with a continuous shimmer and a sliding shine sweep.
+class GamesHubArcadeButton extends StatefulWidget {
   const GamesHubArcadeButton({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
   @override
+  State<GamesHubArcadeButton> createState() => _GamesHubArcadeButtonState();
+}
+
+class _GamesHubArcadeButtonState extends State<GamesHubArcadeButton>
+    with SingleTickerProviderStateMixin {
+  static const Duration _shinePeriod = Duration(milliseconds: 2400);
+
+  late final AnimationController _shine;
+
+  @override
+  void initState() {
+    super.initState();
+    _shine = AnimationController(vsync: this, duration: _shinePeriod)
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shine.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(AppRadius.xl3);
+    final pinkDeep = AppColors.Extra.pinkDeep;
+    final pink = AppColors.Extra.pink;
+    final pinkLight = AppColors.Extra.pinkLight;
+    final onPink = AppColors.Surface.surfaceContainerLowest;
 
     return Material(
-      color: AppColors.Accent.accent,
-      borderRadius: BorderRadius.circular(AppRadius.xl2),
+      color: Colors.transparent,
+      elevation: 0,
       child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.xl2),
+        onTap: widget.onPressed,
+        borderRadius: radius,
+        splashColor: pinkLight.withValues(alpha: 0.35),
+        highlightColor: pinkLight.withValues(alpha: 0.18),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.xl2),
-            border: Border.all(color: cs.onSurface, width: 3),
+            borderRadius: radius,
             boxShadow: [
               BoxShadow(
-                color: cs.onSurface,
-                offset: const Offset(4, 4),
-                blurRadius: 0,
+                color: pinkDeep.withValues(alpha: 0.35),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: pink.withValues(alpha: 0.45),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacings.l),
-            child: Row(
+          child: ClipRRect(
+            borderRadius: radius,
+            child: Stack(
               children: [
-                Container(
-                  width: AppSpacings.xl4,
-                  height: AppSpacings.xl4,
-                  decoration: BoxDecoration(
-                    color: cs.onSurface,
-                    borderRadius: BorderRadius.circular(AppRadius.l),
-                  ),
-                  child: Icon(
-                    Icons.sports_esports_rounded,
-                    color: cs.surface,
-                    size: AppSpacings.xl2,
-                  ),
-                ),
-                const SizedBox(width: AppSpacings.m),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        gamesHubArcadeTitle,
-                        style: typ.headlineS.copyWith(
-                          color: AppColors.Accent.onAccent,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacings.xs),
-                      Text(
-                        gamesHubArcadeSubtitle,
-                        style: typ.body4Light.copyWith(
-                          color: AppColors.Accent.onAccent.withValues(
-                            alpha: 0.9,
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _shine,
+                    builder: (context, _) {
+                      final pulse = (math.sin(_shine.value * math.pi * 2) + 1) / 2;
+                      final mid = Color.lerp(pinkDeep, pink, 0.35 + pulse * 0.45)!;
+                      final highlight = Color.lerp(pink, pinkLight, 0.35 + pulse * 0.4)!;
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment(-1.2 + _shine.value * 2.4, -0.8),
+                            end: Alignment(0.2 + _shine.value * 2.4, 1.0),
+                            colors: [
+                              pinkDeep,
+                              mid,
+                              highlight,
+                              mid,
+                              pinkDeep,
+                            ],
+                            stops: const [0.0, 0.28, 0.5, 0.72, 1.0],
                           ),
                         ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedBuilder(
+                      animation: _shine,
+                      builder: (context, _) {
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final travel = constraints.maxWidth * 1.6;
+                            final dx =
+                                (_shine.value * travel) -
+                                constraints.maxWidth * 0.4;
+                            return Stack(
+                              clipBehavior: Clip.hardEdge,
+                              children: [
+                                Transform.translate(
+                                  offset: Offset(dx, 0),
+                                  child: Transform.rotate(
+                                    angle: -0.55,
+                                    child: Container(
+                                      width: constraints.maxWidth * 0.35,
+                                      height: constraints.maxHeight * 2.2,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            onPink.withValues(alpha: 0),
+                                            onPink.withValues(alpha: 0.42),
+                                            onPink.withValues(alpha: 0),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacings.l,
+                    AppSpacings.l,
+                    AppSpacings.m,
+                    AppSpacings.l,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: AppSpacings.xl4,
+                        height: AppSpacings.xl4,
+                        decoration: BoxDecoration(
+                          color: onPink.withValues(alpha: 0.22),
+                          borderRadius: BorderRadius.circular(AppRadius.l),
+                          border: Border.all(
+                            color: onPink.withValues(alpha: 0.45),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.sports_esports_rounded,
+                          color: onPink,
+                          size: AppSpacings.xl2,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacings.m),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              gamesHubArcadeTitle,
+                              style: typ.headlineS.copyWith(color: onPink),
+                            ),
+                            const SizedBox(height: AppSpacings.xs),
+                            Text(
+                              gamesHubArcadeSubtitle,
+                              style: typ.body4Light.copyWith(
+                                color: onPink.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacings.s),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: onPink.withValues(alpha: 0.9),
+                        size: AppSizes.iconL,
                       ),
                     ],
                   ),
@@ -262,7 +385,7 @@ class GamesHubLoadingList extends StatelessWidget {
         const _GamesHubSectionSkeleton(label: gamesHubSectionVisual),
         const SizedBox(height: AppSpacings.xl2),
         DisplayAsLoader(
-          borderRadius: BorderRadius.circular(AppRadius.xl2),
+          borderRadius: BorderRadius.circular(AppRadius.xl3),
           child: GamesHubArcadeButton(onPressed: () {}),
         ),
       ],
