@@ -9,8 +9,11 @@ import 'package:lume/layers/presentation/screens/trail/trail_detail/trail_detail
 
 @injectable
 final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
-  TrailDetailBloc(this._getGameTrails, this._getTrailProgress)
-    : super(const TrailDetailState()) {
+  TrailDetailBloc(
+    this._getGameTrails,
+    this._getTrailProgress,
+    this._progressCalculator,
+  ) : super(const TrailDetailState()) {
     on<TrailDetailStarted>(_onStarted);
     on<TrailDetailSubmodulePressed>(_onSubmodulePressed);
     on<TrailDetailBackPressed>(_onBackPressed);
@@ -19,6 +22,7 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
 
   final IGetGameTrails _getGameTrails;
   final IGetTrailProgress _getTrailProgress;
+  final ITrailProgressCalculator _progressCalculator;
 
   Future<void> _onStarted(
     TrailDetailStarted event,
@@ -49,10 +53,10 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
         return;
       }
 
-      final pairScores = TrailProgressCalculator.pairScoresById(
+      final pairScores = _progressCalculator.pairScoresById(
         progress.pairProgress,
       );
-      final lockedSubmoduleIds = TrailProgressCalculator.lockedSubmoduleIds(
+      final lockedSubmoduleIds = _progressCalculator.lockedSubmoduleIds(
         trail: trail,
         pairScores: pairScores,
       );
@@ -60,6 +64,7 @@ final class TrailDetailBloc extends Bloc<TrailDetailEvent, TrailDetailState> {
         trail: trail,
         pairScores: pairScores,
         lockedSubmoduleIds: lockedSubmoduleIds,
+        progressCalculator: _progressCalculator,
       );
 
       emit(

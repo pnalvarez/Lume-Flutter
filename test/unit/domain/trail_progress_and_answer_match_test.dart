@@ -18,6 +18,7 @@ void main() {
   });
 
   group('TrailProgressCalculator', () {
+    final calculator = TrailProgressCalculator();
     final trail = GameTrailDomain(
       id: 1,
       title: 'História',
@@ -62,11 +63,11 @@ void main() {
     );
 
     test('requires every pair attempted before completion', () {
-      final scores = TrailProgressCalculator.pairScoresById(const [
+      final scores = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
       ]);
       expect(
-        TrailProgressCalculator.isSubmoduleCompleted(
+        calculator.isSubmoduleCompleted(
           submodule: trail.levels.first.submodules.first,
           pairScores: scores,
         ),
@@ -76,12 +77,12 @@ void main() {
 
     test('completes when average score is at least 60%', () {
       // 1 correct + 1 miss = 50% → not enough
-      final half = TrailProgressCalculator.pairScoresById(const [
+      final half = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 0),
       ]);
       expect(
-        TrailProgressCalculator.isSubmoduleCompleted(
+        calculator.isSubmoduleCompleted(
           submodule: trail.levels.first.submodules.first,
           pairScores: half,
         ),
@@ -89,12 +90,12 @@ void main() {
       );
 
       // Both correct = 100%
-      final all = TrailProgressCalculator.pairScoresById(const [
+      final all = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
-        TrailProgressCalculator.isSubmoduleCompleted(
+        calculator.isSubmoduleCompleted(
           submodule: trail.levels.first.submodules.first,
           pairScores: all,
         ),
@@ -144,14 +145,14 @@ void main() {
       );
 
       // 3/4 correct = 75% ≥ 60%
-      final scores = TrailProgressCalculator.pairScoresById(const [
+      final scores = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 100),
         PairProgressDomain(pairId: 3, scorePct: 100),
         PairProgressDomain(pairId: 4, scorePct: 0),
       ]);
       expect(
-        TrailProgressCalculator.isSubmoduleCompleted(
+        calculator.isSubmoduleCompleted(
           submodule: fourGameSub,
           pairScores: scores,
         ),
@@ -160,64 +161,46 @@ void main() {
     });
 
     test('counts trail percent from completed submodules', () {
-      final scores = TrailProgressCalculator.pairScoresById(const [
+      final scores = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
-        TrailProgressCalculator.completedSubmoduleCount(
-          trail: trail,
-          pairScores: scores,
-        ),
+        calculator.completedSubmoduleCount(trail: trail, pairScores: scores),
         1,
       );
-      expect(
-        TrailProgressCalculator.progressPercent(
-          trail: trail,
-          pairScores: scores,
-        ),
-        50,
-      );
+      expect(calculator.progressPercent(trail: trail, pairScores: scores), 50);
     });
 
     test('minCorrectCount matches 60% ceiling for binary scores', () {
-      expect(TrailProgressCalculator.minCorrectCount(4), 3);
-      expect(TrailProgressCalculator.minCorrectCount(2), 2);
-      expect(TrailProgressCalculator.minCorrectCount(5), 3);
-      expect(
-        TrailProgressCalculator.meetsPassAverage(correctCount: 3, total: 4),
-        isTrue,
-      );
-      expect(
-        TrailProgressCalculator.meetsPassAverage(correctCount: 2, total: 4),
-        isFalse,
-      );
+      expect(calculator.minCorrectCount(4), 3);
+      expect(calculator.minCorrectCount(2), 2);
+      expect(calculator.minCorrectCount(5), 3);
+      expect(calculator.meetsPassAverage(correctCount: 3, total: 4), isTrue);
+      expect(calculator.meetsPassAverage(correctCount: 2, total: 4), isFalse);
     });
 
     test('marks fully attempted below 60% as failed', () {
       final submodule = trail.levels.first.submodules.first;
-      final failed = TrailProgressCalculator.pairScoresById(const [
+      final failed = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 0),
       ]);
       expect(
-        TrailProgressCalculator.isSubmoduleFullyAttempted(
+        calculator.isSubmoduleFullyAttempted(
           submodule: submodule,
           pairScores: failed,
         ),
         isTrue,
       );
       expect(
-        TrailProgressCalculator.isSubmoduleFailed(
-          submodule: submodule,
-          pairScores: failed,
-        ),
+        calculator.isSubmoduleFailed(submodule: submodule, pairScores: failed),
         isTrue,
       );
       expect(
-        TrailProgressCalculator.isSubmoduleFailed(
+        calculator.isSubmoduleFailed(
           submodule: submodule,
-          pairScores: TrailProgressCalculator.pairScoresById(const [
+          pairScores: calculator.pairScoresById(const [
             PairProgressDomain(pairId: 1, scorePct: 100),
           ]),
         ),
@@ -227,22 +210,16 @@ void main() {
 
     test('locks later submodules until the previous one is completed', () {
       expect(
-        TrailProgressCalculator.lockedSubmoduleIds(
-          trail: trail,
-          pairScores: const {},
-        ),
+        calculator.lockedSubmoduleIds(trail: trail, pairScores: const {}),
         {101},
       );
 
-      final firstDone = TrailProgressCalculator.pairScoresById(const [
+      final firstDone = calculator.pairScoresById(const [
         PairProgressDomain(pairId: 1, scorePct: 100),
         PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
-        TrailProgressCalculator.lockedSubmoduleIds(
-          trail: trail,
-          pairScores: firstDone,
-        ),
+        calculator.lockedSubmoduleIds(trail: trail, pairScores: firstDone),
         isEmpty,
       );
     });

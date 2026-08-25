@@ -1,6 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:lume/common/strings/trail_strings.dart';
-import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 
 enum SubmoduleSessionStatus { loading, ready, saving, error }
@@ -22,6 +20,7 @@ final class SubmoduleSessionState {
     this.correctCount = 0,
     this.pairScores = const {},
     this.xpAwarded = 0,
+    this.completeUnlockMessage = '',
     this.errorMessage,
     this.goBackToTrail = false,
   });
@@ -38,6 +37,9 @@ final class SubmoduleSessionState {
   final int correctCount;
   final Map<int, int> pairScores;
   final int xpAwarded;
+
+  /// Guidance under the score on the complete step (set by the bloc).
+  final String completeUnlockMessage;
   final String? errorMessage;
   final bool goBackToTrail;
 
@@ -52,19 +54,6 @@ final class SubmoduleSessionState {
       pairScores.isNotEmpty &&
       pairScores.length == games.length;
 
-  /// Guidance under the score on the complete step.
-  String get completeUnlockMessage {
-    final total = games.length;
-    final minCorrect = TrailProgressCalculator.minCorrectCount(total);
-    if (TrailProgressCalculator.meetsPassAverage(
-      correctCount: correctCount,
-      total: total,
-    )) {
-      return trailSessionUnlockAchieved;
-    }
-    return trailSessionUnlockRequirement(minCorrect: minCorrect, total: total);
-  }
-
   SubmoduleSessionState copyWith({
     SubmoduleSessionStatus? status,
     SubmoduleSessionStage? stage,
@@ -78,6 +67,7 @@ final class SubmoduleSessionState {
     int? correctCount,
     Map<int, int>? pairScores,
     int? xpAwarded,
+    String? completeUnlockMessage,
     String? errorMessage,
     bool? goBackToTrail,
     bool clearError = false,
@@ -85,6 +75,7 @@ final class SubmoduleSessionState {
     bool clearImageUrl = false,
     bool clearPairScores = false,
     bool clearXpAwarded = false,
+    bool clearCompleteUnlockMessage = false,
   }) {
     return SubmoduleSessionState(
       status: status ?? this.status,
@@ -99,6 +90,9 @@ final class SubmoduleSessionState {
       correctCount: correctCount ?? this.correctCount,
       pairScores: clearPairScores ? const {} : pairScores ?? this.pairScores,
       xpAwarded: clearXpAwarded ? 0 : xpAwarded ?? this.xpAwarded,
+      completeUnlockMessage: clearCompleteUnlockMessage
+          ? ''
+          : completeUnlockMessage ?? this.completeUnlockMessage,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       goBackToTrail: goBackToTrail ?? this.goBackToTrail,
     );
@@ -119,6 +113,7 @@ final class SubmoduleSessionState {
       other.correctCount == correctCount &&
       mapEquals(other.pairScores, pairScores) &&
       other.xpAwarded == xpAwarded &&
+      other.completeUnlockMessage == completeUnlockMessage &&
       other.errorMessage == errorMessage &&
       other.goBackToTrail == goBackToTrail;
 
@@ -136,6 +131,7 @@ final class SubmoduleSessionState {
     correctCount,
     Object.hashAll(pairScores.entries),
     xpAwarded,
+    completeUnlockMessage,
     errorMessage,
     goBackToTrail,
   );

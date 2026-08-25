@@ -12,8 +12,12 @@ import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 
 @injectable
 final class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc(this._getGameTrails, this._getTrailProgress, this._getProfile)
-    : super(const HomeState()) {
+  HomeBloc(
+    this._getGameTrails,
+    this._getTrailProgress,
+    this._getProfile,
+    this._progressCalculator,
+  ) : super(const HomeState()) {
     on<HomeStarted>(_onStarted);
     on<HomeTrailPressed>(_onTrailPressed);
     on<HomeNavigationHandled>(_onNavigationHandled);
@@ -22,6 +26,7 @@ final class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final IGetGameTrails _getGameTrails;
   final IGetTrailProgress _getTrailProgress;
   final IGetProfile _getProfile;
+  final ITrailProgressCalculator _progressCalculator;
 
   Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
     emit(state.copyWith(status: HomeStatus.loading, clearError: true));
@@ -37,12 +42,16 @@ final class HomeBloc extends Bloc<HomeEvent, HomeState> {
         profile = null;
       }
 
-      final pairScores = TrailProgressCalculator.pairScoresById(
+      final pairScores = _progressCalculator.pairScoresById(
         progress.pairProgress,
       );
       final cards = [
         for (final GameTrailDomain trail in trails)
-          HomeTrailCardUi.fromDomain(trail: trail, pairScores: pairScores),
+          HomeTrailCardUi.fromDomain(
+            trail: trail,
+            pairScores: pairScores,
+            progressCalculator: _progressCalculator,
+          ),
       ];
 
       emit(

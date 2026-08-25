@@ -34,17 +34,18 @@ final class TrailDetailSubmoduleRowUi {
     required GameTrailSubmoduleDomain submodule,
     required Map<int, int> pairScores,
     required bool isLocked,
+    required ITrailProgressCalculator progressCalculator,
     String? unlockHint,
   }) {
     final needsRetry =
         !isLocked &&
-        TrailProgressCalculator.isSubmoduleFailed(
+        progressCalculator.isSubmoduleFailed(
           submodule: submodule,
           pairScores: pairScores,
         );
     final retryHint = needsRetry && submodule.games.isNotEmpty
         ? trailDetailRetryHint(
-            minCorrect: TrailProgressCalculator.minCorrectCount(
+            minCorrect: progressCalculator.minCorrectCount(
               submodule.games.length,
             ),
             total: submodule.games.length,
@@ -55,7 +56,7 @@ final class TrailDetailSubmoduleRowUi {
       id: submodule.id,
       title: submodule.title,
       gamesCount: submodule.games.length,
-      isCompleted: TrailProgressCalculator.isSubmoduleCompleted(
+      isCompleted: progressCalculator.isSubmoduleCompleted(
         submodule: submodule,
         pairScores: pairScores,
       ),
@@ -140,6 +141,7 @@ final class TrailDetailState {
     required GameTrailDomain trail,
     required Map<int, int> pairScores,
     required Set<int> lockedSubmoduleIds,
+    required ITrailProgressCalculator progressCalculator,
   }) {
     GameTrailSubmoduleDomain? previous;
     var frontierHintAssigned = false;
@@ -155,7 +157,7 @@ final class TrailDetailState {
           if (previous != null && previous.games.isNotEmpty) {
             final total = previous.games.length;
             unlockHint = trailDetailUnlockHint(
-              minCorrect: TrailProgressCalculator.minCorrectCount(total),
+              minCorrect: progressCalculator.minCorrectCount(total),
               total: total,
             );
           }
@@ -166,6 +168,7 @@ final class TrailDetailState {
             submodule: submodule,
             pairScores: pairScores,
             isLocked: locked,
+            progressCalculator: progressCalculator,
             unlockHint: unlockHint,
           ),
         );

@@ -25,9 +25,10 @@ final class HomeTrailCardUi {
   factory HomeTrailCardUi.fromDomain({
     required GameTrailDomain trail,
     required Map<int, int> pairScores,
+    required ITrailProgressCalculator progressCalculator,
   }) {
-    final total = TrailProgressCalculator.totalSubmoduleCount(trail);
-    final done = TrailProgressCalculator.completedSubmoduleCount(
+    final total = progressCalculator.totalSubmoduleCount(trail);
+    final done = progressCalculator.completedSubmoduleCount(
       trail: trail,
       pairScores: pairScores,
     );
@@ -39,7 +40,7 @@ final class HomeTrailCardUi {
           : '🎮',
       completedSubmodules: done,
       totalSubmodules: total,
-      progressPercent: TrailProgressCalculator.progressPercent(
+      progressPercent: progressCalculator.progressPercent(
         trail: trail,
         pairScores: pairScores,
       ),
