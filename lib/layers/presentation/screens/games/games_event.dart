@@ -1,6 +1,6 @@
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 
-enum GamesPlayMode { trail, hub }
+enum GamesPlayMode { trail, hub, arcade }
 
 sealed class GamesEvent {
   const GamesEvent();
@@ -11,6 +11,7 @@ final class GamesStarted extends GamesEvent {
     required this.rounds,
     required this.mode,
     this.onSaveRound,
+    this.arcadeRecord = 0,
   });
 
   final List<GameRound> rounds;
@@ -18,6 +19,9 @@ final class GamesStarted extends GamesEvent {
 
   /// Trail mode: buffer scores in the parent session. Unused in hub mode.
   final GamesRoundSave? onSaveRound;
+
+  /// Arcade mode: personal best fetched by the hub before starting.
+  final int arcadeRecord;
 }
 
 final class GamesChoiceSelected extends GamesEvent {

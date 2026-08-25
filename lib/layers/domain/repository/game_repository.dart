@@ -14,4 +14,7 @@ abstract interface class IGameRepository {
     required String gameSlug,
     int limit = 5,
   });
+
+  /// One random playable round picked by the backend, for arcade mode.
+  Future<HubGameRoundDomain> getRandomGameRound();
 }

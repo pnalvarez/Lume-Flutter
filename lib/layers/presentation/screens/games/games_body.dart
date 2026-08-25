@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lume/common/strings/arcade_strings.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/presentation/screens/games/battle_of_curiosities/battle_of_curiosities_body.dart';
@@ -15,6 +16,7 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/molecules/progress/lume_lives_row.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
@@ -39,11 +41,26 @@ class GamesBody extends StatelessWidget {
     this.useCloseTrailing = false,
     this.onClose,
     this.onAbandoned,
+    this.hideProgress = false,
+    this.useCloseLeading = false,
+    this.showLives = false,
   });
+
+  /// Tall enough for hearts plus the scored / record labels under them.
+  static const double _arcadeToolbarHeight = 88;
 
   final GamesState state;
   final VoidCallback onRetry;
   final bool useCloseTrailing;
+
+  /// Arcade runs are endless, so there is no sequence progress to show.
+  final bool hideProgress;
+
+  /// Turns the leading header action into a close button calling [onAbandoned].
+  final bool useCloseLeading;
+
+  /// Shows the arcade lives and score from [GamesState.arcade] in the header.
+  final bool showLives;
   final VoidCallback? onClose;
   final VoidCallback? onAbandoned;
   final ValueChanged<String> onChoiceSelected;
@@ -71,24 +88,34 @@ class GamesBody extends StatelessWidget {
       backgroundColor: cs.surface,
       appBar: PageHeader(
         onBack: useCloseTrailing ? null : onAbandoned,
-        titleWidget: Padding(
-          padding: EdgeInsets.only(
-            right: useCloseTrailing ? AppSpacings.xs : AppSpacings.s,
+        backIcon: useCloseLeading
+            ? Icons.close_rounded
+            : Icons.arrow_back_rounded,
+        toolbarHeight: showLives
+            ? _arcadeToolbarHeight
+            : PageHeader.defaultToolbarHeight,
+        titleWidget: hideProgress
+            ? null
+            : Padding(
+                padding: EdgeInsets.only(
+                  right: useCloseTrailing ? AppSpacings.xs : AppSpacings.s,
+                ),
+                child: LumeProgressBar(
+                  value: state.progressValue.clamp(0.0, 1.0),
+                  height: 8,
+                  showPercentage: false,
+                  fillColor: cs.primary,
+                ),
+              ),
+        trailing: switch ((showLives, useCloseTrailing && onClose != null)) {
+          (true, _) => _ArcadeHeaderTrailing(arcade: state.arcade),
+          (_, true) => LumeIconButton(
+            icon: Icons.close_rounded,
+            onPressed: onClose,
+            size: LumeIconButtonSize.sm,
           ),
-          child: LumeProgressBar(
-            value: state.progressValue.clamp(0.0, 1.0),
-            height: 8,
-            showPercentage: false,
-            fillColor: cs.primary,
-          ),
-        ),
-        trailing: useCloseTrailing && onClose != null
-            ? LumeIconButton(
-                icon: Icons.close_rounded,
-                onPressed: onClose,
-                size: LumeIconButtonSize.sm,
-              )
-            : null,
+          _ => null,
+        },
       ),
       body: switch ((isSaving, errorMessage)) {
         (true, _) => const Center(child: CircularLoader()),
@@ -176,5 +203,29 @@ class GamesBody extends StatelessWidget {
         onNext: onNext,
       ),
     };
+  }
+}
+
+/// Hearts plus live score / record, right-aligned in the arcade header.
+class _ArcadeHeaderTrailing extends StatelessWidget {
+  const _ArcadeHeaderTrailing({required this.arcade});
+
+  final ArcadeInfo arcade;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final labelStyle = typ.body4Light.copyWith(color: cs.onSurfaceVariant);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        LumeLivesRow(total: ArcadeInfo.maxLives, remaining: arcade.livesLeft),
+        const SizedBox(height: AppSpacings.xs),
+        Text(arcadeHeaderScored(arcade.scoredCount), style: labelStyle),
+        Text(arcadeHeaderRecord(arcade.record), style: labelStyle),
+      ],
+    );
   }
 }

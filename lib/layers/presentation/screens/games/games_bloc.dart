@@ -14,6 +14,9 @@ import 'package:lume/layers/domain/usecases/games/play_mysterious_word.dart';
 import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
+import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
+import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
+import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
@@ -32,6 +35,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._playConnections,
     this._playMysteriousWord,
     this._savePairProgress,
+    this._getRandomGameRound,
+    this._saveArcadeRound,
+    this._saveArcadeRecord,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -61,14 +67,24 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IPlayConnections _playConnections;
   final IPlayMysteriousWord _playMysteriousWord;
   final ISavePairProgress _savePairProgress;
+  final IGetRandomGameRound _getRandomGameRound;
+  final ISaveArcadeRound _saveArcadeRound;
+  final ISaveArcadeRecord _saveArcadeRecord;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
 
+  bool get _isArcade => _mode == GamesPlayMode.arcade;
+
   void _onStarted(GamesStarted event, Emitter<GamesState> emit) {
     _mode = event.mode;
     _onSaveRound = event.onSaveRound;
-    emit(GamesState.initial(rounds: event.rounds));
+    emit(
+      GamesState.initial(
+        rounds: event.rounds,
+        arcadeRecord: event.arcadeRecord,
+      ),
+    );
   }
 
   void _onChoiceSelected(GamesChoiceSelected event, Emitter<GamesState> emit) {
@@ -306,6 +322,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       return;
     }
 
+    if (_isArcade) {
+      await _handleArcadeRound(emit, scorePct: scorePct, xpAwarded: xpAwarded);
+      return;
+    }
+
     final nextCorrect = state.correctCount + (scorePct == 100 ? 1 : 0);
     final nextCompleted = state.completedCount + 1;
 
@@ -344,6 +365,15 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     required String roundId,
     required int scorePct,
   }) async {
+    if (_isArcade) {
+      final result = await _saveArcadeRound(
+        pairId: int.parse(roundId),
+        scorePct: scorePct,
+        roundNumber: state.arcade.scoredCount + 1,
+      );
+      return result.xpAwarded;
+    }
+
     if (_mode == GamesPlayMode.hub) {
       final progress = await _savePairProgress(
         pairId: int.parse(roundId),
@@ -357,7 +387,96 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     return save(roundId: roundId, scorePct: scorePct);
   }
 
-  void _onAbandoned(GamesAbandoned event, Emitter<GamesState> emit) {
+  /// Arcade advances one endless round at a time: a hit adds to the run total,
+  /// a miss costs one of [ArcadeInfo.maxLives] lives, and the run ends at zero.
+  Future<void> _handleArcadeRound(
+    Emitter<GamesState> emit, {
+    required int scorePct,
+    required int xpAwarded,
+  }) async {
+    final isHit = scorePct == 100;
+    final scored = state.arcade.copyWith(
+      xpEarned: state.arcade.xpEarned + xpAwarded,
+    );
+    final advanced = isHit
+        ? scored.copyWith(scoredCount: scored.scoredCount + 1)
+        : scored.copyWith(misses: scored.misses + 1);
+
+    if (advanced.isOutOfLives) {
+      await _endArcadeSession(emit, arcade: advanced);
+      return;
+    }
+
+    TrailGameDomain? nextGame;
+    try {
+      nextGame = await _getRandomGameRound();
+    } on Object {
+      nextGame = null;
+    }
+
+    // Out of content or offline: close the run so the score is not lost.
+    if (nextGame == null) {
+      await _endArcadeSession(emit, arcade: advanced);
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: GamesStatus.ready,
+        rounds: [
+          ...state.rounds,
+          GameRound(id: '${nextGame.pairId}', game: nextGame),
+        ],
+        currentIndex: state.currentIndex + 1,
+        correctCount: state.correctCount + (isHit ? 1 : 0),
+        completedCount: state.completedCount + 1,
+        arcade: advanced,
+        resetPlayFields: true,
+        clearPendingSave: true,
+        clearError: true,
+        xpAwardedToShow: xpAwarded > 0 ? xpAwarded : null,
+        clearXpAwardedToShow: xpAwarded <= 0,
+      ),
+    );
+  }
+
+  Future<void> _endArcadeSession(
+    Emitter<GamesState> emit, {
+    required ArcadeInfo arcade,
+  }) async {
+    var finished = arcade;
+
+    // Only a run past the personal best can change the record.
+    if (arcade.scoredCount > arcade.record) {
+      try {
+        final result = await _saveArcadeRecord(rounds: arcade.scoredCount);
+        finished = arcade.copyWith(isNewRecord: result.isNewRecord);
+      } on Object {
+        // Keep the run on screen even when the record write fails.
+      }
+    }
+
+    emit(
+      state.copyWith(
+        status: GamesStatus.ready,
+        arcade: finished,
+        sequenceCompleted: true,
+        clearPendingSave: true,
+        clearError: true,
+        clearXpAwardedToShow: true,
+      ),
+    );
+  }
+
+  Future<void> _onAbandoned(
+    GamesAbandoned event,
+    Emitter<GamesState> emit,
+  ) async {
+    // Leaving an arcade run is a valid ending: show the score instead of popping.
+    if (_isArcade) {
+      await _endArcadeSession(emit, arcade: state.arcade);
+      return;
+    }
     emit(state.copyWith(goBack: true));
   }
 

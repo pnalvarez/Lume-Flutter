@@ -22,10 +22,16 @@ enum LumeSnackBarTrait {
   neutral,
 }
 
+/// Where [showLumeSnackBar] anchors the toast on screen.
+enum LumeSnackBarPosition {
+  top,
+  bottom,
+}
+
 OverlayEntry? _activeLumeSnackBarEntry;
 Timer? _activeLumeSnackBarTimer;
 
-/// Shows a toast-style snack bar anchored to the **top** of the screen.
+/// Shows a toast-style snack bar anchored to the top or bottom of the screen.
 ///
 /// Replaces any snack bar currently shown by this API. Auto-dismisses after
 /// [duration] unless closed earlier via [hasCloseButton].
@@ -34,6 +40,7 @@ void showLumeSnackBar(
   required IconData icon,
   required String text,
   required LumeSnackBarTrait trait,
+  LumeSnackBarPosition position = LumeSnackBarPosition.top,
   bool hasCloseButton = false,
   Duration duration = const Duration(seconds: 4),
 }) {
@@ -47,25 +54,41 @@ void showLumeSnackBar(
 
   late OverlayEntry entry;
   entry = OverlayEntry(
-    builder: (ctx) => Positioned(
-      left: AppSpacings.l,
-      right: AppSpacings.l,
-      top: 0,
-      child: SafeArea(
-        bottom: false,
-        maintainBottomViewPadding: true,
-        child: Semantics(
-          liveRegion: true,
-          child: LumeSnackBar(
-            icon: icon,
-            text: text,
-            trait: trait,
-            hasCloseButton: hasCloseButton,
-            onClose: hideLumeSnackBar,
+    builder: (ctx) {
+      final bar = Semantics(
+        liveRegion: true,
+        child: LumeSnackBar(
+          icon: icon,
+          text: text,
+          trait: trait,
+          hasCloseButton: hasCloseButton,
+          onClose: hideLumeSnackBar,
+        ),
+      );
+
+      return switch (position) {
+        LumeSnackBarPosition.top => Positioned(
+          left: AppSpacings.l,
+          right: AppSpacings.l,
+          top: 0,
+          child: SafeArea(
+            bottom: false,
+            maintainBottomViewPadding: true,
+            child: bar,
           ),
         ),
-      ),
-    ),
+        LumeSnackBarPosition.bottom => Positioned(
+          left: AppSpacings.l,
+          right: AppSpacings.l,
+          bottom: 0,
+          child: SafeArea(
+            top: false,
+            maintainBottomViewPadding: true,
+            child: bar,
+          ),
+        ),
+      };
+    },
   );
 
   _activeLumeSnackBarEntry = entry;

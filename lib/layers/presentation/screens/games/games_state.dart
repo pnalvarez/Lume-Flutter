@@ -13,6 +13,74 @@ import 'package:lume/layers/presentation/screens/games/who_am_i/who_am_i_state.d
 
 enum GamesStatus { ready, saving, error }
 
+/// Arcade-only session data. Inert in trail and hub modes.
+@immutable
+final class ArcadeInfo {
+  const ArcadeInfo({
+    this.scoredCount = 0,
+    this.record = 0,
+    this.xpEarned = 0,
+    this.misses = 0,
+    this.isNewRecord = false,
+  });
+
+  /// Misses a run can absorb before it ends.
+  static const int maxLives = 5;
+
+  /// Games scored across the whole run. A miss costs a life but never resets
+  /// this total, so it is not a consecutive streak.
+  final int scoredCount;
+
+  /// Best run total fetched before the session started.
+  final int record;
+
+  /// XP accumulated across this run.
+  final int xpEarned;
+
+  /// Games missed so far. Each one costs a life.
+  final int misses;
+
+  /// Set when the run ends above [record].
+  final bool isNewRecord;
+
+  /// Hearts still lit in the header.
+  int get livesLeft => (maxLives - misses).clamp(0, maxLives);
+
+  bool get isOutOfLives => misses >= maxLives;
+
+  /// True once the run passes the personal best, so the UI can celebrate live.
+  bool get isBeatingRecord => scoredCount > record;
+
+  ArcadeInfo copyWith({
+    int? scoredCount,
+    int? record,
+    int? xpEarned,
+    int? misses,
+    bool? isNewRecord,
+  }) {
+    return ArcadeInfo(
+      scoredCount: scoredCount ?? this.scoredCount,
+      record: record ?? this.record,
+      xpEarned: xpEarned ?? this.xpEarned,
+      misses: misses ?? this.misses,
+      isNewRecord: isNewRecord ?? this.isNewRecord,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is ArcadeInfo &&
+      other.scoredCount == scoredCount &&
+      other.record == record &&
+      other.xpEarned == xpEarned &&
+      other.misses == misses &&
+      other.isNewRecord == isNewRecord;
+
+  @override
+  int get hashCode =>
+      Object.hash(scoredCount, record, xpEarned, misses, isNewRecord);
+}
+
 @immutable
 final class GamesState {
   const GamesState({
@@ -33,6 +101,7 @@ final class GamesState {
     this.goBack = false,
     this.pendingSaveScorePct,
     this.xpAwardedToShow,
+    this.arcade = const ArcadeInfo(),
   });
 
   final GamesStatus status;
@@ -57,6 +126,9 @@ final class GamesState {
 
   /// XP from the last successful round save; UI shows a toast then clears it.
   final int? xpAwardedToShow;
+
+  /// Streak and record tracking; only meaningful in [GamesPlayMode.arcade].
+  final ArcadeInfo arcade;
 
   GameRound? get currentRound {
     if (currentIndex < 0 || currentIndex >= rounds.length) return null;
@@ -190,6 +262,7 @@ final class GamesState {
     bool resetPlayFields = false,
     int? xpAwardedToShow,
     bool clearXpAwardedToShow = false,
+    ArcadeInfo? arcade,
   }) {
     return GamesState(
       status: status ?? this.status,
@@ -221,12 +294,19 @@ final class GamesState {
       xpAwardedToShow: clearXpAwardedToShow
           ? null
           : xpAwardedToShow ?? this.xpAwardedToShow,
+      arcade: arcade ?? this.arcade,
     );
   }
 
   /// Fresh play session from [rounds] (booleans reset without nullable traps).
-  factory GamesState.initial({required List<GameRound> rounds}) {
-    return GamesState(rounds: rounds);
+  factory GamesState.initial({
+    required List<GameRound> rounds,
+    int arcadeRecord = 0,
+  }) {
+    return GamesState(
+      rounds: rounds,
+      arcade: ArcadeInfo(record: arcadeRecord),
+    );
   }
 
   @override
@@ -248,7 +328,8 @@ final class GamesState {
       other.sequenceCompleted == sequenceCompleted &&
       other.goBack == goBack &&
       other.pendingSaveScorePct == pendingSaveScorePct &&
-      other.xpAwardedToShow == xpAwardedToShow;
+      other.xpAwardedToShow == xpAwardedToShow &&
+      other.arcade == arcade;
 
   @override
   int get hashCode => Object.hash(
@@ -269,5 +350,6 @@ final class GamesState {
     goBack,
     pendingSaveScorePct,
     xpAwardedToShow,
+    arcade,
   );
 }

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_state.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
-import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
-import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
+import 'package:lume_design_system/molecules/progress/lume_lives_row.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
@@ -61,7 +60,10 @@ class MysteriousWordBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacings.m),
-          _LivesRow(livesLeft: state.livesLeft),
+          LumeLivesRow(
+            total: MysteriousWordState.maxWrong,
+            remaining: state.livesLeft,
+          ),
           const SizedBox(height: AppSpacings.l),
           Wrap(
             spacing: AppSpacings.s,
@@ -79,31 +81,6 @@ class MysteriousWordBody extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _LivesRow extends StatelessWidget {
-  const _LivesRow({required this.livesLeft});
-
-  final int livesLeft;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < MysteriousWordState.maxWrong; i++) ...[
-          if (i > 0) const SizedBox(width: AppSpacings.xs),
-          Icon(
-            i < livesLeft
-                ? Icons.favorite_rounded
-                : Icons.favorite_border_rounded,
-            size: AppSizes.iconS,
-            color: AppColors.Extra.pinkDeep,
-          ),
-        ],
-      ],
     );
   }
 }
