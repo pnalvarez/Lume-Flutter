@@ -119,6 +119,28 @@ while IFS= read -r -d '' file; do
   fi
 done < <(find lib/layers/presentation -name '*.dart' -print0)
 
+# pages must not import or resolve use cases — only blocs / ViewModels
+while IFS= read -r -d '' file; do
+  rel="${file#"$ROOT/"}"
+  if grep -qE "layers/domain/usecases/|getIt<I[A-Z][A-Za-z0-9]*>" "$file"; then
+    # Allow getIt<FooBloc> / getIt<FooViewModel>; flag use-case-shaped I* that aren't *Bloc/*ViewModel
+    if grep -q 'layers/domain/usecases/' "$file"; then
+      note "BLOCKER: pages must not import use cases (inject into the bloc/ViewModel)
+  $rel"
+    fi
+    while IFS= read -r hit; do
+      case "$hit" in
+        *Bloc\>*|*ViewModel\>*) continue ;;
+        *)
+          note "BLOCKER: pages must not getIt use cases (only the feature Bloc/ViewModel)
+  $rel
+$hit"
+          ;;
+      esac
+    done < <(grep -nE 'getIt<I[A-Z][A-Za-z0-9]*>' "$file" || true)
+  fi
+done < <(find lib/layers/presentation -name '*_page.dart' -print0)
+
 # blocs must not import auto_route
 while IFS= read -r -d '' file; do
   rel="${file#"$ROOT/"}"

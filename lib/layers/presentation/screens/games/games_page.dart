@@ -12,28 +12,33 @@ import 'package:lume/layers/presentation/screens/games/games_leave_confirm.dart'
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
 import 'package:lume/layers/presentation/shared/xp_snack_bar.dart';
 
-enum GamesPlayMode { trail, hub }
+export 'package:lume/layers/presentation/screens/games/games_event.dart'
+    show GamesPlayMode;
 
-/// Decoupled game-sequence screen. Callers pass [rounds] and [onSaveRound].
+/// Decoupled game-sequence screen.
+///
+/// Trail callers pass [onSaveRound] to buffer scores in the parent session.
+/// Hub mode persists via [GamesBloc] on next/retry events.
 @RoutePage()
 class GamesPage extends StatelessWidget {
   const GamesPage({
     super.key,
     required this.rounds,
-    required this.onSaveRound,
+    this.onSaveRound,
     this.mode = GamesPlayMode.trail,
   });
 
   final List<GameRound> rounds;
-  final GamesRoundSave onSaveRound;
+  final GamesRoundSave? onSaveRound;
   final GamesPlayMode mode;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          getIt<GamesBloc>()
-            ..add(GamesStarted(rounds: rounds, onSaveRound: onSaveRound)),
+      create: (_) => getIt<GamesBloc>()
+        ..add(
+          GamesStarted(rounds: rounds, mode: mode, onSaveRound: onSaveRound),
+        ),
       child: _GamesView(mode: mode),
     );
   }

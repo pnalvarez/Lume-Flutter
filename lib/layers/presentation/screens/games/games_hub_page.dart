@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
@@ -63,17 +62,7 @@ class _GamesHubViewState extends State<_GamesHubView> {
             context.read<GamesHubBloc>().add(const GamesHubNavigationHandled());
 
             await context.router.push<void>(
-              GamesRoute(
-                rounds: rounds,
-                onSaveRound: ({required roundId, required scorePct}) async {
-                  final progress = await getIt<ISavePairProgress>()(
-                    pairId: int.parse(roundId),
-                    scorePct: scorePct,
-                  );
-                  return progress.xpAwarded;
-                },
-                mode: GamesPlayMode.hub,
-              ),
+              GamesRoute(rounds: rounds, mode: GamesPlayMode.hub),
             );
           },
         ),

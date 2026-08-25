@@ -50,6 +50,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 **Never**
 
 - Presentation → `layers/data`, `package:dio`, `package:supabase_flutter`
+- **`*_page.dart` / screen views → use cases** (`layers/domain/usecases`, `getIt<I…UseCase>()`, calling `ISave…` / `IGet…` directly). Pages only `getIt` the feature **Bloc** / **ViewModel** and dispatch **events**. Use cases are injected into the bloc/ViewModel via DI.
 - Data → `package:flutter`, Dio/Supabase directly, `presentation`
 - Domain → `layers/data` (no allowlisted leaks; keep it that way)
 - Supabase outside `lib/core/auth/auth_service.dart` and `lib/bootstrap.dart` (Lume)
@@ -64,8 +65,8 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - Screen: `@RoutePage()` `FooPage` → `BlocProvider` → private `_*View`
 - Bloc: `{feature}_bloc.dart` + `_event.dart` + `_state.dart` (hand-written `@immutable`, not Freezed)
 - Blocs are `@injectable`; pages only `getIt<FooBloc>()` (pass route args via start events, not `@factoryParam`)
-- Do not wire use cases in the page; inject them into the bloc via DI
-- `getIt` only in `*_page.dart` (and `bootstrap` / `di`)
+- **Blocker — no use cases in pages:** do not import `layers/domain/usecases` or resolve use-case interfaces with `getIt` from `*_page.dart` (or nested `_*View` in that file). Inject use cases into the **bloc**; user interactions become **bloc events** (including persistence / save callbacks that would otherwise call a use case from the page).
+- `getIt` only in `*_page.dart` (and `bootstrap` / `di`) — and only for **blocs**, never for use cases
 - Blocs must not import `auto_route`; navigation via state flags + `BlocListener`
 
 ## Naming (Auror)
@@ -74,6 +75,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - Prefer `*_body.dart` without router/GetIt (testable in `test/ui/`)
 - Events/states: Freezed
 - Extra GetIt params: wrap in a factory-args class (max two `@factoryParam`)
+- Same **no use cases in pages** rule as Lume: inject use cases into the ViewModel; pages only dispatch events
 
 ## Presentation UX (Lume)
 

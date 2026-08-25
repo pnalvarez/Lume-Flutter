@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/usecases/games/play_battle_of_curiosities.dart';
 import 'package:lume/layers/domain/usecases/games/play_complete_sentence.dart';
@@ -9,6 +10,7 @@ import 'package:lume/layers/domain/usecases/games/play_mysterious_word.dart';
 import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
+import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
@@ -32,7 +34,26 @@ const _quiz2 = LightningQuizGameDomain(
   explanation: 'e2',
 );
 
-GamesBloc createGamesBloc() => GamesBloc(
+class _SavePairProgress implements ISavePairProgress {
+  final calls = <({int pairId, int scorePct})>[];
+  int xpAwarded = 0;
+
+  @override
+  Future<PairProgressDomain> call({
+    required int pairId,
+    required int scorePct,
+  }) async {
+    calls.add((pairId: pairId, scorePct: scorePct));
+    return PairProgressDomain(
+      pairId: pairId,
+      scorePct: scorePct,
+      completed: scorePct >= 60,
+      xpAwarded: xpAwarded,
+    );
+  }
+}
+
+GamesBloc createGamesBloc(_SavePairProgress save) => GamesBloc(
   PlayLightningQuiz(),
   PlayTimeline(),
   PlayTrueOrMyth(),
@@ -41,14 +62,17 @@ GamesBloc createGamesBloc() => GamesBloc(
   PlayCompleteSentence(),
   PlayConnections(),
   PlayMysteriousWord(),
+  save,
 );
 
 void main() {
   group('GamesBloc', () {
     late List<({String roundId, int scorePct})> saves;
+    late _SavePairProgress savePair;
 
     setUp(() {
       saves = [];
+      savePair = _SavePairProgress();
     });
 
     const rounds = [
@@ -66,9 +90,15 @@ void main() {
 
     blocTest<GamesBloc, GamesState>(
       'advances after correct choice and save, increments progress',
-      build: createGamesBloc,
+      build: () => createGamesBloc(savePair),
       act: (bloc) async {
-        bloc.add(GamesStarted(rounds: rounds, onSaveRound: onSaveRound));
+        bloc.add(
+          GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.trail,
+            onSaveRound: onSaveRound,
+          ),
+        );
         bloc.add(const GamesChoiceSelected('0'));
         bloc.add(const GamesNextPressed());
       },
@@ -84,9 +114,15 @@ void main() {
 
     blocTest<GamesBloc, GamesState>(
       'completes sequence after last round save',
-      build: createGamesBloc,
+      build: () => createGamesBloc(savePair),
       act: (bloc) async {
-        bloc.add(GamesStarted(rounds: rounds, onSaveRound: onSaveRound));
+        bloc.add(
+          GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.trail,
+            onSaveRound: onSaveRound,
+          ),
+        );
         bloc.add(const GamesChoiceSelected('0'));
         bloc.add(const GamesNextPressed());
         await Future<void>.delayed(Duration.zero);
@@ -104,15 +140,40 @@ void main() {
 
     blocTest<GamesBloc, GamesState>(
       'records incorrect score via save callback',
-      build: createGamesBloc,
+      build: () => createGamesBloc(savePair),
       act: (bloc) async {
-        bloc.add(GamesStarted(rounds: rounds, onSaveRound: onSaveRound));
+        bloc.add(
+          GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.trail,
+            onSaveRound: onSaveRound,
+          ),
+        );
         bloc.add(const GamesChoiceSelected('1'));
         bloc.add(const GamesNextPressed());
       },
       wait: const Duration(milliseconds: 10),
       verify: (_) {
         expect(saves, [(roundId: '10', scorePct: 0)]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub mode persists via save_pair_progress on next',
+      build: () {
+        savePair.xpAwarded = 8;
+        return createGamesBloc(savePair);
+      },
+      act: (bloc) async {
+        bloc.add(const GamesStarted(rounds: rounds, mode: GamesPlayMode.hub));
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 10),
+      verify: (bloc) {
+        expect(savePair.calls, [(pairId: 10, scorePct: 100)]);
+        expect(saves, isEmpty);
+        expect(bloc.state.xpAwardedToShow, 8);
       },
     );
   });

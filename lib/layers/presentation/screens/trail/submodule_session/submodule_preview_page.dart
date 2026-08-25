@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
+import 'package:lume/layers/presentation/screens/games/games_page.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_preview_body.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
@@ -36,6 +37,7 @@ class SubmodulePreviewView extends StatelessWidget {
           );
           return 0;
         },
+        mode: GamesPlayMode.trail,
       ),
     );
 
