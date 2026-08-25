@@ -55,6 +55,7 @@ class _SavePair implements ISavePairProgress {
       pairId: pairId,
       scorePct: scorePct,
       completed: scorePct >= 60,
+      xpAwarded: 0,
     );
   }
 }

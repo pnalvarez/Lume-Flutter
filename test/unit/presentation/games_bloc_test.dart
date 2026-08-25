@@ -56,11 +56,12 @@ void main() {
       GameRound(id: '11', game: _quiz2),
     ];
 
-    Future<void> onSaveRound({
+    Future<int> onSaveRound({
       required String roundId,
       required int scorePct,
     }) async {
       saves.add((roundId: roundId, scorePct: scorePct));
+      return 0;
     }
 
     blocTest<GamesBloc, GamesState>(

@@ -168,12 +168,19 @@ class _LevelListItem extends StatelessWidget {
     required bool applyDisabledOpacity,
   }) {
     final locked = submodule.isLocked;
+    final needsRetry = submodule.needsRetry;
+    final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
     final statusLabel = locked
         ? trailDetailSubmoduleLocked
         : submodule.isCompleted
         ? trailDetailSubmoduleDone
+        : needsRetry
+        ? trailDetailSubmoduleRetry
         : trailDetailSubmoduleTodo;
-    final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
+    final unlockHint = submodule.unlockHint?.trim();
+    final hint = unlockHint != null && unlockHint.isNotEmpty
+        ? unlockHint
+        : null;
 
     final trait = locked
         ? ListItemTrait.neutral
@@ -185,7 +192,11 @@ class _LevelListItem extends StatelessWidget {
         ? Icons.lock_rounded
         : submodule.isCompleted
         ? Icons.check_circle_rounded
+        : needsRetry
+        ? Icons.warning_amber_rounded
         : Icons.chevron_right_rounded;
+
+    final warningColor = needsRetry ? AppColors.Accent.onAccent : null;
 
     return ListItem(
       trait: trait,
@@ -196,7 +207,10 @@ class _LevelListItem extends StatelessWidget {
       input: TitleCaptionTrailingInput(
         title: submodule.title,
         caption: '$gamesLabel · $statusLabel',
+        hint: hint,
+        hintColor: warningColor,
         trailingIcon: trailingIcon,
+        trailingIconColor: warningColor,
         showAccentBar: true,
       ),
     );

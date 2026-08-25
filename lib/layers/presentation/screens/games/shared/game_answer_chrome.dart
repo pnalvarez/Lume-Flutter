@@ -17,11 +17,13 @@ class GameAnswerChrome extends StatefulWidget {
     required this.onNext,
     required this.child,
     this.explanation,
+    this.correctAnswer,
   });
 
   final bool answered;
   final bool isCorrect;
   final String? explanation;
+  final String? correctAnswer;
   final VoidCallback onNext;
   final Widget child;
 
@@ -82,7 +84,10 @@ class _GameAnswerChromeState extends State<GameAnswerChrome> {
 
     final cs = Theme.of(context).colorScheme;
     final explanation = widget.explanation?.trim();
+    final correctAnswer = widget.correctAnswer?.trim();
     final hasExplanation = explanation != null && explanation.isNotEmpty;
+    final hasCorrectAnswer = correctAnswer != null && correctAnswer.isNotEmpty;
+    final hasContent = hasExplanation || hasCorrectAnswer;
 
     _dialogVisible = true;
     try {
@@ -94,10 +99,24 @@ class _GameAnswerChromeState extends State<GameAnswerChrome> {
             : LumeDialogTone.negative,
         title: widget.isCorrect ? trailGameCorrect : trailGameWrong,
         barrierDismissible: true,
-        content: hasExplanation
-            ? Text(
-                explanation,
-                style: typ.body4Light.copyWith(color: cs.onSurface),
+        content: hasContent
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (hasCorrectAnswer)
+                    Text(
+                      '$trailGameCorrectAnswerLabel $correctAnswer',
+                      style: typ.body3Semibold.copyWith(color: cs.onSurface),
+                    ),
+                  if (hasCorrectAnswer && hasExplanation)
+                    const SizedBox(height: AppSpacings.s),
+                  if (hasExplanation)
+                    Text(
+                      explanation,
+                      style: typ.body4Light.copyWith(color: cs.onSurface),
+                    ),
+                ],
               )
             : const SizedBox.shrink(),
         actions: [

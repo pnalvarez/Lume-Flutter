@@ -62,6 +62,7 @@ class _WhoAmIBodyState extends State<WhoAmIBody> {
     return GameAnswerChrome(
       answered: state.answered,
       isCorrect: state.isCorrect,
+      correctAnswer: game.correctAnswer,
       explanation: game.explanation,
       onNext: widget.onNext,
       child: Column(

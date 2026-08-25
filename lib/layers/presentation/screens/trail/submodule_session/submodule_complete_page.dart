@@ -16,6 +16,7 @@ class SubmoduleCompleteView extends StatelessWidget {
         return SubmoduleCompleteBody(
           correctCount: state.correctCount,
           total: state.games.length,
+          unlockMessage: state.completeUnlockMessage,
           onBackToTrail: () {
             context.read<SubmoduleSessionBloc>().add(
               const SubmoduleSessionBackToTrailPressed(),

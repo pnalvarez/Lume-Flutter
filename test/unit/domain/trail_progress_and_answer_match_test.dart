@@ -61,49 +61,167 @@ void main() {
       ],
     );
 
-    test('requires all pairs for submodule completion', () {
-      final completed = TrailProgressCalculator.completedPairIds(const [
-        PairProgressDomain(pairId: 1, completed: true),
+    test('requires every pair attempted before completion', () {
+      final scores = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
       ]);
       expect(
         TrailProgressCalculator.isSubmoduleCompleted(
           submodule: trail.levels.first.submodules.first,
-          completedPairs: completed,
+          pairScores: scores,
+        ),
+        isFalse,
+      );
+    });
+
+    test('completes when average score is at least 60%', () {
+      // 1 correct + 1 miss = 50% → not enough
+      final half = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 0),
+      ]);
+      expect(
+        TrailProgressCalculator.isSubmoduleCompleted(
+          submodule: trail.levels.first.submodules.first,
+          pairScores: half,
         ),
         isFalse,
       );
 
-      final all = TrailProgressCalculator.completedPairIds(const [
-        PairProgressDomain(pairId: 1, completed: true),
-        PairProgressDomain(pairId: 2, completed: true),
+      // Both correct = 100%
+      final all = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
         TrailProgressCalculator.isSubmoduleCompleted(
           submodule: trail.levels.first.submodules.first,
-          completedPairs: all,
+          pairScores: all,
+        ),
+        isTrue,
+      );
+    });
+
+    test('completes with mixed scores when average reaches 60%', () {
+      final fourGameSub = GameTrailSubmoduleDomain(
+        id: 200,
+        title: 'Sub C',
+        sortOrder: 1,
+        games: const [
+          LightningQuizGameDomain(
+            pairId: 1,
+            sortOrder: 1,
+            prompt: 'q',
+            options: ['a'],
+            correctIndex: 0,
+            explanation: '',
+          ),
+          LightningQuizGameDomain(
+            pairId: 2,
+            sortOrder: 2,
+            prompt: 'q',
+            options: ['a'],
+            correctIndex: 0,
+            explanation: '',
+          ),
+          LightningQuizGameDomain(
+            pairId: 3,
+            sortOrder: 3,
+            prompt: 'q',
+            options: ['a'],
+            correctIndex: 0,
+            explanation: '',
+          ),
+          LightningQuizGameDomain(
+            pairId: 4,
+            sortOrder: 4,
+            prompt: 'q',
+            options: ['a'],
+            correctIndex: 0,
+            explanation: '',
+          ),
+        ],
+      );
+
+      // 3/4 correct = 75% ≥ 60%
+      final scores = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 100),
+        PairProgressDomain(pairId: 3, scorePct: 100),
+        PairProgressDomain(pairId: 4, scorePct: 0),
+      ]);
+      expect(
+        TrailProgressCalculator.isSubmoduleCompleted(
+          submodule: fourGameSub,
+          pairScores: scores,
         ),
         isTrue,
       );
     });
 
     test('counts trail percent from completed submodules', () {
-      final pairs = TrailProgressCalculator.completedPairIds(const [
-        PairProgressDomain(pairId: 1, completed: true),
-        PairProgressDomain(pairId: 2, completed: true),
+      final scores = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
         TrailProgressCalculator.completedSubmoduleCount(
           trail: trail,
-          completedPairs: pairs,
+          pairScores: scores,
         ),
         1,
       );
       expect(
         TrailProgressCalculator.progressPercent(
           trail: trail,
-          completedPairs: pairs,
+          pairScores: scores,
         ),
         50,
+      );
+    });
+
+    test('minCorrectCount matches 60% ceiling for binary scores', () {
+      expect(TrailProgressCalculator.minCorrectCount(4), 3);
+      expect(TrailProgressCalculator.minCorrectCount(2), 2);
+      expect(TrailProgressCalculator.minCorrectCount(5), 3);
+      expect(
+        TrailProgressCalculator.meetsPassAverage(correctCount: 3, total: 4),
+        isTrue,
+      );
+      expect(
+        TrailProgressCalculator.meetsPassAverage(correctCount: 2, total: 4),
+        isFalse,
+      );
+    });
+
+    test('marks fully attempted below 60% as failed', () {
+      final submodule = trail.levels.first.submodules.first;
+      final failed = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 0),
+      ]);
+      expect(
+        TrailProgressCalculator.isSubmoduleFullyAttempted(
+          submodule: submodule,
+          pairScores: failed,
+        ),
+        isTrue,
+      );
+      expect(
+        TrailProgressCalculator.isSubmoduleFailed(
+          submodule: submodule,
+          pairScores: failed,
+        ),
+        isTrue,
+      );
+      expect(
+        TrailProgressCalculator.isSubmoduleFailed(
+          submodule: submodule,
+          pairScores: TrailProgressCalculator.pairScoresById(const [
+            PairProgressDomain(pairId: 1, scorePct: 100),
+          ]),
+        ),
+        isFalse,
       );
     });
 
@@ -111,19 +229,19 @@ void main() {
       expect(
         TrailProgressCalculator.lockedSubmoduleIds(
           trail: trail,
-          completedPairs: const {},
+          pairScores: const {},
         ),
         {101},
       );
 
-      final firstDone = TrailProgressCalculator.completedPairIds(const [
-        PairProgressDomain(pairId: 1, completed: true),
-        PairProgressDomain(pairId: 2, completed: true),
+      final firstDone = TrailProgressCalculator.pairScoresById(const [
+        PairProgressDomain(pairId: 1, scorePct: 100),
+        PairProgressDomain(pairId: 2, scorePct: 100),
       ]);
       expect(
         TrailProgressCalculator.lockedSubmoduleIds(
           trail: trail,
-          completedPairs: firstDone,
+          pairScores: firstDone,
         ),
         isEmpty,
       );

@@ -8,11 +8,13 @@ class SubmoduleCompleteBody extends StatelessWidget {
     super.key,
     required this.correctCount,
     required this.total,
+    required this.unlockMessage,
     required this.onBackToTrail,
   });
 
   final int correctCount;
   final int total;
+  final String unlockMessage;
   final VoidCallback onBackToTrail;
 
   @override
@@ -23,6 +25,7 @@ class SubmoduleCompleteBody extends StatelessWidget {
         correctCount: correctCount,
         total: total,
       ),
+      message: unlockMessage,
       actionLabel: trailSessionBackToTrail,
       onAction: onBackToTrail,
     );

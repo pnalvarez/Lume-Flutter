@@ -21,8 +21,9 @@ final class GameRound {
 }
 
 /// Persists a finished round. Implemented by the caller (trail preview, hub, …).
+/// Returns XP awarded by the backend for this round (0 when none / already claimed).
 typedef GamesRoundSave =
-    Future<void> Function({required String roundId, required int scorePct});
+    Future<int> Function({required String roundId, required int scorePct});
 
 /// Result popped from [GamesPage] when the full sequence finishes successfully.
 @immutable

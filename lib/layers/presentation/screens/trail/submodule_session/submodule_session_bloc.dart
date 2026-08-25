@@ -131,13 +131,19 @@ final class SubmoduleSessionBloc
     );
 
     try {
+      var totalXp = 0;
       for (final entry in state.pairScores.entries) {
-        await _savePairProgress(pairId: entry.key, scorePct: entry.value);
+        final progress = await _savePairProgress(
+          pairId: entry.key,
+          scorePct: entry.value,
+        );
+        totalXp += progress.xpAwarded;
       }
       emit(
         state.copyWith(
           status: SubmoduleSessionStatus.ready,
           stage: SubmoduleSessionStage.completed,
+          xpAwarded: totalXp,
           clearError: true,
         ),
       );

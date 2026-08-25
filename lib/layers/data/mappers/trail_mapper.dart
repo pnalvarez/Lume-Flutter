@@ -65,6 +65,7 @@ abstract final class TrailMapper {
       scorePct: data.scorePct,
       completed: data.completed,
       updatedAt: data.updatedAt,
+      xpAwarded: data.xpAwarded,
     );
   }
 

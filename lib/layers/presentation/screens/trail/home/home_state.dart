@@ -24,12 +24,12 @@ final class HomeTrailCardUi {
 
   factory HomeTrailCardUi.fromDomain({
     required GameTrailDomain trail,
-    required Set<int> completedPairs,
+    required Map<int, int> pairScores,
   }) {
     final total = TrailProgressCalculator.totalSubmoduleCount(trail);
     final done = TrailProgressCalculator.completedSubmoduleCount(
       trail: trail,
-      completedPairs: completedPairs,
+      pairScores: pairScores,
     );
     return HomeTrailCardUi(
       trailId: trail.id,
@@ -41,7 +41,7 @@ final class HomeTrailCardUi {
       totalSubmodules: total,
       progressPercent: TrailProgressCalculator.progressPercent(
         trail: trail,
-        completedPairs: completedPairs,
+        pairScores: pairScores,
       ),
     );
   }

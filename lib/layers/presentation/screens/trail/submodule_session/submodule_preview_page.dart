@@ -34,6 +34,7 @@ class SubmodulePreviewView extends StatelessWidget {
               scorePct: scorePct,
             ),
           );
+          return 0;
         },
       ),
     );

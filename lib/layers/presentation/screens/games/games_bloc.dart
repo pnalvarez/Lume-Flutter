@@ -47,6 +47,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     on<GamesRetrySave>(_onRetrySave);
     on<GamesAbandoned>(_onAbandoned);
     on<GamesNavigationHandled>(_onNavigationHandled);
+    on<GamesXpSnackBarShown>(_onXpSnackBarShown);
   }
 
   final IPlayLightningQuiz _playLightningQuiz;
@@ -287,8 +288,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       ),
     );
 
+    late final int xpAwarded;
     try {
-      await save(roundId: round.id, scorePct: scorePct);
+      xpAwarded = await save(roundId: round.id, scorePct: scorePct);
     } on Object {
       emit(
         state.copyWith(
@@ -312,6 +314,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           clearPendingSave: true,
           clearError: true,
           sequenceCompleted: true,
+          xpAwardedToShow: xpAwarded > 0 ? xpAwarded : null,
+          clearXpAwardedToShow: xpAwarded <= 0,
         ),
       );
       return;
@@ -326,6 +330,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         resetPlayFields: true,
         clearPendingSave: true,
         clearError: true,
+        xpAwardedToShow: xpAwarded > 0 ? xpAwarded : null,
+        clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
   }
@@ -339,6 +345,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     Emitter<GamesState> emit,
   ) {
     emit(state.copyWith(clearNavigationFlags: true));
+  }
+
+  void _onXpSnackBarShown(
+    GamesXpSnackBarShown event,
+    Emitter<GamesState> emit,
+  ) {
+    emit(state.copyWith(clearXpAwardedToShow: true));
   }
 
   WhoAmIPlayState get _whoAmIPlayState => WhoAmIPlayState(

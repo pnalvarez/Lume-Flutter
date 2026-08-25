@@ -10,6 +10,7 @@ import 'package:lume/layers/presentation/screens/games/games_complete_body.dart'
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_leave_confirm.dart';
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
+import 'package:lume/layers/presentation/shared/xp_snack_bar.dart';
 
 enum GamesPlayMode { trail, hub }
 
@@ -94,6 +95,17 @@ class _GamesViewState extends State<_GamesView> {
               return;
             }
             _finishExit(result: result);
+          },
+        ),
+        BlocListener<GamesBloc, GamesState>(
+          listenWhen: (previous, current) =>
+              current.xpAwardedToShow != null &&
+              current.xpAwardedToShow != previous.xpAwardedToShow,
+          listener: (context, state) {
+            final xp = state.xpAwardedToShow;
+            if (xp == null) return;
+            showXpAwardedSnackBar(context, xp);
+            context.read<GamesBloc>().add(const GamesXpSnackBarShown());
           },
         ),
         BlocListener<GamesBloc, GamesState>(

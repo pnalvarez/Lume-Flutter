@@ -32,6 +32,7 @@ class PairProgressData {
     this.scorePct = 0,
     this.completed = false,
     this.updatedAt,
+    this.xpAwarded = 0,
   });
 
   final int pairId;
@@ -45,6 +46,9 @@ class PairProgressData {
   @JsonKey(defaultValue: false)
   final bool completed;
   final DateTime? updatedAt;
+
+  @JsonKey(defaultValue: 0)
+  final int xpAwarded;
 
   factory PairProgressData.fromJson(Map<String, dynamic> json) =>
       _$PairProgressDataFromJson(json);

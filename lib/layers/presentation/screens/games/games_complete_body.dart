@@ -15,12 +15,16 @@ class GamesCompleteBody extends StatelessWidget {
     required this.scoreText,
     required this.actionLabel,
     required this.onAction,
+    this.message,
   });
 
   final String title;
   final String scoreText;
   final String actionLabel;
   final VoidCallback onAction;
+
+  /// Optional guidance below the score (e.g. unlock threshold).
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +94,16 @@ class GamesCompleteBody extends StatelessWidget {
                             color: cs.onSurfaceVariant,
                           ),
                         ),
+                        if (message != null && message!.trim().isNotEmpty) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Text(
+                            message!.trim(),
+                            textAlign: TextAlign.center,
+                            style: typ.body4Medium.copyWith(
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

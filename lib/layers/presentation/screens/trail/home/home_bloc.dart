@@ -37,15 +37,12 @@ final class HomeBloc extends Bloc<HomeEvent, HomeState> {
         profile = null;
       }
 
-      final completedPairs = TrailProgressCalculator.completedPairIds(
+      final pairScores = TrailProgressCalculator.pairScoresById(
         progress.pairProgress,
       );
       final cards = [
         for (final GameTrailDomain trail in trails)
-          HomeTrailCardUi.fromDomain(
-            trail: trail,
-            completedPairs: completedPairs,
-          ),
+          HomeTrailCardUi.fromDomain(trail: trail, pairScores: pairScores),
       ];
 
       emit(

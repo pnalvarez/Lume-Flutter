@@ -86,3 +86,7 @@ final class GamesAbandoned extends GamesEvent {
 final class GamesNavigationHandled extends GamesEvent {
   const GamesNavigationHandled();
 }
+
+final class GamesXpSnackBarShown extends GamesEvent {
+  const GamesXpSnackBarShown();
+}
