@@ -17,10 +17,7 @@ class ArcadeRecordData {
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ArcadeRoundResultData {
-  const ArcadeRoundResultData({
-    this.xpAwarded = 0,
-    this.isRecordRound = false,
-  });
+  const ArcadeRoundResultData({this.xpAwarded = 0, this.isRecordRound = false});
 
   @JsonKey(defaultValue: 0)
   final int xpAwarded;

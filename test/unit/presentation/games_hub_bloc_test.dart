@@ -196,11 +196,7 @@ void main() {
           .having((s) => s.isLoadingGame, 'isLoadingGame', isFalse)
           .having((s) => s.arcadeRecord, 'arcadeRecord', 7)
           .having((s) => s.openArcadeRounds, 'openArcadeRounds', hasLength(1))
-          .having(
-            (s) => s.openArcadeRounds!.first.id,
-            'first round id',
-            '42',
-          ),
+          .having((s) => s.openArcadeRounds!.first.id, 'first round id', '42'),
     ],
   );
 

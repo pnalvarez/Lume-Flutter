@@ -278,9 +278,7 @@ void main() {
       },
       wait: const Duration(milliseconds: 10),
       verify: (bloc) {
-        expect(saveRound.calls, [
-          (pairId: 10, scorePct: 100, roundNumber: 1),
-        ]);
+        expect(saveRound.calls, [(pairId: 10, scorePct: 100, roundNumber: 1)]);
         expect(bloc.state.rounds, hasLength(2));
         expect(bloc.state.currentIndex, 1);
         expect(bloc.state.arcade.scoredCount, 1);

@@ -136,10 +136,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     Emitter<GamesHubState> emit,
   ) {
     emit(
-      state.copyWith(
-        clearOpenPlayRounds: true,
-        clearOpenArcadeRounds: true,
-      ),
+      state.copyWith(clearOpenPlayRounds: true, clearOpenArcadeRounds: true),
     );
   }
 

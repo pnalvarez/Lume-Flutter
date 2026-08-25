@@ -23,10 +23,7 @@ enum LumeSnackBarTrait {
 }
 
 /// Where [showLumeSnackBar] anchors the toast on screen.
-enum LumeSnackBarPosition {
-  top,
-  bottom,
-}
+enum LumeSnackBarPosition { top, bottom }
 
 OverlayEntry? _activeLumeSnackBarEntry;
 Timer? _activeLumeSnackBarTimer;
