@@ -21,7 +21,16 @@ const String trailDetailEmpty = 'Esta trilha ainda não tem submódulos.';
 const String trailDetailSubmoduleDone = 'Concluído';
 const String trailDetailSubmoduleTodo = 'Disponível';
 const String trailDetailSubmoduleLocked = 'Bloqueado';
+const String trailDetailSubmoduleRetry = 'Refazer';
 const String trailDetailGamesCountSuffix = 'jogos';
+
+String trailDetailUnlockHint({required int minCorrect, required int total}) =>
+    'Acerte pelo menos $minCorrect de $total jogos '
+    'no anterior para desbloquear';
+
+String trailDetailRetryHint({required int minCorrect, required int total}) =>
+    'Acerte pelo menos $minCorrect de $total jogos '
+    'para desbloquear o próximo';
 
 // --- Submodule session ------------------------------------------------------
 
@@ -38,6 +47,16 @@ String trailSessionCompleteScore({
     '$trailSessionCompleteBodyPrefix$correctCount'
     '$trailSessionCompleteBodyMiddle$total'
     '$trailSessionCompleteBodySuffix';
+
+String trailSessionUnlockRequirement({
+  required int minCorrect,
+  required int total,
+}) =>
+    'Acerte pelo menos $minCorrect de $total jogos '
+    '(60%) para desbloquear o próximo submódulo.';
+
+const String trailSessionUnlockAchieved =
+    'Você atingiu 60% e desbloqueou o próximo submódulo.';
 const String trailSessionBackToTrail = 'Voltar para a trilha';
 const String trailSessionLeaveTitle = 'Sair do submódulo?';
 const String trailSessionLeaveBody =
@@ -57,6 +76,7 @@ const String trailGameNext = 'Próximo';
 const String trailGameCorrect = 'Acertou!';
 const String trailGameWrong = 'Não foi dessa vez';
 const String trailGameFeedbackDismiss = 'Entendi';
+const String trailGameCorrectAnswerLabel = 'Resposta correta:';
 const String trailGameSubmit = 'Responder';
 const String trailGameTypeBattle = 'Batalha de curiosidades';
 const String trailGameTypeMysteriousWord = 'Palavra misteriosa';

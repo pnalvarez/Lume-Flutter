@@ -32,6 +32,7 @@ final class GamesState {
     this.sequenceCompleted = false,
     this.goBack = false,
     this.pendingSaveScorePct,
+    this.xpAwardedToShow,
   });
 
   final GamesStatus status;
@@ -53,6 +54,9 @@ final class GamesState {
   /// When set, [GamesRetrySave] re-attempts persisting this score for the
   /// current round before advancing.
   final int? pendingSaveScorePct;
+
+  /// XP from the last successful round save; UI shows a toast then clears it.
+  final int? xpAwardedToShow;
 
   GameRound? get currentRound {
     if (currentIndex < 0 || currentIndex >= rounds.length) return null;
@@ -184,6 +188,8 @@ final class GamesState {
     int? pendingSaveScorePct,
     bool clearPendingSave = false,
     bool resetPlayFields = false,
+    int? xpAwardedToShow,
+    bool clearXpAwardedToShow = false,
   }) {
     return GamesState(
       status: status ?? this.status,
@@ -212,6 +218,9 @@ final class GamesState {
       pendingSaveScorePct: clearPendingSave
           ? null
           : pendingSaveScorePct ?? this.pendingSaveScorePct,
+      xpAwardedToShow: clearXpAwardedToShow
+          ? null
+          : xpAwardedToShow ?? this.xpAwardedToShow,
     );
   }
 
@@ -238,7 +247,8 @@ final class GamesState {
       other.errorMessage == errorMessage &&
       other.sequenceCompleted == sequenceCompleted &&
       other.goBack == goBack &&
-      other.pendingSaveScorePct == pendingSaveScorePct;
+      other.pendingSaveScorePct == pendingSaveScorePct &&
+      other.xpAwardedToShow == xpAwardedToShow;
 
   @override
   int get hashCode => Object.hash(
@@ -258,5 +268,6 @@ final class GamesState {
     sequenceCompleted,
     goBack,
     pendingSaveScorePct,
+    xpAwardedToShow,
   );
 }

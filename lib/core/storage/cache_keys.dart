@@ -8,5 +8,5 @@ abstract final class CacheKeys {
   static const hubGames = 'cache:hub_games';
 
   static String submoduleGames(int submoduleId) =>
-      'cache:submodule_games:v2:$submoduleId';
+      'cache:submodule_games:v3:$submoduleId';
 }

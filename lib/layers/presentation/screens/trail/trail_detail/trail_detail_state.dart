@@ -13,6 +13,8 @@ final class TrailDetailSubmoduleRowUi {
     required this.gamesCount,
     required this.isCompleted,
     this.isLocked = false,
+    this.needsRetry = false,
+    this.unlockHint,
   });
 
   final int id;
@@ -21,20 +23,46 @@ final class TrailDetailSubmoduleRowUi {
   final bool isCompleted;
   final bool isLocked;
 
+  /// Finished below 60% — replay required to unlock the next submodule.
+  final bool needsRetry;
+
+  /// Shown on the first locked submodule (needs ≥60% on the previous one),
+  /// or on a failed submodule (retry guidance).
+  final String? unlockHint;
+
   factory TrailDetailSubmoduleRowUi.fromDomain({
     required GameTrailSubmoduleDomain submodule,
-    required Set<int> completedPairs,
+    required Map<int, int> pairScores,
     required bool isLocked,
+    required ITrailProgressCalculator progressCalculator,
+    String? unlockHint,
   }) {
+    final needsRetry =
+        !isLocked &&
+        progressCalculator.isSubmoduleFailed(
+          submodule: submodule,
+          pairScores: pairScores,
+        );
+    final retryHint = needsRetry && submodule.games.isNotEmpty
+        ? trailDetailRetryHint(
+            minCorrect: progressCalculator.minCorrectCount(
+              submodule.games.length,
+            ),
+            total: submodule.games.length,
+          )
+        : null;
+
     return TrailDetailSubmoduleRowUi(
       id: submodule.id,
       title: submodule.title,
       gamesCount: submodule.games.length,
-      isCompleted: TrailProgressCalculator.isSubmoduleCompleted(
+      isCompleted: progressCalculator.isSubmoduleCompleted(
         submodule: submodule,
-        completedPairs: completedPairs,
+        pairScores: pairScores,
       ),
       isLocked: isLocked,
+      needsRetry: needsRetry,
+      unlockHint: unlockHint ?? retryHint,
     );
   }
 
@@ -45,10 +73,20 @@ final class TrailDetailSubmoduleRowUi {
       other.title == title &&
       other.gamesCount == gamesCount &&
       other.isCompleted == isCompleted &&
-      other.isLocked == isLocked;
+      other.isLocked == isLocked &&
+      other.needsRetry == needsRetry &&
+      other.unlockHint == unlockHint;
 
   @override
-  int get hashCode => Object.hash(id, title, gamesCount, isCompleted, isLocked);
+  int get hashCode => Object.hash(
+    id,
+    title,
+    gamesCount,
+    isCompleted,
+    isLocked,
+    needsRetry,
+    unlockHint,
+  );
 }
 
 @immutable
@@ -64,26 +102,6 @@ final class TrailDetailLevelUi {
 
   /// True when the previous level is unfinished (first submodule locked).
   final bool isLocked;
-
-  factory TrailDetailLevelUi.fromDomain({
-    required GameTrailLevelDomain level,
-    required Set<int> completedPairs,
-    required Set<int> lockedSubmoduleIds,
-  }) {
-    final submodules = [
-      for (final submodule in level.submodules)
-        TrailDetailSubmoduleRowUi.fromDomain(
-          submodule: submodule,
-          completedPairs: completedPairs,
-          isLocked: lockedSubmoduleIds.contains(submodule.id),
-        ),
-    ];
-    return TrailDetailLevelUi(
-      title: level.title,
-      submodules: submodules,
-      isLocked: submodules.isNotEmpty && submodules.first.isLocked,
-    );
-  }
 
   @override
   bool operator ==(Object other) =>
@@ -117,6 +135,57 @@ final class TrailDetailState {
   final String? errorMessage;
   final int? selectedSubmoduleId;
   final bool goBack;
+
+  /// Builds level rows and attaches an unlock hint on the first locked cell.
+  static List<TrailDetailLevelUi> levelsFromTrail({
+    required GameTrailDomain trail,
+    required Map<int, int> pairScores,
+    required Set<int> lockedSubmoduleIds,
+    required ITrailProgressCalculator progressCalculator,
+  }) {
+    GameTrailSubmoduleDomain? previous;
+    var frontierHintAssigned = false;
+    final levels = <TrailDetailLevelUi>[];
+
+    for (final level in trail.levels) {
+      final rows = <TrailDetailSubmoduleRowUi>[];
+      for (final submodule in level.submodules) {
+        final locked = lockedSubmoduleIds.contains(submodule.id);
+        String? unlockHint;
+        if (locked && !frontierHintAssigned) {
+          frontierHintAssigned = true;
+          if (previous != null && previous.games.isNotEmpty) {
+            final total = previous.games.length;
+            unlockHint = trailDetailUnlockHint(
+              minCorrect: progressCalculator.minCorrectCount(total),
+              total: total,
+            );
+          }
+        }
+
+        rows.add(
+          TrailDetailSubmoduleRowUi.fromDomain(
+            submodule: submodule,
+            pairScores: pairScores,
+            isLocked: locked,
+            progressCalculator: progressCalculator,
+            unlockHint: unlockHint,
+          ),
+        );
+        previous = submodule;
+      }
+
+      levels.add(
+        TrailDetailLevelUi(
+          title: level.title,
+          submodules: rows,
+          isLocked: rows.isNotEmpty && rows.first.isLocked,
+        ),
+      );
+    }
+
+    return levels;
+  }
 
   String get headerTitle {
     final trimmed = title.trim();

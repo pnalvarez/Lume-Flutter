@@ -14,6 +14,7 @@ import 'package:lume/layers/domain/usecases/games/play_mysterious_word.dart';
 import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
+import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_play_ui.dart';
@@ -30,6 +31,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._playCompleteSentence,
     this._playConnections,
     this._playMysteriousWord,
+    this._savePairProgress,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -47,6 +49,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     on<GamesRetrySave>(_onRetrySave);
     on<GamesAbandoned>(_onAbandoned);
     on<GamesNavigationHandled>(_onNavigationHandled);
+    on<GamesXpSnackBarShown>(_onXpSnackBarShown);
   }
 
   final IPlayLightningQuiz _playLightningQuiz;
@@ -57,10 +60,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IPlayCompleteSentence _playCompleteSentence;
   final IPlayConnections _playConnections;
   final IPlayMysteriousWord _playMysteriousWord;
+  final ISavePairProgress _savePairProgress;
 
+  GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
 
   void _onStarted(GamesStarted event, Emitter<GamesState> emit) {
+    _mode = event.mode;
     _onSaveRound = event.onSaveRound;
     emit(GamesState.initial(rounds: event.rounds));
   }
@@ -276,8 +282,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     required int scorePct,
   }) async {
     final round = state.currentRound;
-    final save = _onSaveRound;
-    if (round == null || save == null) return;
+    if (round == null) return;
 
     emit(
       state.copyWith(
@@ -287,8 +292,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       ),
     );
 
+    late final int xpAwarded;
     try {
-      await save(roundId: round.id, scorePct: scorePct);
+      xpAwarded = await _persistRound(roundId: round.id, scorePct: scorePct);
     } on Object {
       emit(
         state.copyWith(
@@ -312,6 +318,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           clearPendingSave: true,
           clearError: true,
           sequenceCompleted: true,
+          xpAwardedToShow: xpAwarded > 0 ? xpAwarded : null,
+          clearXpAwardedToShow: xpAwarded <= 0,
         ),
       );
       return;
@@ -326,8 +334,27 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         resetPlayFields: true,
         clearPendingSave: true,
         clearError: true,
+        xpAwardedToShow: xpAwarded > 0 ? xpAwarded : null,
+        clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
+  }
+
+  Future<int> _persistRound({
+    required String roundId,
+    required int scorePct,
+  }) async {
+    if (_mode == GamesPlayMode.hub) {
+      final progress = await _savePairProgress(
+        pairId: int.parse(roundId),
+        scorePct: scorePct,
+      );
+      return progress.xpAwarded;
+    }
+
+    final save = _onSaveRound;
+    if (save == null) return 0;
+    return save(roundId: roundId, scorePct: scorePct);
   }
 
   void _onAbandoned(GamesAbandoned event, Emitter<GamesState> emit) {
@@ -339,6 +366,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     Emitter<GamesState> emit,
   ) {
     emit(state.copyWith(clearNavigationFlags: true));
+  }
+
+  void _onXpSnackBarShown(
+    GamesXpSnackBarShown event,
+    Emitter<GamesState> emit,
+  ) {
+    emit(state.copyWith(clearXpAwardedToShow: true));
   }
 
   WhoAmIPlayState get _whoAmIPlayState => WhoAmIPlayState(

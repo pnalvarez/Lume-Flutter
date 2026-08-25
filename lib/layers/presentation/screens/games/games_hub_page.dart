@@ -62,11 +62,7 @@ class _GamesHubViewState extends State<_GamesHubView> {
             context.read<GamesHubBloc>().add(const GamesHubNavigationHandled());
 
             await context.router.push<void>(
-              GamesRoute(
-                rounds: rounds,
-                onSaveRound: ({required roundId, required scorePct}) async {},
-                mode: GamesPlayMode.hub,
-              ),
+              GamesRoute(rounds: rounds, mode: GamesPlayMode.hub),
             );
           },
         ),

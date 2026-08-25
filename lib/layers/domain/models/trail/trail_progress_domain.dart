@@ -17,6 +17,7 @@ class PairProgressDomain {
     this.scorePct = 0,
     this.completed = false,
     this.updatedAt,
+    this.xpAwarded = 0,
   });
 
   final int pairId;
@@ -24,6 +25,7 @@ class PairProgressDomain {
   final int scorePct;
   final bool completed;
   final DateTime? updatedAt;
+  final int xpAwarded;
 }
 
 class TrailProgressDomain {

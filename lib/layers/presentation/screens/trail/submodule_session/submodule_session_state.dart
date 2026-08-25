@@ -19,6 +19,8 @@ final class SubmoduleSessionState {
     this.games = const [],
     this.correctCount = 0,
     this.pairScores = const {},
+    this.xpAwarded = 0,
+    this.completeUnlockMessage = '',
     this.errorMessage,
     this.goBackToTrail = false,
   });
@@ -34,6 +36,10 @@ final class SubmoduleSessionState {
   final List<TrailGameDomain> games;
   final int correctCount;
   final Map<int, int> pairScores;
+  final int xpAwarded;
+
+  /// Guidance under the score on the complete step (set by the bloc).
+  final String completeUnlockMessage;
   final String? errorMessage;
   final bool goBackToTrail;
 
@@ -60,12 +66,16 @@ final class SubmoduleSessionState {
     List<TrailGameDomain>? games,
     int? correctCount,
     Map<int, int>? pairScores,
+    int? xpAwarded,
+    String? completeUnlockMessage,
     String? errorMessage,
     bool? goBackToTrail,
     bool clearError = false,
     bool clearLevelTitle = false,
     bool clearImageUrl = false,
     bool clearPairScores = false,
+    bool clearXpAwarded = false,
+    bool clearCompleteUnlockMessage = false,
   }) {
     return SubmoduleSessionState(
       status: status ?? this.status,
@@ -79,6 +89,10 @@ final class SubmoduleSessionState {
       games: games ?? this.games,
       correctCount: correctCount ?? this.correctCount,
       pairScores: clearPairScores ? const {} : pairScores ?? this.pairScores,
+      xpAwarded: clearXpAwarded ? 0 : xpAwarded ?? this.xpAwarded,
+      completeUnlockMessage: clearCompleteUnlockMessage
+          ? ''
+          : completeUnlockMessage ?? this.completeUnlockMessage,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       goBackToTrail: goBackToTrail ?? this.goBackToTrail,
     );
@@ -98,6 +112,8 @@ final class SubmoduleSessionState {
       listEquals(other.games, games) &&
       other.correctCount == correctCount &&
       mapEquals(other.pairScores, pairScores) &&
+      other.xpAwarded == xpAwarded &&
+      other.completeUnlockMessage == completeUnlockMessage &&
       other.errorMessage == errorMessage &&
       other.goBackToTrail == goBackToTrail;
 
@@ -114,6 +130,8 @@ final class SubmoduleSessionState {
     Object.hashAll(games),
     correctCount,
     Object.hashAll(pairScores.entries),
+    xpAwarded,
+    completeUnlockMessage,
     errorMessage,
     goBackToTrail,
   );

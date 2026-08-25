@@ -79,9 +79,11 @@ void main() {
     getGameRound = _GetGameRound();
   });
 
+  GamesHubBloc buildBloc() => GamesHubBloc(getHubGames, getGameRound);
+
   blocTest<GamesHubBloc, GamesHubState>(
     'loads hub games into general and visual sections',
-    build: () => GamesHubBloc(getHubGames, getGameRound),
+    build: buildBloc,
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
       const GamesHubState(isInitialLoading: true),
@@ -96,7 +98,7 @@ void main() {
     'emits error when load fails',
     build: () {
       getHubGames.error = Exception('boom');
-      return GamesHubBloc(getHubGames, getGameRound);
+      return buildBloc();
     },
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
@@ -110,7 +112,7 @@ void main() {
 
   blocTest<GamesHubBloc, GamesHubState>(
     'fetches round and opens play when game is pressed',
-    build: () => GamesHubBloc(getHubGames, getGameRound),
+    build: buildBloc,
     seed: () => const GamesHubState(isInitialLoading: false),
     act: (bloc) => bloc.add(const GamesHubGamePressed('quiz_relampago')),
     expect: () => [
@@ -126,7 +128,7 @@ void main() {
     'emits round error when fetch fails',
     build: () {
       getGameRound.error = Exception('boom');
-      return GamesHubBloc(getHubGames, getGameRound);
+      return buildBloc();
     },
     seed: () => const GamesHubState(isInitialLoading: false),
     act: (bloc) => bloc.add(const GamesHubGamePressed('quiz_relampago')),

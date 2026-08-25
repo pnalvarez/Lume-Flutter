@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
+import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
@@ -9,8 +10,11 @@ import 'package:lume/layers/presentation/screens/trail/submodule_session/submodu
 @injectable
 final class SubmoduleSessionBloc
     extends Bloc<SubmoduleSessionEvent, SubmoduleSessionState> {
-  SubmoduleSessionBloc(this._getSubmoduleGames, this._savePairProgress)
-    : super(const SubmoduleSessionState()) {
+  SubmoduleSessionBloc(
+    this._getSubmoduleGames,
+    this._savePairProgress,
+    this._progressCalculator,
+  ) : super(const SubmoduleSessionState()) {
     on<SubmoduleSessionStarted>(_onStarted);
     on<SubmoduleSessionRoundScored>(_onRoundScored);
     on<SubmoduleSessionGamesCompleted>(_onGamesCompleted);
@@ -23,6 +27,7 @@ final class SubmoduleSessionBloc
 
   final IGetSubmoduleGames _getSubmoduleGames;
   final ISavePairProgress _savePairProgress;
+  final ITrailProgressCalculator _progressCalculator;
 
   Future<void> _onStarted(
     SubmoduleSessionStarted event,
@@ -36,6 +41,7 @@ final class SubmoduleSessionBloc
         submoduleId: event.submoduleId,
         correctCount: 0,
         clearPairScores: true,
+        clearCompleteUnlockMessage: true,
         clearError: true,
         goBackToTrail: false,
       ),
@@ -131,13 +137,23 @@ final class SubmoduleSessionBloc
     );
 
     try {
+      var totalXp = 0;
       for (final entry in state.pairScores.entries) {
-        await _savePairProgress(pairId: entry.key, scorePct: entry.value);
+        final progress = await _savePairProgress(
+          pairId: entry.key,
+          scorePct: entry.value,
+        );
+        totalXp += progress.xpAwarded;
       }
       emit(
         state.copyWith(
           status: SubmoduleSessionStatus.ready,
           stage: SubmoduleSessionStage.completed,
+          xpAwarded: totalXp,
+          completeUnlockMessage: _completeUnlockMessage(
+            correctCount: state.correctCount,
+            total: state.games.length,
+          ),
           clearError: true,
         ),
       );
@@ -178,5 +194,19 @@ final class SubmoduleSessionBloc
     Emitter<SubmoduleSessionState> emit,
   ) {
     emit(state.copyWith(goBackToTrail: false));
+  }
+
+  String _completeUnlockMessage({
+    required int correctCount,
+    required int total,
+  }) {
+    final minCorrect = _progressCalculator.minCorrectCount(total);
+    if (_progressCalculator.meetsPassAverage(
+      correctCount: correctCount,
+      total: total,
+    )) {
+      return trailSessionUnlockAchieved;
+    }
+    return trailSessionUnlockRequirement(minCorrect: minCorrect, total: total);
   }
 }

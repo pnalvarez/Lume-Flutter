@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
@@ -55,6 +56,7 @@ class _SavePair implements ISavePairProgress {
       pairId: pairId,
       scorePct: scorePct,
       completed: scorePct >= 60,
+      xpAwarded: 0,
     );
   }
 }
@@ -62,14 +64,18 @@ class _SavePair implements ISavePairProgress {
 void main() {
   group('SubmoduleSessionBloc', () {
     late _SavePair save;
+    final progressCalculator = TrailProgressCalculator();
 
     setUp(() {
       save = _SavePair();
     });
 
+    SubmoduleSessionBloc buildBloc() =>
+        SubmoduleSessionBloc(_GetGames(), save, progressCalculator);
+
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'buffers round scores without persisting until games completed',
-      build: () => SubmoduleSessionBloc(_GetGames(), save),
+      build: buildBloc,
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
@@ -84,7 +90,7 @@ void main() {
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'flushes all pair scores only after games completed',
-      build: () => SubmoduleSessionBloc(_GetGames(), save),
+      build: buildBloc,
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
@@ -98,12 +104,13 @@ void main() {
         expect(save.calls.map((c) => c.pairId), [10, 11]);
         expect(bloc.state.stage, SubmoduleSessionStage.completed);
         expect(bloc.state.correctCount, 1);
+        expect(bloc.state.completeUnlockMessage, isNotEmpty);
       },
     );
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'games cancelled discards memory without saving',
-      build: () => SubmoduleSessionBloc(_GetGames(), save),
+      build: buildBloc,
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);
@@ -120,7 +127,7 @@ void main() {
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'abandon discards memory without saving',
-      build: () => SubmoduleSessionBloc(_GetGames(), save),
+      build: buildBloc,
       act: (bloc) async {
         bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
         await Future<void>.delayed(Duration.zero);

@@ -226,14 +226,22 @@ class TitleCaptionTrailingInput extends ListItemInput {
   TitleCaptionTrailingInput({
     required this.title,
     this.caption,
+    this.hint,
+    this.hintColor,
     this.trailingIcon,
+    this.trailingIconColor,
     this.showAccentBar = false,
     this.accentColor,
   });
 
   final String title;
   final String? caption;
+
+  /// Optional second line under [caption] (e.g. unlock / retry guidance).
+  final String? hint;
+  final Color? hintColor;
   final IconData? trailingIcon;
+  final Color? trailingIconColor;
   final bool showAccentBar;
   final Color? accentColor;
 
@@ -242,6 +250,8 @@ class TitleCaptionTrailingInput extends ListItemInput {
     final traitStyle = ListItemTraitScope.of(context);
     final accent = accentColor ?? traitStyle.accentColor;
     final hasCaption = caption != null && caption!.trim().isNotEmpty;
+    final hintText = hint?.trim();
+    final hasHint = hintText != null && hintText.isNotEmpty;
 
     // Owns its own padding so an accent bar can sit flush with the shell edge.
     final body = Padding(
@@ -278,12 +288,28 @@ class TitleCaptionTrailingInput extends ListItemInput {
                     ),
                   ),
                 ],
+                if (hasHint) ...[
+                  const SizedBox(height: AppSpacings.xs),
+                  Text(
+                    hintText,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: typ.tagS.copyWith(
+                      color: hintColor ?? accent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
           if (trailingIcon != null) ...[
             const SizedBox(width: AppSpacings.s),
-            Icon(trailingIcon, size: 22, color: traitStyle.trailingIconColor),
+            Icon(
+              trailingIcon,
+              size: 22,
+              color: trailingIconColor ?? traitStyle.trailingIconColor,
+            ),
           ],
         ],
       ),

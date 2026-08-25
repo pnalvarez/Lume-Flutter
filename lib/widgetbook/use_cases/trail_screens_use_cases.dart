@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game_values.dart';
 import 'package:lume/layers/presentation/screens/games/battle_of_curiosities/battle_of_curiosities_body.dart';
@@ -185,7 +186,7 @@ Widget trailHomeEmpty(BuildContext context) {
 )
 Widget trailDetailReady(BuildContext context) {
   return TrailDetailBody(
-    state: const TrailDetailState(
+    state: TrailDetailState(
       status: TrailDetailStatus.ready,
       trailId: 1,
       title: 'História do Brasil',
@@ -198,17 +199,21 @@ Widget trailDetailReady(BuildContext context) {
               id: 10,
               title: 'Chegada dos portugueses',
               gamesCount: 4,
-              isCompleted: true,
+              isCompleted: false,
+              needsRetry: true,
+              unlockHint: trailDetailRetryHint(minCorrect: 3, total: 4),
             ),
             TrailDetailSubmoduleRowUi(
               id: 11,
               title: 'Economia açucareira',
               gamesCount: 4,
               isCompleted: false,
+              isLocked: true,
+              unlockHint: trailDetailUnlockHint(minCorrect: 3, total: 4),
             ),
           ],
         ),
-        TrailDetailLevelUi(
+        const TrailDetailLevelUi(
           title: 'Nível 2 — Império',
           isLocked: true,
           submodules: [
@@ -379,7 +384,26 @@ Widget gamesProgressMid(BuildContext context) {
   type: SubmoduleCompleteBody,
 )
 Widget submoduleCompleted(BuildContext context) {
-  return SubmoduleCompleteBody(correctCount: 2, total: 2, onBackToTrail: _noop);
+  return SubmoduleCompleteBody(
+    correctCount: 2,
+    total: 2,
+    unlockMessage: trailSessionUnlockAchieved,
+    onBackToTrail: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Submodule Complete',
+  name: 'Below threshold',
+  type: SubmoduleCompleteBody,
+)
+Widget submoduleCompletedBelowThreshold(BuildContext context) {
+  return SubmoduleCompleteBody(
+    correctCount: 1,
+    total: 4,
+    unlockMessage: trailSessionUnlockRequirement(minCorrect: 3, total: 4),
+    onBackToTrail: _noop,
+  );
 }
 
 // --- Shared choice chrome ---------------------------------------------------

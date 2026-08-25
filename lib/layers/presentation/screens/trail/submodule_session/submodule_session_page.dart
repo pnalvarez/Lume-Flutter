@@ -7,6 +7,7 @@ import 'package:lume/layers/presentation/screens/trail/submodule_session/submodu
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
+import 'package:lume/layers/presentation/shared/xp_snack_bar.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 
 /// Owns [SubmoduleSessionBloc] and swaps preview / complete.
@@ -57,15 +58,28 @@ class _SubmoduleSessionShellState extends State<_SubmoduleSessionShell> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SubmoduleSessionBloc, SubmoduleSessionState>(
-      listenWhen: (previous, current) =>
-          !previous.goBackToTrail && current.goBackToTrail,
-      listener: (context, state) {
-        context.read<SubmoduleSessionBloc>().add(
-          const SubmoduleSessionNavigationHandled(),
-        );
-        _finishExit();
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<SubmoduleSessionBloc, SubmoduleSessionState>(
+          listenWhen: (previous, current) =>
+              !previous.goBackToTrail && current.goBackToTrail,
+          listener: (context, state) {
+            context.read<SubmoduleSessionBloc>().add(
+              const SubmoduleSessionNavigationHandled(),
+            );
+            _finishExit();
+          },
+        ),
+        BlocListener<SubmoduleSessionBloc, SubmoduleSessionState>(
+          listenWhen: (previous, current) =>
+              previous.stage != SubmoduleSessionStage.completed &&
+              current.stage == SubmoduleSessionStage.completed &&
+              current.xpAwarded > 0,
+          listener: (context, state) {
+            showXpAwardedSnackBar(context, state.xpAwarded);
+          },
+        ),
+      ],
       child: PopScope(
         canPop: _allowPop,
         onPopInvokedWithResult: (didPop, _) {
