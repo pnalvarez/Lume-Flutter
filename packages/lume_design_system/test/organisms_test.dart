@@ -5,6 +5,7 @@ import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
 import 'package:lume_design_system/organisms/feedback/floating_notice.dart';
 import 'package:lume_design_system/organisms/feedback/lume_loading_overlay.dart';
+import 'package:lume_design_system/organisms/feedback/lume_snack_bar.dart';
 import 'package:lume_design_system/organisms/feedback/result_banner.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
@@ -264,6 +265,60 @@ void main() {
     testWidgets('FloatingNotice shows child', (tester) async {
       await tester.pumpWidget(_wrap(FloatingNotice.amount(text: '+10 pts')));
       expect(find.text('+10 pts'), findsOneWidget);
+    });
+
+    testWidgets('LumeSnackBar renders text and optional close', (tester) async {
+      var closed = false;
+      await tester.pumpWidget(
+        _wrap(
+          LumeSnackBar(
+            icon: Icons.check_circle_rounded,
+            text: 'Saved',
+            trait: LumeSnackBarTrait.success,
+            hasCloseButton: true,
+            onClose: () => closed = true,
+          ),
+        ),
+      );
+      expect(find.text('Saved'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      expect(closed, isTrue);
+    });
+
+    testWidgets('showLumeSnackBar inserts top overlay entry', (tester) async {
+      addTearDown(resetLumeSnackBarForTest);
+
+      late BuildContext hostContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: lumeLightTheme(),
+          home: Builder(
+            builder: (context) {
+              hostContext = context;
+              return const Scaffold(body: SizedBox());
+            },
+          ),
+        ),
+      );
+
+      showLumeSnackBar(
+        hostContext,
+        icon: Icons.info_outline_rounded,
+        text: 'Tip',
+        trait: LumeSnackBarTrait.neutral,
+        hasCloseButton: true,
+      );
+      await tester.pump();
+
+      expect(find.text('Tip'), findsOneWidget);
+      expect(isLumeSnackBarVisible, isTrue);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pump();
+
+      expect(find.text('Tip'), findsNothing);
+      expect(isLumeSnackBarVisible, isFalse);
     });
 
     testWidgets('LumeLoadingOverlay shows loader', (tester) async {
