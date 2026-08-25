@@ -60,9 +60,29 @@ Future<T?> showLumeDialog<T>({
         ],
       ),
       content: content,
-      actions: actions
-          ?.map((action) => _actionWithDialogTrait(action, actionTrait))
-          .toList(),
+      actionsAlignment: MainAxisAlignment.center,
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppSpacings.l,
+        0,
+        AppSpacings.l,
+        AppSpacings.l,
+      ),
+      actions: actions == null || actions.isEmpty
+          ? null
+          : [
+              SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var i = 0; i < actions.length; i++) ...[
+                      if (i > 0) const SizedBox(height: AppSpacings.s),
+                      _actionWithDialogTrait(actions[i], actionTrait),
+                    ],
+                  ],
+                ),
+              ),
+            ],
     ),
   );
 }
@@ -84,7 +104,8 @@ Widget _actionWithDialogTrait(Widget action, LumeButtonTrait trait) {
     size: action.size,
     isLoading: action.isLoading,
     isEnabled: action.isEnabled,
-    isExpanded: action.isExpanded,
+    // Dialog actions sit in a stretched column, so buttons share one width.
+    isExpanded: true,
     leadingIcon: action.leadingIcon,
     trailingIcon: action.trailingIcon,
   );

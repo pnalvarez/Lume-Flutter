@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
+import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 
 import 'di.config.dart';
@@ -15,12 +17,17 @@ Future<void> configureDependencies() async {
   _registerGamesHubBloc();
 }
 
-/// [di.config.dart] is gitignored; re-register so both use cases are wired.
+/// [di.config.dart] is gitignored; re-register so every use case is wired.
 void _registerGamesHubBloc() {
   if (getIt.isRegistered<GamesHubBloc>()) {
     getIt.unregister<GamesHubBloc>();
   }
   getIt.registerFactory<GamesHubBloc>(
-    () => GamesHubBloc(getIt<IGetHubGames>(), getIt<IGetGameRound>()),
+    () => GamesHubBloc(
+      getIt<IGetHubGames>(),
+      getIt<IGetGameRound>(),
+      getIt<IGetArcadeRecord>(),
+      getIt<IGetRandomGameRound>(),
+    ),
   );
 }

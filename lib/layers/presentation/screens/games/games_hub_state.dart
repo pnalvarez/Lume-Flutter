@@ -12,6 +12,8 @@ final class GamesHubState {
     this.initialErrorMessage,
     this.gameRoundErrorMessage,
     this.openPlayRounds,
+    this.openArcadeRounds,
+    this.arcadeRecord = 0,
   });
 
   /// Catalog skeleton while hub games load.
@@ -26,6 +28,12 @@ final class GamesHubState {
 
   /// Set after a successful round fetch; cleared when navigation is handled.
   final List<GameRound>? openPlayRounds;
+
+  /// Set after the arcade record and opening round load; cleared on navigation.
+  final List<GameRound>? openArcadeRounds;
+
+  /// Personal best handed to the arcade run that is about to start.
+  final int arcadeRecord;
 
   List<GamesHubCardUi> get generalGames => [
     for (final game in games)
@@ -44,9 +52,12 @@ final class GamesHubState {
     String? initialErrorMessage,
     String? gameRoundErrorMessage,
     List<GameRound>? openPlayRounds,
+    List<GameRound>? openArcadeRounds,
+    int? arcadeRecord,
     bool clearInitialError = false,
     bool clearGameRoundError = false,
     bool clearOpenPlayRounds = false,
+    bool clearOpenArcadeRounds = false,
   }) {
     return GamesHubState(
       isInitialLoading: isInitialLoading ?? this.isInitialLoading,
@@ -61,6 +72,10 @@ final class GamesHubState {
       openPlayRounds: clearOpenPlayRounds
           ? null
           : openPlayRounds ?? this.openPlayRounds,
+      openArcadeRounds: clearOpenArcadeRounds
+          ? null
+          : openArcadeRounds ?? this.openArcadeRounds,
+      arcadeRecord: arcadeRecord ?? this.arcadeRecord,
     );
   }
 
@@ -72,7 +87,9 @@ final class GamesHubState {
       listEquals(other.games, games) &&
       other.initialErrorMessage == initialErrorMessage &&
       other.gameRoundErrorMessage == gameRoundErrorMessage &&
-      listEquals(other.openPlayRounds, openPlayRounds);
+      listEquals(other.openPlayRounds, openPlayRounds) &&
+      listEquals(other.openArcadeRounds, openArcadeRounds) &&
+      other.arcadeRecord == arcadeRecord;
 
   @override
   int get hashCode => Object.hash(
@@ -82,5 +99,7 @@ final class GamesHubState {
     initialErrorMessage,
     gameRoundErrorMessage,
     openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
+    openArcadeRounds == null ? null : Object.hashAll(openArcadeRounds!),
+    arcadeRecord,
   );
 }

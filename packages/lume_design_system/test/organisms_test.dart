@@ -321,6 +321,40 @@ void main() {
       expect(isLumeSnackBarVisible, isFalse);
     });
 
+    testWidgets('showLumeSnackBar can anchor to the bottom', (tester) async {
+      addTearDown(resetLumeSnackBarForTest);
+
+      late BuildContext hostContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: lumeLightTheme(),
+          home: Builder(
+            builder: (context) {
+              hostContext = context;
+              return const Scaffold(body: SizedBox());
+            },
+          ),
+        ),
+      );
+
+      showLumeSnackBar(
+        hostContext,
+        icon: Icons.info_outline_rounded,
+        text: 'Bottom tip',
+        trait: LumeSnackBarTrait.neutral,
+        position: LumeSnackBarPosition.bottom,
+      );
+      await tester.pump();
+
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      expect(positioned.bottom, 0);
+      expect(positioned.top, isNull);
+      expect(find.text('Bottom tip'), findsOneWidget);
+
+      hideLumeSnackBar();
+      await tester.pump();
+    });
+
     testWidgets('LumeLoadingOverlay shows loader', (tester) async {
       await tester.pumpWidget(_wrap(const LumeLoadingOverlay()));
       expect(find.byType(CircularLoader), findsOneWidget);

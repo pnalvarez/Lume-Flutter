@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
 import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/presentation/screens/games/arcade_complete_body.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_body.dart';
@@ -19,6 +20,8 @@ export 'package:lume/layers/presentation/screens/games/games_event.dart'
 ///
 /// Trail callers pass [onSaveRound] to buffer scores in the parent session.
 /// Hub mode persists via [GamesBloc] on next/retry events.
+/// Arcade mode is an endless run: [GamesBloc] appends a new random round after
+/// every hit and ends the run on the first miss.
 @RoutePage()
 class GamesPage extends StatelessWidget {
   const GamesPage({
@@ -26,18 +29,27 @@ class GamesPage extends StatelessWidget {
     required this.rounds,
     this.onSaveRound,
     this.mode = GamesPlayMode.trail,
+    this.arcadeRecord = 0,
   });
 
   final List<GameRound> rounds;
   final GamesRoundSave? onSaveRound;
   final GamesPlayMode mode;
 
+  /// Arcade mode: personal best fetched by the hub before starting.
+  final int arcadeRecord;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<GamesBloc>()
         ..add(
-          GamesStarted(rounds: rounds, mode: mode, onSaveRound: onSaveRound),
+          GamesStarted(
+            rounds: rounds,
+            mode: mode,
+            onSaveRound: onSaveRound,
+            arcadeRecord: arcadeRecord,
+          ),
         ),
       child: _GamesView(mode: mode),
     );
@@ -57,14 +69,28 @@ class _GamesViewState extends State<_GamesView> {
   bool _allowPop = false;
   bool _leaveConfirmVisible = false;
   GamesSequenceResult? _hubCompleteResult;
+  bool _arcadeCompleteVisible = false;
 
   bool get _isHub => widget.mode == GamesPlayMode.hub;
+
+  bool get _isArcade => widget.mode == GamesPlayMode.arcade;
+
+  bool get _completeVisible =>
+      _hubCompleteResult != null || _arcadeCompleteVisible;
 
   Future<void> _requestExit() async {
     if (_allowPop || _leaveConfirmVisible) return;
 
+    // The run is already over; leaving needs no confirmation.
+    if (_completeVisible) {
+      _finishExit(result: _hubCompleteResult);
+      return;
+    }
+
     _leaveConfirmVisible = true;
-    final leave = await confirmLeaveGamesSequence(context);
+    final leave = _isArcade
+        ? await confirmLeaveArcadeRun(context)
+        : await confirmLeaveGamesSequence(context);
     _leaveConfirmVisible = false;
     if (!leave || !mounted) return;
 
@@ -91,6 +117,10 @@ class _GamesViewState extends State<_GamesView> {
               !previous.sequenceCompleted && current.sequenceCompleted,
           listener: (context, state) {
             context.read<GamesBloc>().add(const GamesNavigationHandled());
+            if (_isArcade) {
+              setState(() => _arcadeCompleteVisible = true);
+              return;
+            }
             final result = GamesSequenceResult(
               correctCount: state.correctCount,
               total: state.rounds.length,
@@ -109,7 +139,13 @@ class _GamesViewState extends State<_GamesView> {
           listener: (context, state) {
             final xp = state.xpAwardedToShow;
             if (xp == null) return;
-            showXpAwardedSnackBar(context, xp);
+            showXpAwardedSnackBar(
+              context,
+              xp,
+              position: _isArcade
+                  ? LumeSnackBarPosition.bottom
+                  : LumeSnackBarPosition.top,
+            );
             context.read<GamesBloc>().add(const GamesXpSnackBarShown());
           },
         ),
@@ -136,7 +172,10 @@ class _GamesViewState extends State<_GamesView> {
               children: [
                 GamesBody(
                   state: state,
-                  useCloseTrailing: _isHub && complete == null,
+                  hideProgress: _isArcade,
+                  useCloseLeading: _isArcade && !_completeVisible,
+                  showLives: _isArcade && !_completeVisible,
+                  useCloseTrailing: _isHub && !_completeVisible,
                   onClose: _requestExit,
                   onAbandoned: _isHub ? null : _requestExit,
                   onRetry: () {
@@ -202,7 +241,15 @@ class _GamesViewState extends State<_GamesView> {
                     context.read<GamesBloc>().add(const GamesNextPressed());
                   },
                 ),
-                if (complete != null)
+                if (_arcadeCompleteVisible)
+                  ArcadeCompleteBody(
+                    scoredCount: state.arcade.scoredCount,
+                    record: state.arcade.record,
+                    isNewRecord: state.arcade.isNewRecord,
+                    xpEarned: state.arcade.xpEarned,
+                    onAction: _finishExit,
+                  )
+                else if (complete != null)
                   GamesCompleteBody(
                     title: gamesHubRoundCompleteTitle,
                     scoreText: gamesHubRoundCompleteScore(

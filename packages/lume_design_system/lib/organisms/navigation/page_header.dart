@@ -17,6 +17,9 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   final IconData backIcon;
   final String? backTooltip;
 
+  /// Content height under the status-bar inset. Defaults to [defaultToolbarHeight].
+  final double toolbarHeight;
+
   const PageHeader({
     super.key,
     this.title = '',
@@ -25,9 +28,10 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     this.trailing,
     this.backIcon = Icons.arrow_back_rounded,
     this.backTooltip,
+    this.toolbarHeight = defaultToolbarHeight,
   });
 
-  static const double toolbarHeight = 56;
+  static const double defaultToolbarHeight = 56;
 
   @override
   Size get preferredSize {

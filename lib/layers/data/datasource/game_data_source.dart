@@ -21,6 +21,8 @@ abstract interface class IGameDataSource {
     required String gameSlug,
     int limit = 5,
   });
+
+  Future<HubGameRoundData> fetchRandomGameRound();
 }
 
 @Injectable(as: IGameDataSource)
@@ -81,6 +83,14 @@ final class GameDataSource implements IGameDataSource {
     final raw = await _apiClient.rpc<Map<String, dynamic>>(
       'get_game_round',
       params: {'p_game_slug': gameSlug, 'p_limit': limit},
+    );
+    return HubGameRoundData.fromJson(asJsonMap(raw));
+  }
+
+  @override
+  Future<HubGameRoundData> fetchRandomGameRound() async {
+    final raw = await _apiClient.rpc<Map<String, dynamic>>(
+      'get_random_game_round',
     );
     return HubGameRoundData.fromJson(asJsonMap(raw));
   }
