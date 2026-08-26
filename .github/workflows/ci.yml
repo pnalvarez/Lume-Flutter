@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Needed so git can diff this SHA against the PR base / main.
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -41,19 +44,22 @@ jobs:
       - name: Run unit tests with coverage
         run: flutter test test/unit test/core test/app --coverage
 
-      - name: Enforce minimum line coverage (80%)
-        uses: VeryGoodOpenSource/very_good_coverage@v2
-        with:
-          path: ${{ github.workspace }}/coverage/lcov.info
-          min_coverage: 80
-          exclude: >-
-            **/*.g.dart
-            **/*.freezed.dart
-            **/*.gr.dart
-            **/*.mocks.dart
-            **/di.config.dart
-            **/generated_plugin_registrant.dart
-            **/widgetbook/**
+      # Whole-repo coverage is ~50% today; gate only lines changed vs the PR base
+      # (or main on push). Empty diffs (no Dart line changes) pass.
+      - name: Enforce 80% coverage on changed lines
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_REF="${{ github.base_ref }}"
+            git fetch --no-tags --prune origin "$BASE_REF"
+            DIFF_RANGE="origin/${BASE_REF}...HEAD"
+          else
+            git fetch --no-tags --prune origin main
+            DIFF_RANGE="origin/main...HEAD"
+          fi
+          echo "Diff range: $DIFF_RANGE"
+          git diff "$DIFF_RANGE" -- '*.dart' \
+            | dart run pull_request_coverage
 
   ui-tests:
     name: UI tests

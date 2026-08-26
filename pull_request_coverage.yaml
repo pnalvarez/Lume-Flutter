@@ -1,0 +1,18 @@
+# Fail CI when changed lines vs the PR base are under this coverage rate.
+minimum-coverage: 80
+
+lcov-file: coverage/lcov.info
+
+ignore-known-generated-files: true
+add-to-known-generated-files:
+  - "**/*.gr.dart"
+  - "**/*.mocks.dart"
+  - "**/di.config.dart"
+  - "**/generated_plugin_registrant.dart"
+
+ignore:
+  - "**/widgetbook/**"
+  - "**/*.freezed.dart"
+
+print-emojis: false
+use-colorful-output: false
