@@ -13,6 +13,9 @@ const String trailHomeRetry = 'Tentar novamente';
 const String trailHomeSubmodulesLabel = 'submódulos';
 const String trailHomeEmojiFallback = '🎮';
 
+/// Invisible sizing copy for [DisplayAsLoader] trail-card skeletons.
+const String trailHomeLoadingTrailTitle = 'Carregando título da trilha';
+
 // --- Trail detail -----------------------------------------------------------
 
 const String trailDetailLoadError = 'Não foi possível carregar esta trilha.';
@@ -23,6 +26,9 @@ const String trailDetailSubmoduleTodo = 'Disponível';
 const String trailDetailSubmoduleLocked = 'Bloqueado';
 const String trailDetailSubmoduleRetry = 'Refazer';
 const String trailDetailGamesCountSuffix = 'jogos';
+
+/// Invisible sizing copy for [DisplayAsLoader] submodule-cell skeletons.
+const String trailDetailLoadingSubmoduleTitle = 'Carregando submódulo';
 
 String trailDetailUnlockHint({required int minCorrect, required int total}) =>
     'Acerte pelo menos $minCorrect de $total jogos '
