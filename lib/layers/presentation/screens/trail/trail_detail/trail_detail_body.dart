@@ -70,12 +70,13 @@ class TrailDetailLoadingList extends StatelessWidget {
 
   static const int itemCount = 5;
 
-  static const TrailDetailSubmoduleRowUi _placeholder = TrailDetailSubmoduleRowUi(
-    id: 0,
-    title: trailDetailLoadingSubmoduleTitle,
-    gamesCount: 4,
-    isCompleted: false,
-  );
+  static const TrailDetailSubmoduleRowUi _placeholder =
+      TrailDetailSubmoduleRowUi(
+        id: 0,
+        title: trailDetailLoadingSubmoduleTitle,
+        gamesCount: 4,
+        isCompleted: false,
+      );
 
   @override
   Widget build(BuildContext context) {
