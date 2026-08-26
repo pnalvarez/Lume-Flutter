@@ -19,11 +19,7 @@ enum SparklingBadgeVariant {
 }
 
 /// Leading glyph for [SparklingBadge].
-enum SparklingBadgeIcon {
-  sparkle,
-  flame,
-  bolt,
-}
+enum SparklingBadgeIcon { sparkle, flame, bolt }
 
 /// Pill badge with a leading icon, uppercase [title], and [description].
 ///
