@@ -6,7 +6,7 @@ import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
-import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/molecules/loaders/display_as_loader.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
 /// Trail home chrome. No Bloc, router, or GetIt — safe for Widgetbook.
@@ -25,13 +25,12 @@ class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final topInset = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
       backgroundColor: cs.surface,
       body: switch (state.status) {
-        HomeStatus.loading => const SafeArea(
-          child: Center(child: CircularLoader()),
+        HomeStatus.loading => const _HomeScroll(
+          listChildren: [HomeLoadingList()],
         ),
         HomeStatus.error => SafeArea(
           child: Padding(
@@ -54,94 +53,174 @@ class HomeBody extends StatelessWidget {
             ),
           ),
         ),
-        HomeStatus.ready => CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: AnnotatedRegion<SystemUiOverlayStyle>(
-                value: SystemUiOverlayStyle.light.copyWith(
-                  statusBarColor: Colors.transparent,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacings.xl2,
-                    topInset + AppSpacings.xl2,
-                    AppSpacings.xl2,
-                    AppSpacings.xl3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: cs.primary,
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(AppRadius.xl3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$trailHomeGreetingPrefix${state.greetingName}',
-                        style: typ.body1Semibold.copyWith(color: cs.onPrimary),
-                      ),
-                      const SizedBox(height: AppSpacings.xs),
-                      Text(
-                        trailHomeSubtitle,
-                        style: typ.body4Light.copyWith(
-                          color: cs.onPrimary.withValues(alpha: 0.85),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+        HomeStatus.ready => _HomeScroll(
+          greetingName: state.greetingName.isEmpty
+              ? trailHomeGreetingFallback
+              : state.greetingName,
+          listChildren: [
+            Text(
+              trailHomeSectionTitle,
+              style: typ.body4Semibold.copyWith(color: cs.primary),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacings.l,
-                AppSpacings.l,
-                AppSpacings.l,
-                AppSpacings.xl2,
-              ),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  Text(
-                    trailHomeSectionTitle,
-                    style: typ.body4Semibold.copyWith(color: cs.primary),
-                  ),
-                  const SizedBox(height: AppSpacings.m),
-                  if (state.trails.isEmpty)
-                    Text(
-                      trailHomeEmpty,
-                      style: typ.body4Light.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
-                    )
-                  else
-                    for (final trail in state.trails) ...[
-                      ListItem(
-                        trait: ListItemTrait.brand,
-                        borderRadius: AppRadius.xl,
-                        showShadow: true,
-                        onTap: () => onTrailPressed(trail.trailId),
-                        input: LeadingTitleCaptionInput(
-                          leading: Text(
-                            trail.emoji,
-                            style: const TextStyle(fontSize: 22),
-                          ),
-                          title: trail.title,
-                          caption: trail.progressPercent == 0
-                              ? '${trail.totalSubmodules} $trailHomeSubmodulesLabel'
-                              : '${trail.completedSubmodules}/${trail.totalSubmodules} $trailHomeSubmodulesLabel · ${trail.progressPercent}%',
-                          progress: trail.progressPercent / 100,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacings.m),
-                    ],
-                ]),
-              ),
-            ),
+            const SizedBox(height: AppSpacings.m),
+            if (state.trails.isEmpty)
+              Text(
+                trailHomeEmpty,
+                style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
+              )
+            else
+              for (final trail in state.trails) ...[
+                HomeTrailListItem(
+                  trail: trail,
+                  onPressed: () => onTrailPressed(trail.trailId),
+                ),
+                const SizedBox(height: AppSpacings.m),
+              ],
           ],
         ),
       },
+    );
+  }
+}
+
+/// Skeleton for the trail hub list: section title + 4 trail cards.
+class HomeLoadingList extends StatelessWidget {
+  const HomeLoadingList({super.key});
+
+  static const int itemCount = 4;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DisplayAsLoader(
+          borderRadius: BorderRadius.circular(AppRadius.s),
+          child: Text(
+            trailHomeSectionTitle,
+            style: typ.body4Semibold.copyWith(color: cs.primary),
+          ),
+        ),
+        const SizedBox(height: AppSpacings.m),
+        for (var i = 0; i < itemCount; i++) ...[
+          if (i > 0) const SizedBox(height: AppSpacings.m),
+          DisplayAsLoader(
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            child: HomeTrailListItem(
+              trail: const HomeTrailCardUi(
+                trailId: 0,
+                title: trailHomeLoadingTrailTitle,
+                emoji: trailHomeEmojiFallback,
+                completedSubmodules: 2,
+                totalSubmodules: 8,
+                progressPercent: 25,
+              ),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Single trail row used by the ready list and loading skeleton.
+class HomeTrailListItem extends StatelessWidget {
+  const HomeTrailListItem({
+    super.key,
+    required this.trail,
+    required this.onPressed,
+  });
+
+  final HomeTrailCardUi trail;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListItem(
+      trait: ListItemTrait.brand,
+      borderRadius: AppRadius.xl,
+      showShadow: true,
+      onTap: onPressed,
+      input: LeadingTitleCaptionInput(
+        leading: Text(trail.emoji, style: const TextStyle(fontSize: 22)),
+        title: trail.title,
+        caption: trail.progressPercent == 0
+            ? '${trail.totalSubmodules} $trailHomeSubmodulesLabel'
+            : '${trail.completedSubmodules}/${trail.totalSubmodules} '
+                  '$trailHomeSubmodulesLabel · ${trail.progressPercent}%',
+        progress: trail.progressPercent / 100,
+      ),
+    );
+  }
+}
+
+class _HomeScroll extends StatelessWidget {
+  const _HomeScroll({required this.listChildren, this.greetingName});
+
+  final List<Widget> listChildren;
+  final String? greetingName;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final topInset = MediaQuery.paddingOf(context).top;
+    final name = (greetingName == null || greetingName!.isEmpty)
+        ? trailHomeGreetingFallback
+        : greetingName!;
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent,
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(
+                AppSpacings.xl2,
+                topInset + AppSpacings.xl2,
+                AppSpacings.xl2,
+                AppSpacings.xl3,
+              ),
+              decoration: BoxDecoration(
+                color: cs.primary,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(AppRadius.xl3),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$trailHomeGreetingPrefix$name',
+                    style: typ.body1Semibold.copyWith(color: cs.onPrimary),
+                  ),
+                  const SizedBox(height: AppSpacings.xs),
+                  Text(
+                    trailHomeSubtitle,
+                    style: typ.body4Light.copyWith(
+                      color: cs.onPrimary.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacings.l,
+            AppSpacings.l,
+            AppSpacings.l,
+            AppSpacings.xl2,
+          ),
+          sliver: SliverList(delegate: SliverChildListDelegate(listChildren)),
+        ),
+      ],
     );
   }
 }

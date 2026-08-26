@@ -7,7 +7,7 @@ import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
-import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/molecules/loaders/display_as_loader.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
@@ -35,7 +35,7 @@ class TrailDetailBody extends StatelessWidget {
       backgroundColor: AppColors.Primary.primaryLight,
       appBar: PageHeader(title: state.headerTitle, onBack: onBack),
       body: switch (state.status) {
-        TrailDetailStatus.loading => const Center(child: CircularLoader()),
+        TrailDetailStatus.loading => const TrailDetailLoadingList(),
         TrailDetailStatus.error => Padding(
           padding: const EdgeInsets.all(AppSpacings.xl2),
           child: Column(
@@ -60,6 +60,109 @@ class TrailDetailBody extends StatelessWidget {
           onSubmodulePressed: onSubmodulePressed,
         ),
       },
+    );
+  }
+}
+
+/// Skeleton for trail detail: 5 submodule cells.
+class TrailDetailLoadingList extends StatelessWidget {
+  const TrailDetailLoadingList({super.key});
+
+  static const int itemCount = 5;
+
+  static const TrailDetailSubmoduleRowUi _placeholder =
+      TrailDetailSubmoduleRowUi(
+        id: 0,
+        title: trailDetailLoadingSubmoduleTitle,
+        gamesCount: 4,
+        isCompleted: false,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.l,
+        AppSpacings.l,
+        AppSpacings.l,
+        AppSpacings.xl2,
+      ),
+      itemCount: itemCount,
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacings.m),
+      itemBuilder: (context, index) {
+        return DisplayAsLoader(
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          child: TrailDetailSubmoduleListItem(
+            submodule: _placeholder,
+            onPressed: () {},
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Submodule row used by ready levels and the loading skeleton.
+class TrailDetailSubmoduleListItem extends StatelessWidget {
+  const TrailDetailSubmoduleListItem({
+    super.key,
+    required this.submodule,
+    required this.onPressed,
+    this.applyDisabledOpacity = true,
+  });
+
+  final TrailDetailSubmoduleRowUi submodule;
+  final VoidCallback? onPressed;
+  final bool applyDisabledOpacity;
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = submodule.isLocked;
+    final needsRetry = submodule.needsRetry;
+    final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
+    final statusLabel = locked
+        ? trailDetailSubmoduleLocked
+        : submodule.isCompleted
+        ? trailDetailSubmoduleDone
+        : needsRetry
+        ? trailDetailSubmoduleRetry
+        : trailDetailSubmoduleTodo;
+    final unlockHint = submodule.unlockHint?.trim();
+    final hint = unlockHint != null && unlockHint.isNotEmpty
+        ? unlockHint
+        : null;
+
+    final trait = locked
+        ? ListItemTrait.neutral
+        : submodule.isCompleted
+        ? ListItemTrait.success
+        : ListItemTrait.brand;
+
+    final trailingIcon = locked
+        ? Icons.lock_rounded
+        : submodule.isCompleted
+        ? Icons.check_circle_rounded
+        : needsRetry
+        ? Icons.warning_amber_rounded
+        : Icons.chevron_right_rounded;
+
+    final warningColor = needsRetry ? AppColors.Accent.onAccent : null;
+
+    return ListItem(
+      trait: trait,
+      isEnabled: applyDisabledOpacity ? !locked : true,
+      borderRadius: AppRadius.l,
+      onTap: locked ? null : onPressed,
+      padding: EdgeInsets.zero,
+      input: TitleCaptionTrailingInput(
+        title: submodule.title,
+        caption: '$gamesLabel · $statusLabel',
+        hint: hint,
+        hintColor: warningColor,
+        trailingIcon: trailingIcon,
+        trailingIconColor: warningColor,
+        showAccentBar: true,
+      ),
     );
   }
 }
@@ -153,65 +256,13 @@ class _LevelListItem extends StatelessWidget {
               ),
         children: [
           for (final submodule in level.submodules)
-            _submoduleListItem(
-              submodule,
+            TrailDetailSubmoduleListItem(
+              submodule: submodule,
               // Parent already dims the section when locked.
               applyDisabledOpacity: !locked,
+              onPressed: () => onSubmodulePressed(submodule.id),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _submoduleListItem(
-    TrailDetailSubmoduleRowUi submodule, {
-    required bool applyDisabledOpacity,
-  }) {
-    final locked = submodule.isLocked;
-    final needsRetry = submodule.needsRetry;
-    final gamesLabel = '${submodule.gamesCount} $trailDetailGamesCountSuffix';
-    final statusLabel = locked
-        ? trailDetailSubmoduleLocked
-        : submodule.isCompleted
-        ? trailDetailSubmoduleDone
-        : needsRetry
-        ? trailDetailSubmoduleRetry
-        : trailDetailSubmoduleTodo;
-    final unlockHint = submodule.unlockHint?.trim();
-    final hint = unlockHint != null && unlockHint.isNotEmpty
-        ? unlockHint
-        : null;
-
-    final trait = locked
-        ? ListItemTrait.neutral
-        : submodule.isCompleted
-        ? ListItemTrait.success
-        : ListItemTrait.brand;
-
-    final trailingIcon = locked
-        ? Icons.lock_rounded
-        : submodule.isCompleted
-        ? Icons.check_circle_rounded
-        : needsRetry
-        ? Icons.warning_amber_rounded
-        : Icons.chevron_right_rounded;
-
-    final warningColor = needsRetry ? AppColors.Accent.onAccent : null;
-
-    return ListItem(
-      trait: trait,
-      isEnabled: applyDisabledOpacity ? !locked : true,
-      borderRadius: AppRadius.l,
-      onTap: locked ? null : () => onSubmodulePressed(submodule.id),
-      padding: EdgeInsets.zero,
-      input: TitleCaptionTrailingInput(
-        title: submodule.title,
-        caption: '$gamesLabel · $statusLabel',
-        hint: hint,
-        hintColor: warningColor,
-        trailingIcon: trailingIcon,
-        trailingIconColor: warningColor,
-        showAccentBar: true,
       ),
     );
   }

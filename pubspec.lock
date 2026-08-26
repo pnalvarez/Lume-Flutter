@@ -956,6 +956,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  pull_request_coverage:
+    dependency: "direct dev"
+    description:
+      name: pull_request_coverage
+      sha256: a133c4efa3c6e345e5566e91677877c1965ff2c1601b5e1e4a73ebef5d40db7f
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.5"
   realtime_client:
     dependency: transitive
     description:
