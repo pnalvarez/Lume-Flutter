@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/amount_badge.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
+import 'package:lume_design_system/molecules/badges/sparkling_badge.dart';
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/chips/chip_picker.dart';
@@ -229,6 +230,36 @@ void main() {
       );
       expect(find.text('+15 pts'), findsOneWidget);
       expect(find.textContaining('Bonus'), findsOneWidget);
+    });
+
+    testWidgets('SparklingBadge renders title and description', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SparklingBadge(
+            title: 'Dias seguidos',
+            description: '0 dias',
+            variant: SparklingBadgeVariant.warm,
+            leadingIcon: SparklingBadgeIcon.flame,
+          ),
+        ),
+      );
+      expect(find.text('DIAS SEGUIDOS'), findsOneWidget);
+      expect(find.text('0 dias'), findsOneWidget);
+      expect(find.byIcon(Icons.local_fire_department_outlined), findsOneWidget);
+    });
+
+    testWidgets('SparklingBadge maps icon enum', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SparklingBadge(
+            title: 'XP',
+            description: '10',
+            variant: SparklingBadgeVariant.accent,
+            leadingIcon: SparklingBadgeIcon.bolt,
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.bolt_rounded), findsOneWidget);
     });
   });
 

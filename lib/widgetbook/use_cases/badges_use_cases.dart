@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/molecules/badges/amount_badge.dart';
 import 'package:lume_design_system/molecules/badges/lume_badge.dart';
+import 'package:lume_design_system/molecules/badges/sparkling_badge.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
@@ -83,6 +84,69 @@ Widget amountBadgeInteractive(BuildContext context) {
         secondaryText: secondary.isEmpty ? null : secondary,
         icon: Icons.bolt_rounded,
         accentColor: AppColors.Accent.accent,
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Interactive', type: SparklingBadge)
+Widget sparklingBadgeInteractive(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Dias seguidos',
+  );
+  final description = context.knobs.string(
+    label: 'Description',
+    initialValue: '0 dias',
+  );
+  final variant = context.knobs.object.dropdown(
+    label: 'Variant',
+    options: SparklingBadgeVariant.values,
+    labelBuilder: (v) => v.name,
+  );
+  final leadingIcon = context.knobs.object.dropdown(
+    label: 'Icon',
+    options: SparklingBadgeIcon.values,
+    initialOption: SparklingBadgeIcon.flame,
+    labelBuilder: (v) => v.name,
+  );
+
+  return Scaffold(
+    body: Center(
+      child: SparklingBadge(
+        title: title,
+        description: description,
+        variant: variant,
+        leadingIcon: leadingIcon,
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'All variants', type: SparklingBadge)
+Widget sparklingBadgeAllVariants(BuildContext context) {
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          for (final variant in SparklingBadgeVariant.values)
+            SparklingBadge(
+              title: variant.name,
+              description: '0 dias',
+              variant: variant,
+              leadingIcon: SparklingBadgeIcon.flame,
+            ),
+          for (final icon in SparklingBadgeIcon.values)
+            SparklingBadge(
+              title: icon.name,
+              description: '1 200',
+              variant: SparklingBadgeVariant.accent,
+              leadingIcon: icon,
+            ),
+        ],
       ),
     ),
   );
