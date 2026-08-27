@@ -59,9 +59,10 @@ final class ArcadeDataSource implements IArcadeDataSource {
     return ArcadeRecordResultData.fromJson(asJsonMap(raw));
   }
 
-  /// Arcade rounds write pair progress, so cached trail progress goes stale.
+  /// Arcade rounds write pair progress / XP, so trail + profile caches go stale.
   Future<void> _invalidateTrailCaches() async {
     await _storage.delete(CacheKeys.trailBootstrap);
     await _storage.delete(CacheKeys.trailProgress);
+    await _storage.delete(CacheKeys.profile);
   }
 }

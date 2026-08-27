@@ -108,7 +108,7 @@ const String onboardingSlide2Alt =
 
 const String dashboardTabTrail = 'Trilha';
 const String dashboardTabGames = 'Jogos';
-const String dashboardTabProgress = 'Progresso';
+const String dashboardTabProfile = 'Perfil';
 const String homeAuthenticatedMessage = 'Você está autenticado.';
 const String homeSignOut = 'Sair';
 
@@ -119,9 +119,20 @@ const String selectCategorySubtitle =
     'Escolha os temas que mais te interessam. Você pode mudar depois.';
 const String selectCategorySelectAll = 'Selecionar tudo';
 const String selectCategoryCta = 'Começar agora';
+const String selectCategorySaveCta = 'Salvar';
 const String selectCategoryLoadError =
     'Não foi possível carregar as categorias. Tente novamente.';
 const String selectCategoryRetry = 'Tentar novamente';
 const String selectCategorySaveError = 'Erro ao salvar preferências';
 const String selectCategorySessionExpired =
     'Sessão expirada. Faça login novamente.';
+
+/// Invisible sizing copy for [DisplayAsLoader] when no categories are cached yet.
+const selectCategoryLoadingChipLabels = [
+  'Categoria exemplo',
+  'Tema de estudo',
+  'Área de interesse',
+  'Outro tema',
+  'Mais um tema',
+  'Categoria',
+];

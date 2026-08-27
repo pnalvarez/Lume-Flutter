@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/storage/cache_keys.dart';
 import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/trail_data_source.dart';
 import 'package:mockito/mockito.dart';
@@ -109,5 +110,31 @@ void main() {
         params: {'p_pair_id': 4, 'p_score_pct': 80},
       ),
     ).called(1);
+  });
+
+  test('savePairProgress clears trail and profile caches', () async {
+    when(
+      apiClient.rpc<Map<String, dynamic>>(
+        'save_pair_progress',
+        params: anyNamed('params'),
+        headers: anyNamed('headers'),
+      ),
+    ).thenAnswer(
+      (_) async => {
+        'pair_id': 4,
+        'completed': true,
+        'score_pct': 80,
+        'preview_seen': true,
+      },
+    );
+    await storage.write(CacheKeys.trailBootstrap, '{"modules":[]}');
+    await storage.write(CacheKeys.trailProgress, '{"pair_progress":[]}');
+    await storage.write(CacheKeys.profile, '{"id":"user-1","total_xp":0}');
+
+    await sut.savePairProgress(pairId: 4, scorePct: 80);
+
+    expect(await storage.read(CacheKeys.trailBootstrap), isNull);
+    expect(await storage.read(CacheKeys.trailProgress), isNull);
+    expect(await storage.read(CacheKeys.profile), isNull);
   });
 }

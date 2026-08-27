@@ -33,7 +33,7 @@ class AppRouter extends RootStackRouter {
       children: [
         AutoRoute(page: HomeRoute.page, path: 'home', initial: true),
         AutoRoute(page: GamesHubRoute.page, path: 'games'),
-        AutoRoute(page: ProgressRoute.page, path: 'progress'),
+        AutoRoute(page: ProfileRoute.page, path: 'progress'),
       ],
     ),
     AutoRoute(page: TrailDetailRoute.page, path: '/trail/:trailId'),

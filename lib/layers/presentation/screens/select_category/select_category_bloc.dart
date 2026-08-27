@@ -29,17 +29,23 @@ final class SelectCategoryBloc
     Emitter<SelectCategoryState> emit,
   ) async {
     emit(
-      state.copyWith(status: SelectCategoryStatus.loading, clearError: true),
+      state.copyWith(
+        entry: event.entry,
+        status: SelectCategoryStatus.loading,
+        clearError: true,
+      ),
     );
     try {
       final preferences = await _getCategoriesWithPreferences(
         forceRefresh: true,
       );
+      final selectedIds = preferences.selectedIds.toSet();
       emit(
         state.copyWith(
           status: SelectCategoryStatus.ready,
           categories: preferences.categories,
-          selectedIds: preferences.selectedIds.toSet(),
+          selectedIds: selectedIds,
+          initialSelectedIds: selectedIds,
         ),
       );
     } on Object {
@@ -94,7 +100,9 @@ final class SelectCategoryBloc
       emit(
         state.copyWith(
           isSaving: false,
-          destination: SelectCategoryDestination.home,
+          destination: state.isProfileEntry
+              ? SelectCategoryDestination.pop
+              : SelectCategoryDestination.home,
         ),
       );
     } on ApiHttpException catch (error) {

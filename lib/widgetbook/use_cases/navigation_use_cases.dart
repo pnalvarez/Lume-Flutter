@@ -37,6 +37,22 @@ Widget pageHeaderDefault(BuildContext context) {
   );
 }
 
+@widgetbook.UseCase(name: 'Stacked title', type: PageHeader)
+Widget pageHeaderStackedTitle(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'O que você quer aprender?',
+  );
+  return Scaffold(
+    appBar: PageHeader(
+      title: title,
+      onBack: () {},
+      titleLayout: PageHeaderTitleLayout.stacked,
+    ),
+    body: const SizedBox.shrink(),
+  );
+}
+
 @widgetbook.UseCase(name: 'Progress with close', type: PageHeader)
 Widget pageHeaderProgressWithClose(BuildContext context) {
   return Scaffold(

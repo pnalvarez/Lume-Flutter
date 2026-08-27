@@ -16,6 +16,7 @@ import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
 import 'package:lume_design_system/molecules/tiles/feedback_tile.dart';
 import 'package:lume_design_system/molecules/tiles/score_tile.dart';
+import 'package:lume_design_system/molecules/tiles/stat_tile.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
@@ -340,6 +341,20 @@ void main() {
   });
 
   group('Tiles & loader', () {
+    testWidgets('StatTile renders uppercase label and value', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const StatTile(
+            icon: Icons.star_outline_rounded,
+            label: 'XP Total',
+            value: '341',
+          ),
+        ),
+      );
+      expect(find.text('XP TOTAL'), findsOneWidget);
+      expect(find.text('341'), findsOneWidget);
+    });
+
     testWidgets('ScoreTile renders score', (tester) async {
       await tester.pumpWidget(
         _wrap(

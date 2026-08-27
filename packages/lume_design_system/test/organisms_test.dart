@@ -53,6 +53,29 @@ void main() {
       expect(back, isTrue);
     });
 
+    testWidgets('PageHeader stacked title sits below back', (tester) async {
+      var back = false;
+      await tester.pumpWidget(
+        _wrap(
+          PageHeader(
+            title: 'O que você quer aprender?',
+            onBack: () => back = true,
+            titleLayout: PageHeaderTitleLayout.stacked,
+          ),
+        ),
+      );
+      expect(find.text('O que você quer aprender?'), findsOneWidget);
+      final backCenter = tester.getCenter(
+        find.byIcon(Icons.arrow_back_rounded),
+      );
+      final titleCenter = tester.getCenter(
+        find.text('O que você quer aprender?'),
+      );
+      expect(titleCenter.dy, greaterThan(backCenter.dy));
+      await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+      expect(back, isTrue);
+    });
+
     testWidgets('PageHeader prefers titleWidget over title', (tester) async {
       await tester.pumpWidget(
         _wrap(
