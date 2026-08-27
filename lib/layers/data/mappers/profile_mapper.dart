@@ -10,6 +10,18 @@ abstract final class ProfileMapper {
       email: data.email,
       fullName: data.fullName,
       trailStartedAt: data.trailStartedAt,
+      playerLevel: data.playerLevel,
+      totalXp: data.totalXp,
+      xpToNextLevel: data.xpToNextLevel,
+      xpInLevel: data.xpInLevel,
+      xpForNextLevel: data.xpForNextLevel,
+      currentStreak: data.currentStreak,
+      bestStreak: data.bestStreak,
+      streakShields: data.streakShields,
+      xpToday: data.xpToday,
+      xpWeek: data.xpWeek,
+      daysInApp: data.daysInApp,
+      submodulesCompleted: data.submodulesCompleted,
     );
   }
 }

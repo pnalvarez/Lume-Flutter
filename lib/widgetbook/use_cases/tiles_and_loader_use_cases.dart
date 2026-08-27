@@ -7,6 +7,8 @@ import 'package:lume_design_system/molecules/loaders/display_as_loader.dart';
 import 'package:lume_design_system/molecules/loaders/shimmer_box.dart';
 import 'package:lume_design_system/molecules/tiles/feedback_tile.dart';
 import 'package:lume_design_system/molecules/tiles/score_tile.dart';
+import 'package:lume_design_system/molecules/tiles/stat_tile.dart';
+import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(name: 'Showcase', type: ScoreTile)
@@ -30,6 +32,67 @@ Widget scoreTileShowcase(BuildContext context) {
               score: 240,
               label: 'XP total',
             ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Showcase', type: StatTile)
+Widget statTileShowcase(BuildContext context) {
+  final label = context.knobs.string(label: 'Label', initialValue: 'XP Total');
+  final value = context.knobs.string(label: 'Value', initialValue: '341');
+
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          StatTile(
+            icon: Icons.star_outline_rounded,
+            label: label,
+            value: value,
+          ),
+          const SizedBox(height: 12),
+          const Row(
+            children: [
+              Expanded(
+                child: StatTile(
+                  icon: Icons.local_fire_department_outlined,
+                  label: 'Sequência',
+                  value: '0d',
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: StatTile(
+                  icon: Icons.bolt_rounded,
+                  label: 'XP hoje',
+                  value: '0',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Row(
+            children: [
+              Expanded(
+                child: StatTile(
+                  icon: Icons.bolt_rounded,
+                  label: 'XP semana',
+                  value: '341',
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: StatTile(
+                  icon: Icons.emoji_events_outlined,
+                  label: 'Nível',
+                  value: '3',
+                ),
+              ),
+            ],
           ),
         ],
       ),

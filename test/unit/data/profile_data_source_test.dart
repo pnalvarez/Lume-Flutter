@@ -23,12 +23,31 @@ void main() {
         params: anyNamed('params'),
         headers: anyNamed('headers'),
       ),
-    ).thenAnswer((_) async => {'id': 'user-1', 'full_name': 'Ada'});
+    ).thenAnswer(
+      (_) async => {
+        'id': 'user-1',
+        'full_name': 'Ada',
+        'player_level': 3,
+        'total_xp': 341,
+        'current_streak': 0,
+        'best_streak': 0,
+        'xp_today': 0,
+        'xp_week': 341,
+        'days_in_app': 0,
+        'submodules_completed': 0,
+      },
+    );
 
     final data = await sut.fetchProfile();
 
     expect(data.id, 'user-1');
     expect(data.fullName, 'Ada');
+    expect(data.playerLevel, 3);
+    expect(data.totalXp, 341);
+    expect(data.currentStreak, 0);
+    expect(data.xpWeek, 341);
+    expect(data.daysInApp, 0);
+    expect(data.submodulesCompleted, 0);
     verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
   });
 
@@ -47,6 +66,8 @@ void main() {
       final cached = await sut.fetchProfile();
 
       expect(cached.fullName, 'Ada');
+      expect(cached.playerLevel, 1);
+      expect(cached.totalXp, 0);
       verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
     },
   );

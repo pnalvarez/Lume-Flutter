@@ -343,7 +343,7 @@ Widget dashboardShellTrail(BuildContext context) {
     min: 0,
     max: 2,
   );
-  final titles = [dashboardTabTrail, dashboardTabGames, dashboardTabProgress];
+  final titles = [dashboardTabTrail, dashboardTabGames, dashboardTabProfile];
   return DashboardBody(
     selectedIndex: selected,
     onTabSelected: _noopInt,

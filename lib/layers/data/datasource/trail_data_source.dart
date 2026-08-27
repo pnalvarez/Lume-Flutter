@@ -111,5 +111,7 @@ final class TrailDataSource implements ITrailDataSource {
   Future<void> _invalidateTrailCaches() async {
     await _storage.delete(CacheKeys.trailBootstrap);
     await _storage.delete(CacheKeys.trailProgress);
+    // save_pair_progress awards XP onto profiles — drop the greeting/stats cache.
+    await _storage.delete(CacheKeys.profile);
   }
 }

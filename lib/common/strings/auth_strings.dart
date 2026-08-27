@@ -108,7 +108,7 @@ const String onboardingSlide2Alt =
 
 const String dashboardTabTrail = 'Trilha';
 const String dashboardTabGames = 'Jogos';
-const String dashboardTabProgress = 'Progresso';
+const String dashboardTabProfile = 'Perfil';
 const String homeAuthenticatedMessage = 'Você está autenticado.';
 const String homeSignOut = 'Sair';
 

@@ -20,6 +20,14 @@ void main() {
         id: 'user-1',
         email: 'ada@example.com',
         fullName: 'Ada',
+        playerLevel: 3,
+        totalXp: 341,
+        currentStreak: 2,
+        bestStreak: 5,
+        xpToday: 10,
+        xpWeek: 341,
+        daysInApp: 12,
+        submodulesCompleted: 4,
       ),
     );
 
@@ -28,6 +36,14 @@ void main() {
     expect(profile.id, 'user-1');
     expect(profile.email, 'ada@example.com');
     expect(profile.fullName, 'Ada');
+    expect(profile.playerLevel, 3);
+    expect(profile.totalXp, 341);
+    expect(profile.currentStreak, 2);
+    expect(profile.bestStreak, 5);
+    expect(profile.xpToday, 10);
+    expect(profile.xpWeek, 341);
+    expect(profile.daysInApp, 12);
+    expect(profile.submodulesCompleted, 4);
     verify(dataSource.fetchProfile(forceRefresh: false)).called(1);
   });
 }

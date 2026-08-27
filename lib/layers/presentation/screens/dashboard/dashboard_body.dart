@@ -18,7 +18,7 @@ class DashboardBody extends StatelessWidget {
   static const navItems = [
     BottomNavItem(icon: Icons.home_rounded, label: dashboardTabTrail),
     BottomNavItem(icon: Icons.sports_esports_rounded, label: dashboardTabGames),
-    BottomNavItem(icon: Icons.bar_chart_rounded, label: dashboardTabProgress),
+    BottomNavItem(icon: Icons.person_rounded, label: dashboardTabProfile),
   ];
 
   @override
