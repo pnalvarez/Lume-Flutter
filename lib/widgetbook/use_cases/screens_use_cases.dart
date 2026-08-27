@@ -279,12 +279,13 @@ const _sampleCategories = [
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Select category',
-  name: 'Ready',
+  name: 'Onboarding ready',
   type: SelectCategoryBody,
 )
-Widget selectCategoryReady(BuildContext context) {
+Widget selectCategoryOnboardingReady(BuildContext context) {
   return SelectCategoryBody(
     state: SelectCategoryState(
+      entry: SelectCategoryEntry.onboarding,
       status: SelectCategoryStatus.ready,
       categories: _sampleCategories,
       selectedIds: {1, 3},
@@ -293,6 +294,27 @@ Widget selectCategoryReady(BuildContext context) {
     onToggle: _noopInt,
     onSelectAllToggled: _noop,
     onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Select category',
+  name: 'Profile ready',
+  type: SelectCategoryBody,
+)
+Widget selectCategoryProfileReady(BuildContext context) {
+  return SelectCategoryBody(
+    state: SelectCategoryState(
+      entry: SelectCategoryEntry.profile,
+      status: SelectCategoryStatus.ready,
+      categories: _sampleCategories,
+      selectedIds: {1, 3},
+    ),
+    onRetry: _noop,
+    onToggle: _noopInt,
+    onSelectAllToggled: _noop,
+    onSubmit: _noop,
+    onBack: _noop,
   );
 }
 
@@ -308,6 +330,25 @@ Widget selectCategoryLoading(BuildContext context) {
     onToggle: _noopInt,
     onSelectAllToggled: _noop,
     onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Select category',
+  name: 'Profile loading',
+  type: SelectCategoryBody,
+)
+Widget selectCategoryProfileLoading(BuildContext context) {
+  return SelectCategoryBody(
+    state: const SelectCategoryState(
+      entry: SelectCategoryEntry.profile,
+      status: SelectCategoryStatus.loading,
+    ),
+    onRetry: _noop,
+    onToggle: _noopInt,
+    onSelectAllToggled: _noop,
+    onSubmit: _noop,
+    onBack: _noop,
   );
 }
 

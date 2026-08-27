@@ -9,22 +9,32 @@ import 'package:lume/layers/presentation/screens/select_category/select_category
 import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 
+export 'package:lume/layers/presentation/screens/select_category/select_category_state.dart'
+    show SelectCategoryEntry;
+
 @RoutePage()
 class SelectCategoryPage extends StatelessWidget {
-  const SelectCategoryPage({super.key});
+  const SelectCategoryPage({
+    super.key,
+    this.entry = SelectCategoryEntry.onboarding,
+  });
+
+  final SelectCategoryEntry entry;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          getIt<SelectCategoryBloc>()..add(const SelectCategoryStarted()),
-      child: const _SelectCategoryView(),
+          getIt<SelectCategoryBloc>()..add(SelectCategoryStarted(entry: entry)),
+      child: _SelectCategoryView(entry: entry),
     );
   }
 }
 
 class _SelectCategoryView extends StatelessWidget {
-  const _SelectCategoryView();
+  const _SelectCategoryView({required this.entry});
+
+  final SelectCategoryEntry entry;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +60,8 @@ class _SelectCategoryView extends StatelessWidget {
             context.router.replace(const DashboardRoute());
           case SelectCategoryDestination.login:
             context.router.replaceAll([const LoginRoute()]);
+          case SelectCategoryDestination.pop:
+            context.router.maybePop();
         }
       },
       child: BlocBuilder<SelectCategoryBloc, SelectCategoryState>(
@@ -58,7 +70,7 @@ class _SelectCategoryView extends StatelessWidget {
             state: state,
             onRetry: () {
               context.read<SelectCategoryBloc>().add(
-                const SelectCategoryStarted(),
+                SelectCategoryStarted(entry: entry),
               );
             },
             onToggle: (id) {
@@ -74,6 +86,11 @@ class _SelectCategoryView extends StatelessWidget {
                 const SelectCategorySubmitted(),
               );
             },
+            onBack: state.isProfileEntry
+                ? () {
+                    context.router.maybePop();
+                  }
+                : null,
           );
         },
       ),

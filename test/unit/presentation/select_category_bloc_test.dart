@@ -68,7 +68,35 @@ void main() {
   );
 
   blocTest<SelectCategoryBloc, SelectCategoryState>(
-    'toggles selection and saves to home',
+    'does not save when selection is unchanged',
+    build: () => _bloc(
+      _GetCategories()
+        ..result = const CategoryPreferencesDomain(
+          categories: [
+            CategoryDomain(id: 1, name: 'History'),
+            CategoryDomain(id: 2, name: 'Art'),
+          ],
+          selectedIds: [1],
+        ),
+      _SaveCategories(),
+    ),
+    act: (bloc) async {
+      bloc.add(const SelectCategoryStarted());
+      await bloc.stream.firstWhere(
+        (s) => s.status == SelectCategoryStatus.ready,
+      );
+      bloc.add(const SelectCategorySubmitted());
+    },
+    skip: 2,
+    expect: () => <SelectCategoryState>[],
+    verify: (bloc) {
+      expect(bloc.state.canSubmit, isFalse);
+      expect(bloc.state.hasChanges, isFalse);
+    },
+  );
+
+  blocTest<SelectCategoryBloc, SelectCategoryState>(
+    'toggles selection and saves to home on onboarding',
     build: () => _bloc(_GetCategories(), _SaveCategories()),
     act: (bloc) async {
       bloc.add(const SelectCategoryStarted());
@@ -87,6 +115,30 @@ void main() {
         (s) => s.destination,
         'destination',
         SelectCategoryDestination.home,
+      ),
+    ],
+  );
+
+  blocTest<SelectCategoryBloc, SelectCategoryState>(
+    'profile save pops back',
+    build: () => _bloc(_GetCategories(), _SaveCategories()),
+    act: (bloc) async {
+      bloc.add(const SelectCategoryStarted(entry: SelectCategoryEntry.profile));
+      await bloc.stream.firstWhere(
+        (s) => s.status == SelectCategoryStatus.ready,
+      );
+      bloc
+        ..add(const SelectCategoryToggled(1))
+        ..add(const SelectCategorySubmitted());
+    },
+    skip: 2,
+    expect: () => [
+      isA<SelectCategoryState>().having((s) => s.selectedIds, 'selected', {1}),
+      isA<SelectCategoryState>().having((s) => s.isSaving, 'saving', true),
+      isA<SelectCategoryState>().having(
+        (s) => s.destination,
+        'destination',
+        SelectCategoryDestination.pop,
       ),
     ],
   );

@@ -72,11 +72,19 @@ class SelectableChipGroup<T> extends StatelessWidget {
             onTap: onSelectAllToggled,
             borderRadius: BorderRadius.circular(AppRadius.s),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Checkbox(
-                  value: _allSelected,
-                  onChanged: (_) => onSelectAllToggled?.call(),
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Checkbox(
+                    value: _allSelected,
+                    onChanged: (_) => onSelectAllToggled?.call(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
+                const SizedBox(width: AppSpacings.xs),
                 Expanded(
                   child: Text(
                     selectAllLabel!,
