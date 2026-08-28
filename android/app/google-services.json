@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "145151164143",
+    "project_id": "lume-51a38",
+    "storage_bucket": "lume-51a38.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145151164143:android:2d2d7ec6d6ad0e73ca251a",
+        "android_client_info": {
+          "package_name": "com.lume.learning.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArq2T2z9Wly_DG8RJYAlns81QyvBXJpBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
