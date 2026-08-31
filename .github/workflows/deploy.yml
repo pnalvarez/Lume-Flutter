@@ -191,10 +191,17 @@ jobs:
           APP_STORE_CONNECT_KEY_PATH: ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
         run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
+      - name: Locate IPA
+        run: |
+          set -euo pipefail
+          IPA=$(ls build/ios/ipa/*.ipa | head -n 1)
+          echo "IPA_PATH=$IPA" >> "$GITHUB_ENV"
+          ls -la build/ios/ipa/
+
       - name: Upload to TestFlight
         uses: apple-actions/upload-testflight-build@v3
         with:
-          app-path: build/ios/ipa/*.ipa
+          app-path: ${{ env.IPA_PATH }}
           issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           api-private-key: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
