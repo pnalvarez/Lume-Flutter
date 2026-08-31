@@ -74,15 +74,15 @@ jobs:
             exit 1
           fi
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
-          cat > android/key.properties <<EOF
-          storePassword=$ANDROID_KEYSTORE_PASSWORD
-          keyPassword=$ANDROID_KEY_PASSWORD
-          keyAlias=$ANDROID_KEY_ALIAS
-          storeFile=upload-keystore.jks
-          EOF
+          {
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "storeFile=upload-keystore.jks"
+          } > android/key.properties
 
-      - name: Build release app bundle
-        run: flutter build appbundle --release
+      - name: Build release APK
+        run: flutter build apk --release
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -97,7 +97,7 @@ jobs:
             exit 1
           fi
           RELEASE_NOTES="Tag ${GITHUB_REF_NAME} (${GITHUB_SHA:0:7})"
-          firebase appdistribution:distribute build/app/outputs/bundle/release/app-release.aab \
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
             --app "$FIREBASE_ANDROID_APP_ID" \
             --groups "$FIREBASE_TESTER_GROUPS" \
             --release-notes "$RELEASE_NOTES" \
