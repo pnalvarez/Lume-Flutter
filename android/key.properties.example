@@ -1,0 +1,6 @@
+# Copy to key.properties and fill in values for local release builds.
+# CI creates this file automatically from GitHub Actions secrets.
+storePassword=your-keystore-password
+keyPassword=your-key-password
+keyAlias=upload
+storeFile=upload-keystore.jks
