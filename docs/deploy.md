@@ -64,6 +64,8 @@ For local release builds, copy `android/key.properties.example` to `android/key.
 
 Enable **App Distribution** in the [Firebase console](https://console.firebase.google.com/project/lume-51a38/appdistribution) and create a tester group named `internal` (or change `FIREBASE_TESTER_GROUPS` in the workflow).
 
+CI uploads a release **APK** (not AAB) so Firebase works without linking a Google Play Developer account. Switch to AAB only when you publish on Play Store and link Firebase to Play.
+
 Firebase Android app ID (already in workflow): `1:145151164143:android:2d2d7ec6d6ad0e73ca251a`
 
 ### iOS / TestFlight
@@ -104,6 +106,10 @@ CI installs that profile and uses **manual** signing (team `L332B28T9P`) to buil
 **Android: signing config not found** — verify `ANDROID_*` secrets and that `key.properties` paths match the workflow.
 
 **Firebase: unauthorized** — regenerate token with `firebase login:ci` and update `FIREBASE_TOKEN`.
+
+**Firebase: not linked to Google Play** — CI uses APK uploads to avoid this. If you switch back to AAB, link Play in Firebase → Project settings → Integrations.
+
+**Android: keystore password was incorrect** — regenerate the keystore and update all four `ANDROID_*` secrets together.
 
 **iOS: no signing certificate** — ensure the `.p12` contains an **Apple Distribution** cert (not Development).
 
