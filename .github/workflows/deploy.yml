@@ -1,0 +1,272 @@
+# Deploy Lume to Firebase App Distribution (Android) and TestFlight (iOS).
+#
+# Triggers:
+#   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
+#   - Manual run from Actions tab (choose platform)
+#
+# Required GitHub secrets — see docs/deploy.md
+
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to deploy
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - android
+          - ios
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_CHANNEL: stable
+  FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
+  FIREBASE_TESTER_GROUPS: internal
+  IOS_BUNDLE_ID: com.lume.learning.app
+
+jobs:
+  deploy-android:
+    name: Android → Firebase
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.platform == 'both' || inputs.platform == 'android'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Configure Android signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${ANDROID_KEYSTORE_BASE64:-}" ]]; then
+            echo "::error::Missing ANDROID_KEYSTORE_BASE64 secret. See docs/deploy.md"
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          {
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "storeFile=upload-keystore.jks"
+          } > android/key.properties
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${FIREBASE_TOKEN:-}" ]]; then
+            echo "::error::Missing FIREBASE_TOKEN secret. See docs/deploy.md"
+            exit 1
+          fi
+          RELEASE_NOTES="Tag ${GITHUB_REF_NAME} (${GITHUB_SHA:0:7})"
+          firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+            --app "$FIREBASE_ANDROID_APP_ID" \
+            --groups "$FIREBASE_TESTER_GROUPS" \
+            --release-notes "$RELEASE_NOTES" \
+            --token "$FIREBASE_TOKEN"
+
+  deploy-ios:
+    name: iOS → TestFlight
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.platform == 'both' || inputs.platform == 'ios'))
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Import code signing certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+
+      - name: Install provisioning profile
+        env:
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${IOS_PROVISIONING_PROFILE_BASE64:-}" ]]; then
+            echo "::error::Missing IOS_PROVISIONING_PROFILE_BASE64 secret. See docs/deploy.md"
+            exit 1
+          fi
+
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          PROFILE_PLIST="$RUNNER_TEMP/profile.plist"
+          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$PROFILE_PLIST")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$PROFILE_PLIST")
+          echo "Installing profile: $NAME ($UUID)"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+
+          # Manual signing for this CI checkout only (runner workspace is ephemeral).
+          {
+            echo "CODE_SIGN_STYLE=Manual"
+            echo "CODE_SIGN_IDENTITY=Apple Distribution"
+            echo "PROVISIONING_PROFILE_SPECIFIER=$NAME"
+            echo "DEVELOPMENT_TEAM=L332B28T9P"
+          } >> ios/Flutter/Release.xcconfig
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' \
+            ios/Runner.xcodeproj/project.pbxproj
+
+          /usr/libexec/PlistBuddy -c 'Set :signingStyle manual' ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c 'Add :provisioningProfiles dict' ios/ExportOptions.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:com.lume.learning.app string $NAME" ios/ExportOptions.plist 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Set :provisioningProfiles:com.lume.learning.app $NAME" ios/ExportOptions.plist
+
+      - name: Configure App Store Connect API key
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          for var in APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_PRIVATE_KEY; do
+            if [[ -z "${!var:-}" ]]; then
+              echo "::error::Missing $var secret. See docs/deploy.md"
+              exit 1
+            fi
+          done
+          mkdir -p ~/private_keys
+          printf '%s\n' "$APP_STORE_CONNECT_API_PRIVATE_KEY" > ~/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+      - name: Determine next iOS build number
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          source "$RUNNER_TEMP/asc-venv/bin/activate"
+          pip install --quiet PyJWT cryptography requests
+          python3 <<'PY'
+          import os
+          import time
+
+          import jwt
+          import requests
+
+          key_id = os.environ["APP_STORE_CONNECT_API_KEY_ID"]
+          issuer_id = os.environ["APP_STORE_CONNECT_ISSUER_ID"]
+          private_key = os.environ["APP_STORE_CONNECT_API_PRIVATE_KEY"]
+          bundle_id = os.environ["IOS_BUNDLE_ID"]
+
+          token = jwt.encode(
+              {"iss": issuer_id, "exp": int(time.time()) + 1200, "aud": "appstoreconnect-v1"},
+              private_key,
+              algorithm="ES256",
+              headers={"kid": key_id, "typ": "JWT"},
+          )
+          headers = {"Authorization": f"Bearer {token}"}
+          base = "https://api.appstoreconnect.apple.com/v1"
+
+          apps = requests.get(
+              f"{base}/apps",
+              params={"filter[bundleId]": bundle_id},
+              headers=headers,
+              timeout=60,
+          )
+          apps.raise_for_status()
+          data = apps.json()["data"]
+          if not data:
+              raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
+          app_id = data[0]["id"]
+
+          builds = requests.get(
+              f"{base}/builds",
+              params={"filter[app]": app_id, "sort": "-uploadedDate", "limit": "1"},
+              headers=headers,
+              timeout=60,
+          )
+          builds.raise_for_status()
+          items = builds.json()["data"]
+          latest = int(items[0]["attributes"]["version"]) if items else 0
+          next_build = latest + 1
+          print(f"Latest TestFlight build: {latest} → using {next_build}")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"IOS_BUILD_NUMBER={next_build}\n")
+          PY
+
+      - name: Build release IPA
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_PATH: ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+        run: |
+          set -euo pipefail
+          echo "Using iOS build number (CFBundleVersion): $IOS_BUILD_NUMBER"
+          flutter build ipa --release \
+            --build-number="$IOS_BUILD_NUMBER" \
+            --export-options-plist=ios/ExportOptions.plist
+
+      - name: Locate IPA
+        run: |
+          set -euo pipefail
+          IPA=$(ls build/ios/ipa/*.ipa | head -n 1)
+          echo "IPA_PATH=$IPA" >> "$GITHUB_ENV"
+          ls -la build/ios/ipa/
+
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v3
+        with:
+          app-path: ${{ env.IPA_PATH }}
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
