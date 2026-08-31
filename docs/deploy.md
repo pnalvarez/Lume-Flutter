@@ -19,13 +19,15 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 Recommended release flow:
 
 1. Merge to `main` (CI must pass)
-2. Bump version (`bump-version` skill or edit `pubspec.yaml`)
+2. Bump marketing version in `pubspec.yaml` when needed (`bump-version` skill or manual edit)
 3. Commit, tag, and push:
 
 ```bash
 git tag v1.0.1
 git push origin main --tags
 ```
+
+iOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow queries App Store Connect for the latest uploaded build and uses **latest + 1**. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
 
 ## GitHub secrets
 
@@ -109,4 +111,4 @@ CI installs that profile and uses **manual** signing (team `L332B28T9P`) to buil
 
 **iOS: upload failed** — confirm the app record exists in App Store Connect for bundle ID `com.lume.learning.app`.
 
-**Duplicate build number** — bump the `+N` build number in `pubspec.yaml` before tagging; App Store Connect rejects reused build numbers.
+**Duplicate build number** — CI should auto-increment via App Store Connect (latest build + 1). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.

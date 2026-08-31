@@ -35,6 +35,7 @@ env:
   FLUTTER_CHANNEL: stable
   FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
   FIREBASE_TESTER_GROUPS: internal
+  IOS_BUNDLE_ID: com.lume.learning.app
 
 jobs:
   deploy-android:
@@ -184,12 +185,74 @@ jobs:
           mkdir -p ~/private_keys
           printf '%s\n' "$APP_STORE_CONNECT_API_PRIVATE_KEY" > ~/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
 
+      - name: Determine next iOS build number
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet PyJWT cryptography requests
+          python3 <<'PY'
+          import os
+          import time
+
+          import jwt
+          import requests
+
+          key_id = os.environ["APP_STORE_CONNECT_API_KEY_ID"]
+          issuer_id = os.environ["APP_STORE_CONNECT_ISSUER_ID"]
+          private_key = os.environ["APP_STORE_CONNECT_API_PRIVATE_KEY"]
+          bundle_id = os.environ["IOS_BUNDLE_ID"]
+
+          token = jwt.encode(
+              {"iss": issuer_id, "exp": int(time.time()) + 1200, "aud": "appstoreconnect-v1"},
+              private_key,
+              algorithm="ES256",
+              headers={"kid": key_id, "typ": "JWT"},
+          )
+          headers = {"Authorization": f"Bearer {token}"}
+          base = "https://api.appstoreconnect.apple.com/v1"
+
+          apps = requests.get(
+              f"{base}/apps",
+              params={"filter[bundleId]": bundle_id},
+              headers=headers,
+              timeout=60,
+          )
+          apps.raise_for_status()
+          data = apps.json()["data"]
+          if not data:
+              raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
+          app_id = data[0]["id"]
+
+          builds = requests.get(
+              f"{base}/builds",
+              params={"filter[app]": app_id, "sort": "-uploadedDate", "limit": "1"},
+              headers=headers,
+              timeout=60,
+          )
+          builds.raise_for_status()
+          items = builds.json()["data"]
+          latest = int(items[0]["attributes"]["version"]) if items else 0
+          next_build = latest + 1
+          print(f"Latest TestFlight build: {latest} → using {next_build}")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"IOS_BUILD_NUMBER={next_build}\n")
+          PY
+
       - name: Build release IPA
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_PATH: ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
-        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+        run: |
+          set -euo pipefail
+          echo "Using iOS build number (CFBundleVersion): $IOS_BUILD_NUMBER"
+          flutter build ipa --release \
+            --build-number="$IOS_BUILD_NUMBER" \
+            --export-options-plist=ios/ExportOptions.plist
 
       - name: Locate IPA
         run: |
