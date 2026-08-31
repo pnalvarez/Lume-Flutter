@@ -192,7 +192,9 @@ jobs:
           APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet PyJWT cryptography requests
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          source "$RUNNER_TEMP/asc-venv/bin/activate"
+          pip install --quiet PyJWT cryptography requests
           python3 <<'PY'
           import os
           import time
