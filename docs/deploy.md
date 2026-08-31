@@ -70,6 +70,7 @@ Firebase Android app ID (already in workflow): `1:145151164143:android:2d2d7ec6d
 |--------|-------------|
 | `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Base64-encoded **Apple Distribution** certificate exported as `.p12` |
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password used when exporting the `.p12` |
+| `IOS_PROVISIONING_PROFILE_BASE64` | Base64-encoded **App Store Connect** `.mobileprovision` for `com.lume.learning.app` |
 | `APP_STORE_CONNECT_API_KEY_ID` | App Store Connect API key ID (10 chars) |
 | `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID from App Store Connect → Users and Access → Integrations |
 | `APP_STORE_CONNECT_API_PRIVATE_KEY` | Full contents of the `.p8` API key file (include `BEGIN` / `END` lines) |
@@ -82,7 +83,13 @@ Export the distribution certificate from Keychain Access → export as `.p12`, t
 base64 -i Certificates.p12 | pbcopy
 ```
 
-The Xcode project uses **automatic signing** with team `L332B28T9P`. The distribution certificate + API key allow CI to build and upload without manual Xcode steps.
+Create an **App Store Connect** provisioning profile (Distribution — not Development) for App ID `com.lume.learning.app`, then:
+
+```bash
+base64 -i YourAppStore.mobileprovision | pbcopy
+```
+
+CI installs that profile and uses **manual** signing (team `L332B28T9P`) to build the IPA, then uploads with the App Store Connect API key.
 
 ## Cost notes
 
@@ -97,6 +104,8 @@ The Xcode project uses **automatic signing** with team `L332B28T9P`. The distrib
 **Firebase: unauthorized** — regenerate token with `firebase login:ci` and update `FIREBASE_TOKEN`.
 
 **iOS: no signing certificate** — ensure the `.p12` contains an **Apple Distribution** cert (not Development).
+
+**iOS: no provisioning profile / No Accounts** — use an **App Store Connect** profile (not Development), set `IOS_PROVISIONING_PROFILE_BASE64`, and confirm the profile includes your Distribution certificate.
 
 **iOS: upload failed** — confirm the app record exists in App Store Connect for bundle ID `com.lume.learning.app`.
 
