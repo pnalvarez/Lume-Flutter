@@ -177,6 +177,8 @@ Optional: override Supabase at build time with repository Variables / secrets an
 
 **macOS: no installer identity** — export **Mac Installer Distribution** as `.p12` into `MACOS_INSTALLER_CERTIFICATE_P12_BASE64`.
 
+**macOS: `SecKeychainItemSetAccessWithPassword` / passphrase not correct on installer import** — the second `import-codesign-certs` step must reuse the same `keychain-password` as the first (already wired in `deploy.yml`). Also confirm `MACOS_INSTALLER_CERTIFICATE_PASSWORD` matches the installer `.p12` export password.
+
 **Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1 across iOS + macOS, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
 
 **Vercel: Missing VERCEL_* secret** — add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` (see Web / Vercel above).
