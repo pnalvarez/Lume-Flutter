@@ -27,7 +27,7 @@ git tag v1.0.1
 git push origin main --tags
 ```
 
-iOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow queries App Store Connect for the latest uploaded build and uses **latest + 1**. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
+iOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow scans **all** App Store Connect builds for the app, takes the highest numeric version, and uses **max + 1** (Apple requires this number to rise across every marketing version). If upload still reports a duplicate, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
 
 ## GitHub secrets
 

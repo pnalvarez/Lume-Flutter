@@ -228,45 +228,92 @@ jobs:
               raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
           app_id = data[0]["id"]
 
-          builds = requests.get(
-              f"{base}/builds",
-              params={"filter[app]": app_id, "sort": "-uploadedDate", "limit": "1"},
-              headers=headers,
-              timeout=60,
+          # Apple requires CFBundleVersion to increase across *all* uploads for the
+          # app, not per marketing version. Sorting by uploadedDate + limit=1 can
+          # miss a higher build that still occupies the number (expired/invalid/
+          # processing). Paginate every build and take the numeric max.
+          versions = []
+          url = f"{base}/builds"
+          params = {
+              "filter[app]": app_id,
+              "sort": "-version",
+              "limit": "200",
+              "fields[builds]": "version",
+          }
+          while url:
+              resp = requests.get(url, params=params, headers=headers, timeout=60)
+              resp.raise_for_status()
+              body = resp.json()
+              for item in body.get("data", []):
+                  raw = item.get("attributes", {}).get("version")
+                  if raw is None:
+                      continue
+                  try:
+                      versions.append(int(str(raw).strip()))
+                  except ValueError:
+                      print(f"Skipping non-integer build version: {raw!r}")
+              url = body.get("links", {}).get("next")
+              params = None  # next link already includes query params
+
+          highest = max(versions) if versions else 0
+          next_build = highest + 1
+          print(
+              f"Scanned {len(versions)} App Store Connect build(s); "
+              f"highest CFBundleVersion={highest} → using {next_build}"
           )
-          builds.raise_for_status()
-          items = builds.json()["data"]
-          latest = int(items[0]["attributes"]["version"]) if items else 0
-          next_build = latest + 1
-          print(f"Latest TestFlight build: {latest} → using {next_build}")
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
               env_file.write(f"IOS_BUILD_NUMBER={next_build}\n")
           PY
 
-      - name: Build release IPA
+      - name: Build and upload IPA to TestFlight
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_PATH: ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          echo "Using iOS build number (CFBundleVersion): $IOS_BUILD_NUMBER"
-          flutter build ipa --release \
-            --build-number="$IOS_BUILD_NUMBER" \
-            --export-options-plist=ios/ExportOptions.plist
+          # Rebuild + re-upload with the next build number if Apple reports a
+          # duplicate CFBundleVersion (race / ASC lag after a prior upload).
+          MAX_ATTEMPTS=3
+          build_number="$IOS_BUILD_NUMBER"
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            echo "Attempt $attempt/$MAX_ATTEMPTS — CFBundleVersion=$build_number"
+            flutter build ipa --release \
+              --build-number="$build_number" \
+              --export-options-plist=ios/ExportOptions.plist
+            IPA=$(ls build/ios/ipa/*.ipa | head -n 1)
+            ls -la build/ios/ipa/
 
-      - name: Locate IPA
-        run: |
-          set -euo pipefail
-          IPA=$(ls build/ios/ipa/*.ipa | head -n 1)
-          echo "IPA_PATH=$IPA" >> "$GITHUB_ENV"
-          ls -la build/ios/ipa/
+            set +e
+            upload_log="$RUNNER_TEMP/testflight-upload-${attempt}.log"
+            xcrun altool --upload-app \
+              --type ios \
+              --file "$IPA" \
+              --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+              2>&1 | tee "$upload_log"
+            status=${PIPESTATUS[0]}
+            set -e
 
-      - name: Upload to TestFlight
-        uses: apple-actions/upload-testflight-build@v3
-        with:
-          app-path: ${{ env.IPA_PATH }}
-          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+            if [[ "$status" -eq 0 ]]; then
+              echo "Uploaded to TestFlight with CFBundleVersion=$build_number"
+              echo "IOS_BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
+              exit 0
+            fi
+
+            if grep -Eqi 'DUPLICATE|already been used|must be higher than the previously uploaded version' "$upload_log"; then
+              if [[ "$attempt" -eq "$MAX_ATTEMPTS" ]]; then
+                echo "::error::TestFlight upload failed: CFBundleVersion still colliding after $MAX_ATTEMPTS attempts (last tried $build_number)."
+                exit 1
+              fi
+              build_number=$((build_number + 1))
+              echo "Duplicate build number — retrying with CFBundleVersion=$build_number"
+              continue
+            fi
+
+            echo "::error::TestFlight upload failed with a non-duplicate error (exit $status)."
+            exit "$status"
+          done
