@@ -4,6 +4,7 @@ Deploys **Lume** to:
 
 - **Android** → [Firebase App Distribution](https://firebase.google.com/docs/app-distribution)
 - **iOS** → [TestFlight](https://developer.apple.com/testflight/)
+- **macOS** → [TestFlight](https://developer.apple.com/testflight/) (same App Store Connect app / bundle ID)
 - **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
 
 Workflow file: `.github/workflows/deploy.yml`
@@ -14,8 +15,8 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 
 | Trigger | Behavior |
 |---------|----------|
-| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + Web |
-| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / Web (checkboxes) |
+| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web |
+| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / macOS / Web (checkboxes; macOS defaults off) |
 
 Recommended release flow:
 
@@ -28,7 +29,7 @@ git tag v1.0.1
 git push origin main --tags
 ```
 
-iOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow scans **all** App Store Connect builds for the app, takes the highest numeric version, and uses **max + 1** (Apple requires this number to rise across every marketing version). If upload still reports a duplicate, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
+iOS and macOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow scans **all** App Store Connect builds for the app (shared across iOS + macOS), takes the highest numeric version, and uses **max + 1**. If upload still reports a duplicate, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
 
 ## GitHub secrets
 
@@ -96,6 +97,34 @@ base64 -i YourAppStore.mobileprovision | pbcopy
 
 CI installs that profile and uses **manual** signing (team `L332B28T9P`) to build the IPA, then uploads with the App Store Connect API key.
 
+### macOS / TestFlight
+
+Same App Store Connect app and bundle ID as iOS: `com.lume.learning.app` (macOS platform enabled on the app record).
+
+| Secret | Description |
+|--------|-------------|
+| `MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Base64-encoded **Apple Distribution** (or Mac App Distribution) `.p12` |
+| `MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for that `.p12` |
+| `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` | Base64-encoded **Mac Installer Distribution** `.p12` |
+| `MACOS_INSTALLER_CERTIFICATE_PASSWORD` | Password for the installer `.p12` |
+| `MACOS_PROVISIONING_PROFILE_BASE64` | Base64-encoded **Mac App Store** `.provisionprofile` for `com.lume.learning.app` |
+
+Reuse the existing `APP_STORE_CONNECT_*` secrets for upload and build-number lookup.
+
+Create a **Mac App Store** profile (not the iOS App Store profile) that includes your Apple Distribution certificate. Export certs from Keychain Access as `.p12`, then:
+
+```bash
+base64 -i macos-distribution.p12 | pbcopy   # → MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64
+base64 -i macos-installer.p12 | pbcopy     # → MACOS_INSTALLER_CERTIFICATE_P12_BASE64
+base64 -i Lume_Mac_App_Store.provisionprofile | pbcopy  # → MACOS_PROVISIONING_PROFILE_BASE64
+```
+
+CI builds with `flutter build macos --release`, packages a signed `.pkg` with `productbuild`, and uploads with `xcrun altool --type macos`.
+
+`macos/Runner/Info.plist` must include `LSApplicationCategoryType` (currently `public.app-category.education`) or App Store Connect rejects the upload (error 90242).
+
+Manual workflow runs leave the **macOS** checkbox off by default (macOS runners are expensive); enable it when you want a Mac TestFlight upload. Tag pushes still deploy macOS with the other platforms.
+
 ### Web / Vercel
 
 | Secret | Description |
@@ -122,8 +151,8 @@ Optional: override Supabase at build time with repository Variables / secrets an
 ## Cost notes
 
 - Android and Web builds run on `ubuntu-latest` (1× GitHub Actions minutes)
-- iOS builds run on `macos-latest` (10× minutes on the free tier)
-- Prefer **tag-triggered** deploys to conserve macOS minutes
+- iOS and macOS builds run on `macos-latest` (10× minutes on the free tier)
+- Prefer **tag-triggered** deploys to conserve macOS minutes; leave the macOS checkbox off for most manual runs
 - Vercel has its own [usage limits](https://vercel.com/docs/limits) for hosting
 
 ## Troubleshooting
@@ -142,7 +171,13 @@ Optional: override Supabase at build time with repository Variables / secrets an
 
 **iOS: upload failed** — confirm the app record exists in App Store Connect for bundle ID `com.lume.learning.app`.
 
-**Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
+**macOS: profile doesn’t include signing certificate** — recreate the Mac App Store profile with **Apple Distribution** (not only Mac App Distribution) selected.
+
+**macOS: missing LSApplicationCategoryType (90242)** — ensure `macos/Runner/Info.plist` has `LSApplicationCategoryType`.
+
+**macOS: no installer identity** — export **Mac Installer Distribution** as `.p12` into `MACOS_INSTALLER_CERTIFICATE_P12_BASE64`.
+
+**Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1 across iOS + macOS, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
 
 **Vercel: Missing VERCEL_* secret** — add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` (see Web / Vercel above).
 
