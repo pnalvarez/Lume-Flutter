@@ -4,6 +4,7 @@ Deploys **Lume** to:
 
 - **Android** → [Firebase App Distribution](https://firebase.google.com/docs/app-distribution)
 - **iOS** → [TestFlight](https://developer.apple.com/testflight/)
+- **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
 
 Workflow file: `.github/workflows/deploy.yml`
 
@@ -13,8 +14,8 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 
 | Trigger | Behavior |
 |---------|----------|
-| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS |
-| Manual **workflow_dispatch** | Choose `both`, `android`, or `ios` |
+| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + Web |
+| Manual **workflow_dispatch** | Choose `all`, `both` (Android+iOS), `android`, `ios`, or `web` |
 
 Recommended release flow:
 
@@ -95,11 +96,35 @@ base64 -i YourAppStore.mobileprovision | pbcopy
 
 CI installs that profile and uses **manual** signing (team `L332B28T9P`) to build the IPA, then uploads with the App Store Connect API key.
 
+### Web / Vercel
+
+| Secret | Description |
+|--------|-------------|
+| `VERCEL_TOKEN` | [Vercel → Account Settings → Tokens](https://vercel.com/account/tokens) (create a token with deploy access) |
+| `VERCEL_ORG_ID` | Team / personal account ID from Project Settings → General → “Project ID” panel (`orgId` in `.vercel/project.json` after `vercel link`) |
+| `VERCEL_PROJECT_ID` | Project ID from the same place (`projectId` in `.vercel/project.json`) |
+
+One-time local setup (creates the Vercel project and prints the IDs):
+
+```bash
+npm i -g vercel
+cd /path/to/lume
+vercel link   # create or select the Flutter web project
+cat .vercel/project.json   # copy orgId → VERCEL_ORG_ID, projectId → VERCEL_PROJECT_ID
+```
+
+Do **not** commit `.vercel/` (keep it gitignored). SPA routing is handled by `web/vercel.json` (copied into `build/web` by Flutter).
+
+CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. Tag pushes and `platform: all` / `platform: web` trigger this job.
+
+Optional: override Supabase at build time with repository Variables / secrets and pass `--dart-define=SUPABASE_URL=…` / `SUPABASE_ANON_KEY=…` in the workflow (defaults in `AppConfig` match production today).
+
 ## Cost notes
 
-- Android builds run on `ubuntu-latest` (1× GitHub Actions minutes)
+- Android and Web builds run on `ubuntu-latest` (1× GitHub Actions minutes)
 - iOS builds run on `macos-latest` (10× minutes on the free tier)
 - Prefer **tag-triggered** deploys to conserve macOS minutes
+- Vercel has its own [usage limits](https://vercel.com/docs/limits) for hosting
 
 ## Troubleshooting
 
@@ -117,4 +142,10 @@ CI installs that profile and uses **manual** signing (team `L332B28T9P`) to buil
 
 **iOS: upload failed** — confirm the app record exists in App Store Connect for bundle ID `com.lume.learning.app`.
 
-**Duplicate build number** — CI should auto-increment via App Store Connect (latest build + 1). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
+**Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
+
+**Vercel: Missing VERCEL_* secret** — add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` (see Web / Vercel above).
+
+**Vercel: project not found / not linked** — run `vercel link` locally, then update `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` from `.vercel/project.json`.
+
+**Web: blank page / routes 404** — confirm `web/vercel.json` is present so Flutter copies SPA rewrites into `build/web`.
