@@ -6,11 +6,7 @@ import 'package:lume/layers/domain/models/xp/level_up_domain.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
 class LumeApp extends StatelessWidget {
-  const LumeApp({
-    super.key,
-    required this.router,
-    required this.levelUpEvents,
-  });
+  const LumeApp({super.key, required this.router, required this.levelUpEvents});
 
   final AppRouter router;
   final Stream<LevelUpDomain> levelUpEvents;
