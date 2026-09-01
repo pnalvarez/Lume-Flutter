@@ -4,6 +4,7 @@ import 'package:lume/app/lume_app.dart';
 import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/core/config/app_config.dart';
 import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> bootstrap() async {
@@ -22,5 +23,7 @@ Future<void> bootstrap() async {
 
   await configureDependencies();
   final router = getIt<AppRouter>();
-  runApp(LumeApp(router: router));
+  runApp(
+    LumeApp(router: router, levelUpEvents: getIt<IWatchLevelUpEvents>()()),
+  );
 }

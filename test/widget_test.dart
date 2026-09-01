@@ -64,7 +64,9 @@ void main() {
       recoveryGuard: RecoveryGuard(session),
     );
 
-    await tester.pumpWidget(LumeApp(router: router));
+    await tester.pumpWidget(
+      LumeApp(router: router, levelUpEvents: const Stream<Never>.empty()),
+    );
     await tester.pump();
 
     expect(find.byType(SplashPage), findsOneWidget);
