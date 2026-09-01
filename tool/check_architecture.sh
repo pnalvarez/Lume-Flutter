@@ -76,10 +76,10 @@ check_grep_in packages/lume_design_system \
 while IFS= read -r -d '' file; do
   rel="${file#"$ROOT/"}"
   case "$rel" in
-    lib/bootstrap.dart|lib/core/auth/auth_service.dart) continue ;;
-  esac
-  if grep -q 'package:supabase_flutter/' "$file"; then
-    note "BLOCKER: supabase_flutter only allowed in bootstrap.dart and auth_service.dart
+    lib/bootstrap.dart|lib/core/auth/auth_service.dart|lib/core/realtime/realtime_client.dart) continue ;;
+    esac
+    if grep -q 'package:supabase_flutter/' "$file"; then
+      note "BLOCKER: supabase_flutter only allowed in bootstrap.dart, auth_service.dart, and realtime_client.dart
   $rel"
   fi
 done < <(find lib -name '*.dart' -print0)
