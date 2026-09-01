@@ -1,4 +1,5 @@
-# Deploy Lume to Firebase App Distribution (Android) and TestFlight (iOS).
+# Deploy Lume to Firebase App Distribution (Android), TestFlight (iOS),
+# and Vercel (Flutter web).
 #
 # Triggers:
 #   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
@@ -17,12 +18,14 @@ on:
       platform:
         description: Platform to deploy
         required: true
-        default: both
+        default: all
         type: choice
         options:
+          - all
           - both
           - android
           - ios
+          - web
 
 permissions:
   contents: read
@@ -43,7 +46,7 @@ jobs:
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' &&
-       (inputs.platform == 'both' || inputs.platform == 'android'))
+       (inputs.platform == 'all' || inputs.platform == 'both' || inputs.platform == 'android'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -108,7 +111,7 @@ jobs:
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' &&
-       (inputs.platform == 'both' || inputs.platform == 'ios'))
+       (inputs.platform == 'all' || inputs.platform == 'both' || inputs.platform == 'ios'))
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -317,3 +320,48 @@ jobs:
             echo "::error::TestFlight upload failed with a non-duplicate error (exit $status)."
             exit "$status"
           done
+
+  deploy-web:
+    name: Web → Vercel
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.platform == 'all' || inputs.platform == 'web'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build release web
+        run: flutter build web --release
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          for var in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [[ -z "${!var:-}" ]]; then
+              echo "::error::Missing $var secret. See docs/deploy.md"
+              exit 1
+            fi
+          done
+          # Flutter copies web/vercel.json into build/web for SPA rewrites.
+          vercel deploy build/web --prod --yes --token="$VERCEL_TOKEN"

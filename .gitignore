@@ -12,6 +12,9 @@
 .swiftpm/
 migrate_working_dir/
 
+# Vercel CLI local link (org/project IDs live in GitHub secrets)
+.vercel/
+
 # IntelliJ related
 *.iml
 *.ipr
