@@ -229,10 +229,18 @@ jobs:
         run: |
           set -euo pipefail
           # Compile-only check; deploy-macos handles App Store signing.
-          flutter build macos --release -- \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=-
+          # Flutter does not accept xcodebuild KEY=VALUE after `--` for macos.
+          {
+            echo "CODE_SIGN_IDENTITY=-"
+            echo "CODE_SIGNING_REQUIRED=NO"
+            echo "CODE_SIGNING_ALLOWED=NO"
+          } >> macos/Flutter/Flutter-Release.xcconfig
+          sed -i '' \
+            -e 's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
+            -e 's/"CODE_SIGN_IDENTITY\[sdk=macosx\*\]" = "Apple Distribution";/"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";/g' \
+            -e 's/"PROVISIONING_PROFILE_SPECIFIER\[sdk=macosx\*\]" = "[^"]*";/"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";/g' \
+            macos/Runner.xcodeproj/project.pbxproj
+          flutter build macos --release
 
   ci-required:
     name: All checks passed
