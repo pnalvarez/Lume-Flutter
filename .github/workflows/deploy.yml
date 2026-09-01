@@ -1,9 +1,9 @@
-# Deploy Lume to Firebase App Distribution (Android), TestFlight (iOS),
+# Deploy Lume to Firebase App Distribution (Android), TestFlight (iOS / macOS),
 # and Vercel (Flutter web).
 #
 # Triggers:
 #   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
-#   - Manual run from Actions tab (toggle Android / iOS / Web)
+#   - Manual run from Actions tab (toggle Android / iOS / macOS / Web)
 #
 # Required GitHub secrets — see docs/deploy.md
 
@@ -23,6 +23,10 @@ on:
         description: Deploy iOS → TestFlight
         type: boolean
         default: true
+      macos:
+        description: Deploy macOS → TestFlight
+        type: boolean
+        default: false
       web:
         description: Deploy Web → Vercel
         type: boolean
@@ -40,6 +44,7 @@ env:
   FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
   FIREBASE_TESTER_GROUPS: internal
   IOS_BUNDLE_ID: com.lume.learning.app
+  MACOS_BUNDLE_ID: com.lume.learning.app
 
 jobs:
   deploy-android:
@@ -317,6 +322,243 @@ jobs:
             fi
 
             echo "::error::TestFlight upload failed with a non-duplicate error (exit $status)."
+            exit "$status"
+          done
+
+  deploy-macos:
+    name: macOS → TestFlight
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.macos)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Import Mac Distribution certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+
+      - name: Import Mac Installer certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
+          create-keychain: false
+
+      - name: Install Mac App Store provisioning profile
+        env:
+          MACOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.MACOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MACOS_PROVISIONING_PROFILE_BASE64:-}" ]]; then
+            echo "::error::Missing MACOS_PROVISIONING_PROFILE_BASE64 secret. See docs/deploy.md"
+            exit 1
+          fi
+
+          PROFILE_PATH="$RUNNER_TEMP/macos.provisionprofile"
+          PROFILE_PLIST="$RUNNER_TEMP/macos-profile.plist"
+          echo "$MACOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$PROFILE_PLIST")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$PROFILE_PLIST")
+          echo "Installing Mac profile: $NAME ($UUID)"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.provisionprofile"
+          cp "$PROFILE_PATH" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$UUID.provisionprofile"
+
+          {
+            echo "CODE_SIGN_STYLE=Manual"
+            echo "CODE_SIGN_IDENTITY=Apple Distribution"
+            echo "PROVISIONING_PROFILE_SPECIFIER=$NAME"
+            echo "DEVELOPMENT_TEAM=L332B28T9P"
+          } >> macos/Flutter/Flutter-Release.xcconfig
+
+          # Manual signing for this CI checkout only (runner workspace is ephemeral).
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' \
+            macos/Runner.xcodeproj/project.pbxproj
+
+          /usr/libexec/PlistBuddy -c "Set :provisioningProfiles:com.lume.learning.app $NAME" macos/ExportOptions.plist 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:com.lume.learning.app string $NAME" macos/ExportOptions.plist
+
+          echo "MACOS_PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+
+      - name: Configure App Store Connect API key
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          for var in APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_PRIVATE_KEY; do
+            if [[ -z "${!var:-}" ]]; then
+              echo "::error::Missing $var secret. See docs/deploy.md"
+              exit 1
+            fi
+          done
+          mkdir -p ~/private_keys
+          printf '%s\n' "$APP_STORE_CONNECT_API_PRIVATE_KEY" > ~/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+      - name: Determine next macOS build number
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          source "$RUNNER_TEMP/asc-venv/bin/activate"
+          pip install --quiet PyJWT cryptography requests
+          python3 <<'PY'
+          import os
+          import time
+
+          import jwt
+          import requests
+
+          key_id = os.environ["APP_STORE_CONNECT_API_KEY_ID"]
+          issuer_id = os.environ["APP_STORE_CONNECT_ISSUER_ID"]
+          private_key = os.environ["APP_STORE_CONNECT_API_PRIVATE_KEY"]
+          bundle_id = os.environ["MACOS_BUNDLE_ID"]
+
+          token = jwt.encode(
+              {"iss": issuer_id, "exp": int(time.time()) + 1200, "aud": "appstoreconnect-v1"},
+              private_key,
+              algorithm="ES256",
+              headers={"kid": key_id, "typ": "JWT"},
+          )
+          headers = {"Authorization": f"Bearer {token}"}
+          base = "https://api.appstoreconnect.apple.com/v1"
+
+          apps = requests.get(
+              f"{base}/apps",
+              params={"filter[bundleId]": bundle_id},
+              headers=headers,
+              timeout=60,
+          )
+          apps.raise_for_status()
+          data = apps.json()["data"]
+          if not data:
+              raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
+          app_id = data[0]["id"]
+
+          # Same app as iOS — CFBundleVersion must rise across iOS + macOS builds.
+          versions = []
+          url = f"{base}/builds"
+          params = {
+              "filter[app]": app_id,
+              "sort": "-version",
+              "limit": "200",
+              "fields[builds]": "version",
+          }
+          while url:
+              resp = requests.get(url, params=params, headers=headers, timeout=60)
+              resp.raise_for_status()
+              body = resp.json()
+              for item in body.get("data", []):
+                  raw = item.get("attributes", {}).get("version")
+                  if raw is None:
+                      continue
+                  try:
+                      versions.append(int(str(raw).strip()))
+                  except ValueError:
+                      print(f"Skipping non-integer build version: {raw!r}")
+              url = body.get("links", {}).get("next")
+              params = None
+
+          highest = max(versions) if versions else 0
+          next_build = highest + 1
+          print(
+              f"Scanned {len(versions)} App Store Connect build(s); "
+              f"highest CFBundleVersion={highest} → using {next_build}"
+          )
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"MACOS_BUILD_NUMBER={next_build}\n")
+          PY
+
+      - name: Build, package, and upload macOS to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          MAX_ATTEMPTS=3
+          build_number="$MACOS_BUILD_NUMBER"
+          APP_NAME="lume"
+          APP_PATH="build/macos/Build/Products/Release/${APP_NAME}.app"
+
+          INSTALLER_IDENTITY=$(security find-identity -v | awk -F'"' '/Mac Developer Installer|3rd Party Mac Developer Installer/{print $2; exit}')
+          if [[ -z "${INSTALLER_IDENTITY:-}" ]]; then
+            echo "::error::No Mac Installer signing identity found in the keychain."
+            security find-identity -v
+            exit 1
+          fi
+          echo "Using installer identity: $INSTALLER_IDENTITY"
+
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            echo "Attempt $attempt/$MAX_ATTEMPTS — CFBundleVersion=$build_number"
+            flutter build macos --release --build-number="$build_number"
+
+            if [[ ! -d "$APP_PATH" ]]; then
+              echo "::error::Expected app not found at $APP_PATH"
+              find build/macos -name '*.app' -maxdepth 5 2>/dev/null || true
+              exit 1
+            fi
+
+            PKG_PATH="$RUNNER_TEMP/lume-${build_number}.pkg"
+            rm -f "$PKG_PATH"
+            productbuild \
+              --component "$APP_PATH" /Applications \
+              --sign "$INSTALLER_IDENTITY" \
+              "$PKG_PATH"
+            ls -la "$PKG_PATH"
+
+            set +e
+            upload_log="$RUNNER_TEMP/macos-testflight-upload-${attempt}.log"
+            xcrun altool --upload-app \
+              --type macos \
+              --file "$PKG_PATH" \
+              --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+              2>&1 | tee "$upload_log"
+            status=${PIPESTATUS[0]}
+            set -e
+
+            if [[ "$status" -eq 0 ]]; then
+              echo "Uploaded macOS build to TestFlight with CFBundleVersion=$build_number"
+              echo "MACOS_BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
+              exit 0
+            fi
+
+            if grep -Eqi 'DUPLICATE|already been used|must be higher than the previously uploaded version' "$upload_log"; then
+              if [[ "$attempt" -eq "$MAX_ATTEMPTS" ]]; then
+                echo "::error::macOS TestFlight upload failed: CFBundleVersion still colliding after $MAX_ATTEMPTS attempts (last tried $build_number)."
+                exit 1
+              fi
+              build_number=$((build_number + 1))
+              echo "Duplicate build number — retrying with CFBundleVersion=$build_number"
+              continue
+            fi
+
+            echo "::error::macOS TestFlight upload failed with a non-duplicate error (exit $status)."
             exit "$status"
           done
 

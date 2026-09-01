@@ -206,6 +206,42 @@ jobs:
       - name: Build release web
         run: flutter build web --release
 
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build release macOS (unsigned)
+        run: |
+          set -euo pipefail
+          # Compile-only check; deploy-macos handles App Store signing.
+          # Flutter does not accept xcodebuild KEY=VALUE after `--` for macos.
+          {
+            echo "CODE_SIGN_IDENTITY=-"
+            echo "CODE_SIGNING_REQUIRED=NO"
+            echo "CODE_SIGNING_ALLOWED=NO"
+          } >> macos/Flutter/Flutter-Release.xcconfig
+          sed -i '' \
+            -e 's/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Automatic;/g' \
+            -e 's/"CODE_SIGN_IDENTITY\[sdk=macosx\*\]" = "Apple Distribution";/"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";/g' \
+            -e 's/"PROVISIONING_PROFILE_SPECIFIER\[sdk=macosx\*\]" = "[^"]*";/"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";/g' \
+            macos/Runner.xcodeproj/project.pbxproj
+          flutter build macos --release
+
   ci-required:
     name: All checks passed
     runs-on: ubuntu-latest
@@ -217,6 +253,7 @@ jobs:
       - build-android
       - build-ios
       - build-web
+      - build-macos
     if: always()
     steps:
       - name: Enforce job results
@@ -228,6 +265,7 @@ jobs:
           ANDROID: ${{ needs.build-android.result }}
           IOS: ${{ needs.build-ios.result }}
           WEB: ${{ needs.build-web.result }}
+          MACOS: ${{ needs.build-macos.result }}
         run: |
           echo "unit-tests-and-coverage: $UNIT"
           echo "ui-tests: $UI"
@@ -236,7 +274,8 @@ jobs:
           echo "build-android: $ANDROID"
           echo "build-ios: $IOS"
           echo "build-web: $WEB"
-          if [[ "$UNIT" != "success" || "$UI" != "success" || "$STYLE" != "success" || "$ARCH" != "success" || "$ANDROID" != "success" || "$IOS" != "success" || "$WEB" != "success" ]]; then
+          echo "build-macos: $MACOS"
+          if [[ "$UNIT" != "success" || "$UI" != "success" || "$STYLE" != "success" || "$ARCH" != "success" || "$ANDROID" != "success" || "$IOS" != "success" || "$WEB" != "success" || "$MACOS" != "success" ]]; then
             echo "::error::CI did not complete successfully; do not merge."
             exit 1
           fi
