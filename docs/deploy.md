@@ -103,23 +103,34 @@ Same App Store Connect app and bundle ID as iOS: `com.lume.learning.app` (macOS 
 
 | Secret | Description |
 |--------|-------------|
-| `MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Base64-encoded **Apple Distribution** (or Mac App Distribution) `.p12` |
+| `MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Base64-encoded **Apple Distribution** `.p12` |
 | `MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for that `.p12` |
-| `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` | Base64-encoded **Mac Installer Distribution** `.p12` |
+| `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` | Base64-encoded **3rd Party Mac Developer Installer** `.p12` (must not be Distribution) |
 | `MACOS_INSTALLER_CERTIFICATE_PASSWORD` | Password for the installer `.p12` |
 | `MACOS_PROVISIONING_PROFILE_BASE64` | Base64-encoded **Mac App Store** `.provisionprofile` for `com.lume.learning.app` |
 
 Reuse the existing `APP_STORE_CONNECT_*` secrets for upload and build-number lookup.
 
-Create a **Mac App Store** profile (not the iOS App Store profile) that includes your Apple Distribution certificate. Export certs from Keychain Access as `.p12`, then:
+Export **two separate** `.p12` files from Keychain Access → **My Certificates** (each with its private key):
+
+1. `Apple Distribution: … (L332B28T9P)` → `macos-distribution.p12`
+2. `3rd Party Mac Developer Installer: … (L332B28T9P)` → `macos-installer.p12`
 
 ```bash
 base64 -i macos-distribution.p12 | pbcopy   # → MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64
-base64 -i macos-installer.p12 | pbcopy     # → MACOS_INSTALLER_CERTIFICATE_P12_BASE64
+base64 -i macos-installer.p12 | pbcopy       # → MACOS_INSTALLER_CERTIFICATE_P12_BASE64
 base64 -i Lume_Mac_App_Store.provisionprofile | pbcopy  # → MACOS_PROVISIONING_PROFILE_BASE64
 ```
 
-CI builds with `flutter build macos --release`, packages a signed `.pkg` with `productbuild`, and uploads with `xcrun altool --type macos`.
+Verify the installer file before uploading the secret:
+
+```bash
+openssl pkcs12 -in macos-installer.p12 -nokeys -passin pass:YOUR_PASSWORD \
+  | openssl x509 -noout -subject
+# subject must include "Installer"
+```
+
+CI imports **both** `.p12` files in a single custom keychain step (not two `import-codesign-certs` calls), builds with `flutter build macos --release`, packages a signed `.pkg` with `productbuild`, and uploads with `xcrun altool --type macos`.
 
 `macos/Runner/Info.plist` must include `LSApplicationCategoryType` (currently `public.app-category.education`) or App Store Connect rejects the upload (error 90242).
 
@@ -175,9 +186,7 @@ Optional: override Supabase at build time with repository Variables / secrets an
 
 **macOS: missing LSApplicationCategoryType (90242)** — ensure `macos/Runner/Info.plist` has `LSApplicationCategoryType`.
 
-**macOS: no installer identity** — export **Mac Installer Distribution** as `.p12` into `MACOS_INSTALLER_CERTIFICATE_P12_BASE64`.
-
-**macOS: `SecKeychainItemSetAccessWithPassword` / passphrase not correct on installer import** — the second `import-codesign-certs` step must reuse the same `keychain-password` as the first (already wired in `deploy.yml`). Also confirm `MACOS_INSTALLER_CERTIFICATE_PASSWORD` matches the installer `.p12` export password.
+**macOS: no installer identity / Installer missing after import** — `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` is probably still an Apple Distribution export. Re-export **3rd Party Mac Developer Installer** from Keychain, confirm `openssl … -subject` contains `Installer`, then update the secret. CI imports both certs in one step and fails early if Installer is missing.
 
 **Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1 across iOS + macOS, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
 
