@@ -3,7 +3,7 @@
 #
 # Triggers:
 #   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
-#   - Manual run from Actions tab (choose platform)
+#   - Manual run from Actions tab (toggle Android / iOS / Web)
 #
 # Required GitHub secrets — see docs/deploy.md
 
@@ -15,17 +15,18 @@ on:
       - "v*"
   workflow_dispatch:
     inputs:
-      platform:
-        description: Platform to deploy
-        required: true
-        default: all
-        type: choice
-        options:
-          - all
-          - both
-          - android
-          - ios
-          - web
+      android:
+        description: Deploy Android → Firebase
+        type: boolean
+        default: true
+      ios:
+        description: Deploy iOS → TestFlight
+        type: boolean
+        default: true
+      web:
+        description: Deploy Web → Vercel
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -45,8 +46,7 @@ jobs:
     name: Android → Firebase
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' &&
-       (inputs.platform == 'all' || inputs.platform == 'both' || inputs.platform == 'android'))
+      (github.event_name == 'workflow_dispatch' && inputs.android)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -110,8 +110,7 @@ jobs:
     name: iOS → TestFlight
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' &&
-       (inputs.platform == 'all' || inputs.platform == 'both' || inputs.platform == 'ios'))
+      (github.event_name == 'workflow_dispatch' && inputs.ios)
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -325,8 +324,7 @@ jobs:
     name: Web → Vercel
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' &&
-       (inputs.platform == 'all' || inputs.platform == 'web'))
+      (github.event_name == 'workflow_dispatch' && inputs.web)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
