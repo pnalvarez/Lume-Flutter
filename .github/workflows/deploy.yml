@@ -347,11 +347,15 @@ jobs:
       - name: Generate code
         run: dart run build_runner build --delete-conflicting-outputs
 
+      # Both imports must share the same keychain-password. With create-keychain:
+      # false, the second import fails at set-key-partition-list if the password
+      # differs from the one used when the temp keychain was created.
       - name: Import Mac Distribution certificate
         uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
 
       - name: Import Mac Installer certificate
         uses: apple-actions/import-codesign-certs@v3
@@ -359,6 +363,7 @@ jobs:
           p12-file-base64: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_P12_BASE64 }}
           p12-password: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSWORD }}
           create-keychain: false
+          keychain-password: ${{ secrets.MACOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
 
       - name: Install Mac App Store provisioning profile
         env:
