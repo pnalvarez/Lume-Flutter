@@ -15,7 +15,7 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 | Trigger | Behavior |
 |---------|----------|
 | Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + Web |
-| Manual **workflow_dispatch** | Choose `all`, `both` (Android+iOS), `android`, `ios`, or `web` |
+| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / Web (checkboxes) |
 
 Recommended release flow:
 
@@ -115,7 +115,7 @@ cat .vercel/project.json   # copy orgId → VERCEL_ORG_ID, projectId → VERCEL_
 
 Do **not** commit `.vercel/` (keep it gitignored). SPA routing is handled by `web/vercel.json` (copied into `build/web` by Flutter).
 
-CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. Tag pushes and `platform: all` / `platform: web` trigger this job.
+CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. Tag pushes always include Web; manual runs include it when the **Web** checkbox is enabled.
 
 Optional: override Supabase at build time with repository Variables / secrets and pass `--dart-define=SUPABASE_URL=…` / `SUPABASE_ANON_KEY=…` in the workflow (defaults in `AppConfig` match production today).
 
