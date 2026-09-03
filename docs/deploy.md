@@ -6,6 +6,7 @@ Deploys **Lume** to:
 - **iOS** → [TestFlight](https://developer.apple.com/testflight/)
 - **macOS** → [TestFlight](https://developer.apple.com/testflight/) (same App Store Connect app / bundle ID)
 - **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
+- **Linux** → [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) (x86_64 `.tar.gz` bundle)
 
 Workflow file: `.github/workflows/deploy.yml`
 
@@ -15,8 +16,8 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 
 | Trigger | Behavior |
 |---------|----------|
-| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web |
-| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / macOS / Web (checkboxes; macOS defaults off) |
+| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web + Linux |
+| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / macOS / Web / Linux (checkboxes; macOS defaults off) |
 
 Recommended release flow:
 
@@ -159,9 +160,40 @@ CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. Ta
 
 Optional: override Supabase at build time with repository Variables / secrets and pass `--dart-define=SUPABASE_URL=…` / `SUPABASE_ANON_KEY=…` in the workflow (defaults in `AppConfig` match production today).
 
+### Linux / GitHub Releases
+
+There is no TestFlight for Linux. The closest equivalent for this project is a **GitHub Release** with the desktop bundle attached — testers download a versioned `.tar.gz`, extract it, and run `./lume`. That matches how TestFlight / Firebase App Distribution work for internal builds: a shared download, not a public store.
+
+| Channel | Role |
+|---------|------|
+| **GitHub Releases** (this workflow) | Internal / beta distribution — TestFlight analog |
+| Snap `edge` / `beta`, Flathub beta | Later, if you want a Linux *store* with auto-updates |
+
+No extra GitHub secrets. The Linux job needs `contents: write` (set on the job) so it can attach the archive to the release created for the `v*` tag.
+
+CI runs `flutter build linux --release` on `ubuntu-latest` (x86_64), packs `build/linux/x64/release/bundle` as `lume-<tag>-linux-x64.tar.gz`, always uploads it as a workflow artifact, and on tag pushes also attaches it to the GitHub Release.
+
+Testers on Linux:
+
+```bash
+tar -xzf lume-v1.0.1-linux-x64.tar.gz
+cd bundle
+./lume
+```
+
+The machine needs GTK 3 (Ubuntu 22.04+ / Fedora / similar). The archive is **x86_64 only** — it will not run on ARM Linux (Raspberry Pi, most Apple Silicon VMs) or on macOS.
+
+**Testing on a Mac:** you cannot build or run the Linux desktop app natively. `flutter build linux` only works on Linux, and the CI binary is an ELF executable, not a `.app`. Options:
+
+1. **Use the macOS build instead** if you just want to try the desktop UI on this machine (TestFlight / `flutter run -d macos`).
+2. **UTM** (free) with an **x86_64** Ubuntu VM if you need to run the *same* artifact CI produces. On Apple Silicon that VM is emulated and slower; an ARM Ubuntu VM can `flutter run -d linux` for local development but cannot run the GitHub x86_64 tarball.
+3. **A real Linux x86_64 machine** (or cloud VM) is the reliable way to QA the release bundle.
+
+Manual workflow runs include Linux when the **Linux** checkbox is enabled (on by default). Download the artifact from the Actions run if you did not push a tag.
+
 ## Cost notes
 
-- Android and Web builds run on `ubuntu-latest` (1× GitHub Actions minutes)
+- Android, Web, and Linux builds run on `ubuntu-latest` (1× GitHub Actions minutes)
 - iOS and macOS builds run on `macos-latest` (10× minutes on the free tier)
 - Prefer **tag-triggered** deploys to conserve macOS minutes; leave the macOS checkbox off for most manual runs
 - Vercel has its own [usage limits](https://vercel.com/docs/limits) for hosting
@@ -195,3 +227,11 @@ Optional: override Supabase at build time with repository Variables / secrets an
 **Vercel: project not found / not linked** — run `vercel link` locally, then update `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` from `.vercel/project.json`.
 
 **Web: blank page / routes 404** — confirm `web/vercel.json` is present so Flutter copies SPA rewrites into `build/web`.
+
+**Linux: missing GTK / cmake** — CI installs `clang`, `cmake`, `ninja-build`, `pkg-config`, `libgtk-3-dev`. Local Linux builds need the same packages.
+
+**Linux: cannot run the tarball on a Mac** — expected. Use a Linux x86_64 VM/machine, or test desktop UI via the macOS build.
+
+**Linux: `Exec format error` in an Apple Silicon Ubuntu VM** — the release is x86_64; that VM is ARM. Use an x86_64 VM (emulated) or a real x86_64 Linux host.
+
+**Linux: GitHub Release missing the tarball** — tag-triggered deploys attach it; manual runs only upload the Actions artifact. Confirm the job has `contents: write` and the tag matches `v*`.
