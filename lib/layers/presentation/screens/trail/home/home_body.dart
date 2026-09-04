@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
@@ -8,6 +7,7 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/loaders/display_as_loader.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
+import 'package:lume_design_system/organisms/navigation/brand_header.dart';
 
 /// Trail home chrome. No Bloc, router, or GetIt — safe for Widgetbook.
 class HomeBody extends StatelessWidget {
@@ -165,60 +165,27 @@ class _HomeScroll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final topInset = MediaQuery.paddingOf(context).top;
     final name = (greetingName == null || greetingName!.isEmpty)
         ? trailHomeGreetingFallback
         : greetingName!;
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle.light.copyWith(
-              statusBarColor: Colors.transparent,
-            ),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(
-                AppSpacings.xl2,
-                topInset + AppSpacings.xl2,
-                AppSpacings.xl2,
-                AppSpacings.xl3,
-              ),
-              decoration: BoxDecoration(
-                color: cs.primary,
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(AppRadius.xl3),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$trailHomeGreetingPrefix$name',
-                    style: typ.body1Semibold.copyWith(color: cs.onPrimary),
-                  ),
-                  const SizedBox(height: AppSpacings.xs),
-                  Text(
-                    trailHomeSubtitle,
-                    style: typ.body4Light.copyWith(
-                      color: cs.onPrimary.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        BrandHeader(
+          title: '$trailHomeGreetingPrefix$name',
+          subtitle: trailHomeSubtitle,
         ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacings.l,
-            AppSpacings.l,
-            AppSpacings.l,
-            AppSpacings.xl2,
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacings.l,
+              AppSpacings.l,
+              AppSpacings.l,
+              AppSpacings.xl2,
+            ),
+            children: listChildren,
           ),
-          sliver: SliverList(delegate: SliverChildListDelegate(listChildren)),
         ),
       ],
     );
