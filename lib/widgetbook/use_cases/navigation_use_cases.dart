@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/organisms/navigation/bottom_nav_bar.dart';
+import 'package:lume_design_system/organisms/navigation/brand_header.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 import 'package:lume_design_system/organisms/navigation/screen_header.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -86,6 +87,44 @@ Widget screenHeaderDefault(BuildContext context) {
           const Expanded(child: SizedBox.shrink()),
         ],
       ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Default', type: BrandHeader)
+Widget brandHeaderDefault(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Olá, Ana',
+  );
+  final subtitle = context.knobs.string(
+    label: 'Subtitle',
+    initialValue: 'Vamos aprender algo novo hoje?',
+  );
+  return Scaffold(
+    body: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        BrandHeader(title: title, subtitle: subtitle),
+        const Expanded(child: SizedBox.shrink()),
+      ],
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Title only', type: BrandHeader)
+Widget brandHeaderTitleOnly(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Olá, Ana',
+  );
+  return Scaffold(
+    body: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        BrandHeader(title: title),
+        const Expanded(child: SizedBox.shrink()),
+      ],
     ),
   );
 }

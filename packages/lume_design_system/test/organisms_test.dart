@@ -11,6 +11,7 @@ import 'package:lume_design_system/organisms/game/choice_group.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 import 'package:lume_design_system/organisms/game/session_timer.dart';
 import 'package:lume_design_system/organisms/navigation/bottom_nav_bar.dart';
+import 'package:lume_design_system/organisms/navigation/brand_header.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 import 'package:lume_design_system/organisms/navigation/screen_header.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
@@ -51,6 +52,25 @@ void main() {
       expect(find.text('Quiz'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.arrow_back_rounded));
       expect(back, isTrue);
+    });
+
+    testWidgets('BrandHeader shows title and subtitle', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const BrandHeader(
+            title: 'Olá, Ana',
+            subtitle: 'Vamos aprender algo novo hoje?',
+          ),
+        ),
+      );
+      expect(find.text('Olá, Ana'), findsOneWidget);
+      expect(find.text('Vamos aprender algo novo hoje?'), findsOneWidget);
+    });
+
+    testWidgets('BrandHeader omits subtitle when null', (tester) async {
+      await tester.pumpWidget(_wrap(const BrandHeader(title: 'Olá, Ana')));
+      expect(find.text('Olá, Ana'), findsOneWidget);
+      expect(find.byType(Text), findsOneWidget);
     });
 
     testWidgets('PageHeader stacked title sits below back', (tester) async {
