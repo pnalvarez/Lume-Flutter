@@ -132,11 +132,8 @@ class TrailDetailSubmoduleListItem extends StatelessWidget {
         ? unlockHint
         : null;
 
-    final trait = locked
-        ? ListItemTrait.neutral
-        : submodule.isCompleted
-        ? ListItemTrait.success
-        : ListItemTrait.brand;
+    // Completed keeps default/brand chrome; only the trailing check signals done.
+    final trait = locked ? ListItemTrait.neutral : ListItemTrait.brand;
 
     final trailingIcon = locked
         ? Icons.lock_rounded
@@ -146,7 +143,11 @@ class TrailDetailSubmoduleListItem extends StatelessWidget {
         ? Icons.warning_amber_rounded
         : Icons.chevron_right_rounded;
 
-    final warningColor = needsRetry ? AppColors.Accent.onAccent : null;
+    final trailingIconColor = needsRetry
+        ? AppColors.Accent.onAccent
+        : submodule.isCompleted
+        ? AppColors.Success.onSuccess
+        : null;
 
     return ListItem(
       trait: trait,
@@ -158,9 +159,9 @@ class TrailDetailSubmoduleListItem extends StatelessWidget {
         title: submodule.title,
         caption: '$gamesLabel · $statusLabel',
         hint: hint,
-        hintColor: warningColor,
+        hintColor: needsRetry ? AppColors.Accent.onAccent : null,
         trailingIcon: trailingIcon,
-        trailingIconColor: warningColor,
+        trailingIconColor: trailingIconColor,
         showAccentBar: true,
       ),
     );

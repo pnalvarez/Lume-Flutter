@@ -195,6 +195,12 @@ Widget trailDetailReady(BuildContext context) {
         TrailDetailLevelUi(
           title: 'Nível 1 — Colônia',
           submodules: [
+            const TrailDetailSubmoduleRowUi(
+              id: 9,
+              title: '1.1 - O que é inteligência artificial',
+              gamesCount: 4,
+              isCompleted: true,
+            ),
             TrailDetailSubmoduleRowUi(
               id: 10,
               title: 'Chegada dos portugueses',
