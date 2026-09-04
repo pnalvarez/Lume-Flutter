@@ -1,9 +1,10 @@
 # Deploy Lume to Firebase App Distribution (Android), TestFlight (iOS / macOS),
-# and Vercel (Flutter web).
+# App Store Connect release candidate (iOS), and Vercel (Flutter web).
 #
 # Triggers:
 #   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
-#   - Manual run from Actions tab (toggle Android / iOS / macOS / Web)
+#   - Manual run from Actions tab (toggle Android / iOS / macOS / Web /
+#     iOS App Store RC)
 #
 # Required GitHub secrets — see docs/deploy.md
 
@@ -23,6 +24,10 @@ on:
         description: Deploy iOS → TestFlight
         type: boolean
         default: true
+      ios_release_candidate:
+        description: iOS → App Store version (upload + attach build as RC)
+        type: boolean
+        default: false
       macos:
         description: Deploy macOS → TestFlight
         type: boolean
@@ -115,8 +120,11 @@ jobs:
     name: iOS → TestFlight
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && inputs.ios)
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.ios || inputs.ios_release_candidate))
     runs-on: macos-latest
+    outputs:
+      build_number: ${{ steps.upload_ipa.outputs.build_number }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -274,6 +282,7 @@ jobs:
           PY
 
       - name: Build and upload IPA to TestFlight
+        id: upload_ipa
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -308,6 +317,7 @@ jobs:
             if [[ "$status" -eq 0 ]]; then
               echo "Uploaded to TestFlight with CFBundleVersion=$build_number"
               echo "IOS_BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
+              echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -324,6 +334,238 @@ jobs:
             echo "::error::TestFlight upload failed with a non-duplicate error (exit $status)."
             exit "$status"
           done
+
+  # Manual only: after TestFlight upload, wait for ASC processing and attach the
+  # build to the iOS App Store version (pubspec marketing version) as a release
+  # candidate. Does not submit for App Review.
+  ios-app-store-rc:
+    name: iOS → App Store RC
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.ios_release_candidate
+    needs: deploy-ios
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Attach build to App Store version
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+          IOS_BUNDLE_ID: ${{ env.IOS_BUNDLE_ID }}
+          IOS_BUILD_NUMBER: ${{ needs.deploy-ios.outputs.build_number }}
+        run: |
+          set -euo pipefail
+          for var in APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_PRIVATE_KEY IOS_BUILD_NUMBER; do
+            if [[ -z "${!var:-}" ]]; then
+              echo "::error::Missing $var (secret or deploy-ios output). See docs/deploy.md"
+              exit 1
+            fi
+          done
+
+          MARKETING_VERSION=$(python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path("pubspec.yaml").read_text(encoding="utf-8")
+          match = re.search(r"^version:\s*([0-9]+\.[0-9]+\.[0-9]+)", text, re.M)
+          if not match:
+              raise SystemExit("Could not parse marketing version from pubspec.yaml")
+          print(match.group(1))
+          PY
+          )
+          echo "Marketing version: $MARKETING_VERSION"
+          echo "CFBundleVersion: $IOS_BUILD_NUMBER"
+
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          # shellcheck disable=SC1091
+          source "$RUNNER_TEMP/asc-venv/bin/activate"
+          pip install --quiet PyJWT cryptography requests
+
+          MARKETING_VERSION="$MARKETING_VERSION" python3 <<'PY'
+          import os
+          import time
+
+          import jwt
+          import requests
+
+          key_id = os.environ["APP_STORE_CONNECT_API_KEY_ID"]
+          issuer_id = os.environ["APP_STORE_CONNECT_ISSUER_ID"]
+          private_key = os.environ["APP_STORE_CONNECT_API_PRIVATE_KEY"]
+          bundle_id = os.environ["IOS_BUNDLE_ID"]
+          build_number = str(os.environ["IOS_BUILD_NUMBER"]).strip()
+          marketing_version = os.environ["MARKETING_VERSION"].strip()
+
+          EDITABLE_STATES = {
+              "PREPARE_FOR_SUBMISSION",
+              "DEVELOPER_REJECTED",
+              "REJECTED",
+              "METADATA_REJECTED",
+              "INVALID_BINARY",
+          }
+
+          def make_token() -> str:
+              return jwt.encode(
+                  {
+                      "iss": issuer_id,
+                      "exp": int(time.time()) + 1200,
+                      "aud": "appstoreconnect-v1",
+                  },
+                  private_key,
+                  algorithm="ES256",
+                  headers={"kid": key_id, "typ": "JWT"},
+              )
+
+          session = requests.Session()
+          base = "https://api.appstoreconnect.apple.com/v1"
+
+          def headers() -> dict:
+              return {
+                  "Authorization": f"Bearer {make_token()}",
+                  "Content-Type": "application/json",
+              }
+
+          def api(method: str, path: str, **kwargs):
+              url = path if path.startswith("http") else f"{base}{path}"
+              resp = session.request(method, url, headers=headers(), timeout=60, **kwargs)
+              if resp.status_code >= 400:
+                  detail = resp.text
+                  try:
+                      detail = resp.json()
+                  except Exception:
+                      pass
+                  raise SystemExit(f"ASC {method} {path} failed ({resp.status_code}): {detail}")
+              if resp.status_code == 204 or not resp.content:
+                  return None
+              return resp.json()
+
+          apps = api("GET", "/apps", params={"filter[bundleId]": bundle_id})
+          data = apps["data"]
+          if not data:
+              raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
+          app_id = data[0]["id"]
+          print(f"App ID: {app_id}")
+
+          # Wait until the uploaded build is processed and usable.
+          deadline = time.time() + 45 * 60
+          build = None
+          while time.time() < deadline:
+              body = api(
+                  "GET",
+                  "/builds",
+                  params={
+                      "filter[app]": app_id,
+                      "filter[version]": build_number,
+                      "sort": "-uploadedDate",
+                      "limit": "10",
+                      "fields[builds]": "version,processingState,usesNonExemptEncryption",
+                  },
+              )
+              candidates = body.get("data") or []
+              if candidates:
+                  build = candidates[0]
+                  state = build["attributes"].get("processingState")
+                  print(f"Build {build_number} processingState={state} id={build['id']}")
+                  if state == "VALID":
+                      break
+                  if state in {"FAILED", "INVALID"}:
+                      raise SystemExit(
+                          f"Build {build_number} ended in {state}; cannot attach as RC."
+                      )
+              else:
+                  print(f"Build {build_number} not visible yet; waiting…")
+              time.sleep(30)
+          else:
+              raise SystemExit(
+                  f"Timed out waiting for build {build_number} to become VALID."
+              )
+
+          build_id = build["id"]
+          if build["attributes"].get("usesNonExemptEncryption") is None:
+              print("Setting usesNonExemptEncryption=false on build…")
+              api(
+                  "PATCH",
+                  f"/builds/{build_id}",
+                  json={
+                      "data": {
+                          "type": "builds",
+                          "id": build_id,
+                          "attributes": {"usesNonExemptEncryption": False},
+                      }
+                  },
+              )
+
+          versions = api(
+              "GET",
+              "/apps/{}/appStoreVersions".format(app_id),
+              params={
+                  "filter[platform]": "IOS",
+                  "filter[versionString]": marketing_version,
+                  "limit": "10",
+                  "fields[appStoreVersions]": "versionString,appStoreState,platform",
+              },
+          )
+          version = None
+          for item in versions.get("data") or []:
+              state = item["attributes"].get("appStoreState")
+              print(
+                  f"Found version {item['attributes'].get('versionString')} "
+                  f"state={state} id={item['id']}"
+              )
+              if state in EDITABLE_STATES:
+                  version = item
+                  break
+
+          if version is None:
+              existing = versions.get("data") or []
+              if existing:
+                  states = ", ".join(
+                      f"{v['attributes'].get('appStoreState')}" for v in existing
+                  )
+                  raise SystemExit(
+                      f"App Store version {marketing_version} exists but is not editable "
+                      f"({states}). Bump pubspec marketing version or finish/cancel that "
+                      f"version in App Store Connect."
+                  )
+              print(f"Creating App Store version {marketing_version} (IOS)…")
+              created = api(
+                  "POST",
+                  "/appStoreVersions",
+                  json={
+                      "data": {
+                          "type": "appStoreVersions",
+                          "attributes": {
+                              "platform": "IOS",
+                              "versionString": marketing_version,
+                          },
+                          "relationships": {
+                              "app": {"data": {"type": "apps", "id": app_id}},
+                          },
+                      }
+                  },
+              )
+              version = created["data"]
+
+          version_id = version["id"]
+          print(f"Attaching build {build_id} to App Store version {version_id}…")
+          api(
+              "PATCH",
+              f"/appStoreVersions/{version_id}/relationships/build",
+              json={"data": {"type": "builds", "id": build_id}},
+          )
+
+          print(
+              f"Release candidate ready: iOS {marketing_version} "
+              f"(CFBundleVersion={build_number}). "
+              "Open App Store Connect to complete metadata and submit for review."
+          )
+          print(
+              "https://appstoreconnect.apple.com/apps/"
+              f"{app_id}/appstore/ios/version/inflight"
+          )
+          PY
 
   deploy-macos:
     name: macOS → TestFlight
