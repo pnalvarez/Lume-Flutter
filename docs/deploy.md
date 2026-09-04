@@ -4,6 +4,7 @@ Deploys **Lume** to:
 
 - **Android** → [Firebase App Distribution](https://firebase.google.com/docs/app-distribution)
 - **iOS** → [TestFlight](https://developer.apple.com/testflight/)
+- **iOS App Store RC** → App Store Connect version (attach uploaded build; manual submit)
 - **macOS** → [TestFlight](https://developer.apple.com/testflight/) (same App Store Connect app / bundle ID)
 - **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
 
@@ -16,7 +17,7 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 | Trigger | Behavior |
 |---------|----------|
 | Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web |
-| Manual **workflow_dispatch** | Toggle any combination of Android / iOS / macOS / Web (checkboxes; macOS defaults off) |
+| Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web (macOS and RC default off) |
 
 Recommended release flow:
 
@@ -28,6 +29,20 @@ Recommended release flow:
 git tag v1.0.1
 git push origin main --tags
 ```
+
+### App Store release candidate (manual)
+
+When you want a build attached to the iOS **App Store** version (not only TestFlight):
+
+1. Bump / confirm the marketing version in `pubspec.yaml` (e.g. `1.0.1`)
+2. Actions → **Deploy** → **Run workflow**
+3. Enable **iOS → App Store version (upload + attach build as RC)** (optionally leave other platforms off)
+4. Wait for **iOS → TestFlight** then **iOS → App Store RC** (RC polls until Apple finishes processing the build, up to ~45 minutes)
+5. Open [App Store Connect](https://appstoreconnect.apple.com), finish metadata/screenshots if needed, then **Submit for Review**
+
+The RC job creates the App Store version for the pubspec marketing version when missing, attaches the just-uploaded build, and sets export compliance (`usesNonExemptEncryption=false`) when unset. It does **not** submit for App Review.
+
+If version `X.Y.Z` already exists in a non-editable state (e.g. Waiting for Review / Ready for Sale), bump the marketing version first.
 
 iOS and macOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow scans **all** App Store Connect builds for the app (shared across iOS + macOS), takes the highest numeric version, and uses **max + 1**. If upload still reports a duplicate, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
 
@@ -189,6 +204,10 @@ Optional: override Supabase at build time with repository Variables / secrets an
 **macOS: no installer identity / Installer missing after import** — `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` is probably still an Apple Distribution export. Re-export **3rd Party Mac Developer Installer** from Keychain, confirm `openssl … -subject` contains `Installer`, then update the secret. CI imports both certs in one step and fails early if Installer is missing.
 
 **Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1 across iOS + macOS, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
+
+**App Store RC: version not editable** — bump `pubspec.yaml` marketing version, or cancel/finish the existing version in App Store Connect, then re-run with the RC checkbox.
+
+**App Store RC: timed out waiting for VALID** — Apple is still processing the IPA; re-run only the RC path after the build shows as ready in App Store Connect, or re-run the full RC job (it uploads a new build).
 
 **Vercel: Missing VERCEL_* secret** — add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` (see Web / Vercel above).
 
