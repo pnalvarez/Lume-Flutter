@@ -93,10 +93,7 @@ Widget screenHeaderDefault(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Default', type: BrandHeader)
 Widget brandHeaderDefault(BuildContext context) {
-  final title = context.knobs.string(
-    label: 'Title',
-    initialValue: 'Olá, Ana',
-  );
+  final title = context.knobs.string(label: 'Title', initialValue: 'Olá, Ana');
   final subtitle = context.knobs.string(
     label: 'Subtitle',
     initialValue: 'Vamos aprender algo novo hoje?',
@@ -114,10 +111,7 @@ Widget brandHeaderDefault(BuildContext context) {
 
 @widgetbook.UseCase(name: 'Title only', type: BrandHeader)
 Widget brandHeaderTitleOnly(BuildContext context) {
-  final title = context.knobs.string(
-    label: 'Title',
-    initialValue: 'Olá, Ana',
-  );
+  final title = context.knobs.string(label: 'Title', initialValue: 'Olá, Ana');
   return Scaffold(
     body: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

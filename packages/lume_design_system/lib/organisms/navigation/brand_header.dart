@@ -51,10 +51,7 @@ class BrandHeader extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: typ.body1Semibold.copyWith(color: cs.onPrimary),
-            ),
+            Text(title, style: typ.body1Semibold.copyWith(color: cs.onPrimary)),
             if (subtitle != null) ...[
               const SizedBox(height: AppSpacings.xs),
               Text(
