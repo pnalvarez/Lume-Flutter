@@ -95,6 +95,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - HTTP: `IApiClient.rpc` (prefer RPC over raw REST)
 - Auth SDK: only `IAuthService`
 - Cache: `IStorageClient` + `*Data.fromJson`
+- Crashlytics: `ICrashReporter` / `CrashReporting` in `lib/core/observability/` — `firebase_core` / `firebase_crashlytics` only there and `bootstrap.dart`
 
 ## Tests
 
