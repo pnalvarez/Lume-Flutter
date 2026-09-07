@@ -85,6 +85,40 @@ CI uploads a release **APK** (not AAB) so Firebase works without linking a Googl
 
 Firebase Android app ID (already in workflow): `1:145151164143:android:2d2d7ec6d6ad0e73ca251a`
 
+### Firebase Crashlytics
+
+Crash reporting is wired in `lib/core/observability/` and installed from `bootstrap.dart`.
+
+Firebase project: **`lume-51a38`**
+
+| Platform | Firebase app | Config | Crashlytics |
+|----------|--------------|--------|-------------|
+| Android | `1:145151164143:android:2d2d7ec6d6ad0e73ca251a` | `android/app/google-services.json` | Yes |
+| iOS | `1:145151164143:ios:879a519584454d1eca251a` | `ios/Runner/GoogleService-Info.plist` | Yes |
+| macOS | Same Apple app / bundle `com.lume.learning.app` | `macos/Runner/GoogleService-Info.plist` (same plist as iOS) | Yes |
+| Web | `1:145151164143:web:b41d7e35fe2d9c0fca251a` | Registered in Firebase (no Crashlytics SDK) | **No** — Crashlytics has no web SDK |
+| Windows / Linux | — | — | **No** |
+
+**Enable Crashlytics in the console** (one-time): open [Crashlytics for lume-51a38](https://console.firebase.google.com/project/lume-51a38/crashlytics), select the Android and iOS/macOS apps, and finish the onboarding if prompted. The dashboard populates after the first crash/report from a build with collection enabled.
+
+Collection behavior:
+
+- **Release / profile:** collection **on**
+- **Debug:** collection **off** (keeps local runs quiet)
+- Force on for a validation build: `--dart-define=CRASHLYTICS_ENABLED=true`
+
+Validate a report (iOS / Android / macOS, collection enabled):
+
+```bash
+flutter run -d <device> --release --dart-define=CRASHLYTICS_ENABLED=true
+# Temporarily call getIt<ICrashReporter>().forceCrash() once, restart the app so
+# the report uploads, then check Crashlytics within a few minutes.
+```
+
+App version / build number come from native store metadata — do not put PII in custom Crashlytics keys.
+
+**Web note:** The Firebase **web** app exists for future Firebase web features (Auth, Analytics, etc.). For web crash/error reporting, use a web-capable tool (e.g. Sentry) in a follow-up — not Crashlytics.
+
 ### iOS / TestFlight
 
 | Secret | Description |

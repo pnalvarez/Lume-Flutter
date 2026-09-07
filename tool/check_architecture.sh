@@ -78,8 +78,20 @@ while IFS= read -r -d '' file; do
   case "$rel" in
     lib/bootstrap.dart|lib/core/auth/auth_service.dart|lib/core/realtime/realtime_client.dart) continue ;;
     esac
-    if grep -q 'package:supabase_flutter/' "$file"; then
-      note "BLOCKER: supabase_flutter only allowed in bootstrap.dart, auth_service.dart, and realtime_client.dart
+  if grep -q 'package:supabase_flutter/' "$file"; then
+    note "BLOCKER: supabase_flutter only allowed in bootstrap.dart, auth_service.dart, and realtime_client.dart
+  $rel"
+  fi
+done < <(find lib -name '*.dart' -print0)
+
+# firebase_core / firebase_crashlytics only in observability + bootstrap
+while IFS= read -r -d '' file; do
+  rel="${file#"$ROOT/"}"
+  case "$rel" in
+    lib/bootstrap.dart|lib/core/observability/*) continue ;;
+  esac
+  if grep -qE 'package:firebase_(core|crashlytics)/' "$file"; then
+    note "BLOCKER: firebase_core / firebase_crashlytics only allowed in bootstrap.dart and lib/core/observability/
   $rel"
   fi
 done < <(find lib -name '*.dart' -print0)
