@@ -9,6 +9,12 @@ import 'package:lume_design_system/molecules/progress/lume_lives_row.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 import 'package:lume_design_system/organisms/list_item/list_item.dart';
 
+const double _letterChipSize = 36;
+const int _maxLetterColumns = 9;
+const double _keyboardMaxWidth =
+    _maxLetterColumns * _letterChipSize +
+    (_maxLetterColumns - 1) * AppSpacings.s;
+
 class MysteriousWordBody extends StatelessWidget {
   const MysteriousWordBody({
     super.key,
@@ -65,19 +71,24 @@ class MysteriousWordBody extends StatelessWidget {
             remaining: state.livesLeft,
           ),
           const SizedBox(height: AppSpacings.l),
-          Wrap(
-            spacing: AppSpacings.s,
-            runSpacing: AppSpacings.s,
-            alignment: WrapAlignment.center,
-            children: [
-              for (final letter in MysteriousWordState.alphabet.split(''))
-                _LetterChip(
-                  letter: letter,
-                  visual: state.letterVisual(letter),
-                  enabled: state.lettersEnabled,
-                  onPressed: () => onLetterPressed(letter),
-                ),
-            ],
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _keyboardMaxWidth),
+              child: Wrap(
+                spacing: AppSpacings.s,
+                runSpacing: AppSpacings.s,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (final letter in MysteriousWordState.alphabet.split(''))
+                    _LetterChip(
+                      letter: letter,
+                      visual: state.letterVisual(letter),
+                      enabled: state.lettersEnabled,
+                      onPressed: () => onLetterPressed(letter),
+                    ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -133,8 +144,8 @@ class _LetterChip extends StatelessWidget {
         onTap: enabled && !guessed ? onPressed : null,
         borderRadius: radius,
         child: SizedBox(
-          width: 36,
-          height: 36,
+          width: _letterChipSize,
+          height: _letterChipSize,
           child: Center(
             child: Text(letter, style: typ.body3Semibold.copyWith(color: fg)),
           ),
