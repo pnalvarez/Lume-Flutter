@@ -128,52 +128,55 @@ class _LevelUpAlertState extends State<LevelUpAlert>
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(AppSpacings.xl),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacings.xl2),
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(AppRadius.xl3),
-          border: Border.all(color: cs.outline),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: _TrophyWithConfetti(
-                animation: confetti,
-                trophyColor: cs.primary,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppSizes.dialogMaxWidth),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacings.xl2),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppRadius.xl3),
+            border: Border.all(color: cs.outline),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: _TrophyWithConfetti(
+                  animation: confetti,
+                  trophyColor: cs.primary,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacings.m),
-            Text(
-              xpLevelUpHeadline(widget.level),
-              textAlign: TextAlign.center,
-              style: typ.headlineXs.copyWith(color: cs.onSurface),
-            ),
-            const SizedBox(height: AppSpacings.m),
-            AnimatedBuilder(
-              animation: fill,
-              builder: (context, _) {
-                return LumeProgressBar(
-                  value: (widget.progress * fill.value).clamp(0.0, 1.0),
-                  showPercentage: false,
-                );
-              },
-            ),
-            const SizedBox(height: AppSpacings.m),
-            Text(
-              xpLevelUpDescription(widget.currentXp, widget.xpForNextLevel),
-              textAlign: TextAlign.center,
-              style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(height: AppSpacings.xl),
-            LumeButton(
-              label: xpLevelUpContinue,
-              onPressed: widget.onContinue,
-              isExpanded: true,
-            ),
-          ],
+              const SizedBox(height: AppSpacings.m),
+              Text(
+                xpLevelUpHeadline(widget.level),
+                textAlign: TextAlign.center,
+                style: typ.headlineXs.copyWith(color: cs.onSurface),
+              ),
+              const SizedBox(height: AppSpacings.m),
+              AnimatedBuilder(
+                animation: fill,
+                builder: (context, _) {
+                  return LumeProgressBar(
+                    value: (widget.progress * fill.value).clamp(0.0, 1.0),
+                    showPercentage: false,
+                  );
+                },
+              ),
+              const SizedBox(height: AppSpacings.m),
+              Text(
+                xpLevelUpDescription(widget.currentXp, widget.xpForNextLevel),
+                textAlign: TextAlign.center,
+                style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
+              ),
+              const SizedBox(height: AppSpacings.xl),
+              LumeButton(
+                label: xpLevelUpContinue,
+                onPressed: widget.onContinue,
+                isExpanded: true,
+              ),
+            ],
+          ),
         ),
       ),
     );
