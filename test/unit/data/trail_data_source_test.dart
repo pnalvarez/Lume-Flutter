@@ -80,7 +80,10 @@ void main() {
       expect(data, hasLength(1));
       expect(data.first.title, 'History');
       expect(data.first.levels.first.title, 'Level 1');
-      verify(apiClient.rpc<List<dynamic>>('get_game_trails')).called(1);
+
+      // Nested game_payload is shuffled server-side — never reuse cache.
+      await sut.fetchGameTrails();
+      verify(apiClient.rpc<List<dynamic>>('get_game_trails')).called(2);
     },
   );
 
@@ -129,12 +132,14 @@ void main() {
     );
     await storage.write(CacheKeys.trailBootstrap, '{"modules":[]}');
     await storage.write(CacheKeys.trailProgress, '{"pair_progress":[]}');
+    await storage.write(CacheKeys.gameTrails, '[]');
     await storage.write(CacheKeys.profile, '{"id":"user-1","total_xp":0}');
 
     await sut.savePairProgress(pairId: 4, scorePct: 80);
 
     expect(await storage.read(CacheKeys.trailBootstrap), isNull);
     expect(await storage.read(CacheKeys.trailProgress), isNull);
+    expect(await storage.read(CacheKeys.gameTrails), isNull);
     expect(await storage.read(CacheKeys.profile), isNull);
   });
 }

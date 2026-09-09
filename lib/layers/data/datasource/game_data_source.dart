@@ -37,22 +37,15 @@ final class GameDataSource implements IGameDataSource {
     required int submoduleId,
     bool forceRefresh = false,
   }) async {
-    final cacheKey = CacheKeys.submoduleGames(submoduleId);
-    if (!forceRefresh) {
-      final cached = await _storage.readObject(
-        cacheKey,
-        SubmoduleGamesData.fromJson,
-      );
-      if (cached != null) return cached;
-    }
+    // Never cache: game_payload options are shuffled per RPC response.
+    // Drop any legacy cached payload so re-entry cannot reuse a fixed order.
+    await _storage.delete(CacheKeys.submoduleGames(submoduleId));
 
     final raw = await _apiClient.rpc<Map<String, dynamic>>(
       'get_submodule_games',
       params: {'p_submodule_id': submoduleId},
     );
-    final data = SubmoduleGamesData.fromJson(asJsonMap(raw));
-    await _storage.writeObject(cacheKey, data, (value) => value.toJson());
-    return data;
+    return SubmoduleGamesData.fromJson(asJsonMap(raw));
   }
 
   @override

@@ -76,22 +76,11 @@ final class TrailDataSource implements ITrailDataSource {
   Future<List<GameTrailData>> fetchGameTrails({
     bool forceRefresh = false,
   }) async {
-    if (!forceRefresh) {
-      final cached = await _storage.readList(
-        CacheKeys.gameTrails,
-        GameTrailData.fromJson,
-      );
-      if (cached.isNotEmpty) return cached;
-    }
+    // Never cache: nested game_payload options are shuffled per RPC response.
+    await _storage.delete(CacheKeys.gameTrails);
 
     final raw = await _apiClient.rpc<List<dynamic>>('get_game_trails');
-    final data = parseJsonList(raw, GameTrailData.fromJson);
-    await _storage.writeList(
-      CacheKeys.gameTrails,
-      data,
-      (value) => value.toJson(),
-    );
-    return data;
+    return parseJsonList(raw, GameTrailData.fromJson);
   }
 
   @override
@@ -111,6 +100,7 @@ final class TrailDataSource implements ITrailDataSource {
   Future<void> _invalidateTrailCaches() async {
     await _storage.delete(CacheKeys.trailBootstrap);
     await _storage.delete(CacheKeys.trailProgress);
+    await _storage.delete(CacheKeys.gameTrails);
     // save_pair_progress awards XP onto profiles — drop the greeting/stats cache.
     await _storage.delete(CacheKeys.profile);
   }
