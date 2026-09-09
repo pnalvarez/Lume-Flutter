@@ -6,6 +6,7 @@ import 'package:lume/app/level_up_host.dart';
 import 'package:lume/common/strings/xp_strings.dart';
 import 'package:lume/layers/domain/models/xp/level_up_domain.dart';
 import 'package:lume/layers/presentation/shared/level_up_alert.dart';
+import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
 void main() {
@@ -53,5 +54,41 @@ void main() {
 
     expect(find.byType(LevelUpAlert), findsNothing);
     expect(find.text('home'), findsOneWidget);
+  });
+
+  testWidgets('level-up alert caps width on wide viewports', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1200, 800));
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: lumeLightTheme(),
+        home: const Scaffold(
+          body: LevelUpAlert(
+            level: 7,
+            xpOffset: 400,
+            currentXp: 420,
+            xpForNextLevel: 500,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final card = find.descendant(
+      of: find.byType(LevelUpAlert),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is ConstrainedBox &&
+            widget.constraints.maxWidth == AppSizes.dialogMaxWidth,
+      ),
+    );
+    expect(card, findsOneWidget);
+    expect(
+      tester.getSize(card).width,
+      lessThanOrEqualTo(AppSizes.dialogMaxWidth),
+    );
   });
 }
