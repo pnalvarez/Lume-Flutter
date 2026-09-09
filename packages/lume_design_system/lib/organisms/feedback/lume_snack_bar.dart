@@ -71,6 +71,9 @@ void showLumeSnackBar(
           child: SafeArea(
             bottom: false,
             maintainBottomViewPadding: true,
+            // Desktop/web often has a zero top inset; keep breathing room
+            // below the window chrome while still clearing notches on mobile.
+            minimum: const EdgeInsets.only(top: AppSpacings.l),
             child: bar,
           ),
         ),
@@ -81,6 +84,7 @@ void showLumeSnackBar(
           child: SafeArea(
             top: false,
             maintainBottomViewPadding: true,
+            minimum: const EdgeInsets.only(bottom: AppSpacings.l),
             child: bar,
           ),
         ),
