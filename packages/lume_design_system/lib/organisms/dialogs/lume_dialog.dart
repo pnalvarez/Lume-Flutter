@@ -41,6 +41,7 @@ Future<T?> showLumeDialog<T>({
     builder: (ctx) => AlertDialog(
       backgroundColor: style.background,
       surfaceTintColor: Colors.transparent,
+      constraints: const BoxConstraints(maxWidth: AppSizes.dialogMaxWidth),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.xl2),
         side: BorderSide(color: style.border),
@@ -200,72 +201,77 @@ class CelebrationDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(AppSpacings.xl),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacings.xl2),
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(AppRadius.xl3),
-          border: Border.all(
-            color: accentBorder ?? cs.outline,
-            width: accentBorder == null ? 1 : 2,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppSizes.dialogMaxWidth),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacings.xl2),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppRadius.xl3),
+            border: Border.all(
+              color: accentBorder ?? cs.outline,
+              width: accentBorder == null ? 1 : 2,
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (hero != null)
-                  hero!
-                else if (icon != null)
-                  Container(
-                    width: AppSizes.mediaWellM,
-                    height: AppSizes.mediaWellM,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [iconBackground ?? cs.tertiary, cs.secondary],
+          child: Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (hero != null)
+                    hero!
+                  else if (icon != null)
+                    Container(
+                      width: AppSizes.mediaWellM,
+                      height: AppSizes.mediaWellM,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [iconBackground ?? cs.tertiary, cs.secondary],
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: cs.onPrimary,
+                        size: AppSizes.iconL,
                       ),
                     ),
-                    child: Icon(
-                      icon,
-                      color: cs.onPrimary,
-                      size: AppSizes.iconL,
-                    ),
-                  ),
-                const SizedBox(height: AppSpacings.m),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: typ.headlineXs.copyWith(color: cs.onSurface),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: AppSpacings.s),
+                  const SizedBox(height: AppSpacings.m),
                   Text(
-                    subtitle!,
+                    title,
                     textAlign: TextAlign.center,
-                    style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
+                    style: typ.headlineXs.copyWith(color: cs.onSurface),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: AppSpacings.s),
+                    Text(
+                      subtitle!,
+                      textAlign: TextAlign.center,
+                      style: typ.body4Light.copyWith(
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacings.xl),
+                  LumeButton(
+                    label: actionLabel,
+                    onPressed: onAction,
+                    isExpanded: true,
                   ),
                 ],
-                const SizedBox(height: AppSpacings.xl),
-                LumeButton(
-                  label: actionLabel,
-                  onPressed: onAction,
-                  isExpanded: true,
-                ),
-              ],
-            ),
-            if (onClose != null)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: LumeIconButton(
-                  icon: Icons.close_rounded,
-                  size: LumeIconButtonSize.sm,
-                  onPressed: onClose,
-                ),
               ),
-          ],
+              if (onClose != null)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: LumeIconButton(
+                    icon: Icons.close_rounded,
+                    size: LumeIconButtonSize.sm,
+                    onPressed: onClose,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

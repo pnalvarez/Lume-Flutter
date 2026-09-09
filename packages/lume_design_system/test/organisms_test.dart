@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
+import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
@@ -454,6 +455,40 @@ void main() {
       );
       expect(find.text('Level up'), findsOneWidget);
       expect(find.text('Continue'), findsOneWidget);
+    });
+
+    testWidgets('CelebrationDialog caps width on wide viewports', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 800));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      await tester.pumpWidget(
+        _wrap(
+          CelebrationDialog(
+            title: 'Level up',
+            actionLabel: 'Continue',
+            onAction: () {},
+            icon: Icons.auto_awesome,
+          ),
+        ),
+      );
+
+      final card = find.descendant(
+        of: find.byType(CelebrationDialog),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is ConstrainedBox &&
+              widget.constraints.maxWidth == AppSizes.dialogMaxWidth,
+        ),
+      );
+      expect(card, findsOneWidget);
+      expect(
+        tester.getSize(card).width,
+        lessThanOrEqualTo(AppSizes.dialogMaxWidth),
+      );
     });
   });
 }

@@ -27,6 +27,10 @@ abstract final class AppSizes {
   static const double fabSize = 56;
   static const double dividerThickness = 1;
 
+  /// Max width for centered modal dialogs on wide viewports.
+  /// Narrow screens still use full usable width via [Dialog.insetPadding].
+  static const double dialogMaxWidth = 400;
+
   // --- Media / illustration wells -------------------------------------------
   static const double mediaWellS = 48;
   static const double mediaWellM = 64;
