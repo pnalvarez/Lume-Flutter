@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/organisms/dialogs/lume_dialog.dart';
@@ -357,6 +358,9 @@ void main() {
       expect(find.text('Tip'), findsOneWidget);
       expect(isLumeSnackBarVisible, isTrue);
 
+      final safeArea = tester.widget<SafeArea>(find.byType(SafeArea));
+      expect(safeArea.minimum.top, AppSpacings.l);
+
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pump();
 
@@ -393,6 +397,9 @@ void main() {
       expect(positioned.bottom, 0);
       expect(positioned.top, isNull);
       expect(find.text('Bottom tip'), findsOneWidget);
+
+      final safeArea = tester.widget<SafeArea>(find.byType(SafeArea));
+      expect(safeArea.minimum.bottom, AppSpacings.l);
 
       hideLumeSnackBar();
       await tester.pump();
