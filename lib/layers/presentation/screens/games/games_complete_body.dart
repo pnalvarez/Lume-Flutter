@@ -20,7 +20,7 @@ enum GamesCompleteStatus {
 
   Color get heroIconColor => switch (this) {
     success => AppColors.Accent.accent,
-    failure => AppColors.Error.onError,
+    failure => AppColors.Extra.rose,
   };
 
   IconData get badgeIcon => switch (this) {
@@ -28,19 +28,11 @@ enum GamesCompleteStatus {
     failure => Icons.close_rounded,
   };
 
-  Color get badgeIconColor => switch (this) {
-    success => Colors.white,
-    failure => AppColors.Error.onError,
-  };
+  Color get badgeIconColor => Colors.white;
 
-  Color? get badgeFillColor => switch (this) {
+  Color get badgeFillColor => switch (this) {
     success => AppColors.Success.onSuccess,
-    failure => null,
-  };
-
-  Color? get badgeBorderColor => switch (this) {
-    success => null,
-    failure => AppColors.Error.onError,
+    failure => AppColors.Extra.rose,
   };
 
   /// Trail copy for [SubmoduleCompleteBody].
@@ -162,14 +154,10 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = status.badgeBorderColor;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: status.badgeFillColor,
         shape: BoxShape.circle,
-        border: borderColor == null
-            ? null
-            : Border.all(color: borderColor, width: 1.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacings.xs),
