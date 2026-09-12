@@ -23,9 +23,7 @@ class SubmoduleCompleteBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return GamesCompleteBody(
       status: status,
-      title: status == GamesCompleteStatus.success
-          ? trailSessionCompleteTitle
-          : trailSessionIncompleteTitle,
+      title: status.submoduleTitle,
       scoreText: trailSessionCompleteScore(
         correctCount: correctCount,
         total: total,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/icons/app_icons.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
@@ -8,7 +9,46 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 
 /// Outcome for a finished game / submodule complete screen.
-enum GamesCompleteStatus { success, failure }
+enum GamesCompleteStatus {
+  success,
+  failure;
+
+  String get heroIcon => switch (this) {
+    success => AppIcons.trophy,
+    failure => AppIcons.sadFace,
+  };
+
+  Color get heroIconColor => switch (this) {
+    success => AppColors.Accent.accent,
+    failure => AppColors.Error.onError,
+  };
+
+  IconData get badgeIcon => switch (this) {
+    success => Icons.check_rounded,
+    failure => Icons.close_rounded,
+  };
+
+  Color get badgeIconColor => switch (this) {
+    success => Colors.white,
+    failure => AppColors.Error.onError,
+  };
+
+  Color? get badgeFillColor => switch (this) {
+    success => AppColors.Success.onSuccess,
+    failure => null,
+  };
+
+  Color? get badgeBorderColor => switch (this) {
+    success => null,
+    failure => AppColors.Error.onError,
+  };
+
+  /// Trail copy for [SubmoduleCompleteBody].
+  String get submoduleTitle => switch (this) {
+    success => trailSessionCompleteTitle,
+    failure => trailSessionIncompleteTitle,
+  };
+}
 
 /// End-of-sequence screen for a finished game run. Bloc-free.
 class GamesCompleteBody extends StatelessWidget {
@@ -31,8 +71,6 @@ class GamesCompleteBody extends StatelessWidget {
   /// Optional guidance below the score (e.g. unlock threshold).
   final String? message;
 
-  bool get _isSuccess => status == GamesCompleteStatus.success;
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -52,14 +90,12 @@ class GamesCompleteBody extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SvgPicture.asset(
-                          _isSuccess ? AppIcons.trophy : AppIcons.sadFace,
+                          status.heroIcon,
                           package: 'lume_design_system',
                           width: AppSizes.mediaWellL,
                           height: AppSizes.mediaWellL,
                           colorFilter: ColorFilter.mode(
-                            _isSuccess
-                                ? AppColors.Accent.accent
-                                : AppColors.Error.onError,
+                            status.heroIconColor,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -75,9 +111,7 @@ class GamesCompleteBody extends StatelessWidget {
                                   padding: const EdgeInsets.only(
                                     left: AppSpacings.xs,
                                   ),
-                                  child: _isSuccess
-                                      ? const _SuccessBadge()
-                                      : const _FailureBadge(),
+                                  child: _StatusBadge(status: status),
                                 ),
                               ),
                             ],
@@ -121,44 +155,28 @@ class GamesCompleteBody extends StatelessWidget {
   }
 }
 
-class _SuccessBadge extends StatelessWidget {
-  const _SuccessBadge();
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+
+  final GamesCompleteStatus status;
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = status.badgeBorderColor;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.Success.onSuccess,
+        color: status.badgeFillColor,
         shape: BoxShape.circle,
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(AppSpacings.xs),
-        child: Icon(
-          Icons.check_rounded,
-          size: AppSizes.iconXs,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class _FailureBadge extends StatelessWidget {
-  const _FailureBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: AppColors.Error.onError, width: 1.5),
+        border: borderColor == null
+            ? null
+            : Border.all(color: borderColor, width: 1.5),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacings.xs),
         child: Icon(
-          Icons.close_rounded,
+          status.badgeIcon,
           size: AppSizes.iconXs,
-          color: AppColors.Error.onError,
+          color: status.badgeIconColor,
         ),
       ),
     );
