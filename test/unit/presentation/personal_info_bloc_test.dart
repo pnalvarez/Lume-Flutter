@@ -45,7 +45,11 @@ void main() {
     },
     skip: 3,
     expect: () => [
-      isA<PersonalInfoState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<PersonalInfoState>().having(
+        (s) => s.isSubmitting,
+        'submitting',
+        true,
+      ),
       isA<PersonalInfoState>()
           .having((s) => s.isSubmitting, 'submitting', false)
           .having(
@@ -59,7 +63,8 @@ void main() {
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
     'failed submit clears loading, keeps user on screen, and shows error',
-    build: () => PersonalInfoBloc(_UpdatePersonalInfo()..error = Exception('boom')),
+    build: () =>
+        PersonalInfoBloc(_UpdatePersonalInfo()..error = Exception('boom')),
     act: (bloc) {
       bloc
         ..add(const PersonalInfoFirstNameChanged('Ada'))
@@ -69,7 +74,11 @@ void main() {
     },
     skip: 3,
     expect: () => [
-      isA<PersonalInfoState>().having((s) => s.isSubmitting, 'submitting', true),
+      isA<PersonalInfoState>().having(
+        (s) => s.isSubmitting,
+        'submitting',
+        true,
+      ),
       isA<PersonalInfoState>()
           .having((s) => s.isSubmitting, 'submitting', false)
           .having((s) => s.destination, 'destination', isNull)

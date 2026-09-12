@@ -8,7 +8,8 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 @injectable
 final class PersonalInfoBloc
     extends Bloc<PersonalInfoEvent, PersonalInfoState> {
-  PersonalInfoBloc(this._updatePersonalInfo) : super(const PersonalInfoState()) {
+  PersonalInfoBloc(this._updatePersonalInfo)
+    : super(const PersonalInfoState()) {
     on<PersonalInfoFirstNameChanged>(_onFirstNameChanged);
     on<PersonalInfoLastNameChanged>(_onLastNameChanged);
     on<PersonalInfoAgeChanged>(_onAgeChanged);
