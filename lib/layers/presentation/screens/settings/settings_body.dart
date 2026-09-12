@@ -47,6 +47,7 @@ class SettingsBody extends StatelessWidget {
                   onTap: onPersonalInfoPressed,
                   input: IconTitleDescriptionInput(
                     leadingIcon: Icons.person_outline_rounded,
+                    leadingIconColor: cs.primary,
                     title: settingsPersonalInfoTitle,
                     description: settingsPersonalInfoDescription,
                   ),
@@ -57,6 +58,7 @@ class SettingsBody extends StatelessWidget {
                   onTap: onCategoriesPressed,
                   input: IconTitleDescriptionInput(
                     leadingIcon: Icons.category_outlined,
+                    leadingIconColor: cs.primary,
                     title: settingsCategoriesTitle,
                     description: settingsCategoriesDescription,
                   ),
