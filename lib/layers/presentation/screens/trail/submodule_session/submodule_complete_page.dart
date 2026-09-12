@@ -14,6 +14,7 @@ class SubmoduleCompleteView extends StatelessWidget {
     return BlocBuilder<SubmoduleSessionBloc, SubmoduleSessionState>(
       builder: (context, state) {
         return SubmoduleCompleteBody(
+          status: state.completeStatus,
           correctCount: state.correctCount,
           total: state.games.length,
           unlockMessage: state.completeUnlockMessage,
