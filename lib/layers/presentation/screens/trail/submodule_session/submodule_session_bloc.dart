@@ -4,6 +4,7 @@ import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
+import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
 
@@ -41,6 +42,7 @@ final class SubmoduleSessionBloc
         submoduleId: event.submoduleId,
         correctCount: 0,
         clearPairScores: true,
+        clearCompleteStatus: true,
         clearCompleteUnlockMessage: true,
         clearError: true,
         goBackToTrail: false,
@@ -145,14 +147,20 @@ final class SubmoduleSessionBloc
         );
         totalXp += progress.xpAwarded;
       }
+      final correctCount = state.correctCount;
+      final total = state.games.length;
       emit(
         state.copyWith(
           status: SubmoduleSessionStatus.ready,
           stage: SubmoduleSessionStage.completed,
           xpAwarded: totalXp,
+          completeStatus: _completeStatus(
+            correctCount: correctCount,
+            total: total,
+          ),
           completeUnlockMessage: _completeUnlockMessage(
-            correctCount: state.correctCount,
-            total: state.games.length,
+            correctCount: correctCount,
+            total: total,
           ),
           clearError: true,
         ),
@@ -194,6 +202,19 @@ final class SubmoduleSessionBloc
     Emitter<SubmoduleSessionState> emit,
   ) {
     emit(state.copyWith(goBackToTrail: false));
+  }
+
+  GamesCompleteStatus _completeStatus({
+    required int correctCount,
+    required int total,
+  }) {
+    if (_progressCalculator.meetsPassAverage(
+      correctCount: correctCount,
+      total: total,
+    )) {
+      return GamesCompleteStatus.success;
+    }
+    return GamesCompleteStatus.failure;
   }
 
   String _completeUnlockMessage({
