@@ -6,6 +6,7 @@ import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
+import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
@@ -104,7 +105,25 @@ void main() {
         expect(save.calls.map((c) => c.pairId), [10, 11]);
         expect(bloc.state.stage, SubmoduleSessionStage.completed);
         expect(bloc.state.correctCount, 1);
+        expect(bloc.state.completeStatus, GamesCompleteStatus.failure);
         expect(bloc.state.completeUnlockMessage, isNotEmpty);
+      },
+    );
+
+    blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
+      'marks complete as success when pass average is met',
+      build: buildBloc,
+      act: (bloc) async {
+        bloc.add(const SubmoduleSessionStarted(trailId: 1, submoduleId: 1));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 10, scorePct: 100));
+        bloc.add(const SubmoduleSessionRoundScored(pairId: 11, scorePct: 100));
+        bloc.add(const SubmoduleSessionGamesCompleted(correctCount: 2));
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.stage, SubmoduleSessionStage.completed);
+        expect(bloc.state.completeStatus, GamesCompleteStatus.success);
       },
     );
 

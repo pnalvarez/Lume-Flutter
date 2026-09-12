@@ -6,12 +6,14 @@ import 'package:lume/layers/presentation/screens/games/games_complete_body.dart'
 class SubmoduleCompleteBody extends StatelessWidget {
   const SubmoduleCompleteBody({
     super.key,
+    required this.status,
     required this.correctCount,
     required this.total,
     required this.unlockMessage,
     required this.onBackToTrail,
   });
 
+  final GamesCompleteStatus status;
   final int correctCount;
   final int total;
   final String unlockMessage;
@@ -20,7 +22,10 @@ class SubmoduleCompleteBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GamesCompleteBody(
-      title: trailSessionCompleteTitle,
+      status: status,
+      title: status == GamesCompleteStatus.success
+          ? trailSessionCompleteTitle
+          : trailSessionIncompleteTitle,
       scoreText: trailSessionCompleteScore(
         correctCount: correctCount,
         total: total,

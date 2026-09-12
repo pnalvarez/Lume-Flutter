@@ -7,7 +7,10 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 
-/// Trophy success screen for a finished game sequence. Bloc-free.
+/// Outcome for a finished game / submodule complete screen.
+enum GamesCompleteStatus { success, failure }
+
+/// End-of-sequence screen for a finished game run. Bloc-free.
 class GamesCompleteBody extends StatelessWidget {
   const GamesCompleteBody({
     super.key,
@@ -15,9 +18,11 @@ class GamesCompleteBody extends StatelessWidget {
     required this.scoreText,
     required this.actionLabel,
     required this.onAction,
+    this.status = GamesCompleteStatus.success,
     this.message,
   });
 
+  final GamesCompleteStatus status;
   final String title;
   final String scoreText;
   final String actionLabel;
@@ -25,6 +30,8 @@ class GamesCompleteBody extends StatelessWidget {
 
   /// Optional guidance below the score (e.g. unlock threshold).
   final String? message;
+
+  bool get _isSuccess => status == GamesCompleteStatus.success;
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +52,14 @@ class GamesCompleteBody extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SvgPicture.asset(
-                          AppIcons.trophy,
+                          _isSuccess ? AppIcons.trophy : AppIcons.sadFace,
                           package: 'lume_design_system',
                           width: AppSizes.mediaWellL,
                           height: AppSizes.mediaWellL,
                           colorFilter: ColorFilter.mode(
-                            AppColors.Accent.accent,
+                            _isSuccess
+                                ? AppColors.Accent.accent
+                                : AppColors.Error.onError,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -66,20 +75,9 @@ class GamesCompleteBody extends StatelessWidget {
                                   padding: const EdgeInsets.only(
                                     left: AppSpacings.xs,
                                   ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.Success.onSuccess,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(AppSpacings.xs),
-                                      child: Icon(
-                                        Icons.check_rounded,
-                                        size: AppSizes.iconXs,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  child: _isSuccess
+                                      ? const _SuccessBadge()
+                                      : const _FailureBadge(),
                                 ),
                               ),
                             ],
@@ -117,6 +115,50 @@ class GamesCompleteBody extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SuccessBadge extends StatelessWidget {
+  const _SuccessBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.Success.onSuccess,
+        shape: BoxShape.circle,
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(AppSpacings.xs),
+        child: Icon(
+          Icons.check_rounded,
+          size: AppSizes.iconXs,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+class _FailureBadge extends StatelessWidget {
+  const _FailureBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.Error.onError, width: 1.5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacings.xs),
+        child: Icon(
+          Icons.close_rounded,
+          size: AppSizes.iconXs,
+          color: AppColors.Error.onError,
         ),
       ),
     );
