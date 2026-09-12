@@ -13,9 +13,16 @@ enum GamesCompleteStatus {
   success,
   failure;
 
-  String get heroIcon => switch (this) {
+  /// SVG hero for [success]. [failure] uses [heroIconData] instead.
+  String? get heroSvgAsset => switch (this) {
     success => AppIcons.trophy,
-    failure => AppIcons.sadFace,
+    failure => null,
+  };
+
+  /// Material icon hero for [failure].
+  IconData? get heroIconData => switch (this) {
+    success => null,
+    failure => Icons.sentiment_dissatisfied_rounded,
   };
 
   Color get heroIconColor => switch (this) {
@@ -81,16 +88,23 @@ class GamesCompleteBody extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          status.heroIcon,
-                          package: 'lume_design_system',
-                          width: AppSizes.mediaWellL,
-                          height: AppSizes.mediaWellL,
-                          colorFilter: ColorFilter.mode(
-                            status.heroIconColor,
-                            BlendMode.srcIn,
+                        switch (status.heroSvgAsset) {
+                          final asset? => SvgPicture.asset(
+                            asset,
+                            package: 'lume_design_system',
+                            width: AppSizes.mediaWellL,
+                            height: AppSizes.mediaWellL,
+                            colorFilter: ColorFilter.mode(
+                              status.heroIconColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        ),
+                          null => Icon(
+                            status.heroIconData,
+                            size: AppSizes.mediaWellL,
+                            color: status.heroIconColor,
+                          ),
+                        },
                         const SizedBox(height: AppSpacings.l),
                         Text.rich(
                           TextSpan(
