@@ -8,7 +8,6 @@ import 'package:lume/layers/presentation/screens/profile/profile_bloc.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_body.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_event.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_state.dart';
-import 'package:lume/layers/presentation/screens/select_category/select_category_page.dart';
 import 'package:lume/layers/presentation/shared/auth_snack_bar.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
@@ -76,9 +75,7 @@ class _ProfileViewState extends State<_ProfileView>
               case ProfileDestination.login:
                 context.router.replaceAll([const LoginRoute()]);
               case ProfileDestination.settings:
-                context.router.push(
-                  SelectCategoryRoute(entry: SelectCategoryEntry.profile),
-                );
+                context.router.push(const SettingsRoute());
             }
           },
         ),

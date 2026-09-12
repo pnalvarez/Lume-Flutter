@@ -1,17 +1,28 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/layers/domain/models/profile/profile_domain.dart';
+import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/update_personal_info.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_bloc.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_event.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart';
 
+class _GetProfile implements IGetProfile {
+  _GetProfile(this.profile, {this.error});
+
+  final ProfileDomain profile;
+  final Object? error;
+
+  @override
+  Future<ProfileDomain> call({bool forceRefresh = false}) async {
+    if (error != null) throw error!;
+    return profile;
+  }
+}
+
 class _UpdatePersonalInfo implements IUpdatePersonalInfo {
   Object? error;
   var calls = 0;
-  String? firstName;
-  String? lastName;
-  int? age;
 
   @override
   Future<ProfileDomain> call({
@@ -20,9 +31,6 @@ class _UpdatePersonalInfo implements IUpdatePersonalInfo {
     required int age,
   }) async {
     calls += 1;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.age = age;
     if (error != null) throw error!;
     return ProfileDomain(
       id: 'user-1',
@@ -32,18 +40,29 @@ class _UpdatePersonalInfo implements IUpdatePersonalInfo {
   }
 }
 
+PersonalInfoBloc _bloc({IGetProfile? getProfile, IUpdatePersonalInfo? update}) {
+  return PersonalInfoBloc(
+    getProfile ??
+        _GetProfile(
+          const ProfileDomain(id: '1', fullName: 'Ada Lovelace', age: 28),
+        ),
+    update ?? _UpdatePersonalInfo(),
+  );
+}
+
 void main() {
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'successful submit saves and navigates to select category',
-    build: () => PersonalInfoBloc(_UpdatePersonalInfo()),
+    'onboarding submit saves and navigates to select category',
+    build: _bloc,
     act: (bloc) {
       bloc
+        ..add(const PersonalInfoStarted())
         ..add(const PersonalInfoFirstNameChanged('Ada'))
         ..add(const PersonalInfoLastNameChanged('Lovelace'))
         ..add(const PersonalInfoAgeChanged('28'))
         ..add(const PersonalInfoSubmitted());
     },
-    skip: 3,
+    skip: 4,
     expect: () => [
       isA<PersonalInfoState>().having(
         (s) => s.isSubmitting,
@@ -58,21 +77,63 @@ void main() {
             PersonalInfoDestination.selectCategory,
           ),
     ],
-    verify: (_) {},
+  );
+
+  blocTest<PersonalInfoBloc, PersonalInfoState>(
+    'settings start loads existing profile values',
+    build: _bloc,
+    act: (bloc) =>
+        bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings)),
+    expect: () => [
+      isA<PersonalInfoState>()
+          .having((s) => s.entry, 'entry', PersonalInfoEntry.settings)
+          .having((s) => s.status, 'status', PersonalInfoStatus.loading),
+      isA<PersonalInfoState>()
+          .having((s) => s.status, 'status', PersonalInfoStatus.ready)
+          .having((s) => s.firstName, 'firstName', 'Ada')
+          .having((s) => s.lastName, 'lastName', 'Lovelace')
+          .having((s) => s.age, 'age', '28'),
+    ],
+  );
+
+  blocTest<PersonalInfoBloc, PersonalInfoState>(
+    'settings submit saves and pops to profile',
+    build: _bloc,
+    act: (bloc) async {
+      bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+      await pumpEventQueue();
+      bloc.add(const PersonalInfoSubmitted());
+    },
+    skip: 2,
+    expect: () => [
+      isA<PersonalInfoState>().having(
+        (s) => s.isSubmitting,
+        'submitting',
+        true,
+      ),
+      isA<PersonalInfoState>()
+          .having((s) => s.isSubmitting, 'submitting', false)
+          .having(
+            (s) => s.destination,
+            'destination',
+            PersonalInfoDestination.popToProfile,
+          ),
+    ],
   );
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
     'failed submit clears loading, keeps user on screen, and shows error',
     build: () =>
-        PersonalInfoBloc(_UpdatePersonalInfo()..error = Exception('boom')),
+        _bloc(update: _UpdatePersonalInfo()..error = Exception('boom')),
     act: (bloc) {
       bloc
+        ..add(const PersonalInfoStarted())
         ..add(const PersonalInfoFirstNameChanged('Ada'))
         ..add(const PersonalInfoLastNameChanged('Lovelace'))
         ..add(const PersonalInfoAgeChanged('28'))
         ..add(const PersonalInfoSubmitted());
     },
-    skip: 3,
+    skip: 4,
     expect: () => [
       isA<PersonalInfoState>().having(
         (s) => s.isSubmitting,
@@ -104,5 +165,11 @@ void main() {
       ).canSubmit,
       isFalse,
     );
+  });
+
+  test('splitFullName separates first and last', () {
+    expect(splitFullName('Ada Lovelace'), ('Ada', 'Lovelace'));
+    expect(splitFullName('Ada'), ('Ada', ''));
+    expect(splitFullName(null), ('', ''));
   });
 }

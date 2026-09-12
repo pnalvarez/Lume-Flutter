@@ -31,6 +31,7 @@ class AppRouter extends RootStackRouter {
       path: '/select-category',
       guards: [authGuard],
     ),
+    AutoRoute(page: SettingsRoute.page, path: '/settings', guards: [authGuard]),
     AutoRoute(
       page: DashboardRoute.page,
       path: '/dashboard',

@@ -124,6 +124,10 @@ const String personalInfoLastNamePlaceholder = 'Seu sobrenome';
 const String personalInfoAgeLabel = 'Idade';
 const String personalInfoAgePlaceholder = 'Sua idade';
 const String personalInfoCta = 'Continuar';
+const String personalInfoSaveCta = 'Salvar';
+const String personalInfoLoadError =
+    'Não foi possível carregar suas informações. Tente novamente.';
+const String personalInfoRetry = 'Tentar novamente';
 const String personalInfoSaveError =
     'Não foi possível salvar suas informações. Tente novamente.';
 

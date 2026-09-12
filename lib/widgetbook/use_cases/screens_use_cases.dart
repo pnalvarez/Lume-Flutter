@@ -325,6 +325,46 @@ Widget personalInfoEmpty(BuildContext context) {
   );
 }
 
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Settings prefilled',
+  type: PersonalInfoBody,
+)
+Widget personalInfoSettingsPrefilled(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      entry: PersonalInfoEntry.settings,
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      age: '28',
+    ),
+    onBack: _noop,
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Settings loading',
+  type: PersonalInfoBody,
+)
+Widget personalInfoSettingsLoading(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      entry: PersonalInfoEntry.settings,
+      status: PersonalInfoStatus.loading,
+    ),
+    onBack: _noop,
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
 // --- Select category --------------------------------------------------------
 
 const _sampleCategories = [

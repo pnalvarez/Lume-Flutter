@@ -6,8 +6,9 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
+import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
-/// Personal-info onboarding chrome. No Bloc, router, or GetIt — safe for Widgetbook.
+/// Personal-info chrome. No Bloc, router, or GetIt — safe for Widgetbook.
 class PersonalInfoBody extends StatefulWidget {
   const PersonalInfoBody({
     super.key,
@@ -16,6 +17,8 @@ class PersonalInfoBody extends StatefulWidget {
     required this.onLastNameChanged,
     required this.onAgeChanged,
     required this.onSubmit,
+    this.onBack,
+    this.onRetry,
   });
 
   final PersonalInfoState state;
@@ -23,6 +26,8 @@ class PersonalInfoBody extends StatefulWidget {
   final ValueChanged<String> onLastNameChanged;
   final ValueChanged<String> onAgeChanged;
   final VoidCallback onSubmit;
+  final VoidCallback? onBack;
+  final VoidCallback? onRetry;
 
   @override
   State<PersonalInfoBody> createState() => _PersonalInfoBodyState();
@@ -69,79 +74,119 @@ class _PersonalInfoBodyState extends State<PersonalInfoBody> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final state = widget.state;
+    final showHeader = state.isSettingsEntry && widget.onBack != null;
 
     return Scaffold(
       backgroundColor: cs.surface,
+      appBar: showHeader
+          ? PageHeader(
+              title: personalInfoTitle,
+              onBack: widget.onBack,
+              titleLayout: PageHeaderTitleLayout.stacked,
+            )
+          : null,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: _maxWidth),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacings.xl2,
-                vertical: AppSpacings.l,
+            child: switch (state.status) {
+              PersonalInfoStatus.loading => const Center(
+                child: CircularProgressIndicator(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    personalInfoTitle,
-                    style: typ.headlineM.copyWith(color: cs.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacings.s),
-                  Text(
-                    personalInfoSubtitle,
-                    style: typ.body3Light.copyWith(color: cs.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: AppSpacings.l),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          InputField(
-                            controller: _firstName,
-                            label: personalInfoFirstNameLabel,
-                            placeholder: personalInfoFirstNamePlaceholder,
-                            isEnabled: !state.isSubmitting,
-                            onChanged: widget.onFirstNameChanged,
-                          ),
-                          const SizedBox(height: AppSpacings.m),
-                          InputField(
-                            controller: _lastName,
-                            label: personalInfoLastNameLabel,
-                            placeholder: personalInfoLastNamePlaceholder,
-                            isEnabled: !state.isSubmitting,
-                            onChanged: widget.onLastNameChanged,
-                          ),
-                          const SizedBox(height: AppSpacings.m),
-                          InputField(
-                            controller: _age,
-                            label: personalInfoAgeLabel,
-                            placeholder: personalInfoAgePlaceholder,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            isEnabled: !state.isSubmitting,
-                            onChanged: widget.onAgeChanged,
-                          ),
-                        ],
+              PersonalInfoStatus.error => Padding(
+                padding: const EdgeInsets.all(AppSpacings.xl2),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      state.errorMessage ?? personalInfoLoadError,
+                      textAlign: TextAlign.center,
+                      style: typ.body3Light.copyWith(
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacings.m),
-                  LumeButton(
-                    label: personalInfoCta,
-                    size: LumeButtonSize.lg,
-                    isLoading: state.isSubmitting,
-                    isEnabled: state.canSubmit,
-                    isExpanded: true,
-                    onPressed: widget.onSubmit,
-                  ),
-                ],
+                    if (widget.onRetry != null) ...[
+                      const SizedBox(height: AppSpacings.l),
+                      LumeButton(
+                        label: personalInfoRetry,
+                        type: LumeButtonType.outlined,
+                        onPressed: widget.onRetry,
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            ),
+              PersonalInfoStatus.ready => Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacings.xl2,
+                  vertical: AppSpacings.l,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (!state.isSettingsEntry) ...[
+                      Text(
+                        personalInfoTitle,
+                        style: typ.headlineM.copyWith(color: cs.onSurface),
+                      ),
+                      const SizedBox(height: AppSpacings.s),
+                      Text(
+                        personalInfoSubtitle,
+                        style: typ.body3Light.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacings.l),
+                    ],
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            InputField(
+                              controller: _firstName,
+                              label: personalInfoFirstNameLabel,
+                              placeholder: personalInfoFirstNamePlaceholder,
+                              isEnabled: !state.isSubmitting,
+                              onChanged: widget.onFirstNameChanged,
+                            ),
+                            const SizedBox(height: AppSpacings.m),
+                            InputField(
+                              controller: _lastName,
+                              label: personalInfoLastNameLabel,
+                              placeholder: personalInfoLastNamePlaceholder,
+                              isEnabled: !state.isSubmitting,
+                              onChanged: widget.onLastNameChanged,
+                            ),
+                            const SizedBox(height: AppSpacings.m),
+                            InputField(
+                              controller: _age,
+                              label: personalInfoAgeLabel,
+                              placeholder: personalInfoAgePlaceholder,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              isEnabled: !state.isSubmitting,
+                              onChanged: widget.onAgeChanged,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacings.m),
+                    LumeButton(
+                      label: state.submitLabel,
+                      size: LumeButtonSize.lg,
+                      isLoading: state.isSubmitting,
+                      isEnabled: state.canSubmit,
+                      isExpanded: true,
+                      onPressed: widget.onSubmit,
+                    ),
+                  ],
+                ),
+              ),
+            },
           ),
         ),
       ),

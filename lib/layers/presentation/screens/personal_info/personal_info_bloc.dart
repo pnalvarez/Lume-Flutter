@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/update_personal_info.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_event.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart';
@@ -8,8 +10,9 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 @injectable
 final class PersonalInfoBloc
     extends Bloc<PersonalInfoEvent, PersonalInfoState> {
-  PersonalInfoBloc(this._updatePersonalInfo)
+  PersonalInfoBloc(this._getProfile, this._updatePersonalInfo)
     : super(const PersonalInfoState()) {
+    on<PersonalInfoStarted>(_onStarted);
     on<PersonalInfoFirstNameChanged>(_onFirstNameChanged);
     on<PersonalInfoLastNameChanged>(_onLastNameChanged);
     on<PersonalInfoAgeChanged>(_onAgeChanged);
@@ -17,7 +20,46 @@ final class PersonalInfoBloc
     on<PersonalInfoNavigationHandled>(_onNavigationHandled);
   }
 
+  final IGetProfile _getProfile;
   final IUpdatePersonalInfo _updatePersonalInfo;
+
+  Future<void> _onStarted(
+    PersonalInfoStarted event,
+    Emitter<PersonalInfoState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        entry: event.entry,
+        status: event.entry == PersonalInfoEntry.settings
+            ? PersonalInfoStatus.loading
+            : PersonalInfoStatus.ready,
+        clearError: true,
+      ),
+    );
+
+    if (event.entry != PersonalInfoEntry.settings) return;
+
+    try {
+      final profile = await _getProfile(forceRefresh: true);
+      final (firstName, lastName) = splitFullName(profile.fullName);
+      emit(
+        state.copyWith(
+          status: PersonalInfoStatus.ready,
+          firstName: firstName,
+          lastName: lastName,
+          age: profile.age?.toString() ?? '',
+          clearError: true,
+        ),
+      );
+    } on Object {
+      emit(
+        state.copyWith(
+          status: PersonalInfoStatus.error,
+          errorMessage: personalInfoLoadError,
+        ),
+      );
+    }
+  }
 
   void _onFirstNameChanged(
     PersonalInfoFirstNameChanged event,
@@ -58,7 +100,9 @@ final class PersonalInfoBloc
       emit(
         state.copyWith(
           isSubmitting: false,
-          destination: PersonalInfoDestination.selectCategory,
+          destination: state.isSettingsEntry
+              ? PersonalInfoDestination.popToProfile
+              : PersonalInfoDestination.selectCategory,
         ),
       );
     } on Object catch (error) {
