@@ -53,12 +53,15 @@ void main() {
       expect(data.id, 9);
       expect(data.title, 'Preview');
       expect(data.games.single.gameType, GameType.whoAmI);
+
+      // Options are shuffled server-side — never reuse a cached payload.
+      await sut.fetchSubmoduleGames(submoduleId: 9);
       verify(
         apiClient.rpc<Map<String, dynamic>>(
           'get_submodule_games',
           params: {'p_submodule_id': 9},
         ),
-      ).called(1);
+      ).called(2);
     },
   );
 
