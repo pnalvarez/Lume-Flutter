@@ -24,6 +24,7 @@ abstract final class AppIcons {
   static const String sparkle = '$_base/sparkle.svg';
   static const String flame = '$_base/flame.svg';
   static const String trophy = '$_base/trophy.svg';
+  static const String sadFace = '$_base/sad_face.svg';
 
   // --- Status glyphs -------------------------------------------------------
   static const String statusNew = '$_base/status_new.svg';

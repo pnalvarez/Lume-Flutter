@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/icons/app_icons.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
@@ -7,7 +8,48 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 
-/// Trophy success screen for a finished game sequence. Bloc-free.
+/// Outcome for a finished game / submodule complete screen.
+enum GamesCompleteStatus {
+  success,
+  failure;
+
+  /// SVG hero for [success]. [failure] uses [heroIconData] instead.
+  String? get heroSvgAsset => switch (this) {
+    success => AppIcons.trophy,
+    failure => null,
+  };
+
+  /// Material icon hero for [failure].
+  IconData? get heroIconData => switch (this) {
+    success => null,
+    failure => Icons.sentiment_dissatisfied_rounded,
+  };
+
+  Color get heroIconColor => switch (this) {
+    success => AppColors.Accent.accent,
+    failure => AppColors.Extra.rose,
+  };
+
+  IconData get badgeIcon => switch (this) {
+    success => Icons.check_rounded,
+    failure => Icons.close_rounded,
+  };
+
+  Color get badgeIconColor => Colors.white;
+
+  Color get badgeFillColor => switch (this) {
+    success => AppColors.Success.onSuccess,
+    failure => AppColors.Extra.rose,
+  };
+
+  /// Trail copy for [SubmoduleCompleteBody].
+  String get submoduleTitle => switch (this) {
+    success => trailSessionCompleteTitle,
+    failure => trailSessionIncompleteTitle,
+  };
+}
+
+/// End-of-sequence screen for a finished game run. Bloc-free.
 class GamesCompleteBody extends StatelessWidget {
   const GamesCompleteBody({
     super.key,
@@ -15,9 +57,11 @@ class GamesCompleteBody extends StatelessWidget {
     required this.scoreText,
     required this.actionLabel,
     required this.onAction,
+    this.status = GamesCompleteStatus.success,
     this.message,
   });
 
+  final GamesCompleteStatus status;
   final String title;
   final String scoreText;
   final String actionLabel;
@@ -44,16 +88,23 @@ class GamesCompleteBody extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          AppIcons.trophy,
-                          package: 'lume_design_system',
-                          width: AppSizes.mediaWellL,
-                          height: AppSizes.mediaWellL,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.Accent.accent,
-                            BlendMode.srcIn,
+                        switch (status.heroSvgAsset) {
+                          final asset? => SvgPicture.asset(
+                            asset,
+                            package: 'lume_design_system',
+                            width: AppSizes.mediaWellL,
+                            height: AppSizes.mediaWellL,
+                            colorFilter: ColorFilter.mode(
+                              status.heroIconColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        ),
+                          null => Icon(
+                            status.heroIconData,
+                            size: AppSizes.mediaWellL,
+                            color: status.heroIconColor,
+                          ),
+                        },
                         const SizedBox(height: AppSpacings.l),
                         Text.rich(
                           TextSpan(
@@ -66,20 +117,7 @@ class GamesCompleteBody extends StatelessWidget {
                                   padding: const EdgeInsets.only(
                                     left: AppSpacings.xs,
                                   ),
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.Success.onSuccess,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(AppSpacings.xs),
-                                      child: Icon(
-                                        Icons.check_rounded,
-                                        size: AppSizes.iconXs,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  child: _StatusBadge(status: status),
                                 ),
                               ),
                             ],
@@ -117,6 +155,30 @@ class GamesCompleteBody extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+
+  final GamesCompleteStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: status.badgeFillColor,
+        shape: BoxShape.circle,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacings.xs),
+        child: Icon(
+          status.badgeIcon,
+          size: AppSizes.iconXs,
+          color: status.badgeIconColor,
         ),
       ),
     );
