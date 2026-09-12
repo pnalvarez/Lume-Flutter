@@ -1,13 +1,14 @@
-# Runs on every PR. To block merging until this workflow is green, enable branch
-# protection (or a ruleset): Repository Settings → Branches → edit the default
-# rule → enable "Require status checks to pass before merging" → add the check
-# named "All checks passed" (the final job below).
+# Runs on every PR. Merges into main and release/* require this workflow green
+# via the "Lume" repository ruleset (required status check: "All checks passed").
 
 name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+      - 'release/**'
   pull_request:
   workflow_dispatch:
 
@@ -45,7 +46,7 @@ jobs:
         run: flutter test test/unit test/core test/app --coverage
 
       # Whole-repo coverage is ~50% today; gate only lines changed vs the PR base
-      # (or main on push). Empty diffs (no Dart line changes) pass.
+      # (or main / prior tip on push). Empty diffs (no Dart line changes) pass.
       - name: Enforce 80% coverage on changed lines
         run: |
           set -euo pipefail
@@ -54,8 +55,13 @@ jobs:
             git fetch --no-tags --prune origin "$BASE_REF"
             DIFF_RANGE="origin/${BASE_REF}...HEAD"
           else
-            git fetch --no-tags --prune origin main
-            DIFF_RANGE="origin/main...HEAD"
+            BEFORE="${{ github.event.before }}"
+            if [[ -n "${BEFORE}" && "${BEFORE}" != "0000000000000000000000000000000000000000" ]]; then
+              DIFF_RANGE="${BEFORE}...HEAD"
+            else
+              git fetch --no-tags --prune origin main
+              DIFF_RANGE="origin/main...HEAD"
+            fi
           fi
           echo "Diff range: $DIFF_RANGE"
           git diff "$DIFF_RANGE" -- '*.dart' \

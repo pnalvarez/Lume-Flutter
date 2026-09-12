@@ -42,6 +42,7 @@ String trailDetailRetryHint({required int minCorrect, required int total}) =>
 
 const String trailPreviewContinue = 'Prosseguir';
 const String trailSessionCompleteTitle = 'Você concluiu\no submódulo';
+const String trailSessionIncompleteTitle = 'Você não completou\no submódulo';
 const String trailSessionCompleteBodyPrefix = 'Você acertou ';
 const String trailSessionCompleteBodyMiddle = ' de ';
 const String trailSessionCompleteBodySuffix = ' jogos.';

@@ -10,6 +10,7 @@ import 'package:lume/layers/presentation/screens/games/connections/connections_b
 import 'package:lume/layers/presentation/screens/games/connections/connections_state.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_body.dart';
+import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_body.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_state.dart';
@@ -386,13 +387,14 @@ Widget gamesProgressMid(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Submodule Complete',
-  name: 'Default',
+  name: 'Success',
   type: SubmoduleCompleteBody,
 )
-Widget submoduleCompleted(BuildContext context) {
+Widget submoduleCompletedSuccess(BuildContext context) {
   return SubmoduleCompleteBody(
-    correctCount: 2,
-    total: 2,
+    status: GamesCompleteStatus.success,
+    correctCount: 3,
+    total: 4,
     unlockMessage: trailSessionUnlockAchieved,
     onBackToTrail: _noop,
   );
@@ -400,11 +402,12 @@ Widget submoduleCompleted(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Submodule Complete',
-  name: 'Below threshold',
+  name: 'Failure',
   type: SubmoduleCompleteBody,
 )
-Widget submoduleCompletedBelowThreshold(BuildContext context) {
+Widget submoduleCompletedFailure(BuildContext context) {
   return SubmoduleCompleteBody(
+    status: GamesCompleteStatus.failure,
     correctCount: 1,
     total: 4,
     unlockMessage: trailSessionUnlockRequirement(minCorrect: 3, total: 4),
