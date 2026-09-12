@@ -69,16 +69,34 @@ void main() {
   });
 
   group('AuthGate.splashDestination', () {
-    test('sends a confirmed session with categories home', () {
+    test(
+      'sends a confirmed session with personal info and categories home',
+      () {
+        expect(
+          AuthGate.splashDestination(
+            hasSession: true,
+            isEmailConfirmed: true,
+            isPasswordRecovery: false,
+            hasSeenOnboarding: false,
+            hasCompletedPersonalInfo: true,
+            hasSelectedCategories: true,
+          ),
+          SplashDestination.home,
+        );
+      },
+    );
+
+    test('sends a confirmed session without personal info first', () {
       expect(
         AuthGate.splashDestination(
           hasSession: true,
           isEmailConfirmed: true,
           isPasswordRecovery: false,
-          hasSeenOnboarding: false,
-          hasSelectedCategories: true,
+          hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: false,
+          hasSelectedCategories: false,
         ),
-        SplashDestination.home,
+        SplashDestination.personalInfo,
       );
     });
 
@@ -89,6 +107,7 @@ void main() {
           isEmailConfirmed: true,
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: true,
           hasSelectedCategories: false,
         ),
         SplashDestination.selectCategory,
@@ -102,6 +121,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: false,
+          hasCompletedPersonalInfo: false,
           hasSelectedCategories: false,
         ),
         SplashDestination.onboarding,
@@ -112,6 +132,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: false,
           hasSelectedCategories: false,
         ),
         SplashDestination.login,
@@ -122,6 +143,7 @@ void main() {
           isEmailConfirmed: false,
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: false,
           hasSelectedCategories: false,
         ),
         SplashDestination.login,

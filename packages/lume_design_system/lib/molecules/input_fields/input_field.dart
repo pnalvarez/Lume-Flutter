@@ -2,6 +2,7 @@ import 'package:lume_design_system/atoms/spacing/radius.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Text field following Lume / shadcn Input patterns.
 ///
@@ -15,6 +16,7 @@ class InputField extends StatelessWidget {
   final bool isEnabled;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final FocusNode? focusNode;
@@ -31,6 +33,7 @@ class InputField extends StatelessWidget {
     this.isEnabled = true,
     this.obscureText = false,
     this.keyboardType,
+    this.inputFormatters,
     this.prefixIcon,
     this.suffixIcon,
     this.focusNode,
@@ -65,6 +68,7 @@ class InputField extends StatelessWidget {
           enabled: isEnabled,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           maxLines: obscureText ? 1 : maxLines,
           minLines: minLines,
           onChanged: onChanged,

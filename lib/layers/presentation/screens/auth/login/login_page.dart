@@ -45,6 +45,8 @@ class _LoginView extends StatelessWidget {
         switch (destination) {
           case LoginDestination.home:
             context.router.replaceAll([const DashboardRoute()]);
+          case LoginDestination.personalInfo:
+            context.router.replaceAll([const PersonalInfoRoute()]);
           case LoginDestination.selectCategory:
             context.router.replaceAll([SelectCategoryRoute()]);
           case LoginDestination.confirmEmail:

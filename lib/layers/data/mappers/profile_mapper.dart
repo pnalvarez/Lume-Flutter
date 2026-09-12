@@ -9,6 +9,7 @@ abstract final class ProfileMapper {
       id: data.id,
       email: data.email,
       fullName: data.fullName,
+      age: data.age,
       trailStartedAt: data.trailStartedAt,
       playerLevel: data.playerLevel,
       totalXp: data.totalXp,

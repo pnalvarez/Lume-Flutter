@@ -4,6 +4,7 @@ enum LoginMode { login, signup }
 
 enum LoginDestination {
   home,
+  personalInfo,
   selectCategory,
   confirmEmail,
   recoverPassword,

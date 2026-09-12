@@ -22,6 +22,11 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: RecoverPasswordRoute.page, path: '/recover-password'),
     AutoRoute(page: DefinePasswordRoute.page, path: '/define-password'),
     AutoRoute(
+      page: PersonalInfoRoute.page,
+      path: '/personal-info',
+      guards: [authGuard],
+    ),
+    AutoRoute(
       page: SelectCategoryRoute.page,
       path: '/select-category',
       guards: [authGuard],

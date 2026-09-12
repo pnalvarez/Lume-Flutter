@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/app/navigation/auth_gate.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
+import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
 import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
@@ -13,6 +14,7 @@ final class SplashBloc extends Bloc<SplashEvent, SplashState> {
   SplashBloc(
     this._restoreSession,
     this._hasSeenOnboarding,
+    this._hasCompletedPersonalInfo,
     this._hasSelectedCategories,
   ) : super(const SplashLoading()) {
     on<SplashStarted>(_onStarted);
@@ -20,6 +22,7 @@ final class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
   final IRestoreSession _restoreSession;
   final IHasSeenOnboarding _hasSeenOnboarding;
+  final IHasCompletedPersonalInfo _hasCompletedPersonalInfo;
   final IHasSelectedCategories _hasSelectedCategories;
 
   Future<void> _onStarted(
@@ -40,7 +43,8 @@ final class SplashBloc extends Bloc<SplashEvent, SplashState> {
       seenOnboarding = false;
     }
 
-    // Match web login gate: on prefs fetch failure, continue to home.
+    // Match web login gate: on prefs/profile fetch failure, continue to home.
+    var hasCompletedPersonalInfo = true;
     var hasSelectedCategories = true;
     final canEnterApp = AuthGate.allowsAuthenticatedRoute(
       hasSession: session != null,
@@ -48,12 +52,24 @@ final class SplashBloc extends Bloc<SplashEvent, SplashState> {
       isPasswordRecovery: session?.isPasswordRecovery ?? false,
     );
     if (canEnterApp) {
+      var personalInfoCheckFailed = false;
       try {
-        hasSelectedCategories = await _hasSelectedCategories(
+        hasCompletedPersonalInfo = await _hasCompletedPersonalInfo(
           forceRefresh: true,
         );
       } on Object {
+        personalInfoCheckFailed = true;
+        hasCompletedPersonalInfo = true;
         hasSelectedCategories = true;
+      }
+      if (!personalInfoCheckFailed && hasCompletedPersonalInfo) {
+        try {
+          hasSelectedCategories = await _hasSelectedCategories(
+            forceRefresh: true,
+          );
+        } on Object {
+          hasSelectedCategories = true;
+        }
       }
     }
 
@@ -64,6 +80,7 @@ final class SplashBloc extends Bloc<SplashEvent, SplashState> {
           isEmailConfirmed: session?.user.isEmailConfirmed ?? false,
           isPasswordRecovery: session?.isPasswordRecovery ?? false,
           hasSeenOnboarding: seenOnboarding,
+          hasCompletedPersonalInfo: hasCompletedPersonalInfo,
           hasSelectedCategories: hasSelectedCategories,
         ),
       ),

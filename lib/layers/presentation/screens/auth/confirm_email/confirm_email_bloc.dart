@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
+import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/observe_auth_state.dart';
 import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
@@ -17,6 +18,7 @@ final class ConfirmEmailBloc
   ConfirmEmailBloc(
     this._resendConfirmationEmail,
     this._observeAuthState,
+    this._hasCompletedPersonalInfo,
     this._hasSelectedCategories,
   ) : super(const ConfirmEmailState()) {
     on<ConfirmEmailStarted>(_onStarted);
@@ -29,6 +31,7 @@ final class ConfirmEmailBloc
 
   final IResendConfirmationEmail _resendConfirmationEmail;
   final IObserveAuthState _observeAuthState;
+  final IHasCompletedPersonalInfo _hasCompletedPersonalInfo;
   final IHasSelectedCategories _hasSelectedCategories;
 
   StreamSubscription<AuthSession?>? _authSubscription;
@@ -74,6 +77,18 @@ final class ConfirmEmailBloc
         session.isPasswordRecovery) {
       return null;
     }
+
+    try {
+      final hasPersonalInfo = await _hasCompletedPersonalInfo(
+        forceRefresh: true,
+      );
+      if (!hasPersonalInfo) {
+        return ConfirmEmailDestination.personalInfo;
+      }
+    } on Object {
+      return ConfirmEmailDestination.personalInfo;
+    }
+
     try {
       final hasSelected = await _hasSelectedCategories(forceRefresh: true);
       return hasSelected

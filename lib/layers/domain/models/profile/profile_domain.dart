@@ -4,6 +4,7 @@ class ProfileDomain {
     required this.id,
     this.email,
     this.fullName,
+    this.age,
     this.trailStartedAt,
     this.playerLevel = 1,
     this.totalXp = 0,
@@ -22,6 +23,7 @@ class ProfileDomain {
   final String id;
   final String? email;
   final String? fullName;
+  final int? age;
   final DateTime? trailStartedAt;
   final int playerLevel;
   final int totalXp;

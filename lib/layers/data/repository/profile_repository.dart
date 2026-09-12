@@ -15,4 +15,18 @@ final class ProfileRepository implements IProfileRepository {
     final data = await _dataSource.fetchProfile(forceRefresh: forceRefresh);
     return ProfileMapper.toDomain(data);
   }
+
+  @override
+  Future<ProfileDomain> updatePersonalInfo({
+    required String firstName,
+    required String lastName,
+    required int age,
+  }) async {
+    final data = await _dataSource.updatePersonalInfo(
+      firstName: firstName,
+      lastName: lastName,
+      age: age,
+    );
+    return ProfileMapper.toDomain(data);
+  }
 }

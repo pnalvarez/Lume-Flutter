@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 
-enum ConfirmEmailDestination { home, selectCategory }
+enum ConfirmEmailDestination { home, personalInfo, selectCategory }
 
 @immutable
 sealed class ConfirmEmailEvent {

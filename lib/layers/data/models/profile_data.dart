@@ -8,6 +8,7 @@ class ProfileData {
     required this.id,
     this.email,
     this.fullName,
+    this.age,
     this.trailStartedAt,
     this.playerLevel = 1,
     this.totalXp = 0,
@@ -26,6 +27,7 @@ class ProfileData {
   final String id;
   final String? email;
   final String? fullName;
+  final int? age;
   final DateTime? trailStartedAt;
 
   @JsonKey(defaultValue: 1)
