@@ -111,7 +111,30 @@ class _PreviewContent extends StatelessWidget {
                       child: Image.network(
                         image,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                        gaplessPlayback: true,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return ColoredBox(
+                            color: cs.surfaceContainerHighest,
+                            child: const Center(child: CircularLoader()),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          assert(() {
+                            debugPrint(
+                              'Submodule preview image failed: $image → $error',
+                            );
+                            return true;
+                          }());
+                          return ColoredBox(
+                            color: cs.surfaceContainerHighest,
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              color: cs.onSurfaceVariant,
+                              size: 40,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
