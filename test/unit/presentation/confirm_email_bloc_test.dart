@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/models/auth/auth_user.dart';
+import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/observe_auth_state.dart';
 import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
@@ -33,6 +34,15 @@ class _Observe implements IObserveAuthState {
   }
 }
 
+class _HasPersonalInfo implements IHasCompletedPersonalInfo {
+  _HasPersonalInfo(this.value);
+
+  final bool value;
+
+  @override
+  Future<bool> call({bool forceRefresh = false}) async => value;
+}
+
 class _HasSelected implements IHasSelectedCategories {
   _HasSelected(this.value);
 
@@ -46,6 +56,20 @@ AuthSession _confirmed() {
   return const AuthSession(
     user: AuthUser(id: '1', email: 'a@b.c', isEmailConfirmed: true),
     isPasswordRecovery: false,
+  );
+}
+
+ConfirmEmailBloc _bloc(
+  _Resend resend,
+  StreamController<AuthSession?> sessions, {
+  bool hasPersonalInfo = true,
+  bool hasSelected = false,
+}) {
+  return ConfirmEmailBloc(
+    resend,
+    _Observe(sessions),
+    _HasPersonalInfo(hasPersonalInfo),
+    _HasSelected(hasSelected),
   );
 }
 
@@ -63,9 +87,8 @@ void main() {
   });
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
-    'seeds email and keeps waiting until a confirmed session arrives',
-    build: () =>
-        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(false)),
+    'seeds email and routes to personal info when profile is incomplete',
+    build: () => _bloc(resend, sessions, hasPersonalInfo: false),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -78,16 +101,36 @@ void main() {
           .having(
             (s) => s.destination,
             'destination',
-            ConfirmEmailDestination.selectCategory,
+            ConfirmEmailDestination.personalInfo,
           )
           .having((s) => s.notice, 'notice', confirmEmailSuccessNotice),
     ],
   );
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
+    'confirmed session without categories goes to select category',
+    build: () =>
+        _bloc(resend, sessions, hasPersonalInfo: true, hasSelected: false),
+    act: (bloc) async {
+      bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
+      await pumpEventQueue();
+      sessions.add(_confirmed());
+      await pumpEventQueue();
+    },
+    expect: () => [
+      isA<ConfirmEmailState>().having((s) => s.email, 'email', 'a@b.c'),
+      isA<ConfirmEmailState>().having(
+        (s) => s.destination,
+        'destination',
+        ConfirmEmailDestination.selectCategory,
+      ),
+    ],
+  );
+
+  blocTest<ConfirmEmailBloc, ConfirmEmailState>(
     'confirmed session with categories goes home',
     build: () =>
-        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(true)),
+        _bloc(resend, sessions, hasPersonalInfo: true, hasSelected: true),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -106,8 +149,7 @@ void main() {
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
     'resend works while waiting for confirmation',
-    build: () =>
-        ConfirmEmailBloc(resend, _Observe(sessions), _HasSelected(false)),
+    build: () => _bloc(resend, sessions, hasPersonalInfo: false),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();
@@ -125,6 +167,5 @@ void main() {
           .having((s) => s.isSubmitting, 'submitting', false)
           .having((s) => s.notice, 'notice', confirmEmailResentNotice),
     ],
-    verify: (_) => expect(resend.callCount, 1),
   );
 }

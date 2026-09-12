@@ -20,6 +20,7 @@ void main() {
         id: 'user-1',
         email: 'ada@example.com',
         fullName: 'Ada',
+        age: 28,
         playerLevel: 3,
         totalXp: 341,
         currentStreak: 2,
@@ -36,6 +37,7 @@ void main() {
     expect(profile.id, 'user-1');
     expect(profile.email, 'ada@example.com');
     expect(profile.fullName, 'Ada');
+    expect(profile.age, 28);
     expect(profile.playerLevel, 3);
     expect(profile.totalXp, 341);
     expect(profile.currentStreak, 2);

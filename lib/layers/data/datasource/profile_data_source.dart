@@ -8,6 +8,12 @@ import 'package:lume/layers/data/models/profile_data.dart';
 
 abstract interface class IProfileDataSource {
   Future<ProfileData> fetchProfile({bool forceRefresh = false});
+
+  Future<ProfileData> updatePersonalInfo({
+    required String firstName,
+    required String lastName,
+    required int age,
+  });
 }
 
 @Injectable(as: IProfileDataSource)
@@ -35,5 +41,23 @@ final class ProfileDataSource implements IProfileDataSource {
       (value) => value.toJson(),
     );
     return data;
+  }
+
+  @override
+  Future<ProfileData> updatePersonalInfo({
+    required String firstName,
+    required String lastName,
+    required int age,
+  }) async {
+    await _apiClient.rpc<Map<String, dynamic>>(
+      'update_personal_info',
+      params: {
+        'p_first_name': firstName,
+        'p_last_name': lastName,
+        'p_age': age,
+      },
+    );
+    // Refresh cached profile so gates and profile UI see the new values.
+    return fetchProfile(forceRefresh: true);
   }
 }

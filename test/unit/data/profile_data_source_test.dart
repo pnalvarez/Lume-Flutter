@@ -27,6 +27,7 @@ void main() {
       (_) async => {
         'id': 'user-1',
         'full_name': 'Ada',
+        'age': 28,
         'player_level': 3,
         'total_xp': 341,
         'current_streak': 0,
@@ -42,6 +43,7 @@ void main() {
 
     expect(data.id, 'user-1');
     expect(data.fullName, 'Ada');
+    expect(data.age, 28);
     expect(data.playerLevel, 3);
     expect(data.totalXp, 341);
     expect(data.currentStreak, 0);

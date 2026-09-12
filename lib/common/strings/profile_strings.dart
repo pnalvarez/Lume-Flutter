@@ -20,6 +20,14 @@ const String profileLoadError = 'Não foi possível carregar o perfil.';
 const String profileRetry = 'Tentar novamente';
 const String profileDisplayNameFallback = 'Explorador';
 
+// --- Settings ---------------------------------------------------------------
+
+const String settingsTitle = 'Configurações';
+const String settingsPersonalInfoTitle = 'Informações pessoais';
+const String settingsPersonalInfoDescription = 'Nome, sobrenome e idade';
+const String settingsCategoriesTitle = 'Categorias';
+const String settingsCategoriesDescription = 'Temas que você quer aprender';
+
 const _ptMonths = [
   'janeiro',
   'fevereiro',

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/errors/auth_failure.dart';
+import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
@@ -14,6 +15,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc(
     this._signInWithEmail,
     this._signUpWithEmail,
+    this._hasCompletedPersonalInfo,
     this._hasSelectedCategories,
   ) : super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
@@ -27,6 +29,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   final ISignInWithEmail _signInWithEmail;
   final ISignUpWithEmail _signUpWithEmail;
+  final IHasCompletedPersonalInfo _hasCompletedPersonalInfo;
   final IHasSelectedCategories _hasSelectedCategories;
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
@@ -77,7 +80,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(
           state.copyWith(
             isSubmitting: false,
-            destination: LoginDestination.selectCategory,
+            destination: LoginDestination.personalInfo,
           ),
         );
         return;
@@ -107,8 +110,19 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  /// Web: no prefs → categories; prefs present or prefs check fails → home.
+  /// Personal info → categories → home. Prefs/profile check failures go home.
   Future<LoginDestination> _destinationAfterSignIn() async {
+    try {
+      final hasPersonalInfo = await _hasCompletedPersonalInfo(
+        forceRefresh: true,
+      );
+      if (!hasPersonalInfo) {
+        return LoginDestination.personalInfo;
+      }
+    } on Object {
+      return LoginDestination.home;
+    }
+
     try {
       final hasSelected = await _hasSelectedCategories(forceRefresh: true);
       return hasSelected

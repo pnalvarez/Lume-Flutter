@@ -53,6 +53,8 @@ class _ConfirmEmailView extends StatelessWidget {
           switch (destination) {
             case ConfirmEmailDestination.home:
               context.router.replaceAll([const DashboardRoute()]);
+            case ConfirmEmailDestination.personalInfo:
+              context.router.replaceAll([PersonalInfoRoute()]);
             case ConfirmEmailDestination.selectCategory:
               context.router.replaceAll([SelectCategoryRoute()]);
           }

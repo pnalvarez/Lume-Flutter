@@ -61,7 +61,7 @@ class _SelectCategoryView extends StatelessWidget {
           case SelectCategoryDestination.login:
             context.router.replaceAll([const LoginRoute()]);
           case SelectCategoryDestination.pop:
-            context.router.maybePop();
+            context.router.popUntilRouteWithName(DashboardRoute.name);
         }
       },
       child: BlocBuilder<SelectCategoryBloc, SelectCategoryState>(

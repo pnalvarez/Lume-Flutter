@@ -18,6 +18,8 @@ import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_card_ui.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_body.dart';
+import 'package:lume/layers/presentation/screens/personal_info/personal_info_body.dart';
+import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_body.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
 import 'package:lume/layers/presentation/screens/trail/home/home_body.dart';
@@ -265,6 +267,102 @@ class _OnboardingPreviewState extends State<_OnboardingPreview> {
       onPageChanged: (index) => setState(() => _index = index),
     );
   }
+}
+
+// --- Personal info ----------------------------------------------------------
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Default',
+  type: PersonalInfoBody,
+)
+Widget personalInfoDefault(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      age: '28',
+    ),
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Submitting',
+  type: PersonalInfoBody,
+)
+Widget personalInfoSubmitting(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      age: '28',
+      isSubmitting: true,
+    ),
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Empty',
+  type: PersonalInfoBody,
+)
+Widget personalInfoEmpty(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(),
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Settings prefilled',
+  type: PersonalInfoBody,
+)
+Widget personalInfoSettingsPrefilled(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      entry: PersonalInfoEntry.settings,
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      age: '28',
+    ),
+    onBack: _noop,
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Personal info',
+  name: 'Settings loading',
+  type: PersonalInfoBody,
+)
+Widget personalInfoSettingsLoading(BuildContext context) {
+  return PersonalInfoBody(
+    state: const PersonalInfoState(
+      entry: PersonalInfoEntry.settings,
+      status: PersonalInfoStatus.loading,
+    ),
+    onBack: _noop,
+    onFirstNameChanged: _noopString,
+    onLastNameChanged: _noopString,
+    onAgeChanged: _noopString,
+    onSubmit: _noop,
+  );
 }
 
 // --- Select category --------------------------------------------------------
