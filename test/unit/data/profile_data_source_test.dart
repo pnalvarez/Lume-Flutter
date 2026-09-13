@@ -1,19 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/auth/auth_session.dart';
 import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/profile_data_source.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../helpers/fake_auth_service.dart';
 import '../../helpers/mocks.mocks.dart';
 
 void main() {
   late MockIApiClient apiClient;
   late InMemoryStorageClient storage;
+  late FakeAuthService auth;
   late ProfileDataSource sut;
 
   setUp(() {
     apiClient = MockIApiClient();
     storage = InMemoryStorageClient();
-    sut = ProfileDataSource(apiClient, storage);
+    auth = FakeAuthService();
+    sut = ProfileDataSource(apiClient, storage, auth);
   });
 
   test('fetchProfile parses get_profile into ProfileData', () async {
@@ -76,7 +80,7 @@ void main() {
     },
   );
 
-  test('fetchProfile treats invalid created_at as null', () async {
+  test('fetchProfile treats invalid created_at as null without auth', () async {
     when(
       apiClient.rpc<Map<String, dynamic>>(
         'get_profile',
@@ -95,4 +99,87 @@ void main() {
 
     expect(data.createdAt, isNull);
   });
+
+  test(
+    'fetchProfile falls back to auth session createdAt when RPC omits it',
+    () async {
+      auth.currentSession = AuthSessionSnapshot(
+        accessToken: 'jwt',
+        userId: 'user-1',
+        email: 'ada@example.com',
+        isEmailConfirmed: true,
+        createdAt: DateTime.utc(2026, 9, 13, 12),
+      );
+      when(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_profile',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => {
+          'id': 'user-1',
+          'full_name': 'Ada',
+          // no created_at — mirrors live get_profile
+        },
+      );
+
+      final data = await sut.fetchProfile();
+
+      expect(data.createdAt, DateTime.utc(2026, 9, 13, 12));
+    },
+  );
+
+  test(
+    'fetchProfile prefers RPC created_at over auth session createdAt',
+    () async {
+      auth.currentSession = AuthSessionSnapshot(
+        accessToken: 'jwt',
+        userId: 'user-1',
+        isEmailConfirmed: true,
+        createdAt: DateTime.utc(2026, 1, 1),
+      );
+      when(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_profile',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => {'id': 'user-1', 'created_at': '2026-08-01T12:00:00Z'},
+      );
+
+      final data = await sut.fetchProfile();
+
+      expect(data.createdAt, DateTime.utc(2026, 8, 1, 12));
+    },
+  );
+
+  test(
+    'fetchProfile enriches cached profile missing created_at from auth',
+    () async {
+      auth.currentSession = AuthSessionSnapshot(
+        accessToken: 'jwt',
+        userId: 'user-1',
+        isEmailConfirmed: true,
+        createdAt: DateTime.utc(2026, 9, 13, 12),
+      );
+      when(
+        apiClient.rpc<Map<String, dynamic>>(
+          'get_profile',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async => {'id': 'user-1', 'full_name': 'Ada'});
+
+      // First fetch caches without RPC created_at; auth fills it.
+      await sut.fetchProfile();
+      // Clear auth then re-read cache — createdAt should already be persisted.
+      auth.currentSession = null;
+      final cached = await sut.fetchProfile();
+
+      expect(cached.createdAt, DateTime.utc(2026, 9, 13, 12));
+      verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
+    },
+  );
 }

@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:lume/core/auth/auth_service.dart';
 import 'package:lume/core/network/api_client.dart';
 import 'package:lume/core/storage/cache_keys.dart';
 import 'package:lume/core/storage/storage_client.dart';
@@ -18,23 +19,29 @@ abstract interface class IProfileDataSource {
 
 @Injectable(as: IProfileDataSource)
 final class ProfileDataSource implements IProfileDataSource {
-  ProfileDataSource(this._apiClient, this._storage);
+  ProfileDataSource(this._apiClient, this._storage, this._auth);
 
   final IApiClient _apiClient;
   final IStorageClient _storage;
+  final IAuthService _auth;
 
   @override
   Future<ProfileData> fetchProfile({bool forceRefresh = false}) async {
+    ProfileData? data;
     if (!forceRefresh) {
-      final cached = await _storage.readObject(
-        CacheKeys.profile,
-        ProfileData.fromJson,
-      );
-      if (cached != null) return cached;
+      data = await _storage.readObject(CacheKeys.profile, ProfileData.fromJson);
     }
 
-    final raw = await _apiClient.rpc<Map<String, dynamic>>('get_profile');
-    final data = ProfileData.fromJson(asJsonMap(raw));
+    if (data == null) {
+      final raw = await _apiClient.rpc<Map<String, dynamic>>('get_profile');
+      data = ProfileData.fromJson(asJsonMap(raw));
+    }
+
+    // `get_profile` often omits `created_at` even though `profiles.created_at`
+    // exists. Fall back to the signed-in auth account creation timestamp so
+    // Profile “Membro desde …” is not stuck on an em dash.
+    data = _withAccountCreatedAtFallback(data);
+
     await _storage.writeObject(
       CacheKeys.profile,
       data,
@@ -59,5 +66,12 @@ final class ProfileDataSource implements IProfileDataSource {
     );
     // Refresh cached profile so gates and profile UI see the new values.
     return fetchProfile(forceRefresh: true);
+  }
+
+  ProfileData _withAccountCreatedAtFallback(ProfileData data) {
+    if (data.createdAt != null) return data;
+    final fromAuth = _auth.currentSession?.createdAt;
+    if (fromAuth == null) return data;
+    return data.copyWith(createdAt: fromAuth);
   }
 }

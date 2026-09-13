@@ -26,7 +26,7 @@ class ProfileDomain {
   final String? fullName;
   final int? age;
 
-  /// Member start date from backend `created_at` (account creation).
+  /// Member start date: `get_profile.created_at`, else auth account creation.
   final DateTime? createdAt;
   final DateTime? trailStartedAt;
   final int playerLevel;

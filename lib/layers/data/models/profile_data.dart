@@ -31,7 +31,8 @@ class ProfileData {
   final String? fullName;
   final int? age;
 
-  /// Account / member start timestamp from `get_profile.created_at`.
+  /// Account / member start timestamp from `get_profile.created_at`, with
+  /// auth-session fallback applied in [ProfileDataSource] when the RPC omits it.
   @NullableDateTimeConverter()
   final DateTime? createdAt;
 
@@ -78,4 +79,46 @@ class ProfileData {
       _$ProfileDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProfileDataToJson(this);
+
+  ProfileData copyWith({
+    String? id,
+    String? email,
+    String? fullName,
+    int? age,
+    DateTime? createdAt,
+    DateTime? trailStartedAt,
+    int? playerLevel,
+    int? totalXp,
+    int? xpToNextLevel,
+    int? xpInLevel,
+    int? xpForNextLevel,
+    int? currentStreak,
+    int? bestStreak,
+    int? streakShields,
+    int? xpToday,
+    int? xpWeek,
+    int? daysInApp,
+    int? submodulesCompleted,
+  }) {
+    return ProfileData(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      age: age ?? this.age,
+      createdAt: createdAt ?? this.createdAt,
+      trailStartedAt: trailStartedAt ?? this.trailStartedAt,
+      playerLevel: playerLevel ?? this.playerLevel,
+      totalXp: totalXp ?? this.totalXp,
+      xpToNextLevel: xpToNextLevel ?? this.xpToNextLevel,
+      xpInLevel: xpInLevel ?? this.xpInLevel,
+      xpForNextLevel: xpForNextLevel ?? this.xpForNextLevel,
+      currentStreak: currentStreak ?? this.currentStreak,
+      bestStreak: bestStreak ?? this.bestStreak,
+      streakShields: streakShields ?? this.streakShields,
+      xpToday: xpToday ?? this.xpToday,
+      xpWeek: xpWeek ?? this.xpWeek,
+      daysInApp: daysInApp ?? this.daysInApp,
+      submodulesCompleted: submodulesCompleted ?? this.submodulesCompleted,
+    );
+  }
 }
