@@ -28,27 +28,15 @@ const String settingsPersonalInfoDescription = 'Nome, sobrenome e idade';
 const String settingsCategoriesTitle = 'Categorias';
 const String settingsCategoriesDescription = 'Temas que você quer aprender';
 
-const _ptMonths = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-];
-
 String profileMemberSince(String? memberSince) =>
     'Membro desde ${memberSince ?? '—'}';
 
-String? profileFormatMemberSince(DateTime? trailStartedAt) {
-  if (trailStartedAt == null) return null;
-  return '${_ptMonths[trailStartedAt.month - 1]} de ${trailStartedAt.year}';
+/// Formats a member-start [DateTime] as zero-padded `dd/mm/yyyy`.
+String? profileFormatMemberSince(DateTime? memberStartedAt) {
+  if (memberStartedAt == null) return null;
+  final day = memberStartedAt.day.toString().padLeft(2, '0');
+  final month = memberStartedAt.month.toString().padLeft(2, '0');
+  return '$day/$month/${memberStartedAt.year}';
 }
 
 String profileStreakValue(int streak) => streak == 1 ? '1 dia' : '$streak dias';

@@ -22,7 +22,7 @@ class ProfileHeader extends StatelessWidget {
 
   final String displayName;
 
-  /// Formatted membership date (e.g. `agosto de 2026`). Null shows an em dash.
+  /// Formatted membership date (e.g. `01/08/2026`). Null shows an em dash.
   final String? memberSince;
   final VoidCallback onSettingsPressed;
   final VoidCallback onSignOutPressed;

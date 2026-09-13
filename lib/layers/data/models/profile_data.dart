@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:lume/layers/data/nullable_date_time_converter.dart';
 
 part 'profile_data.g.dart';
 
@@ -9,6 +10,7 @@ class ProfileData {
     this.email,
     this.fullName,
     this.age,
+    this.createdAt,
     this.trailStartedAt,
     this.playerLevel = 1,
     this.totalXp = 0,
@@ -28,6 +30,12 @@ class ProfileData {
   final String? email;
   final String? fullName;
   final int? age;
+
+  /// Account / member start timestamp from `get_profile.created_at`.
+  @NullableDateTimeConverter()
+  final DateTime? createdAt;
+
+  @NullableDateTimeConverter()
   final DateTime? trailStartedAt;
 
   @JsonKey(defaultValue: 1)

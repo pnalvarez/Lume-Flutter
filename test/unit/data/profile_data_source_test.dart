@@ -27,6 +27,7 @@ void main() {
       (_) async => {
         'id': 'user-1',
         'full_name': 'Ada',
+        'created_at': '2026-08-01T12:00:00Z',
         'age': 28,
         'player_level': 3,
         'total_xp': 341,
@@ -43,6 +44,7 @@ void main() {
 
     expect(data.id, 'user-1');
     expect(data.fullName, 'Ada');
+    expect(data.createdAt, DateTime.utc(2026, 8, 1, 12));
     expect(data.age, 28);
     expect(data.playerLevel, 3);
     expect(data.totalXp, 341);
@@ -73,4 +75,24 @@ void main() {
       verify(apiClient.rpc<Map<String, dynamic>>('get_profile')).called(1);
     },
   );
+
+  test('fetchProfile treats invalid created_at as null', () async {
+    when(
+      apiClient.rpc<Map<String, dynamic>>(
+        'get_profile',
+        params: anyNamed('params'),
+        headers: anyNamed('headers'),
+      ),
+    ).thenAnswer(
+      (_) async => {
+        'id': 'user-1',
+        'full_name': 'Ada',
+        'created_at': 'not-a-date',
+      },
+    );
+
+    final data = await sut.fetchProfile();
+
+    expect(data.createdAt, isNull);
+  });
 }

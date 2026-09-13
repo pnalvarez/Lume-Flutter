@@ -11,7 +11,7 @@ void main() {
         id: 'user-1',
         email: 'ada@example.com',
         fullName: 'Ada Lovelace',
-        trailStartedAt: DateTime(2026, 8, 1),
+        createdAt: DateTime(2026, 8, 1),
         playerLevel: 5,
         totalXp: 1240,
         xpInLevel: 140,
@@ -28,7 +28,7 @@ void main() {
     expect(state.status, ProfileStatus.ready);
     expect(state.isLoading, isFalse);
     expect(state.displayName, 'Ada Lovelace');
-    expect(state.memberSince, 'agosto de 2026');
+    expect(state.memberSince, '01/08/2026');
     expect(state.playerLevel, 5);
     expect(state.currentStreak, 7);
     expect(state.xpInLevel, 140);
@@ -75,5 +75,31 @@ void main() {
     );
 
     expect(state.displayName, 'explorer');
+  });
+
+  test('fromDomain prefers createdAt over trailStartedAt for memberSince', () {
+    final state = ProfileState.fromDomain(
+      ProfileDomain(
+        id: 'user-1',
+        createdAt: DateTime(2026, 1, 15),
+        trailStartedAt: DateTime(2026, 8, 1),
+      ),
+    );
+
+    expect(state.memberSince, '15/01/2026');
+  });
+
+  test('fromDomain falls back to trailStartedAt when createdAt is null', () {
+    final state = ProfileState.fromDomain(
+      ProfileDomain(id: 'user-1', trailStartedAt: DateTime(2026, 8, 1)),
+    );
+
+    expect(state.memberSince, '01/08/2026');
+  });
+
+  test('fromDomain leaves memberSince null when no dates exist', () {
+    final state = ProfileState.fromDomain(const ProfileDomain(id: 'user-1'));
+
+    expect(state.memberSince, isNull);
   });
 }
