@@ -14,6 +14,7 @@ final class GamesHubState {
     this.openPlayRounds,
     this.openArcadeRounds,
     this.arcadeRecord = 0,
+    this.showArcade = true,
   });
 
   /// Catalog skeleton while hub games load.
@@ -35,6 +36,9 @@ final class GamesHubState {
   /// Personal best handed to the arcade run that is about to start.
   final int arcadeRecord;
 
+  /// Whether the Arcade CTA is shown (Remote Config `arcade_enabled`).
+  final bool showArcade;
+
   List<GamesHubCardUi> get generalGames => [
     for (final game in games)
       if (game.hubSection == HubSection.general) game,
@@ -54,6 +58,7 @@ final class GamesHubState {
     List<GameRound>? openPlayRounds,
     List<GameRound>? openArcadeRounds,
     int? arcadeRecord,
+    bool? showArcade,
     bool clearInitialError = false,
     bool clearGameRoundError = false,
     bool clearOpenPlayRounds = false,
@@ -76,6 +81,7 @@ final class GamesHubState {
           ? null
           : openArcadeRounds ?? this.openArcadeRounds,
       arcadeRecord: arcadeRecord ?? this.arcadeRecord,
+      showArcade: showArcade ?? this.showArcade,
     );
   }
 
@@ -89,7 +95,8 @@ final class GamesHubState {
       other.gameRoundErrorMessage == gameRoundErrorMessage &&
       listEquals(other.openPlayRounds, openPlayRounds) &&
       listEquals(other.openArcadeRounds, openArcadeRounds) &&
-      other.arcadeRecord == arcadeRecord;
+      other.arcadeRecord == arcadeRecord &&
+      other.showArcade == showArcade;
 
   @override
   int get hashCode => Object.hash(
@@ -101,5 +108,6 @@ final class GamesHubState {
     openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
     openArcadeRounds == null ? null : Object.hashAll(openArcadeRounds!),
     arcadeRecord,
+    showArcade,
   );
 }

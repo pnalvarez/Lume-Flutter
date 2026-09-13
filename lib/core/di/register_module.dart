@@ -1,8 +1,10 @@
 import 'package:injectable/injectable.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/auth/auth_token_provider.dart';
 import 'package:lume/core/observability/crash_reporter.dart';
 import 'package:lume/core/observability/crash_reporting.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 
 @module
 abstract class CoreAuthModule {
@@ -14,4 +16,16 @@ abstract class CoreAuthModule {
 abstract class CoreObservabilityModule {
   @lazySingleton
   ICrashReporter crashReporter() => CrashReporting.reporter;
+}
+
+@module
+abstract class CoreAnalyticsModule {
+  @lazySingleton
+  IAnalytics analytics() => AnalyticsService.client;
+}
+
+@module
+abstract class CoreRemoteConfigModule {
+  @lazySingleton
+  IRemoteConfig remoteConfig() => RemoteConfigService.client;
 }

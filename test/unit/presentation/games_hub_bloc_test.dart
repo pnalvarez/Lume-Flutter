@@ -1,6 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/core/remote_config/remote_config_keys.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
 import 'package:lume/layers/domain/models/game/hub_game_round_domain.dart';
 import 'package:lume/layers/domain/models/arcade/arcade_domain.dart';
@@ -102,17 +105,58 @@ class _GetRandomGameRound implements IGetRandomGameRound {
   }
 }
 
+class _RemoteConfig implements IRemoteConfig {
+  bool arcade = true;
+
+  @override
+  bool get arcadeEnabled => arcade;
+
+  @override
+  Map<String, Object> get debugOverrides => const {};
+
+  @override
+  bool getBool(String key, {required bool defaultValue}) {
+    if (key == RemoteConfigKeys.arcadeEnabled) return arcade;
+    return defaultValue;
+  }
+
+  @override
+  String getString(String key, {required String defaultValue}) => defaultValue;
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  void setDebugOverride(String key, Object? value) {}
+}
+
+class _Analytics implements IAnalytics {
+  final List<String> events = [];
+
+  @override
+  Future<void> logEvent(String name, {Map<String, Object>? parameters}) async {
+    events.add(name);
+  }
+
+  @override
+  Future<void> setUserId(String? userId) async {}
+}
+
 void main() {
   late _GetHubGames getHubGames;
   late _GetGameRound getGameRound;
   late _GetArcadeRecord getArcadeRecord;
   late _GetRandomGameRound getRandomGameRound;
+  late _RemoteConfig remoteConfig;
+  late _Analytics analytics;
 
   setUp(() {
     getHubGames = _GetHubGames();
     getGameRound = _GetGameRound();
     getArcadeRecord = _GetArcadeRecord();
     getRandomGameRound = _GetRandomGameRound();
+    remoteConfig = _RemoteConfig();
+    analytics = _Analytics();
   });
 
   GamesHubBloc buildBloc() => GamesHubBloc(
@@ -120,6 +164,8 @@ void main() {
     getGameRound,
     getArcadeRecord,
     getRandomGameRound,
+    remoteConfig,
+    analytics,
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
@@ -127,12 +173,37 @@ void main() {
     build: buildBloc,
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
-      const GamesHubState(isInitialLoading: true),
+      const GamesHubState(isInitialLoading: true, showArcade: true),
       isA<GamesHubState>()
           .having((s) => s.isInitialLoading, 'isInitialLoading', isFalse)
           .having((s) => s.generalGames, 'general', hasLength(1))
-          .having((s) => s.visualGames, 'visual', hasLength(1)),
+          .having((s) => s.visualGames, 'visual', hasLength(1))
+          .having((s) => s.showArcade, 'showArcade', isTrue),
     ],
+    verify: (_) {
+      expect(analytics.events, contains(AnalyticsEvents.arcadeCtaImpression));
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'hides arcade when Remote Config disables it',
+    build: () {
+      remoteConfig.arcade = false;
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(const GamesHubStarted()),
+    expect: () => [
+      const GamesHubState(isInitialLoading: true, showArcade: false),
+      isA<GamesHubState>()
+          .having((s) => s.isInitialLoading, 'isInitialLoading', isFalse)
+          .having((s) => s.showArcade, 'showArcade', isFalse),
+    ],
+    verify: (_) {
+      expect(
+        analytics.events,
+        isNot(contains(AnalyticsEvents.arcadeCtaImpression)),
+      );
+    },
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
@@ -198,6 +269,9 @@ void main() {
           .having((s) => s.openArcadeRounds, 'openArcadeRounds', hasLength(1))
           .having((s) => s.openArcadeRounds!.first.id, 'first round id', '42'),
     ],
+    verify: (_) {
+      expect(analytics.events, contains(AnalyticsEvents.arcadeOpened));
+    },
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
