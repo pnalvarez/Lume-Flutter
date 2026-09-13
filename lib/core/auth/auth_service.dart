@@ -179,7 +179,19 @@ AuthSessionSnapshot? _mapSession(Session? session) {
     userId: user.id,
     email: user.email,
     isEmailConfirmed: _isEmailConfirmed(user),
+    createdAt: _parseUserCreatedAt(user.createdAt),
   );
+}
+
+DateTime? _parseUserCreatedAt(String? value) {
+  if (value == null) return null;
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) return null;
+  try {
+    return DateTime.parse(trimmed);
+  } on FormatException {
+    return null;
+  }
 }
 
 bool _isEmailConfirmed(User? user) {
