@@ -96,6 +96,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - Auth SDK: only `IAuthService`
 - Cache: `IStorageClient` + `*Data.fromJson`
 - Crashlytics: `ICrashReporter` / `CrashReporting` in `lib/core/observability/` — `firebase_core` / `firebase_crashlytics` only there and `bootstrap.dart`
+- Remote Config: `IRemoteConfig` / `RemoteConfigService` in `lib/core/remote_config/` — `firebase_remote_config` only there and `bootstrap.dart`
 
 ## Tests
 

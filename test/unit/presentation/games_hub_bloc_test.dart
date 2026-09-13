@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/core/remote_config/remote_config_keys.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
 import 'package:lume/layers/domain/models/game/hub_game_round_domain.dart';
 import 'package:lume/layers/domain/models/arcade/arcade_domain.dart';
@@ -102,17 +104,44 @@ class _GetRandomGameRound implements IGetRandomGameRound {
   }
 }
 
+class _RemoteConfig implements IRemoteConfig {
+  bool arcade = true;
+
+  @override
+  bool get arcadeEnabled => arcade;
+
+  @override
+  Map<String, Object> get debugOverrides => const {};
+
+  @override
+  bool getBool(String key, {required bool defaultValue}) {
+    if (key == RemoteConfigKeys.arcadeEnabled) return arcade;
+    return defaultValue;
+  }
+
+  @override
+  String getString(String key, {required String defaultValue}) => defaultValue;
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  void setDebugOverride(String key, Object? value) {}
+}
+
 void main() {
   late _GetHubGames getHubGames;
   late _GetGameRound getGameRound;
   late _GetArcadeRecord getArcadeRecord;
   late _GetRandomGameRound getRandomGameRound;
+  late _RemoteConfig remoteConfig;
 
   setUp(() {
     getHubGames = _GetHubGames();
     getGameRound = _GetGameRound();
     getArcadeRecord = _GetArcadeRecord();
     getRandomGameRound = _GetRandomGameRound();
+    remoteConfig = _RemoteConfig();
   });
 
   GamesHubBloc buildBloc() => GamesHubBloc(
@@ -120,6 +149,7 @@ void main() {
     getGameRound,
     getArcadeRecord,
     getRandomGameRound,
+    remoteConfig,
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
@@ -127,11 +157,27 @@ void main() {
     build: buildBloc,
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
-      const GamesHubState(isInitialLoading: true),
+      const GamesHubState(isInitialLoading: true, showArcade: true),
       isA<GamesHubState>()
           .having((s) => s.isInitialLoading, 'isInitialLoading', isFalse)
           .having((s) => s.generalGames, 'general', hasLength(1))
-          .having((s) => s.visualGames, 'visual', hasLength(1)),
+          .having((s) => s.visualGames, 'visual', hasLength(1))
+          .having((s) => s.showArcade, 'showArcade', isTrue),
+    ],
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'hides arcade when Remote Config disables it',
+    build: () {
+      remoteConfig.arcade = false;
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(const GamesHubStarted()),
+    expect: () => [
+      const GamesHubState(isInitialLoading: true, showArcade: false),
+      isA<GamesHubState>()
+          .having((s) => s.isInitialLoading, 'isInitialLoading', isFalse)
+          .having((s) => s.showArcade, 'showArcade', isFalse),
     ],
   );
 

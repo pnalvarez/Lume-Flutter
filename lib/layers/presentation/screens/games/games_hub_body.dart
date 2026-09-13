@@ -68,8 +68,10 @@ class GamesHubBody extends StatelessWidget {
     return _GamesHubScroll(
       listChildren: [
         if (state.generalGames.isNotEmpty) ...[
-          GamesHubArcadeButton(onPressed: onArcadePressed),
-          const SizedBox(height: AppSpacings.m),
+          if (state.showArcade) ...[
+            GamesHubArcadeButton(onPressed: onArcadePressed),
+            const SizedBox(height: AppSpacings.m),
+          ],
           const GamesHubSectionTitle(gamesHubSectionGeneral),
           const SizedBox(height: AppSpacings.m),
           GamesHubGamesList(

@@ -119,6 +119,34 @@ App version / build number come from native store metadata — do not put PII in
 
 **Web note:** The Firebase **web** app exists for future Firebase web features (Auth, Analytics, etc.). For web crash/error reporting, use a web-capable tool (e.g. Sentry) in a follow-up — not Crashlytics.
 
+### Firebase Remote Config
+
+Feature toggles and remote parameters are wired in `lib/core/remote_config/` and installed from `bootstrap.dart` (after Crashlytics / Firebase init).
+
+Firebase project: **`lume-51a38`**
+
+| Platform | Remote Config |
+|----------|---------------|
+| iOS / Android / macOS | Yes (`firebase_remote_config`) |
+| Web / Windows / Linux | **No** — in-app defaults + optional debug overrides only |
+
+**Enable Remote Config in the console** (one-time): open [Remote Config for lume-51a38](https://console.firebase.google.com/project/lume-51a38/config), add parameters, and publish.
+
+Known parameter keys (`RemoteConfigKeys`):
+
+| Key | Type | In-app default | Effect |
+|-----|------|----------------|--------|
+| `arcade_enabled` | Boolean | `true` | Shows / hides the Arcade CTA on Games Hub |
+
+Behavior:
+
+- Fetch on launch (`fetchAndActivate`); fetch failures keep defaults / last activated values
+- Debug: minimum fetch interval is `0`; release uses 1 hour
+- QA without console: `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
+- Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)` (debug builds, or `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`)
+
+Do not put PII or secrets in Remote Config values.
+
 ### iOS / TestFlight
 
 | Secret | Description |

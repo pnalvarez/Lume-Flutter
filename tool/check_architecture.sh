@@ -84,14 +84,14 @@ while IFS= read -r -d '' file; do
   fi
 done < <(find lib -name '*.dart' -print0)
 
-# firebase_core / firebase_crashlytics only in observability + bootstrap
+# firebase_core / firebase_crashlytics / firebase_remote_config only in core + bootstrap
 while IFS= read -r -d '' file; do
   rel="${file#"$ROOT/"}"
   case "$rel" in
-    lib/bootstrap.dart|lib/core/observability/*) continue ;;
+    lib/bootstrap.dart|lib/core/observability/*|lib/core/remote_config/*) continue ;;
   esac
-  if grep -qE 'package:firebase_(core|crashlytics)/' "$file"; then
-    note "BLOCKER: firebase_core / firebase_crashlytics only allowed in bootstrap.dart and lib/core/observability/
+  if grep -qE 'package:firebase_(core|crashlytics|remote_config)/' "$file"; then
+    note "BLOCKER: firebase_* only allowed in bootstrap.dart, lib/core/observability/, and lib/core/remote_config/
   $rel"
   fi
 done < <(find lib -name '*.dart' -print0)

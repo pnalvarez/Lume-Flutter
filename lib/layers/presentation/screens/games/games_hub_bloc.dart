@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
@@ -17,6 +18,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     this._getGameRound,
     this._getArcadeRecord,
     this._getRandomGameRound,
+    this._remoteConfig,
   ) : super(const GamesHubState()) {
     on<GamesHubStarted>(_onStarted);
     on<GamesHubGamePressed>(_onGamePressed);
@@ -29,18 +31,26 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
   final IGetGameRound _getGameRound;
   final IGetArcadeRecord _getArcadeRecord;
   final IGetRandomGameRound _getRandomGameRound;
+  final IRemoteConfig _remoteConfig;
 
   Future<void> _onStarted(
     GamesHubStarted event,
     Emitter<GamesHubState> emit,
   ) async {
-    emit(state.copyWith(isInitialLoading: true, clearInitialError: true));
+    emit(
+      state.copyWith(
+        isInitialLoading: true,
+        clearInitialError: true,
+        showArcade: _remoteConfig.arcadeEnabled,
+      ),
+    );
     try {
       final games = await _getHubGames(forceRefresh: event.forceRefresh);
       emit(
         state.copyWith(
           isInitialLoading: false,
           games: [for (final game in games) GamesHubCardUi.fromDomain(game)],
+          showArcade: _remoteConfig.arcadeEnabled,
         ),
       );
     } on Object {
@@ -48,6 +58,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         state.copyWith(
           isInitialLoading: false,
           initialErrorMessage: gamesHubLoadError,
+          showArcade: _remoteConfig.arcadeEnabled,
         ),
       );
     }
@@ -95,6 +106,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     GamesHubArcadePressed event,
     Emitter<GamesHubState> emit,
   ) async {
+    if (!state.showArcade) return;
     if (state.isLoadingGame || state.isInitialLoading) return;
 
     emit(state.copyWith(isLoadingGame: true, clearGameRoundError: true));
