@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
@@ -19,6 +20,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     this._getArcadeRecord,
     this._getRandomGameRound,
     this._remoteConfig,
+    this._analytics,
   ) : super(const GamesHubState()) {
     on<GamesHubStarted>(_onStarted);
     on<GamesHubGamePressed>(_onGamePressed);
@@ -32,16 +34,18 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
   final IGetArcadeRecord _getArcadeRecord;
   final IGetRandomGameRound _getRandomGameRound;
   final IRemoteConfig _remoteConfig;
+  final IAnalytics _analytics;
 
   Future<void> _onStarted(
     GamesHubStarted event,
     Emitter<GamesHubState> emit,
   ) async {
+    final showArcade = _remoteConfig.arcadeEnabled;
     emit(
       state.copyWith(
         isInitialLoading: true,
         clearInitialError: true,
-        showArcade: _remoteConfig.arcadeEnabled,
+        showArcade: showArcade,
       ),
     );
     try {
@@ -50,15 +54,18 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         state.copyWith(
           isInitialLoading: false,
           games: [for (final game in games) GamesHubCardUi.fromDomain(game)],
-          showArcade: _remoteConfig.arcadeEnabled,
+          showArcade: showArcade,
         ),
       );
+      if (showArcade) {
+        await _analytics.logEvent(AnalyticsEvents.arcadeCtaImpression);
+      }
     } on Object {
       emit(
         state.copyWith(
           isInitialLoading: false,
           initialErrorMessage: gamesHubLoadError,
-          showArcade: _remoteConfig.arcadeEnabled,
+          showArcade: showArcade,
         ),
       );
     }
@@ -108,6 +115,8 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
   ) async {
     if (!state.showArcade) return;
     if (state.isLoadingGame || state.isInitialLoading) return;
+
+    await _analytics.logEvent(AnalyticsEvents.arcadeOpened);
 
     emit(state.copyWith(isLoadingGame: true, clearGameRoundError: true));
     try {

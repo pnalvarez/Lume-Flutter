@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/realtime/realtime_client.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
@@ -41,6 +42,7 @@ void _registerGamesHubBloc() {
       getIt<IGetArcadeRecord>(),
       getIt<IGetRandomGameRound>(),
       getIt<IRemoteConfig>(),
+      getIt<IAnalytics>(),
     ),
   );
 }

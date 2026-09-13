@@ -147,6 +147,42 @@ Behavior:
 
 Do not put PII or secrets in Remote Config values.
 
+### Firebase Analytics + A/B Testing
+
+Analytics is wired in `lib/core/analytics/` and installed from `bootstrap.dart` **after** Crashlytics (Firebase init) and **before** Remote Config.
+
+| Platform | Analytics |
+|----------|-----------|
+| iOS / Android / macOS | Yes (`firebase_analytics`) |
+| Web / Windows / Linux | **No** (NoOp) — A/B enrollment is mobile-first |
+
+Collection behavior (same pattern as Crashlytics):
+
+- **Release / profile:** collection **on**
+- **Debug:** collection **off**
+- Force on: `--dart-define=ANALYTICS_ENABLED=true`
+
+Custom events used as A/B goals (`AnalyticsEvents`):
+
+| Event | When |
+|-------|------|
+| `arcade_cta_impression` | Games Hub loads with Arcade visible |
+| `arcade_opened` | User taps Arcade |
+
+**Create the Arcade A/B experiment** (console — not available via public API):
+
+1. Open [A/B Testing](https://console.firebase.google.com/project/lume-51a38/abtesting)
+2. **Create experiment** → **Remote Config**
+3. Parameter: `arcade_enabled`
+4. Variants (example 50/50):
+   - Control: `false`
+   - Treatment: `true`
+5. Primary goal: custom event `arcade_opened` (maximize unique users)
+6. Optional secondary: `arcade_cta_impression`
+7. Start the experiment and publish Remote Config when prompted
+
+Until an experiment is running, `arcade_enabled` is controlled by Remote Config defaults/conditions only.
+
 ### iOS / TestFlight
 
 | Secret | Description |
