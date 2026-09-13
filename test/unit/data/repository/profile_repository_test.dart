@@ -16,11 +16,12 @@ void main() {
 
   test('getProfile maps ProfileData to ProfileDomain', () async {
     when(dataSource.fetchProfile(forceRefresh: false)).thenAnswer(
-      (_) async => const ProfileData(
+      (_) async => ProfileData(
         id: 'user-1',
         email: 'ada@example.com',
         fullName: 'Ada',
         age: 28,
+        createdAt: DateTime.utc(2026, 1, 15),
         playerLevel: 3,
         totalXp: 341,
         currentStreak: 2,
@@ -38,6 +39,7 @@ void main() {
     expect(profile.email, 'ada@example.com');
     expect(profile.fullName, 'Ada');
     expect(profile.age, 28);
+    expect(profile.createdAt, DateTime.utc(2026, 1, 15));
     expect(profile.playerLevel, 3);
     expect(profile.totalXp, 341);
     expect(profile.currentStreak, 2);

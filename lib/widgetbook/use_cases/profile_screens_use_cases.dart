@@ -17,7 +17,7 @@ ProfileState _readyState() {
       id: '1',
       email: 'ada@lume.app',
       fullName: 'Ada Lovelace',
-      trailStartedAt: DateTime(2026, 8, 1),
+      createdAt: DateTime(2026, 8, 1),
       playerLevel: 5,
       totalXp: 1240,
       xpInLevel: 140,
@@ -116,7 +116,7 @@ Widget profileHeaderWithMembership(BuildContext context) {
       padding: const EdgeInsets.all(AppSpacings.xl2),
       child: ProfileHeader(
         displayName: 'Ada Lovelace',
-        memberSince: 'agosto de 2026',
+        memberSince: '01/08/2026',
         onSettingsPressed: _noop,
         onSignOutPressed: _noop,
       ),
@@ -135,7 +135,7 @@ Widget profileHeaderLoading(BuildContext context) {
       padding: const EdgeInsets.all(AppSpacings.xl2),
       child: ProfileHeader(
         displayName: 'Ada Lovelace',
-        memberSince: 'agosto de 2026',
+        memberSince: '01/08/2026',
         isLoading: true,
         onSettingsPressed: _noop,
         onSignOutPressed: _noop,

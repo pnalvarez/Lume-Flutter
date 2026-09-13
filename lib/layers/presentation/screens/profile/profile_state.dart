@@ -104,7 +104,9 @@ final class ProfileState {
         fullName: profile.fullName,
         email: profile.email,
       ),
-      memberSince: profileFormatMemberSince(profile.trailStartedAt),
+      memberSince: profileFormatMemberSince(
+        profile.createdAt ?? profile.trailStartedAt,
+      ),
       playerLevel: profile.playerLevel,
       currentStreak: profile.currentStreak,
       xpInLevel: profile.xpInLevel,
