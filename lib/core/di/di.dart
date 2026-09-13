@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/realtime/realtime_client.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/data/datasource/level_up_data_source.dart';
 import 'package:lume/layers/data/repository/level_up_repository.dart';
 import 'package:lume/layers/domain/repository/level_up_repository.dart';
@@ -39,6 +40,7 @@ void _registerGamesHubBloc() {
       getIt<IGetGameRound>(),
       getIt<IGetArcadeRecord>(),
       getIt<IGetRandomGameRound>(),
+      getIt<IRemoteConfig>(),
     ),
   );
 }
