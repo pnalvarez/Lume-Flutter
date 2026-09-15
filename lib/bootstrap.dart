@@ -7,6 +7,8 @@ import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/core/config/app_config.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/core/observability/crash_reporting.dart';
+import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,6 +16,8 @@ Future<void> bootstrap() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await CrashReporting.install();
+    await AnalyticsService.install();
+    await RemoteConfigService.install();
 
     final config = AppConfig.fromEnvironment();
     await Supabase.initialize(

@@ -604,6 +604,24 @@ Widget gamesHubReady(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Games Hub',
+  name: 'Arcade hidden',
+  type: GamesHubBody,
+)
+Widget gamesHubArcadeHidden(BuildContext context) {
+  return GamesHubBody(
+    state: const GamesHubState(
+      isInitialLoading: false,
+      games: _sampleHubGames,
+      showArcade: false,
+    ),
+    onRetry: _noop,
+    onGamePressed: _noopString,
+    onArcadePressed: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Games Hub',
   name: 'Loading',
   type: GamesHubBody,
 )
