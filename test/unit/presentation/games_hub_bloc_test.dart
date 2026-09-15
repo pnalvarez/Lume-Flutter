@@ -214,10 +214,11 @@ void main() {
     },
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
-      const GamesHubState(isInitialLoading: true),
+      const GamesHubState(isInitialLoading: true, showArcade: true),
       const GamesHubState(
         isInitialLoading: false,
         initialErrorMessage: gamesHubLoadError,
+        showArcade: true,
       ),
     ],
   );
@@ -259,10 +260,14 @@ void main() {
       getArcadeRecord.bestRounds = 7;
       return buildBloc();
     },
-    seed: () => const GamesHubState(isInitialLoading: false),
+    seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
     act: (bloc) => bloc.add(const GamesHubArcadePressed()),
     expect: () => [
-      const GamesHubState(isInitialLoading: false, isLoadingGame: true),
+      const GamesHubState(
+        isInitialLoading: false,
+        isLoadingGame: true,
+        showArcade: true,
+      ),
       isA<GamesHubState>()
           .having((s) => s.isLoadingGame, 'isLoadingGame', isFalse)
           .having((s) => s.arcadeRecord, 'arcadeRecord', 7)
@@ -280,13 +285,18 @@ void main() {
       getRandomGameRound.result = null;
       return buildBloc();
     },
-    seed: () => const GamesHubState(isInitialLoading: false),
+    seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
     act: (bloc) => bloc.add(const GamesHubArcadePressed()),
     expect: () => [
-      const GamesHubState(isInitialLoading: false, isLoadingGame: true),
+      const GamesHubState(
+        isInitialLoading: false,
+        isLoadingGame: true,
+        showArcade: true,
+      ),
       const GamesHubState(
         isInitialLoading: false,
         gameRoundErrorMessage: gamesHubRoundEmpty,
+        showArcade: true,
       ),
     ],
   );
