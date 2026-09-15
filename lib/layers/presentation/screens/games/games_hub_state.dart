@@ -14,7 +14,7 @@ final class GamesHubState {
     this.openPlayRounds,
     this.openArcadeRounds,
     this.arcadeRecord = 0,
-    this.showArcade = true,
+    this.showArcade = false,
   });
 
   /// Catalog skeleton while hub games load.
