@@ -8,12 +8,16 @@ class AuthSessionSnapshot {
     required this.userId,
     this.email,
     required this.isEmailConfirmed,
+    this.createdAt,
   });
 
   final String accessToken;
   final String userId;
   final String? email;
   final bool isEmailConfirmed;
+
+  /// Auth account creation time (`auth.users.created_at`), when available.
+  final DateTime? createdAt;
 }
 
 /// Kind of auth-state event from the SDK adapter.
