@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_event.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_state.dart';
@@ -7,12 +8,14 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
 @injectable
 final class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
-  DashboardBloc(this._signOut) : super(const DashboardState()) {
+  DashboardBloc(this._signOut, this._analytics)
+    : super(const DashboardState()) {
     on<DashboardSignOutPressed>(_onSignOutPressed);
     on<DashboardNavigationHandled>(_onNavigationHandled);
   }
 
   final ISignOut _signOut;
+  final IAnalytics _analytics;
 
   Future<void> _onSignOutPressed(
     DashboardSignOutPressed event,
@@ -22,6 +25,7 @@ final class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     emit(state.copyWith(isSigningOut: true, clearError: true));
     try {
       await _signOut();
+      await _analytics.setUserId(null);
       emit(state.copyWith(isSigningOut: false, goToLogin: true));
     } on Object catch (error) {
       emit(

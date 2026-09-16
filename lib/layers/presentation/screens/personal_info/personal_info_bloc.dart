@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/update_personal_info.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_event.dart';
@@ -10,7 +11,7 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 @injectable
 final class PersonalInfoBloc
     extends Bloc<PersonalInfoEvent, PersonalInfoState> {
-  PersonalInfoBloc(this._getProfile, this._updatePersonalInfo)
+  PersonalInfoBloc(this._getProfile, this._updatePersonalInfo, this._analytics)
     : super(const PersonalInfoState()) {
     on<PersonalInfoStarted>(_onStarted);
     on<PersonalInfoFirstNameChanged>(_onFirstNameChanged);
@@ -22,6 +23,7 @@ final class PersonalInfoBloc
 
   final IGetProfile _getProfile;
   final IUpdatePersonalInfo _updatePersonalInfo;
+  final IAnalytics _analytics;
 
   Future<void> _onStarted(
     PersonalInfoStarted event,
@@ -97,6 +99,11 @@ final class PersonalInfoBloc
         lastName: state.lastName.trim(),
         age: age,
       );
+      if (!state.isSettingsEntry) {
+        await _analytics.logEvent(
+          AnalyticsEvents.onboardingPersonalInfoCompleted,
+        );
+      }
       emit(
         state.copyWith(
           isSubmitting: false,

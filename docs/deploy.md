@@ -162,12 +162,19 @@ Collection behavior (same pattern as Crashlytics):
 - **Debug:** collection **off**
 - Force on: `--dart-define=ANALYTICS_ENABLED=true`
 
-Custom events used as A/B goals (`AnalyticsEvents`):
+Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 
 | Event | When |
 |-------|------|
 | `arcade_cta_impression` | Games Hub loads with Arcade visible |
 | `arcade_opened` | User taps Arcade |
+| `login_submitted` / `login_succeeded` / `login_failed` | Auth submit outcomes |
+| `onboarding_personal_info_completed` | Onboarding personal info saved |
+| `onboarding_category_selected` | Onboarding categories saved |
+| `submodule_session_started` / `completed` / `abandoned` | Trail submodule session |
+| `game_round_started` / `game_session_completed` / `game_session_abandoned` | Games play sequence |
+
+Shared parameter keys live in `AnalyticsParams` (`play_mode`, `game_type`, `trail_id`, `submodule_id`, `pair_id`, `score_pct`, `error_code`, …). No PII.
 
 **Create the Arcade A/B experiment** (console — not available via public API):
 

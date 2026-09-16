@@ -7,6 +7,7 @@ import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_bloc.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_event.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _GetProfile implements IGetProfile {
   ProfileDomain result = const ProfileDomain(
@@ -55,7 +56,8 @@ void main() {
     signOut = _SignOut();
   });
 
-  ProfileBloc buildBloc() => ProfileBloc(getProfile, signOut);
+  ProfileBloc buildBloc({FakeAnalytics? analytics}) =>
+      ProfileBloc(getProfile, signOut, analytics ?? FakeAnalytics());
 
   blocTest<ProfileBloc, ProfileState>(
     'loads profile stats into ready state',
@@ -135,6 +137,17 @@ void main() {
     ],
     verify: (_) => expect(signOut.calls, 1),
   );
+
+  test('sign out clears analytics user id', () async {
+    final analytics = FakeAnalytics();
+    final bloc = buildBloc(analytics: analytics);
+    bloc.add(const ProfileSignOutPressed());
+    await bloc.stream.firstWhere(
+      (s) => s.destination == ProfileDestination.login,
+    );
+    expect(analytics.userIds, [null]);
+    await bloc.close();
+  });
 
   blocTest<ProfileBloc, ProfileState>(
     'clears destination after navigation is handled',

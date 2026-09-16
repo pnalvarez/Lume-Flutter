@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
@@ -15,6 +16,7 @@ final class SubmoduleSessionBloc
     this._getSubmoduleGames,
     this._savePairProgress,
     this._progressCalculator,
+    this._analytics,
   ) : super(const SubmoduleSessionState()) {
     on<SubmoduleSessionStarted>(_onStarted);
     on<SubmoduleSessionRoundScored>(_onRoundScored);
@@ -29,11 +31,19 @@ final class SubmoduleSessionBloc
   final IGetSubmoduleGames _getSubmoduleGames;
   final ISavePairProgress _savePairProgress;
   final ITrailProgressCalculator _progressCalculator;
+  final IAnalytics _analytics;
 
   Future<void> _onStarted(
     SubmoduleSessionStarted event,
     Emitter<SubmoduleSessionState> emit,
   ) async {
+    await _analytics.logEvent(
+      AnalyticsEvents.submoduleSessionStarted,
+      parameters: {
+        AnalyticsParams.trailId: event.trailId,
+        AnalyticsParams.submoduleId: event.submoduleId,
+      },
+    );
     emit(
       state.copyWith(
         status: SubmoduleSessionStatus.loading,
@@ -109,10 +119,18 @@ final class SubmoduleSessionBloc
     await _flushPairScores(emit);
   }
 
-  void _onGamesCancelled(
+  Future<void> _onGamesCancelled(
     SubmoduleSessionGamesCancelled event,
     Emitter<SubmoduleSessionState> emit,
-  ) {
+  ) async {
+    await _analytics.logEvent(
+      AnalyticsEvents.submoduleSessionAbandoned,
+      parameters: {
+        AnalyticsParams.trailId: state.trailId,
+        AnalyticsParams.submoduleId: state.submoduleId,
+        AnalyticsParams.reason: 'games_cancelled',
+      },
+    );
     emit(
       state.copyWith(
         correctCount: 0,
@@ -149,6 +167,14 @@ final class SubmoduleSessionBloc
       }
       final correctCount = state.correctCount;
       final total = state.games.length;
+      await _analytics.logEvent(
+        AnalyticsEvents.submoduleSessionCompleted,
+        parameters: {
+          AnalyticsParams.trailId: state.trailId,
+          AnalyticsParams.submoduleId: state.submoduleId,
+          AnalyticsParams.correctCount: correctCount,
+        },
+      );
       emit(
         state.copyWith(
           status: SubmoduleSessionStatus.ready,
@@ -176,10 +202,18 @@ final class SubmoduleSessionBloc
     }
   }
 
-  void _onAbandoned(
+  Future<void> _onAbandoned(
     SubmoduleSessionAbandoned event,
     Emitter<SubmoduleSessionState> emit,
-  ) {
+  ) async {
+    await _analytics.logEvent(
+      AnalyticsEvents.submoduleSessionAbandoned,
+      parameters: {
+        AnalyticsParams.trailId: state.trailId,
+        AnalyticsParams.submoduleId: state.submoduleId,
+        AnalyticsParams.reason: 'leave',
+      },
+    );
     emit(
       state.copyWith(
         correctCount: 0,

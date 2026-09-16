@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/helpers/trail_progress_calculator.dart';
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
@@ -10,6 +11,7 @@ import 'package:lume/layers/presentation/screens/games/games_complete_body.dart'
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_bloc.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_event.dart';
 import 'package:lume/layers/presentation/screens/trail/submodule_session/submodule_session_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _GetGames implements IGetSubmoduleGames {
   @override
@@ -65,14 +67,16 @@ class _SavePair implements ISavePairProgress {
 void main() {
   group('SubmoduleSessionBloc', () {
     late _SavePair save;
+    late FakeAnalytics analytics;
     final progressCalculator = TrailProgressCalculator();
 
     setUp(() {
       save = _SavePair();
+      analytics = FakeAnalytics();
     });
 
     SubmoduleSessionBloc buildBloc() =>
-        SubmoduleSessionBloc(_GetGames(), save, progressCalculator);
+        SubmoduleSessionBloc(_GetGames(), save, progressCalculator, analytics);
 
     blocTest<SubmoduleSessionBloc, SubmoduleSessionState>(
       'buffers round scores without persisting until games completed',
@@ -107,6 +111,14 @@ void main() {
         expect(bloc.state.correctCount, 1);
         expect(bloc.state.completeStatus, GamesCompleteStatus.failure);
         expect(bloc.state.completeUnlockMessage, isNotEmpty);
+        expect(
+          analytics.hasEvent(AnalyticsEvents.submoduleSessionStarted),
+          isTrue,
+        );
+        expect(
+          analytics.hasEvent(AnalyticsEvents.submoduleSessionCompleted),
+          isTrue,
+        );
       },
     );
 
@@ -141,6 +153,12 @@ void main() {
         expect(save.calls, isEmpty);
         expect(bloc.state.pairScores, isEmpty);
         expect(bloc.state.stage, SubmoduleSessionStage.preview);
+        expect(
+          analytics.parametersFor(
+            AnalyticsEvents.submoduleSessionAbandoned,
+          )?[AnalyticsParams.reason],
+          'games_cancelled',
+        );
       },
     );
 
@@ -158,6 +176,12 @@ void main() {
         expect(save.calls, isEmpty);
         expect(bloc.state.pairScores, isEmpty);
         expect(bloc.state.goBackToTrail, isTrue);
+        expect(
+          analytics.parametersFor(
+            AnalyticsEvents.submoduleSessionAbandoned,
+          )?[AnalyticsParams.reason],
+          'leave',
+        );
       },
     );
   });

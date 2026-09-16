@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/profile_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_event.dart';
@@ -9,7 +10,8 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
 @injectable
 final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  ProfileBloc(this._getProfile, this._signOut) : super(const ProfileState()) {
+  ProfileBloc(this._getProfile, this._signOut, this._analytics)
+    : super(const ProfileState()) {
     on<ProfileStarted>(_onStarted);
     on<ProfileSignOutPressed>(_onSignOutPressed);
     on<ProfileSettingsPressed>(_onSettingsPressed);
@@ -18,6 +20,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   final IGetProfile _getProfile;
   final ISignOut _signOut;
+  final IAnalytics _analytics;
 
   Future<void> _onStarted(
     ProfileStarted event,
@@ -51,6 +54,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(state.copyWith(isSigningOut: true, clearError: true));
     try {
       await _signOut();
+      await _analytics.setUserId(null);
       emit(
         state.copyWith(
           isSigningOut: false,

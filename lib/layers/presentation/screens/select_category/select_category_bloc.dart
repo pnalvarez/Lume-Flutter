@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/errors/api_exception.dart';
 import 'package:lume/layers/domain/usecases/get_categories_with_preferences.dart';
 import 'package:lume/layers/domain/usecases/save_category_preferences.dart';
@@ -13,6 +14,7 @@ final class SelectCategoryBloc
   SelectCategoryBloc(
     this._getCategoriesWithPreferences,
     this._saveCategoryPreferences,
+    this._analytics,
   ) : super(const SelectCategoryState()) {
     on<SelectCategoryStarted>(_onStarted);
     on<SelectCategoryToggled>(_onToggled);
@@ -23,6 +25,7 @@ final class SelectCategoryBloc
 
   final IGetCategoriesWithPreferences _getCategoriesWithPreferences;
   final ISaveCategoryPreferences _saveCategoryPreferences;
+  final IAnalytics _analytics;
 
   Future<void> _onStarted(
     SelectCategoryStarted event,
@@ -94,9 +97,15 @@ final class SelectCategoryBloc
     if (!state.canSubmit) return;
     emit(state.copyWith(isSaving: true, clearError: true));
     try {
-      await _saveCategoryPreferences(
-        categoryIds: state.selectedIds.toList(growable: false),
-      );
+      final categoryIds = state.selectedIds.toList(growable: false);
+      await _saveCategoryPreferences(categoryIds: categoryIds);
+      if (!state.isProfileEntry) {
+        final sortedIds = [...categoryIds]..sort();
+        await _analytics.logEvent(
+          AnalyticsEvents.onboardingCategorySelected,
+          parameters: {AnalyticsParams.categoryId: sortedIds.join(',')},
+        );
+      }
       emit(
         state.copyWith(
           isSaving: false,

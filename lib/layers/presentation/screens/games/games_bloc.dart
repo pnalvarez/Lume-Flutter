@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/game_play/complete_sentence_play.dart';
 import 'package:lume/layers/domain/models/game_play/connections_play.dart';
 import 'package:lume/layers/domain/models/game_play/mysterious_word_play.dart';
@@ -38,6 +39,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._getRandomGameRound,
     this._saveArcadeRound,
     this._saveArcadeRecord,
+    this._analytics,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -70,15 +72,28 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IGetRandomGameRound _getRandomGameRound;
   final ISaveArcadeRound _saveArcadeRound;
   final ISaveArcadeRecord _saveArcadeRecord;
+  final IAnalytics _analytics;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
 
   bool get _isArcade => _mode == GamesPlayMode.arcade;
 
-  void _onStarted(GamesStarted event, Emitter<GamesState> emit) {
+  Future<void> _onStarted(GamesStarted event, Emitter<GamesState> emit) async {
     _mode = event.mode;
     _onSaveRound = event.onSaveRound;
+    final first = event.rounds.isEmpty ? null : event.rounds.first;
+    final params = <String, Object>{
+      AnalyticsParams.playMode: event.mode.name,
+      AnalyticsParams.roundsTotal: event.rounds.length,
+    };
+    if (first != null) {
+      params[AnalyticsParams.gameType] = first.game.gameType.wireValue;
+    }
+    await _analytics.logEvent(
+      AnalyticsEvents.gameRoundStarted,
+      parameters: params,
+    );
     emit(
       GamesState.initial(
         rounds: event.rounds,
@@ -343,6 +358,14 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           clearXpAwardedToShow: xpAwarded <= 0,
         ),
       );
+      await _analytics.logEvent(
+        AnalyticsEvents.gameSessionCompleted,
+        parameters: {
+          AnalyticsParams.playMode: _mode.name,
+          AnalyticsParams.correctCount: nextCorrect,
+          AnalyticsParams.roundsTotal: state.rounds.length,
+        },
+      );
       return;
     }
 
@@ -443,6 +466,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   Future<void> _endArcadeSession(
     Emitter<GamesState> emit, {
     required ArcadeInfo arcade,
+    bool abandoned = false,
   }) async {
     var finished = arcade;
 
@@ -466,15 +490,33 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: true,
       ),
     );
+
+    if (abandoned) return;
+    await _analytics.logEvent(
+      AnalyticsEvents.gameSessionCompleted,
+      parameters: {
+        AnalyticsParams.playMode: _mode.name,
+        AnalyticsParams.correctCount: finished.scoredCount,
+        AnalyticsParams.roundsTotal: state.rounds.length,
+      },
+    );
   }
 
   Future<void> _onAbandoned(
     GamesAbandoned event,
     Emitter<GamesState> emit,
   ) async {
+    await _analytics.logEvent(
+      AnalyticsEvents.gameSessionAbandoned,
+      parameters: {
+        AnalyticsParams.playMode: _mode.name,
+        AnalyticsParams.roundIndex: state.currentIndex,
+        AnalyticsParams.roundsTotal: state.rounds.length,
+      },
+    );
     // Leaving an arcade run is a valid ending: show the score instead of popping.
     if (_isArcade) {
-      await _endArcadeSession(emit, arcade: state.arcade);
+      await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
       return;
     }
     emit(state.copyWith(goBack: true));

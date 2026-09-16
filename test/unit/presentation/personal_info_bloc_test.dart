@@ -1,11 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/profile/profile_domain.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
 import 'package:lume/layers/domain/usecases/update_personal_info.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_bloc.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_event.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _GetProfile implements IGetProfile {
   _GetProfile(this.profile, {this.error});
@@ -40,13 +42,18 @@ class _UpdatePersonalInfo implements IUpdatePersonalInfo {
   }
 }
 
-PersonalInfoBloc _bloc({IGetProfile? getProfile, IUpdatePersonalInfo? update}) {
+PersonalInfoBloc _bloc({
+  IGetProfile? getProfile,
+  IUpdatePersonalInfo? update,
+  FakeAnalytics? analytics,
+}) {
   return PersonalInfoBloc(
     getProfile ??
         _GetProfile(
           const ProfileDomain(id: '1', fullName: 'Ada Lovelace', age: 28),
         ),
     update ?? _UpdatePersonalInfo(),
+    analytics ?? FakeAnalytics(),
   );
 }
 
@@ -171,5 +178,40 @@ void main() {
     expect(splitFullName('Ada Lovelace'), ('Ada', 'Lovelace'));
     expect(splitFullName('Ada'), ('Ada', ''));
     expect(splitFullName(null), ('', ''));
+  });
+
+  test('onboarding submit logs onboarding_personal_info_completed', () async {
+    final analytics = FakeAnalytics();
+    final bloc = _bloc(analytics: analytics);
+    bloc
+      ..add(const PersonalInfoStarted())
+      ..add(const PersonalInfoFirstNameChanged('Ada'))
+      ..add(const PersonalInfoLastNameChanged('Lovelace'))
+      ..add(const PersonalInfoAgeChanged('28'))
+      ..add(const PersonalInfoSubmitted());
+    await bloc.stream.firstWhere(
+      (s) => s.destination == PersonalInfoDestination.selectCategory,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.onboardingPersonalInfoCompleted),
+      isTrue,
+    );
+    await bloc.close();
+  });
+
+  test('settings submit does not log onboarding event', () async {
+    final analytics = FakeAnalytics();
+    final bloc = _bloc(analytics: analytics);
+    bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+    await pumpEventQueue();
+    bloc.add(const PersonalInfoSubmitted());
+    await bloc.stream.firstWhere(
+      (s) => s.destination == PersonalInfoDestination.popToProfile,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.onboardingPersonalInfoCompleted),
+      isFalse,
+    );
+    await bloc.close();
   });
 }
