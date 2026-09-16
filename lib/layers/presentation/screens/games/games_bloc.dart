@@ -506,6 +506,20 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesAbandoned event,
     Emitter<GamesState> emit,
   ) async {
+    // Leaving an arcade run is a valid ending: show the score instead of popping.
+    if (_isArcade) {
+      await _analytics.logEvent(
+        AnalyticsEvents.arcadeAbandoned,
+        parameters: {
+          AnalyticsParams.score: state.arcade.scoredCount,
+          AnalyticsParams.record: state.arcade.record,
+          AnalyticsParams.roundIndex: state.currentIndex,
+          AnalyticsParams.roundsTotal: state.rounds.length,
+        },
+      );
+      await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
+      return;
+    }
     await _analytics.logEvent(
       AnalyticsEvents.gameSessionAbandoned,
       parameters: {
@@ -514,11 +528,6 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
-    // Leaving an arcade run is a valid ending: show the score instead of popping.
-    if (_isArcade) {
-      await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
-      return;
-    }
     emit(state.copyWith(goBack: true));
   }
 

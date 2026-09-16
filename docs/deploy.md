@@ -168,6 +168,7 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 |-------|------|
 | `arcade_cta_impression` | Games Hub loads with Arcade visible |
 | `arcade_opened` | User taps Arcade |
+| `arcade_abandoned` | User leaves arcade mid-run (includes `score`) |
 | `login_submitted` / `login_succeeded` / `login_failed` | Auth submit outcomes |
 | `onboarding_personal_info_completed` | Onboarding personal info saved |
 | `onboarding_category_selected` | Onboarding categories saved |

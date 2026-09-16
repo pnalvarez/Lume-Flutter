@@ -129,6 +129,8 @@ final class SubmoduleSessionBloc
         AnalyticsParams.trailId: state.trailId,
         AnalyticsParams.submoduleId: state.submoduleId,
         AnalyticsParams.reason: 'games_cancelled',
+        AnalyticsParams.gamesPlayed: state.pairScores.length,
+        AnalyticsParams.roundsTotal: state.games.length,
       },
     );
     emit(
@@ -212,6 +214,8 @@ final class SubmoduleSessionBloc
         AnalyticsParams.trailId: state.trailId,
         AnalyticsParams.submoduleId: state.submoduleId,
         AnalyticsParams.reason: 'leave',
+        AnalyticsParams.gamesPlayed: state.pairScores.length,
+        AnalyticsParams.roundsTotal: state.games.length,
       },
     );
     emit(

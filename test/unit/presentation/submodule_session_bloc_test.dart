@@ -154,10 +154,14 @@ void main() {
         expect(bloc.state.pairScores, isEmpty);
         expect(bloc.state.stage, SubmoduleSessionStage.preview);
         expect(
-          analytics.parametersFor(
-            AnalyticsEvents.submoduleSessionAbandoned,
-          )?[AnalyticsParams.reason],
-          'games_cancelled',
+          analytics.parametersFor(AnalyticsEvents.submoduleSessionAbandoned),
+          {
+            AnalyticsParams.trailId: 1,
+            AnalyticsParams.submoduleId: 1,
+            AnalyticsParams.reason: 'games_cancelled',
+            AnalyticsParams.gamesPlayed: 1,
+            AnalyticsParams.roundsTotal: 2,
+          },
         );
       },
     );
@@ -177,10 +181,14 @@ void main() {
         expect(bloc.state.pairScores, isEmpty);
         expect(bloc.state.goBackToTrail, isTrue);
         expect(
-          analytics.parametersFor(
-            AnalyticsEvents.submoduleSessionAbandoned,
-          )?[AnalyticsParams.reason],
-          'leave',
+          analytics.parametersFor(AnalyticsEvents.submoduleSessionAbandoned),
+          {
+            AnalyticsParams.trailId: 1,
+            AnalyticsParams.submoduleId: 1,
+            AnalyticsParams.reason: 'leave',
+            AnalyticsParams.gamesPlayed: 1,
+            AnalyticsParams.roundsTotal: 2,
+          },
         );
       },
     );

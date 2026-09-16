@@ -467,6 +467,41 @@ void main() {
       await pumpEventQueue();
       expect(analytics.hasEvent(AnalyticsEvents.gameSessionAbandoned), isTrue);
       expect(analytics.hasEvent(AnalyticsEvents.gameSessionCompleted), isFalse);
+      expect(analytics.hasEvent(AnalyticsEvents.arcadeAbandoned), isFalse);
+      await bloc.close();
+    });
+
+    test('arcade abandon logs arcade_abandoned with score', () async {
+      final analytics = FakeAnalytics();
+      final bloc = _createGamesBloc(
+        _SavePairProgress(),
+        getRandomRound: _GetRandomGameRound(),
+        saveArcadeRound: _SaveArcadeRound(),
+        analytics: analytics,
+      );
+      bloc.add(
+        GamesStarted(
+          rounds: [GameRound(id: '10', game: _quiz1)],
+          mode: GamesPlayMode.arcade,
+          arcadeRecord: 5,
+        ),
+      );
+      await pumpEventQueue();
+      // Correct option index 0 → hit → score becomes 1, next round appended.
+      bloc.add(const GamesChoiceSelected('0'));
+      await pumpEventQueue();
+      bloc.add(const GamesNextPressed());
+      await pumpEventQueue();
+      bloc.add(const GamesAbandoned());
+      await pumpEventQueue();
+      expect(analytics.hasEvent(AnalyticsEvents.arcadeAbandoned), isTrue);
+      expect(analytics.parametersFor(AnalyticsEvents.arcadeAbandoned), {
+        AnalyticsParams.score: 1,
+        AnalyticsParams.record: 5,
+        AnalyticsParams.roundIndex: 1,
+        AnalyticsParams.roundsTotal: 2,
+      });
+      expect(analytics.hasEvent(AnalyticsEvents.gameSessionCompleted), isFalse);
       await bloc.close();
     });
   });

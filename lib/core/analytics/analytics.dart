@@ -23,6 +23,9 @@ abstract final class AnalyticsEvents {
   /// Fired when the user taps Arcade (primary experiment goal).
   static const arcadeOpened = 'arcade_opened';
 
+  /// Fired when the user leaves an arcade run (shows score screen).
+  static const arcadeAbandoned = 'arcade_abandoned';
+
   /// Fired when the user taps login/signup submit.
   static const loginSubmitted = 'login_submitted';
 
@@ -74,6 +77,9 @@ abstract final class AnalyticsParams {
   static const gameType = 'game_type';
   static const roundsTotal = 'rounds_total';
   static const roundIndex = 'round_index';
+  static const gamesPlayed = 'games_played';
+  static const score = 'score';
+  static const record = 'record';
   static const arcadeEnabled = 'arcade_enabled';
 }
 
