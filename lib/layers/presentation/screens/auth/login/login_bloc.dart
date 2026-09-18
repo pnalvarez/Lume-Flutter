@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/errors/auth_failure.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
@@ -17,6 +18,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     this._signUpWithEmail,
     this._hasCompletedPersonalInfo,
     this._hasSelectedCategories,
+    this._analytics,
   ) : super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
@@ -31,6 +33,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final ISignUpWithEmail _signUpWithEmail;
   final IHasCompletedPersonalInfo _hasCompletedPersonalInfo;
   final IHasSelectedCategories _hasSelectedCategories;
+  final IAnalytics _analytics;
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
     emit(state.copyWith(email: event.email, clearError: true));
@@ -59,6 +62,11 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
     if (!state.canSubmit) return;
+    final mode = state.mode.name;
+    await _analytics.logEvent(
+      AnalyticsEvents.loginSubmitted,
+      parameters: {AnalyticsParams.mode: mode},
+    );
     emit(
       state.copyWith(isSubmitting: true, clearError: true, clearNotice: true),
     );
@@ -69,6 +77,13 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
           password: state.password,
         );
         if (result.needsEmailConfirmation) {
+          await _analytics.logEvent(
+            AnalyticsEvents.loginSucceeded,
+            parameters: {
+              AnalyticsParams.mode: mode,
+              AnalyticsParams.destination: LoginDestination.confirmEmail.name,
+            },
+          );
           emit(
             state.copyWith(
               isSubmitting: false,
@@ -77,6 +92,17 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
           );
           return;
         }
+        final userId = result.session?.user.id;
+        if (userId != null) {
+          await _analytics.setUserId(userId);
+        }
+        await _analytics.logEvent(
+          AnalyticsEvents.loginSucceeded,
+          parameters: {
+            AnalyticsParams.mode: mode,
+            AnalyticsParams.destination: LoginDestination.personalInfo.name,
+          },
+        );
         emit(
           state.copyWith(
             isSubmitting: false,
@@ -86,13 +112,28 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         return;
       }
 
-      await _signInWithEmail(
+      final session = await _signInWithEmail(
         email: state.email.trim(),
         password: state.password,
       );
+      await _analytics.setUserId(session.user.id);
       final destination = await _destinationAfterSignIn();
+      await _analytics.logEvent(
+        AnalyticsEvents.loginSucceeded,
+        parameters: {
+          AnalyticsParams.mode: mode,
+          AnalyticsParams.destination: destination.name,
+        },
+      );
       emit(state.copyWith(isSubmitting: false, destination: destination));
     } on AuthEmailNotConfirmedFailure {
+      await _analytics.logEvent(
+        AnalyticsEvents.loginFailed,
+        parameters: {
+          AnalyticsParams.mode: mode,
+          AnalyticsParams.errorCode: 'email_not_confirmed',
+        },
+      );
       emit(
         state.copyWith(
           isSubmitting: false,
@@ -101,6 +142,13 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         ),
       );
     } on Object catch (error) {
+      await _analytics.logEvent(
+        AnalyticsEvents.loginFailed,
+        parameters: {
+          AnalyticsParams.mode: mode,
+          AnalyticsParams.errorCode: _errorCode(error),
+        },
+      );
       emit(
         state.copyWith(
           isSubmitting: false,
@@ -149,5 +197,10 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) {
     emit(state.copyWith(clearDestination: true, clearNotice: true));
+  }
+
+  static String _errorCode(Object error) {
+    if (error is AuthOperationFailure) return error.operation;
+    return error.runtimeType.toString();
   }
 }

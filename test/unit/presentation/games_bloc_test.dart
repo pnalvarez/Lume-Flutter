@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/usecases/games/play_battle_of_curiosities.dart';
@@ -19,6 +20,7 @@ import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 const _quiz1 = LightningQuizGameDomain(
   pairId: 10,
@@ -112,6 +114,7 @@ GamesBloc _createGamesBloc(
   _GetRandomGameRound? getRandomRound,
   _SaveArcadeRound? saveArcadeRound,
   _SaveArcadeRecord? saveArcadeRecord,
+  FakeAnalytics? analytics,
 }) => GamesBloc(
   PlayLightningQuiz(),
   PlayTimeline(),
@@ -125,6 +128,7 @@ GamesBloc _createGamesBloc(
   getRandomRound ?? _GetRandomGameRound(),
   saveArcadeRound ?? _SaveArcadeRound(),
   saveArcadeRecord ?? _SaveArcadeRecord(),
+  analytics ?? FakeAnalytics(),
 );
 
 void main() {
@@ -424,5 +428,81 @@ void main() {
         expect(bloc.state.goBack, isFalse);
       },
     );
+  });
+
+  group('GamesBloc analytics', () {
+    test('start logs game_round_started', () async {
+      final analytics = FakeAnalytics();
+      final bloc = _createGamesBloc(_SavePairProgress(), analytics: analytics);
+      bloc.add(
+        GamesStarted(
+          rounds: [
+            GameRound(id: '10', game: _quiz1),
+            GameRound(id: '11', game: _quiz2),
+          ],
+          mode: GamesPlayMode.hub,
+        ),
+      );
+      await pumpEventQueue();
+      expect(analytics.hasEvent(AnalyticsEvents.gameRoundStarted), isTrue);
+      expect(analytics.parametersFor(AnalyticsEvents.gameRoundStarted), {
+        AnalyticsParams.playMode: 'hub',
+        AnalyticsParams.roundsTotal: 2,
+        AnalyticsParams.gameType: 'lightning_quiz',
+      });
+      await bloc.close();
+    });
+
+    test('abandon logs game_session_abandoned', () async {
+      final analytics = FakeAnalytics();
+      final bloc = _createGamesBloc(_SavePairProgress(), analytics: analytics);
+      bloc.add(
+        GamesStarted(
+          rounds: [GameRound(id: '10', game: _quiz1)],
+          mode: GamesPlayMode.hub,
+        ),
+      );
+      await pumpEventQueue();
+      bloc.add(const GamesAbandoned());
+      await pumpEventQueue();
+      expect(analytics.hasEvent(AnalyticsEvents.gameSessionAbandoned), isTrue);
+      expect(analytics.hasEvent(AnalyticsEvents.gameSessionCompleted), isFalse);
+      expect(analytics.hasEvent(AnalyticsEvents.arcadeAbandoned), isFalse);
+      await bloc.close();
+    });
+
+    test('arcade abandon logs arcade_abandoned with score', () async {
+      final analytics = FakeAnalytics();
+      final bloc = _createGamesBloc(
+        _SavePairProgress(),
+        getRandomRound: _GetRandomGameRound(),
+        saveArcadeRound: _SaveArcadeRound(),
+        analytics: analytics,
+      );
+      bloc.add(
+        GamesStarted(
+          rounds: [GameRound(id: '10', game: _quiz1)],
+          mode: GamesPlayMode.arcade,
+          arcadeRecord: 5,
+        ),
+      );
+      await pumpEventQueue();
+      // Correct option index 0 → hit → score becomes 1, next round appended.
+      bloc.add(const GamesChoiceSelected('0'));
+      await pumpEventQueue();
+      bloc.add(const GamesNextPressed());
+      await pumpEventQueue();
+      bloc.add(const GamesAbandoned());
+      await pumpEventQueue();
+      expect(analytics.hasEvent(AnalyticsEvents.arcadeAbandoned), isTrue);
+      expect(analytics.parametersFor(AnalyticsEvents.arcadeAbandoned), {
+        AnalyticsParams.score: 1,
+        AnalyticsParams.record: 5,
+        AnalyticsParams.roundIndex: 1,
+        AnalyticsParams.roundsTotal: 2,
+      });
+      expect(analytics.hasEvent(AnalyticsEvents.gameSessionCompleted), isFalse);
+      await bloc.close();
+    });
   });
 }

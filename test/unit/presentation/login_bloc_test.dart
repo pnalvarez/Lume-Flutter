@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/errors/auth_failure.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/models/auth/auth_sign_up_result.dart';
@@ -11,6 +12,7 @@ import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _SignIn implements ISignInWithEmail {
   Object? error;
@@ -74,12 +76,14 @@ LoginBloc _bloc(
   _SignUp signUp, {
   IHasCompletedPersonalInfo? hasPersonalInfo,
   IHasSelectedCategories? hasSelected,
+  FakeAnalytics? analytics,
 }) {
   return LoginBloc(
     signIn,
     signUp,
     hasPersonalInfo ?? _HasPersonalInfo(true),
     hasSelected ?? _HasSelected(true),
+    analytics ?? FakeAnalytics(),
   );
 }
 
@@ -206,6 +210,10 @@ void main() {
         ..result = const AuthSignUpResult(
           email: 'a@b.c',
           needsEmailConfirmation: false,
+          session: AuthSession(
+            user: AuthUser(id: 'u-2', email: 'a@b.c', isEmailConfirmed: true),
+            isPasswordRecovery: false,
+          ),
         ),
     ),
     act: (bloc) {
@@ -225,4 +233,44 @@ void main() {
       ),
     ],
   );
+
+  test('sign-in logs submitted/succeeded and sets user id', () async {
+    final analytics = FakeAnalytics();
+    final bloc = _bloc(_SignIn(), _SignUp(), analytics: analytics);
+    bloc
+      ..add(const LoginEmailChanged('a@b.c'))
+      ..add(const LoginPasswordChanged('secret1'))
+      ..add(const LoginSubmitted());
+    await bloc.stream.firstWhere((s) => s.destination == LoginDestination.home);
+    expect(analytics.hasEvent(AnalyticsEvents.loginSubmitted), isTrue);
+    expect(analytics.hasEvent(AnalyticsEvents.loginSucceeded), isTrue);
+    expect(analytics.parametersFor(AnalyticsEvents.loginSucceeded), {
+      AnalyticsParams.mode: 'login',
+      AnalyticsParams.destination: 'home',
+    });
+    expect(analytics.userIds, ['1']);
+    await bloc.close();
+  });
+
+  test('failed sign-in logs login_failed with error_code', () async {
+    final analytics = FakeAnalytics();
+    final bloc = _bloc(
+      _SignIn()..error = const AuthOperationFailure(operation: 'sign_in'),
+      _SignUp(),
+      analytics: analytics,
+    );
+    bloc
+      ..add(const LoginEmailChanged('a@b.c'))
+      ..add(const LoginPasswordChanged('secret1'))
+      ..add(const LoginSubmitted());
+    await bloc.stream.firstWhere((s) => s.errorMessage != null);
+    expect(analytics.hasEvent(AnalyticsEvents.loginFailed), isTrue);
+    expect(
+      analytics.parametersFor(
+        AnalyticsEvents.loginFailed,
+      )?[AnalyticsParams.errorCode],
+      'sign_in',
+    );
+    await bloc.close();
+  });
 }
