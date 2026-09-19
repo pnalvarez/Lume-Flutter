@@ -52,7 +52,11 @@ void _registerProfileBloc() {
     getIt.unregister<ProfileBloc>();
   }
   getIt.registerFactory<ProfileBloc>(
-    () => ProfileBloc(getIt<IGetProfile>(), getIt<ISignOut>()),
+    () => ProfileBloc(
+      getIt<IGetProfile>(),
+      getIt<ISignOut>(),
+      getIt<IAnalytics>(),
+    ),
   );
 }
 

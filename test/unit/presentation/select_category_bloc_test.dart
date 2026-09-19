@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/errors/api_exception.dart';
 import 'package:lume/layers/domain/models/category/category_domain.dart';
 import 'package:lume/layers/domain/models/category/category_preferences_domain.dart';
@@ -9,6 +10,7 @@ import 'package:lume/layers/domain/usecases/save_category_preferences.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_bloc.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_event.dart';
 import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _GetCategories implements IGetCategoriesWithPreferences {
   CategoryPreferencesDomain result = const CategoryPreferencesDomain(
@@ -46,8 +48,12 @@ class _SaveCategories implements ISaveCategoryPreferences {
   }
 }
 
-SelectCategoryBloc _bloc(_GetCategories get, _SaveCategories save) {
-  return SelectCategoryBloc(get, save);
+SelectCategoryBloc _bloc(
+  _GetCategories get,
+  _SaveCategories save, {
+  FakeAnalytics? analytics,
+}) {
+  return SelectCategoryBloc(get, save, analytics ?? FakeAnalytics());
 }
 
 void main() {
@@ -174,4 +180,30 @@ void main() {
           .having((s) => s.notice, 'notice', selectCategorySessionExpired),
     ],
   );
+
+  test('onboarding save logs onboarding_category_selected', () async {
+    final analytics = FakeAnalytics();
+    final get = _GetCategories();
+    final save = _SaveCategories();
+    final bloc = _bloc(get, save, analytics: analytics);
+    bloc.add(const SelectCategoryStarted());
+    await bloc.stream.firstWhere((s) => s.status == SelectCategoryStatus.ready);
+    bloc
+      ..add(const SelectCategoryToggled(1))
+      ..add(const SelectCategorySubmitted());
+    await bloc.stream.firstWhere(
+      (s) => s.destination == SelectCategoryDestination.home,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.onboardingCategorySelected),
+      isTrue,
+    );
+    expect(
+      analytics.parametersFor(
+        AnalyticsEvents.onboardingCategorySelected,
+      )?[AnalyticsParams.categoryId],
+      '1',
+    );
+    await bloc.close();
+  });
 }
