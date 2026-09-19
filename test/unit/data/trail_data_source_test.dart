@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/errors/api_exception.dart';
 import 'package:lume/core/storage/cache_keys.dart';
 import 'package:lume/core/storage/in_memory_storage_client.dart';
 import 'package:lume/layers/data/datasource/trail_data_source.dart';
@@ -84,6 +85,40 @@ void main() {
       // Nested game_payload is shuffled server-side — never reuse cache.
       await sut.fetchGameTrails();
       verify(apiClient.rpc<List<dynamic>>('get_game_trails')).called(2);
+    },
+  );
+
+  test(
+    'fetchGameTrails retries transient RPC failures up to 3 attempts',
+    () async {
+      var calls = 0;
+      when(
+        apiClient.rpc<List<dynamic>>(
+          'get_game_trails',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async {
+        calls += 1;
+        if (calls < 3) {
+          throw const ApiTimeoutException(message: 'timeout');
+        }
+        return [
+          {
+            'id': 1,
+            'title': 'History',
+            'emoji': '📜',
+            'sort_order': 1,
+            'levels': <Map<String, dynamic>>[],
+          },
+        ];
+      });
+
+      final data = await sut.fetchGameTrails();
+
+      expect(data, hasLength(1));
+      expect(calls, 3);
+      verify(apiClient.rpc<List<dynamic>>('get_game_trails')).called(3);
     },
   );
 
