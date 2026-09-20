@@ -29,10 +29,7 @@ Future<T> withRpcRetries<T>(
     }
   }
   // Unreachable when maxAttempts >= 1, but keeps the analyzer happy.
-  Error.throwWithStackTrace(
-    lastError!,
-    StackTrace.current,
-  );
+  Error.throwWithStackTrace(lastError!, StackTrace.current);
 }
 
 /// Transient transport / auth failures that are worth retrying on cold start.
