@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:lume/core/network/api_client.dart';
+import 'package:lume/core/network/rpc_retry.dart';
 import 'package:lume/core/storage/cache_keys.dart';
 import 'package:lume/core/storage/storage_client.dart';
 import 'package:lume/core/storage/storage_json.dart';
@@ -28,6 +29,9 @@ final class TrailDataSource implements ITrailDataSource {
   final IApiClient _apiClient;
   final IStorageClient _storage;
 
+  /// Cold-start / flaky network: up to 3 attempts per read RPC.
+  static const _readAttempts = 3;
+
   @override
   Future<TrailBootstrapData> fetchBootstrap({bool forceRefresh = false}) async {
     if (!forceRefresh) {
@@ -38,8 +42,9 @@ final class TrailDataSource implements ITrailDataSource {
       if (cached != null) return cached;
     }
 
-    final raw = await _apiClient.rpc<Map<String, dynamic>>(
-      'get_trail_bootstrap',
+    final raw = await withRpcRetries(
+      () => _apiClient.rpc<Map<String, dynamic>>('get_trail_bootstrap'),
+      maxAttempts: _readAttempts,
     );
     final data = TrailBootstrapData.fromJson(asJsonMap(raw));
     await _storage.writeObject(
@@ -60,8 +65,9 @@ final class TrailDataSource implements ITrailDataSource {
       if (cached != null) return cached;
     }
 
-    final raw = await _apiClient.rpc<Map<String, dynamic>>(
-      'get_trail_progress',
+    final raw = await withRpcRetries(
+      () => _apiClient.rpc<Map<String, dynamic>>('get_trail_progress'),
+      maxAttempts: _readAttempts,
     );
     final data = TrailProgressData.fromJson(asJsonMap(raw));
     await _storage.writeObject(
@@ -79,7 +85,10 @@ final class TrailDataSource implements ITrailDataSource {
     // Never cache: nested game_payload options are shuffled per RPC response.
     await _storage.delete(CacheKeys.gameTrails);
 
-    final raw = await _apiClient.rpc<List<dynamic>>('get_game_trails');
+    final raw = await withRpcRetries(
+      () => _apiClient.rpc<List<dynamic>>('get_game_trails'),
+      maxAttempts: _readAttempts,
+    );
     return parseJsonList(raw, GameTrailData.fromJson);
   }
 
