@@ -19,6 +19,8 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 | Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web |
 | Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web (macOS and RC default off) |
 
+Actions run titles use `run-name`, e.g. `Deploy v1.0.1 (android, ios, macos, web)` on a tag, or `Deploy manual (android, ios)` when only those platforms are selected.
+
 Recommended release flow:
 
 1. Merge to `main` (CI must pass)
