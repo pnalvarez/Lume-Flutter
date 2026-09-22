@@ -10,6 +10,19 @@
 
 name: Deploy
 
+# Tag push → "Deploy v1.1.1 (android, ios, macos, web)"
+# Manual   → "Deploy manual (android, ios)" (selected inputs only)
+run-name: >-
+  Deploy ${{ github.ref_type == 'tag' && github.ref_name || 'manual' }} (${{
+    format('{0}{1}{2}{3}{4}',
+      (github.event_name == 'push' || inputs.android) && 'android' || '',
+      (github.event_name == 'push' || inputs.ios || inputs.ios_release_candidate) && format('{0}ios', (github.event_name == 'push' || inputs.android) && ', ' || '') || '',
+      (github.event_name == 'workflow_dispatch' && inputs.ios_release_candidate) && format('{0}ios-rc', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate) && ', ' || '') || '',
+      (github.event_name == 'push' || inputs.macos) && format('{0}macos', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate) && ', ' || '') || '',
+      (github.event_name == 'push' || inputs.web) && format('{0}web', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate || inputs.macos) && ', ' || '') || ''
+    )
+  }})
+
 on:
   push:
     tags:
