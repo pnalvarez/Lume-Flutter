@@ -357,6 +357,23 @@ void main() {
       expect(find.byIcon(Icons.emoji_events_rounded), findsOneWidget);
     });
 
+    testWidgets('LumeSnackBar applies iconColor override', (tester) async {
+      const gold = Color(0xFFE8C87A);
+      await tester.pumpWidget(
+        _wrap(
+          const LumeSnackBar(
+            icon: Icons.emoji_events_rounded,
+            text: 'Gold icon',
+            trait: LumeSnackBarTrait.brand,
+            iconColor: gold,
+          ),
+        ),
+      );
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.emoji_events_rounded));
+      expect(icon.color, gold);
+    });
+
     testWidgets('showLumeSnackBar inserts top overlay entry', (tester) async {
       addTearDown(resetLumeSnackBarForTest);
 

@@ -240,6 +240,7 @@ Widget lumeSnackBarBrand(BuildContext context) {
             icon: Icons.emoji_events_rounded,
             text: text,
             trait: LumeSnackBarTrait.brand,
+            iconColor: AppColors.Accent.accent,
             hasCloseButton: hasCloseButton,
             onClose: () {},
           ),
@@ -251,6 +252,7 @@ Widget lumeSnackBarBrand(BuildContext context) {
               showLumeSnackBar(
                 context,
                 icon: Icons.emoji_events_rounded,
+                iconColor: AppColors.Accent.accent,
                 text: text,
                 trait: LumeSnackBarTrait.brand,
                 hasCloseButton: hasCloseButton,

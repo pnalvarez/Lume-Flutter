@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/layers/presentation/shared/achievement_snack_bar.dart';
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/organisms/feedback/lume_snack_bar.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
@@ -37,6 +38,9 @@ void main() {
     expect(find.text('Achievement unlocked: Primeiro passo'), findsOneWidget);
     expect(find.byIcon(Icons.emoji_events_rounded), findsOneWidget);
     expect(isLumeSnackBarVisible, isTrue);
+
+    final icon = tester.widget<Icon>(find.byIcon(Icons.emoji_events_rounded));
+    expect(icon.color, AppColors.Accent.accent);
 
     hideLumeSnackBar();
     await tester.pump();
