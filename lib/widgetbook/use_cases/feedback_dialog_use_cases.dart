@@ -217,6 +217,52 @@ Widget lumeSnackBarInteractive(BuildContext context) {
   );
 }
 
+@widgetbook.UseCase(name: 'Brand trait', type: LumeSnackBar)
+Widget lumeSnackBarBrand(BuildContext context) {
+  final text = context.knobs.string(
+    label: 'Text',
+    initialValue: 'Mensagem com o trait brand.',
+  );
+  final hasCloseButton = context.knobs.boolean(
+    label: 'Has close button',
+    initialValue: false,
+  );
+
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(AppSpacings.xl2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('brand', style: typ.body3Semibold),
+          const SizedBox(height: AppSpacings.s),
+          LumeSnackBar(
+            icon: Icons.emoji_events_rounded,
+            text: text,
+            trait: LumeSnackBarTrait.brand,
+            hasCloseButton: hasCloseButton,
+            onClose: () {},
+          ),
+          const SizedBox(height: AppSpacings.xl),
+          LumeButton(
+            label: 'Mostrar toast brand',
+            isExpanded: true,
+            onPressed: () {
+              showLumeSnackBar(
+                context,
+                icon: Icons.emoji_events_rounded,
+                text: text,
+                trait: LumeSnackBarTrait.brand,
+                hasCloseButton: hasCloseButton,
+              );
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 @widgetbook.UseCase(name: 'Inline', type: LumeLoadingOverlay)
 Widget lumeLoadingOverlayInline(BuildContext context) {
   return const Scaffold(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/spacing/sizes.dart';
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
@@ -329,6 +330,31 @@ void main() {
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
       await tester.tap(find.byIcon(Icons.close_rounded));
       expect(closed, isTrue);
+    });
+
+    test('LumeSnackBarTrait.brand resolves primary brand tokens', () {
+      final style = LumeSnackBarTraitStyle.resolve(LumeSnackBarTrait.brand);
+      expect(style.backgroundColor, AppColors.Primary.primaryContainer);
+      expect(style.foregroundColor, AppColors.Primary.onPrimaryContainer);
+      expect(
+        style.borderColor,
+        AppColors.Primary.primary.withValues(alpha: 0.7),
+      );
+      expect(style.borderWidth, 1.5);
+    });
+
+    testWidgets('LumeSnackBar renders brand trait', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const LumeSnackBar(
+            icon: Icons.emoji_events_rounded,
+            text: 'Brand toast',
+            trait: LumeSnackBarTrait.brand,
+          ),
+        ),
+      );
+      expect(find.text('Brand toast'), findsOneWidget);
+      expect(find.byIcon(Icons.emoji_events_rounded), findsOneWidget);
     });
 
     testWidgets('showLumeSnackBar inserts top overlay entry', (tester) async {

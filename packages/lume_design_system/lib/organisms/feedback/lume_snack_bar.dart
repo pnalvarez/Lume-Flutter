@@ -8,6 +8,8 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 
 /// Semantic tone for [LumeSnackBar] / [showLumeSnackBar].
+///
+/// Traits are visual only — map product features (XP, unlocks, …) in the app.
 enum LumeSnackBarTrait {
   /// Green success tones.
   success,
@@ -18,8 +20,11 @@ enum LumeSnackBarTrait {
   /// Red / peach error tones.
   error,
 
-  /// Brand blue informational tones.
+  /// Soft primary wash — light informational tones.
   neutral,
+
+  /// Saturated brand primary — stronger than [neutral].
+  brand,
 }
 
 /// Where [showLumeSnackBar] anchors the toast on screen.
@@ -234,6 +239,12 @@ class LumeSnackBarTraitStyle {
       LumeSnackBarTrait.neutral => LumeSnackBarTraitStyle(
         backgroundColor: AppColors.Primary.primaryLight,
         borderColor: AppColors.Primary.primary.withValues(alpha: 0.45),
+        foregroundColor: AppColors.Primary.onPrimaryContainer,
+        borderWidth: 1.5,
+      ),
+      LumeSnackBarTrait.brand => LumeSnackBarTraitStyle(
+        backgroundColor: AppColors.Primary.primaryContainer,
+        borderColor: AppColors.Primary.primary.withValues(alpha: 0.7),
         foregroundColor: AppColors.Primary.onPrimaryContainer,
         borderWidth: 1.5,
       ),
