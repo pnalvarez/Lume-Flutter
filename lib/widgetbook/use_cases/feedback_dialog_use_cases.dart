@@ -234,7 +234,7 @@ Widget lumeSnackBarBrand(BuildContext context) {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('brand', style: typ.body3Semibold),
+          Text('brand', style: typ.body3Semibold),
           const SizedBox(height: AppSpacings.s),
           LumeSnackBar(
             icon: Icons.emoji_events_rounded,

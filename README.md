@@ -112,7 +112,7 @@ Deep-link schemes used for auth:
 ### Widgetbook
 
 ```bash
-flutter run -t lib/widgetbook/main.dart
+flutter run -t lib/widgetbook/main.widgetbook.dart
 ```
 
 ---
