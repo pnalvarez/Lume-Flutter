@@ -1,2 +1,2 @@
 String achievementUnlockedSnackBarText(String name) =>
-    'Achievement unlocked: $name';
+    'Conquista desbloqueada: $name';
