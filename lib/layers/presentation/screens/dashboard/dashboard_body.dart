@@ -9,16 +9,26 @@ class DashboardBody extends StatelessWidget {
     required this.selectedIndex,
     required this.onTabSelected,
     required this.child,
+    this.showAchievements = false,
   });
 
   final int selectedIndex;
   final ValueChanged<int> onTabSelected;
   final Widget child;
+  final bool showAchievements;
 
-  static const navItems = [
-    BottomNavItem(icon: Icons.home_rounded, label: dashboardTabTrail),
-    BottomNavItem(icon: Icons.sports_esports_rounded, label: dashboardTabGames),
-    BottomNavItem(icon: Icons.person_rounded, label: dashboardTabProfile),
+  static List<BottomNavItem> navItems({required bool showAchievements}) => [
+    const BottomNavItem(icon: Icons.home_rounded, label: dashboardTabTrail),
+    const BottomNavItem(
+      icon: Icons.sports_esports_rounded,
+      label: dashboardTabGames,
+    ),
+    if (showAchievements)
+      const BottomNavItem(
+        icon: Icons.emoji_events_rounded,
+        label: dashboardTabAchievements,
+      ),
+    const BottomNavItem(icon: Icons.person_rounded, label: dashboardTabProfile),
   ];
 
   @override
@@ -26,7 +36,7 @@ class DashboardBody extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavBar(
-        items: navItems,
+        items: navItems(showAchievements: showAchievements),
         selectedIndex: selectedIndex,
         onSelected: onTabSelected,
       ),
