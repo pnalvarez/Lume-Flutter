@@ -10,6 +10,9 @@ abstract interface class IRemoteConfig {
   /// Whether [RemoteConfigKeys.arcadeEnabled] is on.
   bool get arcadeEnabled;
 
+  /// Whether [RemoteConfigKeys.achievementsEnabled] is on.
+  bool get achievementsEnabled;
+
   /// Boolean parameter with [defaultValue] when the key is missing.
   bool getBool(String key, {required bool defaultValue});
 
@@ -33,6 +36,7 @@ abstract interface class IRemoteConfig {
 abstract final class RemoteConfigDefaults {
   static Map<String, Object> get values => {
     RemoteConfigKeys.arcadeEnabled: arcadeEnabled,
+    RemoteConfigKeys.achievementsEnabled: achievementsEnabled,
   };
 
   /// Default for [RemoteConfigKeys.arcadeEnabled].
@@ -44,6 +48,18 @@ abstract final class RemoteConfigDefaults {
     if (raw == 'true') return true;
     if (raw == 'false') return false;
     return true;
+  }
+
+  /// Default for [RemoteConfigKeys.achievementsEnabled].
+  ///
+  /// Override at build time with
+  /// `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`) for
+  /// QA without changing the Firebase console.
+  static bool get achievementsEnabled {
+    const raw = String.fromEnvironment('REMOTE_CONFIG_ACHIEVEMENTS_ENABLED');
+    if (raw == 'true') return true;
+    if (raw == 'false') return false;
+    return false;
   }
 }
 
@@ -59,8 +75,16 @@ final class NoOpRemoteConfig implements IRemoteConfig {
   Map<String, Object> get debugOverrides => Map.unmodifiable(_overrides);
 
   @override
-  bool get arcadeEnabled =>
-      getBool(RemoteConfigKeys.arcadeEnabled, defaultValue: true);
+  bool get arcadeEnabled => getBool(
+    RemoteConfigKeys.arcadeEnabled,
+    defaultValue: RemoteConfigDefaults.arcadeEnabled,
+  );
+
+  @override
+  bool get achievementsEnabled => getBool(
+    RemoteConfigKeys.achievementsEnabled,
+    defaultValue: RemoteConfigDefaults.achievementsEnabled,
+  );
 
   @override
   bool getBool(String key, {required bool defaultValue}) {
@@ -113,6 +137,12 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
   bool get arcadeEnabled => getBool(
     RemoteConfigKeys.arcadeEnabled,
     defaultValue: RemoteConfigDefaults.arcadeEnabled,
+  );
+
+  @override
+  bool get achievementsEnabled => getBool(
+    RemoteConfigKeys.achievementsEnabled,
+    defaultValue: RemoteConfigDefaults.achievementsEnabled,
   );
 
   @override
