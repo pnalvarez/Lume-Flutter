@@ -34,33 +34,42 @@ abstract interface class IRemoteConfig {
 
 /// In-app defaults used before the first successful fetch (and offline).
 abstract final class RemoteConfigDefaults {
+  static const _dartDefineTrue = 'true';
+  static const _dartDefineFalse = 'false';
+
   static Map<String, Object> get values => {
     RemoteConfigKeys.arcadeEnabled: arcadeEnabled,
     RemoteConfigKeys.achievementsEnabled: achievementsEnabled,
   };
 
+  /// Parses a `--dart-define` bool. [fallback] when unset or unrecognized.
+  ///
+  /// Callers must pass [String.fromEnvironment] with a **literal** name —
+  /// dart-defines are not resolved when the name is a runtime parameter.
+  static bool boolFromDartDefine(String raw, {required bool fallback}) {
+    if (raw == _dartDefineTrue) return true;
+    if (raw == _dartDefineFalse) return false;
+    return fallback;
+  }
+
   /// Default for [RemoteConfigKeys.arcadeEnabled].
   ///
   /// Override at build time with `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false`
   /// (or `true`) for QA without changing the Firebase console.
-  static bool get arcadeEnabled {
-    const raw = String.fromEnvironment('REMOTE_CONFIG_ARCADE_ENABLED');
-    if (raw == 'true') return true;
-    if (raw == 'false') return false;
-    return true;
-  }
+  static bool get arcadeEnabled => boolFromDartDefine(
+    const String.fromEnvironment('REMOTE_CONFIG_ARCADE_ENABLED'),
+    fallback: true,
+  );
 
   /// Default for [RemoteConfigKeys.achievementsEnabled].
   ///
   /// Override at build time with
   /// `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`) for
   /// QA without changing the Firebase console.
-  static bool get achievementsEnabled {
-    const raw = String.fromEnvironment('REMOTE_CONFIG_ACHIEVEMENTS_ENABLED');
-    if (raw == 'true') return true;
-    if (raw == 'false') return false;
-    return false;
-  }
+  static bool get achievementsEnabled => boolFromDartDefine(
+    const String.fromEnvironment('REMOTE_CONFIG_ACHIEVEMENTS_ENABLED'),
+    fallback: false,
+  );
 }
 
 /// Defaults-only client used on unsupported platforms or when install fails.

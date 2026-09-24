@@ -7,6 +7,22 @@ void main() {
     expect(RemoteConfigService.client, isA<NoOpRemoteConfig>());
   });
 
+  test('boolFromDartDefine parses true/false and falls back', () {
+    expect(
+      RemoteConfigDefaults.boolFromDartDefine('true', fallback: false),
+      isTrue,
+    );
+    expect(
+      RemoteConfigDefaults.boolFromDartDefine('false', fallback: true),
+      isFalse,
+    );
+    expect(RemoteConfigDefaults.boolFromDartDefine('', fallback: true), isTrue);
+    expect(
+      RemoteConfigDefaults.boolFromDartDefine('maybe', fallback: false),
+      isFalse,
+    );
+  });
+
   test('NoOpRemoteConfig returns in-app defaults', () {
     final config = NoOpRemoteConfig();
     expect(config.arcadeEnabled, isTrue);
