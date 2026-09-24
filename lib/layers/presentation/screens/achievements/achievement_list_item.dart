@@ -87,7 +87,7 @@ class AchievementListItem extends StatelessWidget {
                         Icon(
                           Icons.check_circle_rounded,
                           size: AppSizes.iconS,
-                          color: AppColors.Success.success,
+                          color: AppColors.Success.onSuccess,
                         ),
                       ],
                     ],
