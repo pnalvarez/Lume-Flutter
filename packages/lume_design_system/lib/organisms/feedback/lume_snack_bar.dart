@@ -8,6 +8,8 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 
 /// Semantic tone for [LumeSnackBar] / [showLumeSnackBar].
+///
+/// Traits are visual only — map product features (XP, unlocks, …) in the app.
 enum LumeSnackBarTrait {
   /// Green success tones.
   success,
@@ -18,8 +20,11 @@ enum LumeSnackBarTrait {
   /// Red / peach error tones.
   error,
 
-  /// Brand blue informational tones.
+  /// Soft primary wash — light informational tones.
   neutral,
+
+  /// Saturated brand primary — stronger than [neutral].
+  brand,
 }
 
 /// Where [showLumeSnackBar] anchors the toast on screen.
@@ -37,6 +42,7 @@ void showLumeSnackBar(
   required IconData icon,
   required String text,
   required LumeSnackBarTrait trait,
+  Color? iconColor,
   LumeSnackBarPosition position = LumeSnackBarPosition.top,
   bool hasCloseButton = false,
   Duration duration = const Duration(seconds: 4),
@@ -58,6 +64,7 @@ void showLumeSnackBar(
           icon: icon,
           text: text,
           trait: trait,
+          iconColor: iconColor,
           hasCloseButton: hasCloseButton,
           onClose: hideLumeSnackBar,
         ),
@@ -129,6 +136,7 @@ class LumeSnackBar extends StatelessWidget {
     required this.icon,
     required this.text,
     required this.trait,
+    this.iconColor,
     this.hasCloseButton = false,
     this.onClose,
   });
@@ -136,6 +144,9 @@ class LumeSnackBar extends StatelessWidget {
   final IconData icon;
   final String text;
   final LumeSnackBarTrait trait;
+
+  /// When set, overrides the trait foreground color for the leading icon only.
+  final Color? iconColor;
   final bool hasCloseButton;
 
   /// Called when the trailing close control is pressed.
@@ -163,7 +174,11 @@ class LumeSnackBar extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, color: style.foregroundColor, size: AppSizes.iconXs),
+            Icon(
+              icon,
+              color: iconColor ?? style.foregroundColor,
+              size: AppSizes.iconXs,
+            ),
             const SizedBox(width: AppSpacings.s),
             Expanded(
               child: Text(
@@ -234,6 +249,12 @@ class LumeSnackBarTraitStyle {
       LumeSnackBarTrait.neutral => LumeSnackBarTraitStyle(
         backgroundColor: AppColors.Primary.primaryLight,
         borderColor: AppColors.Primary.primary.withValues(alpha: 0.45),
+        foregroundColor: AppColors.Primary.onPrimaryContainer,
+        borderWidth: 1.5,
+      ),
+      LumeSnackBarTrait.brand => LumeSnackBarTraitStyle(
+        backgroundColor: AppColors.Primary.primaryContainer,
+        borderColor: AppColors.Primary.primary.withValues(alpha: 0.7),
         foregroundColor: AppColors.Primary.onPrimaryContainer,
         borderWidth: 1.5,
       ),
