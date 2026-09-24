@@ -44,6 +44,7 @@ class AchievementListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isLocked = status == AchievementListItemStatus.locked;
     final isCompleted = status == AchievementListItemStatus.completed;
     final caption = achievementProgressCaption(
@@ -54,7 +55,6 @@ class AchievementListItem extends StatelessWidget {
     return ListItem(
       trait: isCompleted ? ListItemTrait.brand : ListItemTrait.neutral,
       isExpanded: true,
-      isEnabled: !isLocked,
       onTap: isLocked ? null : onTap,
       borderRadius: AppRadius.xl,
       padding: const EdgeInsets.all(AppSpacings.l),
@@ -77,7 +77,7 @@ class AchievementListItem extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: typ.body3Semibold.copyWith(
-                            color: AppColors.Text.Body.primary,
+                            color: cs.onSurface,
                             height: 1.2,
                           ),
                         ),
@@ -98,20 +98,20 @@ class AchievementListItem extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: typ.body4Light.copyWith(
-                      color: AppColors.Text.Body.secondary,
+                      color: cs.onSurfaceVariant,
                       height: 1.3,
                     ),
                   ),
                   const SizedBox(height: AppSpacings.s),
                   LumeProgressBar(
                     value: _progressValue,
-                    height: 6,
+                    height: AppSizes.progressRingStroke,
                     showPercentage: false,
                     label: caption,
                     fillColor: isCompleted
                         ? AppColors.Accent.accent
                         : AppColors.Primary.primary,
-                    trackColor: AppColors.Primary.primaryLight,
+                    trackColor: cs.surfaceContainerHigh,
                   ),
                 ],
               ),
@@ -130,29 +130,32 @@ class _AchievementLeading extends StatelessWidget {
     this.image,
   });
 
+  static const double _well = AppSizes.avatarL;
+
   final IconData icon;
   final ImageProvider? image;
   final AchievementListItemStatus status;
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isCompleted = status == AchievementListItemStatus.completed;
     final isLocked = status == AchievementListItemStatus.locked;
     final iconColor = isCompleted
         ? AppColors.Accent.accent
         : isLocked
-        ? AppColors.Text.Body.secondary
+        ? cs.onSurfaceVariant
         : AppColors.Primary.primary;
 
     return SizedBox(
-      width: 48,
-      height: 48,
+      width: _well,
+      height: _well,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: _well,
+            height: _well,
             decoration: BoxDecoration(
               color: isCompleted
                   ? AppColors.Accent.accentLight
@@ -164,52 +167,65 @@ class _AchievementLeading extends StatelessWidget {
             child: image != null
                 ? Image(
                     image: image!,
-                    width: 48,
-                    height: 48,
+                    width: _well,
+                    height: _well,
                     fit: BoxFit.cover,
-                    color: isLocked ? Colors.grey : null,
+                    color: isLocked ? cs.onSurfaceVariant : null,
                     colorBlendMode: isLocked ? BlendMode.saturation : null,
                   )
                 : Icon(icon, size: AppSizes.iconM, color: iconColor),
           ),
           if (isLocked)
             Positioned(
-              right: -2,
-              bottom: -2,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: AppColors.Surface.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.Outline.outline),
-                ),
-                child: Icon(
-                  Icons.lock_rounded,
-                  size: 14,
-                  color: AppColors.Text.Body.secondary,
-                ),
+              right: -AppSpacings.xs2,
+              bottom: -AppSpacings.xs2,
+              child: _AchievementBadge(
+                icon: Icons.lock_rounded,
+                iconColor: cs.onSurfaceVariant,
+                borderColor: cs.outline,
+                fillColor: cs.surfaceContainerLowest,
               ),
             ),
           if (isCompleted)
             Positioned(
-              right: -2,
-              bottom: -2,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: AppColors.Surface.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.Accent.accent),
-                ),
-                child: Icon(
-                  Icons.emoji_events_rounded,
-                  size: 14,
-                  color: AppColors.Accent.accent,
-                ),
+              right: -AppSpacings.xs2,
+              bottom: -AppSpacings.xs2,
+              child: _AchievementBadge(
+                icon: Icons.emoji_events_rounded,
+                iconColor: AppColors.Accent.accent,
+                borderColor: AppColors.Accent.accent,
+                fillColor: cs.surfaceContainerLowest,
               ),
             ),
         ],
       ),
+    );
+  }
+}
+
+class _AchievementBadge extends StatelessWidget {
+  const _AchievementBadge({
+    required this.icon,
+    required this.iconColor,
+    required this.borderColor,
+    required this.fillColor,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color borderColor;
+  final Color fillColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacings.xs2),
+      decoration: BoxDecoration(
+        color: fillColor,
+        shape: BoxShape.circle,
+        border: Border.all(color: borderColor),
+      ),
+      child: Icon(icon, size: AppSizes.iconXs, color: iconColor),
     );
   }
 }
