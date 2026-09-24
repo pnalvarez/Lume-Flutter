@@ -12,6 +12,7 @@ import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_body.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievements_body.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_body.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeholder.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
@@ -476,16 +477,26 @@ Widget selectCategoryError(BuildContext context) {
   type: DashboardBody,
 )
 Widget dashboardShellTrail(BuildContext context) {
+  final showAchievements = context.knobs.boolean(
+    label: 'Show Achievements',
+    initialValue: false,
+  );
+  final titles = [
+    dashboardTabTrail,
+    dashboardTabGames,
+    if (showAchievements) dashboardTabAchievements,
+    dashboardTabProfile,
+  ];
   final selected = context.knobs.int.slider(
     label: 'Tab',
     initialValue: 0,
     min: 0,
-    max: 2,
+    max: titles.length - 1,
   );
-  final titles = [dashboardTabTrail, dashboardTabGames, dashboardTabProfile];
   return DashboardBody(
     selectedIndex: selected,
     onTabSelected: _noopInt,
+    showAchievements: showAchievements,
     child: DashboardTabPlaceholder(
       title: titles[selected],
       isSigningOut: false,
@@ -508,6 +519,17 @@ Widget dashboardTabPlaceholder(BuildContext context) {
     isSigningOut: context.knobs.boolean(label: 'Signing out'),
     onSignOut: _noop,
   );
+}
+
+// --- Achievements -----------------------------------------------------------
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Under development',
+  type: AchievementsBody,
+)
+Widget achievementsStub(BuildContext context) {
+  return const AchievementsBody();
 }
 
 // --- Trail home -------------------------------------------------------------

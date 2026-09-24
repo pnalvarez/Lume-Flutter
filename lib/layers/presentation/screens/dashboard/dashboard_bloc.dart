@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_event.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_state.dart';
@@ -8,8 +9,10 @@ import 'package:lume/layers/presentation/shared/auth_messages.dart';
 
 @injectable
 final class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
-  DashboardBloc(this._signOut, this._analytics)
-    : super(const DashboardState()) {
+  DashboardBloc(this._signOut, this._analytics, IRemoteConfig remoteConfig)
+    : super(
+        DashboardState(showAchievements: remoteConfig.achievementsEnabled),
+      ) {
     on<DashboardSignOutPressed>(_onSignOutPressed);
     on<DashboardNavigationHandled>(_onNavigationHandled);
   }
