@@ -79,6 +79,8 @@ void main() {
         router: router,
         levelUpEvents: const Stream<Never>.empty(),
         achievementUnlockEvents: const Stream<Never>.empty(),
+        authSessionChanges: const Stream<Never>.empty(),
+        hasAuthSession: () => false,
       ),
     );
     await tester.pump();

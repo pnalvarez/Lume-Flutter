@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lume/app/achievement_unlock_host.dart';
+import 'package:lume/app/app_root_overlay.dart';
 import 'package:lume/app/level_up_host.dart';
 import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/common/strings/auth_strings.dart';
@@ -13,11 +14,15 @@ class LumeApp extends StatelessWidget {
     required this.router,
     required this.levelUpEvents,
     required this.achievementUnlockEvents,
+    required this.authSessionChanges,
+    required this.hasAuthSession,
   });
 
   final AppRouter router;
   final Stream<LevelUpDomain> levelUpEvents;
   final Stream<AchievementUnlockDomain> achievementUnlockEvents;
+  final Stream<void> authSessionChanges;
+  final bool Function() hasAuthSession;
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +32,16 @@ class LumeApp extends StatelessWidget {
       routerConfig: router.config(),
       builder: (context, child) {
         final content = child ?? const SizedBox.shrink();
-        return AchievementUnlockHost(
-          events: achievementUnlockEvents,
-          navigatorKey: router.navigatorKey,
-          child: LevelUpHost(
-            events: levelUpEvents,
-            navigatorKey: router.navigatorKey,
-            child: content,
+        return AppRootOverlay(
+          child: AchievementUnlockHost(
+            events: achievementUnlockEvents,
+            authSessionChanges: authSessionChanges,
+            hasAuthSession: hasAuthSession,
+            child: LevelUpHost(
+              events: levelUpEvents,
+              navigatorKey: router.navigatorKey,
+              child: content,
+            ),
           ),
         );
       },

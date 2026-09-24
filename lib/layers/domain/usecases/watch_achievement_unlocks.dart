@@ -7,7 +7,7 @@ abstract interface class IWatchAchievementUnlocks {
 }
 
 @LazySingleton(as: IWatchAchievementUnlocks)
-class WatchAchievementUnlocks implements IWatchAchievementUnlocks {
+final class WatchAchievementUnlocks implements IWatchAchievementUnlocks {
   WatchAchievementUnlocks(this._repository);
 
   final IAchievementUnlockRepository _repository;
