@@ -40,15 +40,28 @@ class _DashboardView extends StatelessWidget {
           context.router.replaceAll([const LoginRoute()]);
         }
       },
-      child: AutoTabsRouter(
-        routes: const [HomeRoute(), GamesHubRoute(), ProfileRoute()],
-        navigatorObservers: () => [AutoRouteObserver()],
-        builder: (context, child) {
-          final tabsRouter = AutoTabsRouter.of(context);
-          return DashboardBody(
-            selectedIndex: tabsRouter.activeIndex,
-            onTabSelected: tabsRouter.setActiveIndex,
-            child: child,
+      child: BlocBuilder<DashboardBloc, DashboardState>(
+        buildWhen: (previous, current) =>
+            previous.showAchievements != current.showAchievements,
+        builder: (context, state) {
+          return AutoTabsRouter(
+            key: ValueKey(state.showAchievements),
+            routes: [
+              const HomeRoute(),
+              const GamesHubRoute(),
+              if (state.showAchievements) const AchievementsRoute(),
+              const ProfileRoute(),
+            ],
+            navigatorObservers: () => [AutoRouteObserver()],
+            builder: (context, child) {
+              final tabsRouter = AutoTabsRouter.of(context);
+              return DashboardBody(
+                selectedIndex: tabsRouter.activeIndex,
+                onTabSelected: tabsRouter.setActiveIndex,
+                showAchievements: state.showAchievements,
+                child: child,
+              );
+            },
           );
         },
       ),
