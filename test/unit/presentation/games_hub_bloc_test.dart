@@ -107,9 +107,13 @@ class _GetRandomGameRound implements IGetRandomGameRound {
 
 class _RemoteConfig implements IRemoteConfig {
   bool arcade = true;
+  bool achievements = false;
 
   @override
   bool get arcadeEnabled => arcade;
+
+  @override
+  bool get achievementsEnabled => achievements;
 
   @override
   Map<String, Object> get debugOverrides => const {};
@@ -117,6 +121,7 @@ class _RemoteConfig implements IRemoteConfig {
   @override
   bool getBool(String key, {required bool defaultValue}) {
     if (key == RemoteConfigKeys.arcadeEnabled) return arcade;
+    if (key == RemoteConfigKeys.achievementsEnabled) return achievements;
     return defaultValue;
   }
 

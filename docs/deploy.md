@@ -139,13 +139,16 @@ Known parameter keys (`RemoteConfigKeys`):
 | Key | Type | In-app default | Effect |
 |-----|------|----------------|--------|
 | `arcade_enabled` | Boolean | `true` | Shows / hides the Arcade CTA on Games Hub |
+| `achievements_enabled` | Boolean | `false` | Shows / hides Achievements tab, unlock host, and unlock toasts |
 
 Behavior:
 
 - Fetch on launch (`fetchAndActivate`); fetch failures keep defaults / last activated values
 - Debug: minimum fetch interval is `0`; release uses 1 hour
-- QA without console: `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
-- Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)` (debug builds, or `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`)
+- QA without console:
+  - `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
+  - `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`)
+- Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)` or `setDebugOverride('achievements_enabled', true)` (debug builds, or `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`)
 
 Do not put PII or secrets in Remote Config values.
 
