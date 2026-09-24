@@ -9,6 +9,7 @@ import 'package:lume/core/di/di.dart';
 import 'package:lume/core/observability/crash_reporting.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/layers/domain/usecases/watch_achievement_unlocks.dart';
 import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -33,7 +34,11 @@ Future<void> bootstrap() async {
     await configureDependencies();
     final router = getIt<AppRouter>();
     runApp(
-      LumeApp(router: router, levelUpEvents: getIt<IWatchLevelUpEvents>()()),
+      LumeApp(
+        router: router,
+        levelUpEvents: getIt<IWatchLevelUpEvents>()(),
+        achievementUnlockEvents: getIt<IWatchAchievementUnlocks>()(),
+      ),
     );
   }, CrashReporting.onZoneError);
 }
