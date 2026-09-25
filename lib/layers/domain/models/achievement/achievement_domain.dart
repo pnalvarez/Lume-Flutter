@@ -9,7 +9,7 @@ class AchievementDomain {
     required this.conditionType,
     required this.conditionTarget,
     required this.rewardType,
-    required this.rewardAmount,
+    this.rewardAmount = 0,
     this.progress = 0,
     this.completedAt,
     this.rewardClaimedAt,

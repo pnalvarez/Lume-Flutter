@@ -17,6 +17,11 @@ final class AchievementsDataSource implements IAchievementsDataSource {
   @override
   Future<List<AchievementData>> fetchAchievements() async {
     final raw = await _apiClient.rpc<Map<String, dynamic>>('get_achievements');
-    return AchievementsResponseData.fromJson(asJsonMap(raw)).achievements;
+    // Nested RPC maps from Dio are often `Map<dynamic, dynamic>`; cast via
+    // [parseJsonList]/[asJsonMap] instead of generated `as Map<String, dynamic>`.
+    return parseJsonList(
+      asJsonMap(raw)['achievements'],
+      AchievementData.fromJson,
+    );
   }
 }

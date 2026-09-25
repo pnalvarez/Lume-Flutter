@@ -14,7 +14,7 @@ class AchievementData {
     required this.conditionType,
     required this.conditionTarget,
     required this.rewardType,
-    required this.rewardAmount,
+    this.rewardAmount = 0,
     this.progress = 0,
     this.completedAt,
     this.rewardClaimedAt,
@@ -28,6 +28,9 @@ class AchievementData {
   final String conditionType;
   final int conditionTarget;
   final String rewardType;
+
+  /// Null in catalog for chest / title / collectible rewards.
+  @JsonKey(defaultValue: 0)
   final int rewardAmount;
 
   @JsonKey(defaultValue: 0)

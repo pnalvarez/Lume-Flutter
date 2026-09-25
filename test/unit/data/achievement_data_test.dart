@@ -46,6 +46,22 @@ void main() {
       });
       expect(item.progress, 0);
     });
+
+    test('defaults null reward_amount for non-xp rewards', () {
+      final item = AchievementData.fromJson({
+        'id': 'a1',
+        'code': 'museum_master',
+        'name': 'Mestre do Museu',
+        'description': 'Colete tudo.',
+        'condition_type': 'museum_items',
+        'condition_target': 10,
+        'reward_type': 'collectible',
+        'reward_amount': null,
+        'progress': 0,
+      });
+      expect(item.rewardAmount, 0);
+      expect(item.rewardType, 'collectible');
+    });
   });
 
   group('AchievementMapper', () {
