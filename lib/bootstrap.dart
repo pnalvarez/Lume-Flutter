@@ -41,7 +41,7 @@ Future<void> bootstrap() async {
         levelUpEvents: getIt<IWatchLevelUpEvents>()(),
         achievementUnlockEvents: getIt<IWatchAchievementUnlocks>()(),
         authSessionChanges: authSession.changes,
-        hasAuthSession: () => authSession.hasSession,
+        authUserId: () => authSession.userId,
       ),
     );
   }, CrashReporting.onZoneError);

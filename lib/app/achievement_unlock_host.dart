@@ -14,25 +14,27 @@ import 'package:lume_design_system/organisms/feedback/lume_snack_bar.dart';
 /// [OverlayEntry] (not [showLumeSnackBar]) so XP toasts in the shared snackbar
 /// slot cannot dismiss or replace an unlock toast.
 ///
-/// Multiple unlocks are queued and shown sequentially. Sign-out clears the
-/// queue and dismisses any visible unlock toast.
+/// Multiple unlocks are queued and shown sequentially. Sign-out and user
+/// switch clear the queue and dismiss any visible unlock toast. Token refresh
+/// (same user id) does not.
 class AchievementUnlockHost extends StatefulWidget {
   const AchievementUnlockHost({
     super.key,
     required this.events,
     required this.authSessionChanges,
-    required this.hasAuthSession,
+    required this.authUserId,
     required this.child,
     this.toastDuration = const Duration(seconds: 4),
   });
 
   final Stream<AchievementUnlockDomain> events;
 
-  /// Fires when the auth session changes (sign-in, sign-out, user switch).
+  /// Fires when the auth session changes (sign-in, sign-out, user switch,
+  /// token refresh).
   final Stream<void> authSessionChanges;
 
-  /// Whether a user is currently signed in.
-  final bool Function() hasAuthSession;
+  /// Current signed-in user id, or null when signed out.
+  final String? Function() authUserId;
 
   final Widget child;
 
@@ -51,10 +53,12 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
   OverlayEntry? _toastEntry;
   Timer? _toastTimer;
   Completer<void>? _toastWait;
+  String? _boundUserId;
 
   @override
   void initState() {
     super.initState();
+    _boundUserId = widget.authUserId();
     _eventsSub = widget.events.listen(_enqueue, onError: (_) {});
     _authSub = widget.authSessionChanges.listen((_) => _onAuthChanged());
   }
@@ -83,7 +87,14 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
   }
 
   void _onAuthChanged() {
-    if (widget.hasAuthSession()) return;
+    final nextUserId = widget.authUserId();
+    // Token refresh keeps the same user id — leave the queue alone.
+    if (nextUserId == _boundUserId) return;
+    _boundUserId = nextUserId;
+    _clearUnlockUi();
+  }
+
+  void _clearUnlockUi() {
     _pending.clear();
     _cancelToastWait();
     _removeToast();
@@ -91,7 +102,7 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
   }
 
   void _enqueue(AchievementUnlockDomain event) {
-    if (!widget.hasAuthSession()) return;
+    if (widget.authUserId() == null) return;
     if (event.name.trim().isEmpty) return;
     _pending.add(event);
     unawaited(_drain());
@@ -100,7 +111,7 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
   Future<void> _drain() async {
     if (_showing) return;
     _showing = true;
-    while (_pending.isNotEmpty && mounted && widget.hasAuthSession()) {
+    while (_pending.isNotEmpty && mounted && widget.authUserId() != null) {
       final event = _pending.removeAt(0);
       if (!_present(event)) {
         _pending.insert(0, event);
@@ -111,13 +122,12 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
         return;
       }
       await _waitToastDuration();
-      if (!mounted || !widget.hasAuthSession()) break;
+      if (!mounted || widget.authUserId() == null) break;
       _removeToast();
     }
     _showing = false;
-    if (!widget.hasAuthSession()) {
-      _pending.clear();
-      _removeToast();
+    if (widget.authUserId() == null) {
+      _clearUnlockUi();
     }
   }
 

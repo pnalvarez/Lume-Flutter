@@ -80,7 +80,7 @@ void main() {
         levelUpEvents: const Stream<Never>.empty(),
         achievementUnlockEvents: const Stream<Never>.empty(),
         authSessionChanges: const Stream<Never>.empty(),
-        hasAuthSession: () => false,
+        authUserId: () => null,
       ),
     );
     await tester.pump();

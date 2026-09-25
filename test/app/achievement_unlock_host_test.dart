@@ -14,7 +14,7 @@ import 'package:lume_design_system/theme/lume_theme.dart';
 Widget _shell({
   required Stream<AchievementUnlockDomain> events,
   required StreamController<void> authChanges,
-  required bool Function() hasAuthSession,
+  required String? Function() authUserId,
   required GlobalKey<NavigatorState> navigatorKey,
   Duration toastDuration = const Duration(milliseconds: 50),
   Widget home = const Scaffold(body: Text('home')),
@@ -28,7 +28,7 @@ Widget _shell({
         child: AchievementUnlockHost(
           events: events,
           authSessionChanges: authChanges.stream,
-          hasAuthSession: hasAuthSession,
+          authUserId: authUserId,
           toastDuration: toastDuration,
           child: child ?? const SizedBox.shrink(),
         ),
@@ -49,13 +49,13 @@ void main() {
     addTearDown(authChanges.close);
     final navigatorKey = GlobalKey<NavigatorState>();
     const toastDuration = Duration(milliseconds: 50);
-    var signedIn = true;
+    String? userId = 'user-1';
 
     await tester.pumpWidget(
       _shell(
         events: events.stream,
         authChanges: authChanges,
-        hasAuthSession: () => signedIn,
+        authUserId: () => userId,
         navigatorKey: navigatorKey,
         toastDuration: toastDuration,
       ),
@@ -90,13 +90,13 @@ void main() {
     addTearDown(authChanges.close);
     final navigatorKey = GlobalKey<NavigatorState>();
     const toastDuration = Duration(milliseconds: 100);
-    var signedIn = true;
+    String? userId = 'user-1';
 
     await tester.pumpWidget(
       _shell(
         events: events.stream,
         authChanges: authChanges,
-        hasAuthSession: () => signedIn,
+        authUserId: () => userId,
         navigatorKey: navigatorKey,
         toastDuration: toastDuration,
       ),
@@ -151,13 +151,13 @@ void main() {
     addTearDown(events.close);
     addTearDown(authChanges.close);
     final navigatorKey = GlobalKey<NavigatorState>();
-    var signedIn = true;
+    String? userId = 'user-1';
 
     await tester.pumpWidget(
       _shell(
         events: events.stream,
         authChanges: authChanges,
-        hasAuthSession: () => signedIn,
+        authUserId: () => userId,
         navigatorKey: navigatorKey,
         toastDuration: const Duration(milliseconds: 200),
       ),
@@ -207,13 +207,13 @@ void main() {
     addTearDown(events.close);
     addTearDown(authChanges.close);
     final navigatorKey = GlobalKey<NavigatorState>();
-    var signedIn = true;
+    String? userId = 'user-1';
 
     await tester.pumpWidget(
       _shell(
         events: events.stream,
         authChanges: authChanges,
-        hasAuthSession: () => signedIn,
+        authUserId: () => userId,
         navigatorKey: navigatorKey,
         toastDuration: const Duration(milliseconds: 200),
       ),
@@ -253,13 +253,13 @@ void main() {
     addTearDown(events.close);
     addTearDown(authChanges.close);
     final navigatorKey = GlobalKey<NavigatorState>();
-    var signedIn = true;
+    String? userId = 'user-1';
 
     await tester.pumpWidget(
       _shell(
         events: events.stream,
         authChanges: authChanges,
-        hasAuthSession: () => signedIn,
+        authUserId: () => userId,
         navigatorKey: navigatorKey,
         toastDuration: const Duration(milliseconds: 200),
       ),
@@ -289,7 +289,7 @@ void main() {
       findsOneWidget,
     );
 
-    signedIn = false;
+    userId = null;
     authChanges.add(null);
     await tester.pump();
     await tester.pump();
@@ -299,5 +299,115 @@ void main() {
       findsNothing,
     );
     expect(find.text(achievementUnlockedSnackBarText('Segunda')), findsNothing);
+  });
+
+  testWidgets(
+    'user switch clears the previous user queue while still signed in',
+    (tester) async {
+      final events = StreamController<AchievementUnlockDomain>.broadcast();
+      final authChanges = StreamController<void>.broadcast();
+      addTearDown(events.close);
+      addTearDown(authChanges.close);
+      final navigatorKey = GlobalKey<NavigatorState>();
+      String? userId = 'user-1';
+
+      await tester.pumpWidget(
+        _shell(
+          events: events.stream,
+          authChanges: authChanges,
+          authUserId: () => userId,
+          navigatorKey: navigatorKey,
+          toastDuration: const Duration(milliseconds: 200),
+        ),
+      );
+      await tester.pump();
+
+      events
+        ..add(
+          const AchievementUnlockDomain(
+            achievementId: 'ach-1',
+            code: 'first',
+            name: 'Primeira',
+          ),
+        )
+        ..add(
+          const AchievementUnlockDomain(
+            achievementId: 'ach-2',
+            code: 'second',
+            name: 'Segunda',
+          ),
+        );
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.text(achievementUnlockedSnackBarText('Primeira')),
+        findsOneWidget,
+      );
+
+      // Session stays present; only the user id changes (no signed-out gap).
+      userId = 'user-2';
+      authChanges.add(null);
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.text(achievementUnlockedSnackBarText('Primeira')),
+        findsNothing,
+      );
+      expect(
+        find.text(achievementUnlockedSnackBarText('Segunda')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('token refresh with the same user id keeps the unlock toast', (
+    tester,
+  ) async {
+    final events = StreamController<AchievementUnlockDomain>.broadcast();
+    final authChanges = StreamController<void>.broadcast();
+    addTearDown(events.close);
+    addTearDown(authChanges.close);
+    final navigatorKey = GlobalKey<NavigatorState>();
+    String? userId = 'user-1';
+
+    await tester.pumpWidget(
+      _shell(
+        events: events.stream,
+        authChanges: authChanges,
+        authUserId: () => userId,
+        navigatorKey: navigatorKey,
+        toastDuration: const Duration(milliseconds: 200),
+      ),
+    );
+    await tester.pump();
+
+    events.add(
+      const AchievementUnlockDomain(
+        achievementId: 'ach-1',
+        code: 'first',
+        name: 'Primeira',
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(
+      find.text(achievementUnlockedSnackBarText('Primeira')),
+      findsOneWidget,
+    );
+
+    // Same user id — e.g. token refresh — must not clear the toast.
+    authChanges.add(null);
+    await tester.pump();
+    await tester.pump();
+
+    expect(
+      find.text(achievementUnlockedSnackBarText('Primeira')),
+      findsOneWidget,
+    );
+
+    await tester.pump(const Duration(milliseconds: 200));
   });
 }

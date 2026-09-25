@@ -15,14 +15,14 @@ class LumeApp extends StatelessWidget {
     required this.levelUpEvents,
     required this.achievementUnlockEvents,
     required this.authSessionChanges,
-    required this.hasAuthSession,
+    required this.authUserId,
   });
 
   final AppRouter router;
   final Stream<LevelUpDomain> levelUpEvents;
   final Stream<AchievementUnlockDomain> achievementUnlockEvents;
   final Stream<void> authSessionChanges;
-  final bool Function() hasAuthSession;
+  final String? Function() authUserId;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class LumeApp extends StatelessWidget {
           child: AchievementUnlockHost(
             events: achievementUnlockEvents,
             authSessionChanges: authSessionChanges,
-            hasAuthSession: hasAuthSession,
+            authUserId: authUserId,
             child: LevelUpHost(
               events: levelUpEvents,
               navigatorKey: router.navigatorKey,
