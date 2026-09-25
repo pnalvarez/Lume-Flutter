@@ -75,7 +75,13 @@ void main() {
     );
 
     await tester.pumpWidget(
-      LumeApp(router: router, levelUpEvents: const Stream<Never>.empty()),
+      LumeApp(
+        router: router,
+        levelUpEvents: const Stream<Never>.empty(),
+        achievementUnlockEvents: const Stream<Never>.empty(),
+        authSessionChanges: const Stream<Never>.empty(),
+        authUserId: () => null,
+      ),
     );
     await tester.pump();
 

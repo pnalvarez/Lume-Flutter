@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:lume/app/lume_app.dart';
 import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/core/config/app_config.dart';
+import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/core/observability/crash_reporting.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/layers/domain/usecases/watch_achievement_unlocks.dart';
 import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -32,8 +34,15 @@ Future<void> bootstrap() async {
 
     await configureDependencies();
     final router = getIt<AppRouter>();
+    final authSession = getIt<IAuthSessionProvider>();
     runApp(
-      LumeApp(router: router, levelUpEvents: getIt<IWatchLevelUpEvents>()()),
+      LumeApp(
+        router: router,
+        levelUpEvents: getIt<IWatchLevelUpEvents>()(),
+        achievementUnlockEvents: getIt<IWatchAchievementUnlocks>()(),
+        authSessionChanges: authSession.changes,
+        authUserId: () => authSession.userId,
+      ),
     );
   }, CrashReporting.onZoneError);
 }
