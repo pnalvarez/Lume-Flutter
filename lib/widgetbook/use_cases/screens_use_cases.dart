@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/models/category/category_domain.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_body.dart';
@@ -12,7 +13,9 @@ import 'package:lume/layers/presentation/screens/auth/login/login_state.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_body.dart';
 import 'package:lume/layers/presentation/screens/auth/recover_password/recover_password_state.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievement_list_item.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_body.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievements_state.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_body.dart';
 import 'package:lume/layers/presentation/screens/dashboard/dashboard_tab_placeholder.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_body.dart';
@@ -523,13 +526,84 @@ Widget dashboardTabPlaceholder(BuildContext context) {
 
 // --- Achievements -----------------------------------------------------------
 
+const _sampleAchievements = [
+  AchievementListItemUi(
+    id: '1',
+    title: 'Arcade 50',
+    description: 'Alcance 50 pontos em uma partida no Arcade.',
+    status: AchievementListItemStatus.locked,
+    progress: 0,
+    target: 50,
+  ),
+  AchievementListItemUi(
+    id: '2',
+    title: 'Explorador',
+    description: 'Complete 5 submódulos na trilha.',
+    status: AchievementListItemStatus.inProgress,
+    progress: 3,
+    target: 5,
+  ),
+  AchievementListItemUi(
+    id: '3',
+    title: 'Primeiro passo',
+    description: 'Complete 1 submódulo na trilha.',
+    status: AchievementListItemStatus.completed,
+    progress: 1,
+    target: 1,
+    icon: Icons.explore_rounded,
+  ),
+];
+
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Achievements',
-  name: 'Under development',
+  name: 'Ready',
   type: AchievementsBody,
 )
-Widget achievementsStub(BuildContext context) {
-  return const AchievementsBody();
+Widget achievementsReady(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: _sampleAchievements,
+    ),
+    onRetry: _noop,
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Loading',
+  type: AchievementsBody,
+)
+Widget achievementsLoading(BuildContext context) {
+  return AchievementsBody(state: const AchievementsState(), onRetry: _noop);
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Empty',
+  type: AchievementsBody,
+)
+Widget achievementsEmpty(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(status: AchievementsStatus.ready),
+    onRetry: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Error',
+  type: AchievementsBody,
+)
+Widget achievementsError(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.error,
+      errorMessage: achievementsLoadError,
+    ),
+    onRetry: _noop,
+  );
 }
 
 // --- Trail home -------------------------------------------------------------

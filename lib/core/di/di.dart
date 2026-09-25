@@ -10,6 +10,11 @@ import 'package:lume/layers/data/repository/achievement_unlock_repository.dart';
 import 'package:lume/layers/data/repository/level_up_repository.dart';
 import 'package:lume/layers/domain/repository/achievement_unlock_repository.dart';
 import 'package:lume/layers/domain/repository/level_up_repository.dart';
+import 'package:lume/core/network/api_client.dart';
+import 'package:lume/layers/data/datasource/achievements_data_source.dart';
+import 'package:lume/layers/data/repository/achievements_repository.dart';
+import 'package:lume/layers/domain/repository/achievements_repository.dart';
+import 'package:lume/layers/domain/usecases/get_achievements.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
@@ -18,6 +23,7 @@ import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/domain/usecases/watch_achievement_unlocks.dart';
 import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_bloc.dart';
 
@@ -31,6 +37,7 @@ Future<void> configureDependencies() async {
   await getIt.init();
   _registerGamesHubBloc();
   _registerProfileBloc();
+  _registerAchievementsBloc();
   _registerLevelUpWatcher();
   _registerAchievementUnlockWatcher();
 }
@@ -62,6 +69,31 @@ void _registerProfileBloc() {
       getIt<ISignOut>(),
       getIt<IAnalytics>(),
     ),
+  );
+}
+
+/// [di.config.dart] is gitignored; re-register so every use case is wired.
+void _registerAchievementsBloc() {
+  if (!getIt.isRegistered<IAchievementsDataSource>()) {
+    getIt.registerLazySingleton<IAchievementsDataSource>(
+      () => AchievementsDataSource(getIt<IApiClient>()),
+    );
+  }
+  if (!getIt.isRegistered<IAchievementsRepository>()) {
+    getIt.registerLazySingleton<IAchievementsRepository>(
+      () => AchievementsRepository(getIt<IAchievementsDataSource>()),
+    );
+  }
+  if (!getIt.isRegistered<IGetAchievements>()) {
+    getIt.registerLazySingleton<IGetAchievements>(
+      () => GetAchievements(getIt<IAchievementsRepository>()),
+    );
+  }
+  if (getIt.isRegistered<AchievementsBloc>()) {
+    getIt.unregister<AchievementsBloc>();
+  }
+  getIt.registerFactory<AchievementsBloc>(
+    () => AchievementsBloc(getIt<IGetAchievements>()),
   );
 }
 
