@@ -27,21 +27,23 @@ class AchievementsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: const PageHeader(title: achievementsTitle),
-      body: switch (state.status) {
-        AchievementsStatus.error => _AchievementsError(
-          message: state.errorMessage ?? achievementsLoadError,
+      body: switch (state) {
+        final s when s.showFullScreenError => _AchievementsError(
+          message: s.errorMessage ?? achievementsLoadError,
           onRetry: onRetry,
         ),
-        AchievementsStatus.loading => const _AchievementsLoadingList(),
-        AchievementsStatus.ready when state.items.isEmpty =>
-          const _AchievementsEmptyState(),
-        AchievementsStatus.ready => _AchievementsList(
-          items: state.items,
+        final s when s.showSkeleton => const _AchievementsLoadingList(),
+        final s when s.items.isEmpty => _AchievementsEmptyState(
+          onRetry: onRetry,
+          onRefresh: onRefresh,
+        ),
+        final s => _AchievementsList(
+          items: s.items,
+          inlineError: s.errorMessage,
+          onRetry: onRetry,
           onRefresh: onRefresh,
         ),
       },
@@ -50,24 +52,36 @@ class AchievementsBody extends StatelessWidget {
 }
 
 class _AchievementsList extends StatelessWidget {
-  const _AchievementsList({required this.items, this.onRefresh});
+  const _AchievementsList({
+    required this.items,
+    required this.onRetry,
+    this.inlineError,
+    this.onRefresh,
+  });
 
   final List<AchievementListItemUi> items;
+  final String? inlineError;
+  final VoidCallback onRetry;
   final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
+    final error = inlineError;
     final list = ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(
         AppSpacings.xl,
         AppSpacings.s,
         AppSpacings.xl,
         AppSpacings.xl2,
       ),
-      itemCount: items.length,
+      itemCount: items.length + (error != null ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacings.m),
       itemBuilder: (context, index) {
-        final item = items[index];
+        if (error != null && index == 0) {
+          return _InlineErrorBanner(message: error, onRetry: onRetry);
+        }
+        final item = items[error != null ? index - 1 : index];
         return AchievementListItem(
           title: item.title,
           description: item.description,
@@ -83,6 +97,35 @@ class _AchievementsList extends StatelessWidget {
     if (refresh == null) return list;
 
     return RefreshIndicator(onRefresh: refresh, child: list);
+  }
+}
+
+class _InlineErrorBanner extends StatelessWidget {
+  const _InlineErrorBanner({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacings.m),
+        LumeButton(
+          label: achievementsRetry,
+          type: LumeButtonType.outlined,
+          onPressed: onRetry,
+        ),
+      ],
+    );
   }
 }
 
@@ -130,38 +173,46 @@ class _AchievementsLoadingList extends StatelessWidget {
 }
 
 class _AchievementsEmptyState extends StatelessWidget {
-  const _AchievementsEmptyState();
+  const _AchievementsEmptyState({required this.onRetry, this.onRefresh});
+
+  final VoidCallback onRetry;
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacings.xl2),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              AppIcons.statusAlert,
-              package: 'lume_design_system',
-              width: AppSizes.mediaWellL,
-              height: AppSizes.mediaWellL,
-              colorFilter: ColorFilter.mode(
-                cs.onSurfaceVariant,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(height: AppSpacings.l),
-            Text(
-              achievementsEmpty,
-              textAlign: TextAlign.center,
-              style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
-            ),
-          ],
+    final content = ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacings.xl2),
+      children: [
+        const SizedBox(height: AppSpacings.xl4),
+        SvgPicture.asset(
+          AppIcons.statusAlert,
+          package: 'lume_design_system',
+          width: AppSizes.mediaWellL,
+          height: AppSizes.mediaWellL,
+          colorFilter: ColorFilter.mode(cs.onSurfaceVariant, BlendMode.srcIn),
         ),
-      ),
+        const SizedBox(height: AppSpacings.l),
+        Text(
+          achievementsEmpty,
+          textAlign: TextAlign.center,
+          style: typ.body4Light.copyWith(color: cs.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacings.l),
+        LumeButton(
+          label: achievementsRetry,
+          type: LumeButtonType.outlined,
+          onPressed: onRetry,
+        ),
+      ],
     );
+
+    final refresh = onRefresh;
+    if (refresh == null) return content;
+
+    return RefreshIndicator(onRefresh: refresh, child: content);
   }
 }
 

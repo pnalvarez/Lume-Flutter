@@ -18,17 +18,40 @@ final class AchievementsBloc
     AchievementsStarted event,
     Emitter<AchievementsState> emit,
   ) async {
-    emit(state.copyWith(status: AchievementsStatus.loading, clearError: true));
+    final keepItems = state.items.isNotEmpty;
+    if (keepItems) {
+      emit(state.copyWith(isRefreshing: true, clearError: true));
+    } else {
+      emit(
+        state.copyWith(
+          status: AchievementsStatus.loading,
+          isRefreshing: false,
+          clearError: true,
+        ),
+      );
+    }
+
     try {
       final achievements = await _getAchievements();
       emit(AchievementsState.fromDomain(achievements));
     } on Object {
-      emit(
-        state.copyWith(
-          status: AchievementsStatus.error,
-          errorMessage: achievementsLoadError,
-        ),
-      );
+      if (keepItems) {
+        emit(
+          state.copyWith(
+            status: AchievementsStatus.ready,
+            isRefreshing: false,
+            errorMessage: achievementsLoadError,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: AchievementsStatus.error,
+            isRefreshing: false,
+            errorMessage: achievementsLoadError,
+          ),
+        );
+      }
     }
   }
 }

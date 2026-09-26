@@ -97,14 +97,23 @@ final class AchievementsState {
   const AchievementsState({
     this.status = AchievementsStatus.loading,
     this.items = const [],
+    this.isRefreshing = false,
     this.errorMessage,
   });
 
   final AchievementsStatus status;
   final List<AchievementListItemUi> items;
+  final bool isRefreshing;
   final String? errorMessage;
 
   bool get isLoading => status == AchievementsStatus.loading;
+
+  /// First paint with no rows yet — show skeleton instead of an empty list.
+  bool get showSkeleton => isLoading && items.isEmpty;
+
+  /// Full-screen error only when there is nothing to keep on screen.
+  bool get showFullScreenError =>
+      status == AchievementsStatus.error && items.isEmpty;
 
   factory AchievementsState.fromDomain(List<AchievementDomain> achievements) {
     return AchievementsState(
@@ -119,12 +128,14 @@ final class AchievementsState {
   AchievementsState copyWith({
     AchievementsStatus? status,
     List<AchievementListItemUi>? items,
+    bool? isRefreshing,
     String? errorMessage,
     bool clearError = false,
   }) {
     return AchievementsState(
       status: status ?? this.status,
       items: items ?? this.items,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
   }
@@ -134,8 +145,10 @@ final class AchievementsState {
       other is AchievementsState &&
       other.status == status &&
       listEquals(other.items, items) &&
+      other.isRefreshing == isRefreshing &&
       other.errorMessage == errorMessage;
 
   @override
-  int get hashCode => Object.hash(status, Object.hashAll(items), errorMessage);
+  int get hashCode =>
+      Object.hash(status, Object.hashAll(items), isRefreshing, errorMessage);
 }

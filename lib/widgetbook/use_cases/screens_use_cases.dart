@@ -588,6 +588,7 @@ Widget achievementsEmpty(BuildContext context) {
   return AchievementsBody(
     state: const AchievementsState(status: AchievementsStatus.ready),
     onRetry: _noop,
+    onRefresh: () async {},
   );
 }
 
@@ -603,6 +604,23 @@ Widget achievementsError(BuildContext context) {
       errorMessage: achievementsLoadError,
     ),
     onRetry: _noop,
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Inline error',
+  type: AchievementsBody,
+)
+Widget achievementsInlineError(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: _sampleAchievements,
+      errorMessage: achievementsLoadError,
+    ),
+    onRetry: _noop,
+    onRefresh: () async {},
   );
 }
 

@@ -149,7 +149,46 @@ void main() {
       ),
       isA<AchievementsState>()
           .having((s) => s.status, 'status', AchievementsStatus.error)
+          .having((s) => s.errorMessage, 'error', achievementsLoadError)
+          .having((s) => s.items, 'items', isEmpty),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'keeps rows and sets inline error when reload fails',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) {
+      getAchievements.error = Exception('network');
+      bloc.add(const AchievementsStarted());
+    },
+    expect: () => [
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isTrue)
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.items, 'items', hasLength(3)),
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isFalse)
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.items, 'items', hasLength(3))
           .having((s) => s.errorMessage, 'error', achievementsLoadError),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'reload keeps ready status without skeleton when items exist',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isTrue)
+          .having((s) => s.showSkeleton, 'skeleton', isFalse)
+          .having((s) => s.items, 'items', hasLength(3)),
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isFalse)
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.items, 'items', hasLength(3)),
     ],
   );
 }

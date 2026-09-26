@@ -37,7 +37,7 @@ class _AchievementsViewState extends State<_AchievementsView>
   Future<void> _onRefresh() async {
     final bloc = context.read<AchievementsBloc>();
     final done = bloc.stream.firstWhere(
-      (state) => state.status != AchievementsStatus.loading,
+      (state) => !state.isRefreshing && !state.isLoading,
     );
     bloc.add(const AchievementsStarted());
     await done;
