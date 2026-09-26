@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/layers/data/mappers/achievement_mapper.dart';
 import 'package:lume/layers/data/models/achievement_data.dart';
+import 'package:lume/layers/domain/models/achievement/achievement_domain.dart';
+import 'package:lume/layers/domain/models/achievement/achievement_icon.dart';
 
 void main() {
   group('AchievementData.fromJson', () {
@@ -85,6 +87,27 @@ void main() {
       expect(domain.id, 'a1');
       expect(domain.isCompleted, isTrue);
       expect(domain.conditionTarget, 1);
+      expect(domain.icon, AchievementIcon.trophy);
+    });
+
+    test('maps Lucide-style and emoji wire icons', () {
+      AchievementDomain mapIcon(String? icon) => AchievementMapper.toDomain(
+        AchievementData(
+          id: 'a1',
+          code: 'x',
+          name: 'N',
+          description: 'D',
+          icon: icon,
+          conditionType: 't',
+          conditionTarget: 1,
+          rewardType: 'xp',
+        ),
+      );
+
+      expect(mapIcon('Zap').icon, AchievementIcon.zap);
+      expect(mapIcon('CheckCircle2').icon, AchievementIcon.checkCircle);
+      expect(mapIcon('🎮').icon, AchievementIcon.unknown);
+      expect(mapIcon(null).icon, AchievementIcon.trophy);
     });
   });
 }

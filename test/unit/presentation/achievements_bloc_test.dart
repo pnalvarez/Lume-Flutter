@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_domain.dart';
+import 'package:lume/layers/domain/models/achievement/achievement_icon.dart';
 import 'package:lume/layers/domain/usecases/get_achievements.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievement_list_item.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
@@ -15,7 +16,7 @@ class _GetAchievements implements IGetAchievements {
       code: 'first_submodule',
       name: 'Primeiro passo',
       description: 'Complete 1 submódulo na trilha.',
-      icon: 'trophy',
+      icon: AchievementIcon.trophy,
       conditionType: 'trail_submodules_completed',
       conditionTarget: 1,
       rewardType: 'xp',
@@ -28,7 +29,7 @@ class _GetAchievements implements IGetAchievements {
       code: 'submodules_5',
       name: 'Explorador',
       description: 'Complete 5 submódulos na trilha.',
-      icon: 'trophy',
+      icon: AchievementIcon.trophy,
       conditionType: 'trail_submodules_completed',
       conditionTarget: 5,
       rewardType: 'xp',
@@ -40,7 +41,7 @@ class _GetAchievements implements IGetAchievements {
       code: 'arcade_20',
       name: 'Arcade 20',
       description: 'Alcance 20 pontos em uma partida no Arcade.',
-      icon: 'trophy',
+      icon: AchievementIcon.trophy,
       conditionType: 'arcade_best_rounds',
       conditionTarget: 20,
       rewardType: 'xp',

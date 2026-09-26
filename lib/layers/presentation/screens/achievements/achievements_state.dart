@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show IconData, Icons;
 import 'package:lume/layers/domain/models/achievement/achievement_domain.dart';
+import 'package:lume/layers/domain/models/achievement/achievement_icon.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievement_list_item.dart';
 
 enum AchievementsStatus { loading, ready, error }
@@ -47,15 +48,31 @@ final class AchievementListItemUi {
     return AchievementListItemStatus.inProgress;
   }
 
-  static IconData _iconFor(String? icon) {
-    return switch (icon?.trim().toLowerCase()) {
-      'trophy' || 'emoji_events' || 'award' => Icons.emoji_events_rounded,
-      'star' => Icons.star_rounded,
-      'flame' || 'fire' => Icons.local_fire_department_rounded,
-      'bolt' || 'zap' => Icons.bolt_rounded,
-      'gamepad' || 'sports_esports' => Icons.sports_esports_rounded,
-      'explore' => Icons.explore_rounded,
-      _ => Icons.emoji_events_rounded,
+  static IconData _iconFor(AchievementIcon icon) {
+    return switch (icon) {
+      AchievementIcon.trophy ||
+      AchievementIcon.unknown => Icons.emoji_events_rounded,
+      AchievementIcon.star => Icons.star_rounded,
+      AchievementIcon.flame => Icons.local_fire_department_rounded,
+      AchievementIcon.gamepad => Icons.sports_esports_rounded,
+      AchievementIcon.zap => Icons.bolt_rounded,
+      AchievementIcon.explore => Icons.explore_rounded,
+      AchievementIcon.brain => Icons.psychology_rounded,
+      AchievementIcon.landmark => Icons.account_balance_rounded,
+      AchievementIcon.layers => Icons.layers_rounded,
+      AchievementIcon.checkCircle => Icons.check_circle_rounded,
+      AchievementIcon.clock => Icons.schedule_rounded,
+      AchievementIcon.gavel => Icons.gavel_rounded,
+      AchievementIcon.globe => Icons.public_rounded,
+      AchievementIcon.image => Icons.image_rounded,
+      AchievementIcon.mapPin => Icons.location_on_rounded,
+      AchievementIcon.rewind => Icons.fast_rewind_rounded,
+      AchievementIcon.swords => Icons.sports_mma_rounded,
+      AchievementIcon.user => Icons.person_rounded,
+      AchievementIcon.compass => Icons.explore_rounded,
+      AchievementIcon.package => Icons.inventory_2_rounded,
+      AchievementIcon.repeat => Icons.repeat_rounded,
+      AchievementIcon.sparkles => Icons.auto_awesome_rounded,
     };
   }
 

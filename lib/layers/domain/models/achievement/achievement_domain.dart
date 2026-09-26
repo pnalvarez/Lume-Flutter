@@ -1,3 +1,5 @@
+import 'package:lume/layers/domain/models/achievement/achievement_icon.dart';
+
 /// One achievement from the catalog, with the signed-in user's progress.
 class AchievementDomain {
   const AchievementDomain({
@@ -5,7 +7,7 @@ class AchievementDomain {
     required this.code,
     required this.name,
     required this.description,
-    this.icon,
+    this.icon = AchievementIcon.trophy,
     required this.conditionType,
     required this.conditionTarget,
     required this.rewardType,
@@ -19,7 +21,7 @@ class AchievementDomain {
   final String code;
   final String name;
   final String description;
-  final String? icon;
+  final AchievementIcon icon;
   final String conditionType;
   final int conditionTarget;
   final String rewardType;
