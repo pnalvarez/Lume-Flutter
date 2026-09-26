@@ -97,12 +97,16 @@ final class AchievementsState {
   const AchievementsState({
     this.status = AchievementsStatus.loading,
     this.items = const [],
+    this.selectedStatusFilters = const {},
     this.isRefreshing = false,
     this.errorMessage,
   });
 
   final AchievementsStatus status;
   final List<AchievementListItemUi> items;
+
+  /// Active status chips. Empty means show the full catalog.
+  final Set<AchievementListItemStatus> selectedStatusFilters;
   final bool isRefreshing;
   final String? errorMessage;
 
@@ -115,19 +119,37 @@ final class AchievementsState {
   bool get showFullScreenError =>
       status == AchievementsStatus.error && items.isEmpty;
 
-  factory AchievementsState.fromDomain(List<AchievementDomain> achievements) {
+  /// Whether the filter chip row should appear (catalog loaded with rows).
+  bool get showStatusFilters =>
+      !showSkeleton && !showFullScreenError && items.isNotEmpty;
+
+  /// Items after applying [selectedStatusFilters].
+  List<AchievementListItemUi> get visibleItems {
+    if (selectedStatusFilters.isEmpty) return items;
+    return [
+      for (final item in items)
+        if (selectedStatusFilters.contains(item.status)) item,
+    ];
+  }
+
+  factory AchievementsState.fromDomain(
+    List<AchievementDomain> achievements, {
+    Set<AchievementListItemStatus> selectedStatusFilters = const {},
+  }) {
     return AchievementsState(
       status: AchievementsStatus.ready,
       items: [
         for (final achievement in achievements)
           AchievementListItemUi.fromDomain(achievement),
       ],
+      selectedStatusFilters: selectedStatusFilters,
     );
   }
 
   AchievementsState copyWith({
     AchievementsStatus? status,
     List<AchievementListItemUi>? items,
+    Set<AchievementListItemStatus>? selectedStatusFilters,
     bool? isRefreshing,
     String? errorMessage,
     bool clearError = false,
@@ -135,6 +157,8 @@ final class AchievementsState {
     return AchievementsState(
       status: status ?? this.status,
       items: items ?? this.items,
+      selectedStatusFilters:
+          selectedStatusFilters ?? this.selectedStatusFilters,
       isRefreshing: isRefreshing ?? this.isRefreshing,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
@@ -145,10 +169,16 @@ final class AchievementsState {
       other is AchievementsState &&
       other.status == status &&
       listEquals(other.items, items) &&
+      setEquals(other.selectedStatusFilters, selectedStatusFilters) &&
       other.isRefreshing == isRefreshing &&
       other.errorMessage == errorMessage;
 
   @override
-  int get hashCode =>
-      Object.hash(status, Object.hashAll(items), isRefreshing, errorMessage);
+  int get hashCode => Object.hash(
+    status,
+    Object.hashAll(items),
+    Object.hashAll(selectedStatusFilters),
+    isRefreshing,
+    errorMessage,
+  );
 }

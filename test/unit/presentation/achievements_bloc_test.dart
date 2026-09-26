@@ -191,4 +191,123 @@ void main() {
           .having((s) => s.items, 'items', hasLength(3)),
     ],
   );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'toggles status filters as multi-select',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) {
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.completed),
+      );
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+    },
+    expect: () => [
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.locked},
+      ),
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.locked, AchievementListItemStatus.completed},
+      ),
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.completed},
+      ),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'visibleItems respects selected status filters',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {AchievementListItemStatus.locked},
+    ),
+    verify: (bloc) {
+      expect(bloc.state.visibleItems, hasLength(1));
+      expect(
+        bloc.state.visibleItems.single.status,
+        AchievementListItemStatus.locked,
+      );
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'reload preserves selected status filters',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {
+        AchievementListItemStatus.completed,
+        AchievementListItemStatus.inProgress,
+      },
+    ),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isTrue)
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.completed,
+            AchievementListItemStatus.inProgress,
+          }),
+      isA<AchievementsState>()
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.completed,
+            AchievementListItemStatus.inProgress,
+          }),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'filter toggled during reload is not overwritten by fromDomain emit',
+    // Toggle before the reload: proves fromDomain reads state.selectedStatusFilters
+    // at emit time, not a snapshot captured before the RPC.
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {AchievementListItemStatus.inProgress},
+    ),
+    act: (bloc) {
+      // Toggle to a new set, then reload — the reload must see the new set.
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+      bloc.add(const AchievementsStarted());
+    },
+    expect: () => [
+      // toggle adds locked
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters after toggle',
+        {
+          AchievementListItemStatus.inProgress,
+          AchievementListItemStatus.locked,
+        },
+      ),
+      // refreshing intermediate
+      isA<AchievementsState>().having(
+        (s) => s.isRefreshing,
+        'refreshing',
+        isTrue,
+      ),
+      // fromDomain must preserve the post-toggle set
+      isA<AchievementsState>()
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.selectedStatusFilters, 'filters after reload', {
+            AchievementListItemStatus.inProgress,
+            AchievementListItemStatus.locked,
+          }),
+    ],
+  );
 }
