@@ -4,6 +4,7 @@ import 'package:lume/app/app_root_overlay.dart';
 import 'package:lume/app/level_up_host.dart';
 import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_unlock_domain.dart';
 import 'package:lume/layers/domain/models/xp/level_up_domain.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
@@ -16,6 +17,7 @@ class LumeApp extends StatelessWidget {
     required this.achievementUnlockEvents,
     required this.authSessionChanges,
     required this.authUserId,
+    required this.analytics,
   });
 
   final AppRouter router;
@@ -23,6 +25,7 @@ class LumeApp extends StatelessWidget {
   final Stream<AchievementUnlockDomain> achievementUnlockEvents;
   final Stream<void> authSessionChanges;
   final String? Function() authUserId;
+  final IAnalytics analytics;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,7 @@ class LumeApp extends StatelessWidget {
             events: achievementUnlockEvents,
             authSessionChanges: authSessionChanges,
             authUserId: authUserId,
+            analytics: analytics,
             child: LevelUpHost(
               events: levelUpEvents,
               navigatorKey: router.navigatorKey,

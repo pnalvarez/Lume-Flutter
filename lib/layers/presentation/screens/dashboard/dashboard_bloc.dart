@@ -13,12 +13,26 @@ final class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     : super(
         DashboardState(showAchievements: remoteConfig.achievementsEnabled),
       ) {
+    on<DashboardStarted>(_onStarted);
     on<DashboardSignOutPressed>(_onSignOutPressed);
     on<DashboardNavigationHandled>(_onNavigationHandled);
   }
 
   final ISignOut _signOut;
   final IAnalytics _analytics;
+
+  void _onStarted(DashboardStarted event, Emitter<DashboardState> emit) {
+    // Fire impression when the shell shows the Achievements tab so exposure
+    // is counted even if the user never taps into the tab or the RPC fails.
+    if (state.showAchievements) {
+      _analytics.logEvent(
+        AnalyticsEvents.achievementsTabImpression,
+        parameters: {
+          AnalyticsParams.achievementsEnabled: state.showAchievements,
+        },
+      );
+    }
+  }
 
   Future<void> _onSignOutPressed(
     DashboardSignOutPressed event,

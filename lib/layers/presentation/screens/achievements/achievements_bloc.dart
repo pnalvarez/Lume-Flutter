@@ -30,6 +30,20 @@ final class AchievementsBloc
     Emitter<AchievementsState> emit,
   ) async {
     final keepItems = state.items.isNotEmpty;
+
+    // Fire before any state change or RPC so the open is always counted,
+    // even when the load fails.  Only on the first/fresh load (empty state)
+    // so pull-to-refresh and pop-back do not inflate the metric.
+    if (!keepItems) {
+      _logEvent(
+        AnalyticsEvents.achievementsOpened,
+        parameters: {
+          AnalyticsParams.achievementsEnabled:
+              _remoteConfig.achievementsEnabled,
+        },
+      );
+    }
+
     if (keepItems) {
       emit(state.copyWith(isRefreshing: true, clearError: true));
     } else {
@@ -53,15 +67,6 @@ final class AchievementsBloc
       emit(newState);
 
       // Fire-and-forget: analytics must never block or delay the UI.
-      if (!keepItems) {
-        _logEvent(
-          AnalyticsEvents.achievementsTabImpression,
-          parameters: {
-            AnalyticsParams.achievementsEnabled:
-                _remoteConfig.achievementsEnabled,
-          },
-        );
-      }
       _logEvent(
         AnalyticsEvents.achievementsListViewed,
         parameters: {
@@ -110,12 +115,22 @@ final class AchievementsBloc
     _logEvent(
       AnalyticsEvents.achievementsFilterApplied,
       parameters: {
-        AnalyticsParams.filterStatus: event.status.name,
+        AnalyticsParams.filterStatus: _statusLabel(event.status),
         AnalyticsParams.activeFilterCount: next.length,
         AnalyticsParams.visibleCount: state.visibleItems.length,
       },
     );
   }
+
+  /// Maps enum values to the snake_case strings required by the analytics
+  /// contract.  [AchievementListItemStatus.inProgress.name] gives `inProgress`,
+  /// not `in_progress`, so we convert explicitly here.
+  static String _statusLabel(AchievementListItemStatus status) =>
+      switch (status) {
+        AchievementListItemStatus.locked => 'locked',
+        AchievementListItemStatus.inProgress => 'in_progress',
+        AchievementListItemStatus.completed => 'completed',
+      };
 
   void _onFilterCleared(
     AchievementsFilterCleared event,

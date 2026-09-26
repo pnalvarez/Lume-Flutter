@@ -335,13 +335,19 @@ void main() {
   );
 
   blocTest<AchievementsBloc, AchievementsState>(
-    'logs achievements_tab_impression and achievements_list_viewed on first load',
+    'logs achievements_opened and achievements_list_viewed on first load',
     build: buildBloc,
     act: (bloc) => bloc.add(const AchievementsStarted()),
     verify: (_) {
       expect(
-        analytics.hasEvent(AnalyticsEvents.achievementsTabImpression),
+        analytics.hasEvent(AnalyticsEvents.achievementsOpened),
         isTrue,
+        reason: 'achievementsOpened fires before the RPC on first load',
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementsTabImpression),
+        isFalse,
+        reason: 'achievementsTabImpression is owned by DashboardBloc, not here',
       );
       expect(
         analytics.hasEvent(AnalyticsEvents.achievementsListViewed),
@@ -373,6 +379,40 @@ void main() {
       );
       expect(params?[AnalyticsParams.filterStatus], 'locked');
       expect(params?[AnalyticsParams.activeFilterCount], 1);
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'filter_status uses snake_case: inProgress maps to in_progress',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) => bloc.add(
+      const AchievementsFilterToggled(AchievementListItemStatus.inProgress),
+    ),
+    verify: (_) {
+      final params = analytics.parametersFor(
+        AnalyticsEvents.achievementsFilterApplied,
+      );
+      expect(
+        params?[AnalyticsParams.filterStatus],
+        'in_progress',
+        reason: 'enum.name gives inProgress; contract requires in_progress',
+      );
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'filter_status uses snake_case: completed maps to completed',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) => bloc.add(
+      const AchievementsFilterToggled(AchievementListItemStatus.completed),
+    ),
+    verify: (_) {
+      final params = analytics.parametersFor(
+        AnalyticsEvents.achievementsFilterApplied,
+      );
+      expect(params?[AnalyticsParams.filterStatus], 'completed');
     },
   );
 
