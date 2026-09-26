@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievement_list_item.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_body.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_event.dart';
@@ -34,6 +35,10 @@ class _AchievementsViewState extends State<_AchievementsView>
     context.read<AchievementsBloc>().add(const AchievementsStarted());
   }
 
+  void _onFilterToggled(AchievementListItemStatus status) {
+    context.read<AchievementsBloc>().add(AchievementsFilterToggled(status));
+  }
+
   Future<void> _onRefresh() async {
     final bloc = context.read<AchievementsBloc>();
     final done = bloc.stream.firstWhere(
@@ -60,6 +65,7 @@ class _AchievementsViewState extends State<_AchievementsView>
         return AchievementsBody(
           state: state,
           onRetry: _reload,
+          onFilterToggled: _onFilterToggled,
           onRefresh: _onRefresh,
         );
       },

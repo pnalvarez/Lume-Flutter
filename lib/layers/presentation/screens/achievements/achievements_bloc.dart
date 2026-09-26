@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/layers/domain/usecases/get_achievements.dart';
+import 'package:lume/layers/presentation/screens/achievements/achievement_list_item.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_event.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_state.dart';
 
@@ -10,6 +11,7 @@ final class AchievementsBloc
     extends Bloc<AchievementsEvent, AchievementsState> {
   AchievementsBloc(this._getAchievements) : super(const AchievementsState()) {
     on<AchievementsStarted>(_onStarted);
+    on<AchievementsFilterToggled>(_onFilterToggled);
   }
 
   final IGetAchievements _getAchievements;
@@ -19,6 +21,7 @@ final class AchievementsBloc
     Emitter<AchievementsState> emit,
   ) async {
     final keepItems = state.items.isNotEmpty;
+    final filters = state.selectedStatusFilters;
     if (keepItems) {
       emit(state.copyWith(isRefreshing: true, clearError: true));
     } else {
@@ -33,7 +36,12 @@ final class AchievementsBloc
 
     try {
       final achievements = await _getAchievements();
-      emit(AchievementsState.fromDomain(achievements));
+      emit(
+        AchievementsState.fromDomain(
+          achievements,
+          selectedStatusFilters: filters,
+        ),
+      );
     } on Object {
       if (keepItems) {
         emit(
@@ -53,5 +61,16 @@ final class AchievementsBloc
         );
       }
     }
+  }
+
+  void _onFilterToggled(
+    AchievementsFilterToggled event,
+    Emitter<AchievementsState> emit,
+  ) {
+    final next = Set<AchievementListItemStatus>.of(state.selectedStatusFilters);
+    if (!next.add(event.status)) {
+      next.remove(event.status);
+    }
+    emit(state.copyWith(selectedStatusFilters: next));
   }
 }

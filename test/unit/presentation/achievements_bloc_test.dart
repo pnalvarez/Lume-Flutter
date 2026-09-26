@@ -191,4 +191,81 @@ void main() {
           .having((s) => s.items, 'items', hasLength(3)),
     ],
   );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'toggles status filters as multi-select',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) {
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.completed),
+      );
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+    },
+    expect: () => [
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.locked},
+      ),
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.locked, AchievementListItemStatus.completed},
+      ),
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.completed},
+      ),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'visibleItems respects selected status filters',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {AchievementListItemStatus.locked},
+    ),
+    verify: (bloc) {
+      expect(bloc.state.visibleItems, hasLength(1));
+      expect(
+        bloc.state.visibleItems.single.status,
+        AchievementListItemStatus.locked,
+      );
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'reload preserves selected status filters',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {
+        AchievementListItemStatus.completed,
+        AchievementListItemStatus.inProgress,
+      },
+    ),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>()
+          .having((s) => s.isRefreshing, 'refreshing', isTrue)
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.completed,
+            AchievementListItemStatus.inProgress,
+          }),
+      isA<AchievementsState>()
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.completed,
+            AchievementListItemStatus.inProgress,
+          }),
+    ],
+  );
 }

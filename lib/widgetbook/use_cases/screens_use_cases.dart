@@ -566,6 +566,63 @@ Widget achievementsReady(BuildContext context) {
       items: _sampleAchievements,
     ),
     onRetry: _noop,
+    onFilterToggled: (_) {},
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Filters — completed + locked',
+  type: AchievementsBody,
+)
+Widget achievementsFiltersMulti(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: _sampleAchievements,
+      selectedStatusFilters: {
+        AchievementListItemStatus.completed,
+        AchievementListItemStatus.locked,
+      },
+    ),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Filters — empty match',
+  type: AchievementsBody,
+)
+Widget achievementsFiltersEmpty(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: [
+        AchievementListItemUi(
+          id: '1',
+          title: 'Arcade 50',
+          description: 'Alcance 50 pontos em uma partida no Arcade.',
+          status: AchievementListItemStatus.locked,
+          progress: 0,
+          target: 50,
+        ),
+        AchievementListItemUi(
+          id: '2',
+          title: 'Explorador',
+          description: 'Complete 5 submódulos na trilha.',
+          status: AchievementListItemStatus.inProgress,
+          progress: 3,
+          target: 5,
+        ),
+      ],
+      selectedStatusFilters: {AchievementListItemStatus.completed},
+    ),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
     onRefresh: () async {},
   );
 }
@@ -576,7 +633,11 @@ Widget achievementsReady(BuildContext context) {
   type: AchievementsBody,
 )
 Widget achievementsLoading(BuildContext context) {
-  return AchievementsBody(state: const AchievementsState(), onRetry: _noop);
+  return AchievementsBody(
+    state: const AchievementsState(),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
+  );
 }
 
 @widgetbook.UseCase(
@@ -588,6 +649,7 @@ Widget achievementsEmpty(BuildContext context) {
   return AchievementsBody(
     state: const AchievementsState(status: AchievementsStatus.ready),
     onRetry: _noop,
+    onFilterToggled: (_) {},
     onRefresh: () async {},
   );
 }
@@ -604,6 +666,7 @@ Widget achievementsError(BuildContext context) {
       errorMessage: achievementsLoadError,
     ),
     onRetry: _noop,
+    onFilterToggled: (_) {},
   );
 }
 
@@ -620,6 +683,7 @@ Widget achievementsInlineError(BuildContext context) {
       errorMessage: achievementsLoadError,
     ),
     onRetry: _noop,
+    onFilterToggled: (_) {},
     onRefresh: () async {},
   );
 }
