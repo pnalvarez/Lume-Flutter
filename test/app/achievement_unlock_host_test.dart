@@ -6,16 +6,19 @@ import 'package:lume/app/achievement_unlock_host.dart';
 import 'package:lume/app/app_root_overlay.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/common/strings/xp_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_unlock_domain.dart';
 import 'package:lume/layers/presentation/shared/xp_snack_bar.dart';
 import 'package:lume_design_system/organisms/feedback/lume_snack_bar.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
+import '../helpers/fake_analytics.dart';
 
 Widget _shell({
   required Stream<AchievementUnlockDomain> events,
   required StreamController<void> authChanges,
   required String? Function() authUserId,
   required GlobalKey<NavigatorState> navigatorKey,
+  IAnalytics? analytics,
   Duration toastDuration = const Duration(milliseconds: 50),
   Widget home = const Scaffold(body: Text('home')),
 }) {
@@ -29,6 +32,7 @@ Widget _shell({
           events: events,
           authSessionChanges: authChanges.stream,
           authUserId: authUserId,
+          analytics: analytics ?? const NoOpAnalytics(),
           toastDuration: toastDuration,
           child: child ?? const SizedBox.shrink(),
         ),
@@ -410,4 +414,115 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 200));
   });
+
+  testWidgets(
+    'fires achievement_unlock_received on enqueue and achievement_unlock_shown on display',
+    (tester) async {
+      final events = StreamController<AchievementUnlockDomain>.broadcast();
+      final authChanges = StreamController<void>.broadcast();
+      addTearDown(events.close);
+      addTearDown(authChanges.close);
+      final navigatorKey = GlobalKey<NavigatorState>();
+      final analytics = FakeAnalytics();
+      const toastDuration = Duration(milliseconds: 50);
+      String? userId = 'user-1';
+
+      await tester.pumpWidget(
+        _shell(
+          events: events.stream,
+          authChanges: authChanges,
+          authUserId: () => userId,
+          navigatorKey: navigatorKey,
+          analytics: analytics,
+          toastDuration: toastDuration,
+        ),
+      );
+      await tester.pump();
+
+      events.add(
+        const AchievementUnlockDomain(
+          achievementId: 'ach-1',
+          code: 'first_step',
+          name: 'Primeiro passo',
+        ),
+      );
+      // _enqueue fires synchronously on stream delivery
+      await tester.pump();
+
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementUnlockReceived),
+        isTrue,
+        reason: 'received fires when payload arrives, before toast is shown',
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.achievementUnlockReceived,
+        )?[AnalyticsParams.achievementId],
+        'ach-1',
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.achievementUnlockReceived,
+        )?[AnalyticsParams.achievementCode],
+        'first_step',
+      );
+
+      // Let the overlay build so _present() runs
+      await tester.pump();
+
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementUnlockShown),
+        isTrue,
+        reason: 'shown fires only after the overlay entry is inserted',
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.achievementUnlockShown,
+        )?[AnalyticsParams.achievementId],
+        'ach-1',
+      );
+
+      await tester.pump(toastDuration);
+      await tester.pump();
+    },
+  );
+
+  testWidgets(
+    'achievement_unlock_received fires even when overlay is not ready',
+    (tester) async {
+      final events = StreamController<AchievementUnlockDomain>.broadcast();
+      final authChanges = StreamController<void>.broadcast();
+      addTearDown(events.close);
+      addTearDown(authChanges.close);
+      final navigatorKey = GlobalKey<NavigatorState>();
+      final analytics = FakeAnalytics();
+      String? userId = 'user-1';
+
+      // Pump before any frames so the overlay may not be available yet
+      await tester.pumpWidget(
+        _shell(
+          events: events.stream,
+          authChanges: authChanges,
+          authUserId: () => userId,
+          navigatorKey: navigatorKey,
+          analytics: analytics,
+        ),
+      );
+
+      events.add(
+        const AchievementUnlockDomain(
+          achievementId: 'ach-2',
+          code: 'explorer',
+          name: 'Explorador',
+        ),
+      );
+      await tester.pump();
+
+      // received must always fire when the payload lands (funnel entry point)
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementUnlockReceived),
+        isTrue,
+      );
+    },
+  );
 }

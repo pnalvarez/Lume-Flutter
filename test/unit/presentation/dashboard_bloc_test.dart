@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/core/remote_config/remote_config_keys.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
@@ -48,6 +49,9 @@ class _RemoteConfig implements IRemoteConfig {
 }
 
 void main() {
+  FakeAnalytics? dashboardAnalytics;
+
+  setUp(() => dashboardAnalytics = null);
   test('initial state hides achievements when flag is off', () {
     final bloc = DashboardBloc(_SignOut(), FakeAnalytics(), _RemoteConfig());
     expect(bloc.state.showAchievements, isFalse);
@@ -103,5 +107,45 @@ void main() {
       const DashboardState(isSigningOut: true, showAchievements: true),
       const DashboardState(goToLogin: true, showAchievements: true),
     ],
+  );
+
+  blocTest<DashboardBloc, DashboardState>(
+    'DashboardStarted fires achievementsTabImpression when achievements enabled',
+    build: () {
+      final analytics = FakeAnalytics();
+      dashboardAnalytics = analytics;
+      return DashboardBloc(
+        _SignOut(),
+        analytics,
+        _RemoteConfig(achievements: true),
+      );
+    },
+    act: (bloc) => bloc.add(const DashboardStarted()),
+    verify: (_) {
+      expect(
+        dashboardAnalytics!.hasEvent(AnalyticsEvents.achievementsTabImpression),
+        isTrue,
+      );
+      final params = dashboardAnalytics!.parametersFor(
+        AnalyticsEvents.achievementsTabImpression,
+      );
+      expect(params?[AnalyticsParams.achievementsEnabled], isTrue);
+    },
+  );
+
+  blocTest<DashboardBloc, DashboardState>(
+    'DashboardStarted does not fire achievementsTabImpression when flag is off',
+    build: () {
+      final analytics = FakeAnalytics();
+      dashboardAnalytics = analytics;
+      return DashboardBloc(_SignOut(), analytics, _RemoteConfig());
+    },
+    act: (bloc) => bloc.add(const DashboardStarted()),
+    verify: (_) {
+      expect(
+        dashboardAnalytics!.hasEvent(AnalyticsEvents.achievementsTabImpression),
+        isFalse,
+      );
+    },
   );
 }

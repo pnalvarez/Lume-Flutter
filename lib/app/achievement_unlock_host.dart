@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_unlock_domain.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
@@ -23,6 +24,7 @@ class AchievementUnlockHost extends StatefulWidget {
     required this.events,
     required this.authSessionChanges,
     required this.authUserId,
+    required this.analytics,
     required this.child,
     this.toastDuration = const Duration(seconds: 4),
   });
@@ -35,6 +37,9 @@ class AchievementUnlockHost extends StatefulWidget {
 
   /// Current signed-in user id, or null when signed out.
   final String? Function() authUserId;
+
+  /// Analytics client for unlock funnel events.
+  final IAnalytics analytics;
 
   final Widget child;
 
@@ -104,6 +109,14 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
   void _enqueue(AchievementUnlockDomain event) {
     if (widget.authUserId() == null) return;
     if (event.name.trim().isEmpty) return;
+    // Fire-and-forget: payload received before any UI decision.
+    widget.analytics.logEvent(
+      AnalyticsEvents.achievementUnlockReceived,
+      parameters: {
+        AnalyticsParams.achievementId: event.achievementId,
+        AnalyticsParams.achievementCode: event.code,
+      },
+    );
     _pending.add(event);
     unawaited(_drain());
   }
@@ -183,6 +196,14 @@ class _AchievementUnlockHostState extends State<AchievementUnlockHost> {
     );
     _toastEntry = entry;
     overlay.insert(entry);
+    // Fire-and-forget: toast is in the overlay — funnel step confirmed.
+    widget.analytics.logEvent(
+      AnalyticsEvents.achievementUnlockShown,
+      parameters: {
+        AnalyticsParams.achievementId: event.achievementId,
+        AnalyticsParams.achievementCode: event.code,
+      },
+    );
     return true;
   }
 

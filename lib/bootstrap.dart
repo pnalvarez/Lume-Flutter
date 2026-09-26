@@ -42,6 +42,7 @@ Future<void> bootstrap() async {
         achievementUnlockEvents: getIt<IWatchAchievementUnlocks>()(),
         authSessionChanges: authSession.changes,
         authUserId: () => authSession.userId,
+        analytics: AnalyticsService.client,
       ),
     );
   }, CrashReporting.onZoneError);

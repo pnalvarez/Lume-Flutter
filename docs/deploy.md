@@ -179,6 +179,13 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 | `onboarding_category_selected` | Onboarding categories saved |
 | `submodule_session_started` / `completed` / `abandoned` | Trail submodule session |
 | `game_round_started` / `game_session_completed` / `game_session_abandoned` | Games play sequence |
+| `achievements_tab_impression` | Achievements tab first becomes visible (exposure; includes `achievements_enabled`) — fired by `DashboardBloc` on mount |
+| `achievements_opened` | User opens / navigates to the Achievements tab for the first time in a session (primary A/B goal; includes `achievements_enabled`) — fired before the RPC |
+| `achievements_list_viewed` | Achievements list renders successfully (includes `locked_count`, `in_progress_count`, `completed_count`) |
+| `achievements_filter_applied` | User toggles a status chip (on or off; includes `filter_status` (`locked`/`in_progress`/`completed`), `active_filter_count`, `visible_count`) |
+| `achievements_filter_cleared` | User taps "Limpar filtros" to reset all chips (includes `previous_filter_count`) |
+| `achievement_unlock_received` | Unlock payload received from Realtime host (includes `achievement_id`, `achievement_code`) |
+| `achievement_unlock_shown` | Unlock snackbar shown to user (includes `achievement_id`, `achievement_code`) |
 
 Shared parameter keys live in `AnalyticsParams` (`play_mode`, `game_type`, `trail_id`, `submodule_id`, `pair_id`, `score_pct`, `error_code`, …). No PII.
 
@@ -195,6 +202,20 @@ Shared parameter keys live in `AnalyticsParams` (`play_mode`, `game_type`, `trai
 7. Start the experiment and publish Remote Config when prompted
 
 Until an experiment is running, `arcade_enabled` is controlled by Remote Config defaults/conditions only.
+
+**Create the Achievements A/B experiment** (console — not available via public API):
+
+1. Open [A/B Testing](https://console.firebase.google.com/project/lume-51a38/abtesting)
+2. **Create experiment** → **Remote Config**
+3. Parameter: `achievements_enabled`
+4. Variants (example 50/50):
+   - Control: `false`
+   - Treatment: `true`
+5. Primary goal: custom event `achievements_opened` (maximize unique users)
+6. Optional secondary: `achievement_unlock_shown` (does enabling Achievements increase unlock celebrations?)
+7. Start the experiment and publish Remote Config when prompted
+
+Until an experiment is running, `achievements_enabled` is controlled by Remote Config defaults/conditions only.
 
 ### iOS / TestFlight
 

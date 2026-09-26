@@ -100,9 +100,7 @@ final class PersonalInfoBloc
         age: age,
       );
       if (!state.isSettingsEntry) {
-        await _analytics.logEvent(
-          AnalyticsEvents.onboardingPersonalInfoCompleted,
-        );
+        _analytics.logEvent(AnalyticsEvents.onboardingPersonalInfoCompleted);
       }
       emit(
         state.copyWith(

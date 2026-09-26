@@ -17,3 +17,8 @@ final class AchievementsFilterToggled extends AchievementsEvent {
 
   final AchievementListItemStatus status;
 }
+
+/// Clears all active status filter chips (fired by "Limpar filtros").
+final class AchievementsFilterCleared extends AchievementsEvent {
+  const AchievementsFilterCleared();
+}

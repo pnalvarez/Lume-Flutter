@@ -90,10 +90,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     if (first != null) {
       params[AnalyticsParams.gameType] = first.game.gameType.wireValue;
     }
-    await _analytics.logEvent(
-      AnalyticsEvents.gameRoundStarted,
-      parameters: params,
-    );
+    _analytics.logEvent(AnalyticsEvents.gameRoundStarted, parameters: params);
     emit(
       GamesState.initial(
         rounds: event.rounds,
@@ -358,7 +355,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           clearXpAwardedToShow: xpAwarded <= 0,
         ),
       );
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.gameSessionCompleted,
         parameters: {
           AnalyticsParams.playMode: _mode.name,
@@ -492,7 +489,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     );
 
     if (abandoned) return;
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.gameSessionCompleted,
       parameters: {
         AnalyticsParams.playMode: _mode.name,
@@ -508,7 +505,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   ) async {
     // Leaving an arcade run is a valid ending: show the score instead of popping.
     if (_isArcade) {
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.arcadeAbandoned,
         parameters: {
           AnalyticsParams.score: state.arcade.scoredCount,
@@ -520,7 +517,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
       return;
     }
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.gameSessionAbandoned,
       parameters: {
         AnalyticsParams.playMode: _mode.name,

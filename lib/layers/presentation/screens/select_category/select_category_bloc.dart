@@ -101,7 +101,7 @@ final class SelectCategoryBloc
       await _saveCategoryPreferences(categoryIds: categoryIds);
       if (!state.isProfileEntry) {
         final sortedIds = [...categoryIds]..sort();
-        await _analytics.logEvent(
+        _analytics.logEvent(
           AnalyticsEvents.onboardingCategorySelected,
           parameters: {AnalyticsParams.categoryId: sortedIds.join(',')},
         );

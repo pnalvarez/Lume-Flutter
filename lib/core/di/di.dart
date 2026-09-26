@@ -93,7 +93,11 @@ void _registerAchievementsBloc() {
     getIt.unregister<AchievementsBloc>();
   }
   getIt.registerFactory<AchievementsBloc>(
-    () => AchievementsBloc(getIt<IGetAchievements>()),
+    () => AchievementsBloc(
+      getIt<IGetAchievements>(),
+      getIt<IAnalytics>(),
+      getIt<IRemoteConfig>(),
+    ),
   );
 }
 
