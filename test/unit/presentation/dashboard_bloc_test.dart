@@ -49,9 +49,9 @@ class _RemoteConfig implements IRemoteConfig {
 }
 
 void main() {
-  FakeAnalytics? _dashboardAnalytics;
+  FakeAnalytics? dashboardAnalytics;
 
-  setUp(() => _dashboardAnalytics = null);
+  setUp(() => dashboardAnalytics = null);
   test('initial state hides achievements when flag is off', () {
     final bloc = DashboardBloc(_SignOut(), FakeAnalytics(), _RemoteConfig());
     expect(bloc.state.showAchievements, isFalse);
@@ -113,7 +113,7 @@ void main() {
     'DashboardStarted fires achievementsTabImpression when achievements enabled',
     build: () {
       final analytics = FakeAnalytics();
-      _dashboardAnalytics = analytics;
+      dashboardAnalytics = analytics;
       return DashboardBloc(
         _SignOut(),
         analytics,
@@ -123,12 +123,10 @@ void main() {
     act: (bloc) => bloc.add(const DashboardStarted()),
     verify: (_) {
       expect(
-        _dashboardAnalytics!.hasEvent(
-          AnalyticsEvents.achievementsTabImpression,
-        ),
+        dashboardAnalytics!.hasEvent(AnalyticsEvents.achievementsTabImpression),
         isTrue,
       );
-      final params = _dashboardAnalytics!.parametersFor(
+      final params = dashboardAnalytics!.parametersFor(
         AnalyticsEvents.achievementsTabImpression,
       );
       expect(params?[AnalyticsParams.achievementsEnabled], isTrue);
@@ -139,15 +137,13 @@ void main() {
     'DashboardStarted does not fire achievementsTabImpression when flag is off',
     build: () {
       final analytics = FakeAnalytics();
-      _dashboardAnalytics = analytics;
+      dashboardAnalytics = analytics;
       return DashboardBloc(_SignOut(), analytics, _RemoteConfig());
     },
     act: (bloc) => bloc.add(const DashboardStarted()),
     verify: (_) {
       expect(
-        _dashboardAnalytics!.hasEvent(
-          AnalyticsEvents.achievementsTabImpression,
-        ),
+        dashboardAnalytics!.hasEvent(AnalyticsEvents.achievementsTabImpression),
         isFalse,
       );
     },

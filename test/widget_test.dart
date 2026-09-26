@@ -7,6 +7,7 @@ import 'package:lume/app/navigation/app_router.dart';
 import 'package:lume/app/navigation/auth_guard.dart';
 import 'package:lume/app/navigation/recovery_guard.dart';
 import 'package:lume/common/strings/auth_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
@@ -81,6 +82,7 @@ void main() {
         achievementUnlockEvents: const Stream<Never>.empty(),
         authSessionChanges: const Stream<Never>.empty(),
         authUserId: () => null,
+        analytics: const NoOpAnalytics(),
       ),
     );
     await tester.pump();
