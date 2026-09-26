@@ -629,6 +629,34 @@ Widget achievementsFiltersEmpty(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Achievements',
+  name: 'Filters — empty match + inline error',
+  type: AchievementsBody,
+)
+Widget achievementsFiltersEmptyWithError(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: [
+        AchievementListItemUi(
+          id: '1',
+          title: 'Arcade 50',
+          description: 'Alcance 50 pontos em uma partida no Arcade.',
+          status: AchievementListItemStatus.locked,
+          progress: 0,
+          target: 50,
+        ),
+      ],
+      selectedStatusFilters: {AchievementListItemStatus.completed},
+      errorMessage: achievementsLoadError,
+    ),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
   name: 'Loading',
   type: AchievementsBody,
 )

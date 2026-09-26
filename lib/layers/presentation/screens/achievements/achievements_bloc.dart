@@ -21,7 +21,6 @@ final class AchievementsBloc
     Emitter<AchievementsState> emit,
   ) async {
     final keepItems = state.items.isNotEmpty;
-    final filters = state.selectedStatusFilters;
     if (keepItems) {
       emit(state.copyWith(isRefreshing: true, clearError: true));
     } else {
@@ -36,10 +35,12 @@ final class AchievementsBloc
 
     try {
       final achievements = await _getAchievements();
+      // Read selectedStatusFilters from state *after* the await so any
+      // AchievementsFilterToggled that arrived during the RPC is preserved.
       emit(
         AchievementsState.fromDomain(
           achievements,
-          selectedStatusFilters: filters,
+          selectedStatusFilters: state.selectedStatusFilters,
         ),
       );
     } on Object {

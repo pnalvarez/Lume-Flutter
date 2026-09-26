@@ -268,4 +268,46 @@ void main() {
           }),
     ],
   );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'filter toggled during reload is not overwritten by fromDomain emit',
+    // Toggle before the reload: proves fromDomain reads state.selectedStatusFilters
+    // at emit time, not a snapshot captured before the RPC.
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {AchievementListItemStatus.inProgress},
+    ),
+    act: (bloc) {
+      // Toggle to a new set, then reload — the reload must see the new set.
+      bloc.add(
+        const AchievementsFilterToggled(AchievementListItemStatus.locked),
+      );
+      bloc.add(const AchievementsStarted());
+    },
+    expect: () => [
+      // toggle adds locked
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters after toggle',
+        {
+          AchievementListItemStatus.inProgress,
+          AchievementListItemStatus.locked,
+        },
+      ),
+      // refreshing intermediate
+      isA<AchievementsState>().having(
+        (s) => s.isRefreshing,
+        'refreshing',
+        isTrue,
+      ),
+      // fromDomain must preserve the post-toggle set
+      isA<AchievementsState>()
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having((s) => s.selectedStatusFilters, 'filters after reload', {
+            AchievementListItemStatus.inProgress,
+            AchievementListItemStatus.locked,
+          }),
+    ],
+  );
 }

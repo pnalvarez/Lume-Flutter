@@ -10,6 +10,7 @@ const String achievementsRetry = 'Tentar novamente';
 const String achievementsEmpty = 'Nenhuma conquista disponível no momento.';
 const String achievementsFilterEmpty =
     'Nenhuma conquista corresponde aos filtros selecionados.';
+const String achievementsFilterClearFilters = 'Limpar filtros';
 const String achievementsFilterCompleted = 'Concluídas';
 const String achievementsFilterInProgress = 'Em progresso';
 const String achievementsFilterLocked = 'Bloqueadas';
