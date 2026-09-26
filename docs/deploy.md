@@ -179,6 +179,12 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 | `onboarding_category_selected` | Onboarding categories saved |
 | `submodule_session_started` / `completed` / `abandoned` | Trail submodule session |
 | `game_round_started` / `game_session_completed` / `game_session_abandoned` | Games play sequence |
+| `achievements_tab_impression` | Achievements tab first becomes visible (exposure; includes `achievements_enabled`) |
+| `achievements_list_viewed` | Achievements list renders successfully (includes `locked_count`, `in_progress_count`, `completed_count`) |
+| `achievements_filter_applied` | User toggles a status chip (on or off; includes `filter_status`, `active_filter_count`, `visible_count`) |
+| `achievements_filter_cleared` | User taps "Limpar filtros" to reset all chips (includes `previous_filter_count`) |
+| `achievement_unlock_received` | Unlock payload received from Realtime host (includes `achievement_id`, `achievement_code`) — wired by #82 |
+| `achievement_unlock_shown` | Unlock snackbar shown to user (includes `achievement_id`, `achievement_code`) — wired by #81 |
 
 Shared parameter keys live in `AnalyticsParams` (`play_mode`, `game_type`, `trail_id`, `submodule_id`, `pair_id`, `score_pct`, `error_code`, …). No PII.
 

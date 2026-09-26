@@ -39,6 +39,10 @@ class _AchievementsViewState extends State<_AchievementsView>
     context.read<AchievementsBloc>().add(AchievementsFilterToggled(status));
   }
 
+  void _onClearFilters() {
+    context.read<AchievementsBloc>().add(const AchievementsFilterCleared());
+  }
+
   Future<void> _onRefresh() async {
     final bloc = context.read<AchievementsBloc>();
     final done = bloc.stream.firstWhere(
@@ -66,6 +70,7 @@ class _AchievementsViewState extends State<_AchievementsView>
           state: state,
           onRetry: _reload,
           onFilterToggled: _onFilterToggled,
+          onClearFilters: _onClearFilters,
           onRefresh: _onRefresh,
         );
       },

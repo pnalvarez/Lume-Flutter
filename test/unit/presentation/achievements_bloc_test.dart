@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_domain.dart';
 import 'package:lume/layers/domain/models/achievement/achievement_icon.dart';
 import 'package:lume/layers/domain/usecases/get_achievements.dart';
@@ -8,6 +10,7 @@ import 'package:lume/layers/presentation/screens/achievements/achievement_list_i
 import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_event.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_state.dart';
+import '../../helpers/fake_analytics.dart';
 
 class _GetAchievements implements IGetAchievements {
   List<AchievementDomain> result = const [
@@ -60,14 +63,34 @@ class _GetAchievements implements IGetAchievements {
   }
 }
 
+class _FakeRemoteConfig implements IRemoteConfig {
+  @override
+  bool get arcadeEnabled => true;
+  @override
+  bool get achievementsEnabled => true;
+  @override
+  Map<String, Object> get debugOverrides => const {};
+  @override
+  bool getBool(String key, {required bool defaultValue}) => defaultValue;
+  @override
+  String getString(String key, {required String defaultValue}) => defaultValue;
+  @override
+  Future<void> refresh() async {}
+  @override
+  void setDebugOverride(String key, Object? value) {}
+}
+
 void main() {
   late _GetAchievements getAchievements;
+  late FakeAnalytics analytics;
 
   setUp(() {
     getAchievements = _GetAchievements();
+    analytics = FakeAnalytics();
   });
 
-  AchievementsBloc buildBloc() => AchievementsBloc(getAchievements);
+  AchievementsBloc buildBloc() =>
+      AchievementsBloc(getAchievements, analytics, _FakeRemoteConfig());
 
   blocTest<AchievementsBloc, AchievementsState>(
     'loads catalog into ready state with status mapping',
@@ -309,5 +332,77 @@ void main() {
             AchievementListItemStatus.locked,
           }),
     ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'logs achievements_tab_impression and achievements_list_viewed on first load',
+    build: buildBloc,
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    verify: (_) {
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementsTabImpression),
+        isTrue,
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementsListViewed),
+        isTrue,
+      );
+      final params = analytics.parametersFor(
+        AnalyticsEvents.achievementsListViewed,
+      );
+      expect(params?[AnalyticsParams.lockedCount], 1);
+      expect(params?[AnalyticsParams.inProgressCount], 2);
+      expect(params?[AnalyticsParams.completedCount], 0);
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'logs achievements_filter_applied with correct params on toggle',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(getAchievements.result),
+    act: (bloc) => bloc.add(
+      const AchievementsFilterToggled(AchievementListItemStatus.locked),
+    ),
+    verify: (_) {
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementsFilterApplied),
+        isTrue,
+      );
+      final params = analytics.parametersFor(
+        AnalyticsEvents.achievementsFilterApplied,
+      );
+      expect(params?[AnalyticsParams.filterStatus], 'locked');
+      expect(params?[AnalyticsParams.activeFilterCount], 1);
+    },
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'logs achievements_filter_cleared with previous count on AchievementsFilterCleared',
+    build: buildBloc,
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      selectedStatusFilters: {
+        AchievementListItemStatus.locked,
+        AchievementListItemStatus.completed,
+      },
+    ),
+    act: (bloc) => bloc.add(const AchievementsFilterCleared()),
+    expect: () => [
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters cleared',
+        isEmpty,
+      ),
+    ],
+    verify: (_) {
+      expect(
+        analytics.hasEvent(AnalyticsEvents.achievementsFilterCleared),
+        isTrue,
+      );
+      final params = analytics.parametersFor(
+        AnalyticsEvents.achievementsFilterCleared,
+      );
+      expect(params?[AnalyticsParams.previousFilterCount], 2);
+    },
   );
 }

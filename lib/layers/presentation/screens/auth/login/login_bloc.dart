@@ -63,7 +63,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
     if (!state.canSubmit) return;
     final mode = state.mode.name;
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.loginSubmitted,
       parameters: {AnalyticsParams.mode: mode},
     );
@@ -77,7 +77,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
           password: state.password,
         );
         if (result.needsEmailConfirmation) {
-          await _analytics.logEvent(
+          _analytics.logEvent(
             AnalyticsEvents.loginSucceeded,
             parameters: {
               AnalyticsParams.mode: mode,
@@ -96,7 +96,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (userId != null) {
           await _analytics.setUserId(userId);
         }
-        await _analytics.logEvent(
+        _analytics.logEvent(
           AnalyticsEvents.loginSucceeded,
           parameters: {
             AnalyticsParams.mode: mode,
@@ -118,7 +118,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
       );
       await _analytics.setUserId(session.user.id);
       final destination = await _destinationAfterSignIn();
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.loginSucceeded,
         parameters: {
           AnalyticsParams.mode: mode,
@@ -127,7 +127,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
       );
       emit(state.copyWith(isSubmitting: false, destination: destination));
     } on AuthEmailNotConfirmedFailure {
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.loginFailed,
         parameters: {
           AnalyticsParams.mode: mode,
@@ -142,7 +142,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
         ),
       );
     } on Object catch (error) {
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.loginFailed,
         parameters: {
           AnalyticsParams.mode: mode,

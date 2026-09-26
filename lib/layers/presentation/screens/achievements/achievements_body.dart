@@ -20,12 +20,14 @@ class AchievementsBody extends StatelessWidget {
     required this.state,
     required this.onRetry,
     required this.onFilterToggled,
+    required this.onClearFilters,
     this.onRefresh,
   });
 
   final AchievementsState state;
   final VoidCallback onRetry;
   final ValueChanged<AchievementListItemStatus> onFilterToggled;
+  final VoidCallback onClearFilters;
   final Future<void> Function()? onRefresh;
 
   static const statusFilterOptions =
@@ -81,11 +83,7 @@ class AchievementsBody extends StatelessWidget {
               child: s.visibleItems.isEmpty
                   ? _AchievementsFilteredEmptyState(
                       inlineError: s.errorMessage,
-                      onClearFilters: () {
-                        for (final f in s.selectedStatusFilters.toList()) {
-                          onFilterToggled(f);
-                        }
-                      },
+                      onClearFilters: onClearFilters,
                       onRefresh: onRefresh,
                     )
                   : _AchievementsList(

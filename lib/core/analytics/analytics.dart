@@ -59,6 +59,29 @@ abstract final class AnalyticsEvents {
 
   /// Fired when the user abandons a games play sequence.
   static const gameSessionAbandoned = 'game_session_abandoned';
+
+  // ── Achievements ────────────────────────────────────────────────────────
+
+  /// Fired when the Achievements tab/route becomes visible (exposure).
+  static const achievementsTabImpression = 'achievements_tab_impression';
+
+  /// Fired when the user actively opens / navigates to the Achievements tab.
+  static const achievementsOpened = 'achievements_opened';
+
+  /// Fired when the achievements list data is rendered successfully.
+  static const achievementsListViewed = 'achievements_list_viewed';
+
+  /// Fired when the user toggles a status filter chip (on or off).
+  static const achievementsFilterApplied = 'achievements_filter_applied';
+
+  /// Fired when the user taps "Limpar filtros" to reset all filter chips.
+  static const achievementsFilterCleared = 'achievements_filter_cleared';
+
+  /// Fired when an unlock payload arrives (Realtime / host → client).
+  static const achievementUnlockReceived = 'achievement_unlock_received';
+
+  /// Fired when the unlock snackbar/toast is actually shown to the user.
+  static const achievementUnlockShown = 'achievement_unlock_shown';
 }
 
 /// Shared Analytics parameter keys (no PII).
@@ -81,6 +104,37 @@ abstract final class AnalyticsParams {
   static const score = 'score';
   static const record = 'record';
   static const arcadeEnabled = 'arcade_enabled';
+
+  // ── Achievements ────────────────────────────────────────────────────────
+
+  /// Mirror of the `achievements_enabled` Remote Config flag at event time.
+  static const achievementsEnabled = 'achievements_enabled';
+
+  /// Stable catalog achievement id (not a user id).
+  static const achievementId = 'achievement_id';
+
+  /// Catalog code, e.g. `first_submodule`.
+  static const achievementCode = 'achievement_code';
+
+  /// Achievement status: `locked` / `in_progress` / `completed`.
+  static const achievementStatus = 'status';
+
+  /// Snapshot counts on the achievements list after load.
+  static const lockedCount = 'locked_count';
+  static const inProgressCount = 'in_progress_count';
+  static const completedCount = 'completed_count';
+
+  /// The status chip that was toggled: `completed` / `in_progress` / `locked`.
+  static const filterStatus = 'filter_status';
+
+  /// Total number of chips selected after the toggle.
+  static const activeFilterCount = 'active_filter_count';
+
+  /// Items visible in the list after the filter is applied.
+  static const visibleCount = 'visible_count';
+
+  /// Chips that were active before a full filter clear.
+  static const previousFilterCount = 'previous_filter_count';
 }
 
 /// No-op client for unsupported platforms / failed install.

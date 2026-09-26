@@ -37,7 +37,7 @@ final class SubmoduleSessionBloc
     SubmoduleSessionStarted event,
     Emitter<SubmoduleSessionState> emit,
   ) async {
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.submoduleSessionStarted,
       parameters: {
         AnalyticsParams.trailId: event.trailId,
@@ -123,7 +123,7 @@ final class SubmoduleSessionBloc
     SubmoduleSessionGamesCancelled event,
     Emitter<SubmoduleSessionState> emit,
   ) async {
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.submoduleSessionAbandoned,
       parameters: {
         AnalyticsParams.trailId: state.trailId,
@@ -169,7 +169,7 @@ final class SubmoduleSessionBloc
       }
       final correctCount = state.correctCount;
       final total = state.games.length;
-      await _analytics.logEvent(
+      _analytics.logEvent(
         AnalyticsEvents.submoduleSessionCompleted,
         parameters: {
           AnalyticsParams.trailId: state.trailId,
@@ -208,7 +208,7 @@ final class SubmoduleSessionBloc
     SubmoduleSessionAbandoned event,
     Emitter<SubmoduleSessionState> emit,
   ) async {
-    await _analytics.logEvent(
+    _analytics.logEvent(
       AnalyticsEvents.submoduleSessionAbandoned,
       parameters: {
         AnalyticsParams.trailId: state.trailId,

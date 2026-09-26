@@ -567,6 +567,7 @@ Widget achievementsReady(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }
@@ -588,6 +589,7 @@ Widget achievementsFiltersMulti(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }
@@ -623,6 +625,7 @@ Widget achievementsFiltersEmpty(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }
@@ -651,6 +654,7 @@ Widget achievementsFiltersEmptyWithError(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }
@@ -665,6 +669,7 @@ Widget achievementsLoading(BuildContext context) {
     state: const AchievementsState(),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
   );
 }
 
@@ -678,6 +683,7 @@ Widget achievementsEmpty(BuildContext context) {
     state: const AchievementsState(status: AchievementsStatus.ready),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }
@@ -695,6 +701,7 @@ Widget achievementsError(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
   );
 }
 
@@ -712,6 +719,7 @@ Widget achievementsInlineError(BuildContext context) {
     ),
     onRetry: _noop,
     onFilterToggled: (_) {},
+    onClearFilters: () {},
     onRefresh: () async {},
   );
 }

@@ -58,7 +58,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         ),
       );
       if (showArcade) {
-        await _analytics.logEvent(AnalyticsEvents.arcadeCtaImpression);
+        _analytics.logEvent(AnalyticsEvents.arcadeCtaImpression);
       }
     } on Object {
       emit(
@@ -116,7 +116,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     if (!state.showArcade) return;
     if (state.isLoadingGame || state.isInitialLoading) return;
 
-    await _analytics.logEvent(AnalyticsEvents.arcadeOpened);
+    _analytics.logEvent(AnalyticsEvents.arcadeOpened);
 
     emit(state.copyWith(isLoadingGame: true, clearGameRoundError: true));
     try {
