@@ -30,6 +30,8 @@ class GamesPage extends StatelessWidget {
     this.onSaveRound,
     this.mode = GamesPlayMode.trail,
     this.arcadeRecord = 0,
+    this.matchId,
+    this.gameSlug,
   });
 
   final List<GameRound> rounds;
@@ -38,6 +40,12 @@ class GamesPage extends StatelessWidget {
 
   /// Arcade mode: personal best fetched by the hub before starting.
   final int arcadeRecord;
+
+  /// Hub mode: open match to close when the session ends.
+  final String? matchId;
+
+  /// Hub mode: catalog slug for the open match.
+  final String? gameSlug;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +57,8 @@ class GamesPage extends StatelessWidget {
             mode: mode,
             onSaveRound: onSaveRound,
             arcadeRecord: arcadeRecord,
+            matchId: matchId,
+            gameSlug: gameSlug,
           ),
         ),
       child: _GamesView(mode: mode),

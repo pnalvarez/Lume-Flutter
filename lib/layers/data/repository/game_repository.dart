@@ -1,8 +1,10 @@
 import 'package:injectable/injectable.dart';
 import 'package:lume/layers/data/datasource/game_data_source.dart';
+import 'package:lume/layers/data/mappers/finished_game_match_mapper.dart';
 import 'package:lume/layers/data/mappers/hub_game_mapper.dart';
 import 'package:lume/layers/data/mappers/hub_game_round_mapper.dart';
 import 'package:lume/layers/data/mappers/trail_mapper.dart';
+import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
 import 'package:lume/layers/domain/models/game/hub_game_round_domain.dart';
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart';
@@ -48,5 +50,30 @@ final class GameRepository implements IGameRepository {
   Future<HubGameRoundDomain> getRandomGameRound() async {
     final data = await _dataSource.fetchRandomGameRound();
     return HubGameRoundMapper.toDomain(data);
+  }
+
+  @override
+  Future<String> startGameMatch({required String gameSlug}) {
+    return _dataSource.startGameMatch(gameSlug: gameSlug);
+  }
+
+  @override
+  Future<FinishedGameMatchDomain> finishGameMatch({
+    required String matchId,
+    required int score,
+    required int correctCount,
+    required int totalQuestions,
+    int? durationSeconds,
+    Map<String, Object?>? metadata,
+  }) async {
+    final data = await _dataSource.finishGameMatch(
+      matchId: matchId,
+      score: score,
+      correctCount: correctCount,
+      totalQuestions: totalQuestions,
+      durationSeconds: durationSeconds,
+      metadata: metadata,
+    );
+    return FinishedGameMatchMapper.toDomain(data);
   }
 }

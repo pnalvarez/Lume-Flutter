@@ -12,6 +12,8 @@ final class GamesHubState {
     this.initialErrorMessage,
     this.gameRoundErrorMessage,
     this.openPlayRounds,
+    this.openMatchId,
+    this.openGameSlug,
     this.openArcadeRounds,
     this.arcadeRecord = 0,
     this.showArcade = false,
@@ -29,6 +31,12 @@ final class GamesHubState {
 
   /// Set after a successful round fetch; cleared when navigation is handled.
   final List<GameRound>? openPlayRounds;
+
+  /// Open `game_matches` id for [openPlayRounds]. Cleared with the rounds.
+  final String? openMatchId;
+
+  /// Catalog slug for [openPlayRounds], such as `leilao_dicas`.
+  final String? openGameSlug;
 
   /// Set after the arcade record and opening round load; cleared on navigation.
   final List<GameRound>? openArcadeRounds;
@@ -56,6 +64,8 @@ final class GamesHubState {
     String? initialErrorMessage,
     String? gameRoundErrorMessage,
     List<GameRound>? openPlayRounds,
+    String? openMatchId,
+    String? openGameSlug,
     List<GameRound>? openArcadeRounds,
     int? arcadeRecord,
     bool? showArcade,
@@ -77,6 +87,10 @@ final class GamesHubState {
       openPlayRounds: clearOpenPlayRounds
           ? null
           : openPlayRounds ?? this.openPlayRounds,
+      openMatchId: clearOpenPlayRounds ? null : openMatchId ?? this.openMatchId,
+      openGameSlug: clearOpenPlayRounds
+          ? null
+          : openGameSlug ?? this.openGameSlug,
       openArcadeRounds: clearOpenArcadeRounds
           ? null
           : openArcadeRounds ?? this.openArcadeRounds,
@@ -94,6 +108,8 @@ final class GamesHubState {
       other.initialErrorMessage == initialErrorMessage &&
       other.gameRoundErrorMessage == gameRoundErrorMessage &&
       listEquals(other.openPlayRounds, openPlayRounds) &&
+      other.openMatchId == openMatchId &&
+      other.openGameSlug == openGameSlug &&
       listEquals(other.openArcadeRounds, openArcadeRounds) &&
       other.arcadeRecord == arcadeRecord &&
       other.showArcade == showArcade;
@@ -106,6 +122,8 @@ final class GamesHubState {
     initialErrorMessage,
     gameRoundErrorMessage,
     openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
+    openMatchId,
+    openGameSlug,
     openArcadeRounds == null ? null : Object.hashAll(openArcadeRounds!),
     arcadeRecord,
     showArcade,

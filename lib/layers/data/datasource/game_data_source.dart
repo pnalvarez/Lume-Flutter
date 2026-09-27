@@ -1,9 +1,11 @@
 import 'package:injectable/injectable.dart';
+import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/network/api_client.dart';
 import 'package:lume/core/storage/cache_keys.dart';
 import 'package:lume/core/storage/storage_client.dart';
 import 'package:lume/core/storage/storage_json.dart';
 import 'package:lume/layers/data/json_map.dart';
+import 'package:lume/layers/data/models/finished_game_match_data.dart';
 import 'package:lume/layers/data/models/game_data.dart';
 import 'package:lume/layers/data/models/hub_game_data.dart';
 import 'package:lume/layers/data/models/hub_game_round_data.dart';
@@ -23,14 +25,26 @@ abstract interface class IGameDataSource {
   });
 
   Future<HubGameRoundData> fetchRandomGameRound();
+
+  Future<String> startGameMatch({required String gameSlug});
+
+  Future<FinishedGameMatchData> finishGameMatch({
+    required String matchId,
+    required int score,
+    required int correctCount,
+    required int totalQuestions,
+    int? durationSeconds,
+    Map<String, Object?>? metadata,
+  });
 }
 
 @Injectable(as: IGameDataSource)
 final class GameDataSource implements IGameDataSource {
-  GameDataSource(this._apiClient, this._storage);
+  GameDataSource(this._apiClient, this._storage, this._session);
 
   final IApiClient _apiClient;
   final IStorageClient _storage;
+  final IAuthSessionProvider _session;
 
   @override
   Future<SubmoduleGamesData> fetchSubmoduleGames({
@@ -86,5 +100,57 @@ final class GameDataSource implements IGameDataSource {
       'get_random_game_round',
     );
     return HubGameRoundData.fromJson(asJsonMap(raw));
+  }
+
+  @override
+  Future<String> startGameMatch({required String gameSlug}) async {
+    final raw = await _apiClient.rpc<Object>(
+      'start_game_match',
+      params: {'p_user_id': _requireUserId(), 'p_game_slug': gameSlug},
+    );
+    if (raw is! String || raw.isEmpty) {
+      throw FormatException(
+        'start_game_match returned no match id (${raw.runtimeType})',
+      );
+    }
+    return raw;
+  }
+
+  @override
+  Future<FinishedGameMatchData> finishGameMatch({
+    required String matchId,
+    required int score,
+    required int correctCount,
+    required int totalQuestions,
+    int? durationSeconds,
+    Map<String, Object?>? metadata,
+  }) async {
+    final params = <String, Object?>{
+      'p_user_id': _requireUserId(),
+      'p_match_id': matchId,
+      'p_score': score,
+      'p_correct_count': correctCount,
+      'p_total_questions': totalQuestions,
+      'p_duration_seconds': durationSeconds,
+    };
+    if (metadata != null) {
+      params['p_metadata'] = metadata;
+    }
+    final raw = await _apiClient.rpc<Map<String, dynamic>>(
+      'finish_game_match',
+      params: params,
+    );
+    final data = FinishedGameMatchData.fromJson(asJsonMap(raw));
+    // finish_game_match awards match XP and updates the streak on profiles.
+    await _storage.delete(CacheKeys.profile);
+    return data;
+  }
+
+  String _requireUserId() {
+    final userId = _session.userId;
+    if (userId == null || userId.isEmpty) {
+      throw StateError('game match requires a signed-in user');
+    }
+    return userId;
   }
 }

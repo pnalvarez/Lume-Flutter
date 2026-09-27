@@ -12,6 +12,7 @@ import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
+import 'package:lume/layers/domain/usecases/start_game_match.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
@@ -105,6 +106,19 @@ class _GetRandomGameRound implements IGetRandomGameRound {
   }
 }
 
+class _StartGameMatch implements IStartGameMatch {
+  String matchId = 'match-1';
+  final slugs = <String>[];
+  Object? error;
+
+  @override
+  Future<String> call({required String gameSlug}) async {
+    if (error != null) throw error!;
+    slugs.add(gameSlug);
+    return matchId;
+  }
+}
+
 class _RemoteConfig implements IRemoteConfig {
   bool arcade = true;
   bool achievements = false;
@@ -152,6 +166,7 @@ void main() {
   late _GetGameRound getGameRound;
   late _GetArcadeRecord getArcadeRecord;
   late _GetRandomGameRound getRandomGameRound;
+  late _StartGameMatch startGameMatch;
   late _RemoteConfig remoteConfig;
   late _Analytics analytics;
 
@@ -160,6 +175,7 @@ void main() {
     getGameRound = _GetGameRound();
     getArcadeRecord = _GetArcadeRecord();
     getRandomGameRound = _GetRandomGameRound();
+    startGameMatch = _StartGameMatch();
     remoteConfig = _RemoteConfig();
     analytics = _Analytics();
   });
@@ -169,6 +185,7 @@ void main() {
     getGameRound,
     getArcadeRecord,
     getRandomGameRound,
+    startGameMatch,
     remoteConfig,
     analytics,
   );
@@ -238,8 +255,13 @@ void main() {
       isA<GamesHubState>()
           .having((s) => s.isLoadingGame, 'isLoadingGame', isFalse)
           .having((s) => s.openPlayRounds, 'openPlayRounds', isNotNull)
-          .having((s) => s.openPlayRounds, 'round count', hasLength(1)),
+          .having((s) => s.openPlayRounds, 'round count', hasLength(1))
+          .having((s) => s.openMatchId, 'openMatchId', 'match-1')
+          .having((s) => s.openGameSlug, 'openGameSlug', 'quiz_relampago'),
     ],
+    verify: (_) {
+      expect(startGameMatch.slugs, ['quiz_relampago']);
+    },
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
