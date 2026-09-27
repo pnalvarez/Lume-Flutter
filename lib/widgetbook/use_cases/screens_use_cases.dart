@@ -596,6 +596,46 @@ Widget achievementsFiltersMulti(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Achievements',
+  name: 'Tabs — completed',
+  type: AchievementsBody,
+)
+Widget achievementsFiltersTabs(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: _sampleAchievements,
+      filterVariation: AchievementListFilterVariation.tabs,
+      selectedStatusFilters: {AchievementListItemStatus.completed},
+    ),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
+    onClearFilters: () {},
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
+  name: 'Selector — in progress',
+  type: AchievementsBody,
+)
+Widget achievementsFiltersSelector(BuildContext context) {
+  return AchievementsBody(
+    state: const AchievementsState(
+      status: AchievementsStatus.ready,
+      items: _sampleAchievements,
+      filterVariation: AchievementListFilterVariation.selector,
+      selectedStatusFilters: {AchievementListItemStatus.inProgress},
+    ),
+    onRetry: _noop,
+    onFilterToggled: (_) {},
+    onClearFilters: () {},
+    onRefresh: () async {},
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Achievements',
   name: 'Filters — empty match',
   type: AchievementsBody,
 )

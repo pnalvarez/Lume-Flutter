@@ -6,6 +6,31 @@ import 'package:lume/layers/presentation/screens/achievements/achievement_list_i
 
 enum AchievementsStatus { loading, ready, error }
 
+/// Remote Config layout for the Achievements status filter.
+enum AchievementListFilterVariation {
+  chips,
+  tabs,
+  selector;
+
+  /// Maps a Firebase string. Unknown values fall back to [chips].
+  static AchievementListFilterVariation parse(String raw) {
+    return switch (raw.trim().toLowerCase()) {
+      'tabs' => AchievementListFilterVariation.tabs,
+      'selector' => AchievementListFilterVariation.selector,
+      _ => AchievementListFilterVariation.chips,
+    };
+  }
+
+  bool get isExclusive => this != AchievementListFilterVariation.chips;
+}
+
+/// Display order for the three status filters.
+const achievementFilterCategories = <AchievementListItemStatus>[
+  AchievementListItemStatus.completed,
+  AchievementListItemStatus.inProgress,
+  AchievementListItemStatus.locked,
+];
+
 @immutable
 final class AchievementListItemUi {
   const AchievementListItemUi({
@@ -97,6 +122,7 @@ final class AchievementsState {
   const AchievementsState({
     this.status = AchievementsStatus.loading,
     this.items = const [],
+    this.filterVariation = AchievementListFilterVariation.chips,
     this.selectedStatusFilters = const {},
     this.isRefreshing = false,
     this.errorMessage,
@@ -104,6 +130,7 @@ final class AchievementsState {
 
   final AchievementsStatus status;
   final List<AchievementListItemUi> items;
+  final AchievementListFilterVariation filterVariation;
 
   /// Active status chips. Empty means show the full catalog.
   final Set<AchievementListItemStatus> selectedStatusFilters;
@@ -135,6 +162,8 @@ final class AchievementsState {
   factory AchievementsState.fromDomain(
     List<AchievementDomain> achievements, {
     Set<AchievementListItemStatus> selectedStatusFilters = const {},
+    AchievementListFilterVariation filterVariation =
+        AchievementListFilterVariation.chips,
   }) {
     return AchievementsState(
       status: AchievementsStatus.ready,
@@ -142,6 +171,7 @@ final class AchievementsState {
         for (final achievement in achievements)
           AchievementListItemUi.fromDomain(achievement),
       ],
+      filterVariation: filterVariation,
       selectedStatusFilters: selectedStatusFilters,
     );
   }
@@ -149,6 +179,7 @@ final class AchievementsState {
   AchievementsState copyWith({
     AchievementsStatus? status,
     List<AchievementListItemUi>? items,
+    AchievementListFilterVariation? filterVariation,
     Set<AchievementListItemStatus>? selectedStatusFilters,
     bool? isRefreshing,
     String? errorMessage,
@@ -157,6 +188,7 @@ final class AchievementsState {
     return AchievementsState(
       status: status ?? this.status,
       items: items ?? this.items,
+      filterVariation: filterVariation ?? this.filterVariation,
       selectedStatusFilters:
           selectedStatusFilters ?? this.selectedStatusFilters,
       isRefreshing: isRefreshing ?? this.isRefreshing,
@@ -168,6 +200,7 @@ final class AchievementsState {
   bool operator ==(Object other) =>
       other is AchievementsState &&
       other.status == status &&
+      other.filterVariation == filterVariation &&
       listEquals(other.items, items) &&
       setEquals(other.selectedStatusFilters, selectedStatusFilters) &&
       other.isRefreshing == isRefreshing &&
@@ -176,6 +209,7 @@ final class AchievementsState {
   @override
   int get hashCode => Object.hash(
     status,
+    filterVariation,
     Object.hashAll(items),
     Object.hashAll(selectedStatusFilters),
     isRefreshing,

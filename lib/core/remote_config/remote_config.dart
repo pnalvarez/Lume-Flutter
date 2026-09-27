@@ -13,6 +13,13 @@ abstract interface class IRemoteConfig {
   /// Whether [RemoteConfigKeys.achievementsEnabled] is on.
   bool get achievementsEnabled;
 
+  /// Achievements filter layout from
+  /// [RemoteConfigKeys.achievementsListFilterVariation].
+  ///
+  /// Valid values: `chips`, `tabs`, `selector`. Anything else is treated as
+  /// `chips` by the achievements screen.
+  String get achievementsFilterLayout;
+
   /// Boolean parameter with [defaultValue] when the key is missing.
   bool getBool(String key, {required bool defaultValue});
 
@@ -40,6 +47,8 @@ abstract final class RemoteConfigDefaults {
   static Map<String, Object> get values => {
     RemoteConfigKeys.arcadeEnabled: arcadeEnabled,
     RemoteConfigKeys.achievementsEnabled: achievementsEnabled,
+    RemoteConfigKeys.achievementsListFilterVariation:
+        achievementsListFilterVariation,
   };
 
   /// Parses a `--dart-define` bool. [fallback] when unset or unrecognized.
@@ -70,6 +79,9 @@ abstract final class RemoteConfigDefaults {
     const String.fromEnvironment('REMOTE_CONFIG_ACHIEVEMENTS_ENABLED'),
     fallback: false,
   );
+
+  /// Default for [RemoteConfigKeys.achievementsListFilterVariation].
+  static const achievementsListFilterVariation = 'chips';
 }
 
 /// Defaults-only client used on unsupported platforms or when install fails.
@@ -93,6 +105,12 @@ final class NoOpRemoteConfig implements IRemoteConfig {
   bool get achievementsEnabled => getBool(
     RemoteConfigKeys.achievementsEnabled,
     defaultValue: RemoteConfigDefaults.achievementsEnabled,
+  );
+
+  @override
+  String get achievementsFilterLayout => getString(
+    RemoteConfigKeys.achievementsListFilterVariation,
+    defaultValue: RemoteConfigDefaults.achievementsListFilterVariation,
   );
 
   @override
@@ -152,6 +170,12 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
   bool get achievementsEnabled => getBool(
     RemoteConfigKeys.achievementsEnabled,
     defaultValue: RemoteConfigDefaults.achievementsEnabled,
+  );
+
+  @override
+  String get achievementsFilterLayout => getString(
+    RemoteConfigKeys.achievementsListFilterVariation,
+    defaultValue: RemoteConfigDefaults.achievementsListFilterVariation,
   );
 
   @override

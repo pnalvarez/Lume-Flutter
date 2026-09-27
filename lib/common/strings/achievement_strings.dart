@@ -14,6 +14,7 @@ const String achievementsFilterClearFilters = 'Limpar filtros';
 const String achievementsFilterCompleted = 'Concluídas';
 const String achievementsFilterInProgress = 'Em progresso';
 const String achievementsFilterLocked = 'Bloqueadas';
+const String achievementsFilterSheetTitle = 'Filtrar conquistas';
 const String achievementsLoadingTitle = 'Carregando conquista';
 const String achievementsLoadingDescription =
     'Descrição da conquista enquanto o conteúdo carrega';

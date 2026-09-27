@@ -11,4 +11,10 @@ abstract final class RemoteConfigKeys {
   ///
   /// In-app default: `false` (ship dark until the console turns it on).
   static const achievementsEnabled = 'achievements_enabled';
+
+  /// Achievements list filter layout. Values: `chips`, `tabs`, `selector`.
+  ///
+  /// In-app default: `chips`.
+  static const achievementsListFilterVariation =
+      'achievements_list_filter_variation';
 }

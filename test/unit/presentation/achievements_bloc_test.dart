@@ -64,10 +64,16 @@ class _GetAchievements implements IGetAchievements {
 }
 
 class _FakeRemoteConfig implements IRemoteConfig {
+  _FakeRemoteConfig({this.filterLayout = 'chips'});
+
+  final String filterLayout;
+
   @override
   bool get arcadeEnabled => true;
   @override
   bool get achievementsEnabled => true;
+  @override
+  String get achievementsFilterLayout => filterLayout;
   @override
   Map<String, Object> get debugOverrides => const {};
   @override
@@ -91,6 +97,12 @@ void main() {
 
   AchievementsBloc buildBloc() =>
       AchievementsBloc(getAchievements, analytics, _FakeRemoteConfig());
+
+  AchievementsBloc buildBlocWithLayout(String layout) => AchievementsBloc(
+    getAchievements,
+    analytics,
+    _FakeRemoteConfig(filterLayout: layout),
+  );
 
   blocTest<AchievementsBloc, AchievementsState>(
     'loads catalog into ready state with status mapping',
@@ -329,6 +341,104 @@ void main() {
           .having((s) => s.status, 'status', AchievementsStatus.ready)
           .having((s) => s.selectedStatusFilters, 'filters after reload', {
             AchievementListItemStatus.inProgress,
+            AchievementListItemStatus.locked,
+          }),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'unknown filter layout falls back to chips',
+    build: () => buildBlocWithLayout('tab'),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>().having(
+        (s) => s.filterVariation,
+        'variation',
+        AchievementListFilterVariation.chips,
+      ),
+      isA<AchievementsState>()
+          .having(
+            (s) => s.filterVariation,
+            'variation',
+            AchievementListFilterVariation.chips,
+          )
+          .having((s) => s.selectedStatusFilters, 'filters', isEmpty),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'tabs layout selects the first category when none is selected',
+    build: () => buildBlocWithLayout('tabs'),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>().having(
+        (s) => s.selectedStatusFilters,
+        'filters',
+        {AchievementListItemStatus.completed},
+      ),
+      isA<AchievementsState>()
+          .having(
+            (s) => s.filterVariation,
+            'variation',
+            AchievementListFilterVariation.tabs,
+          )
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.completed,
+          }),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'selector replaces the selection instead of toggling',
+    build: () => buildBlocWithLayout('selector'),
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      filterVariation: AchievementListFilterVariation.selector,
+      selectedStatusFilters: {AchievementListItemStatus.completed},
+    ),
+    act: (bloc) => bloc.add(
+      const AchievementsFilterToggled(AchievementListItemStatus.locked),
+    ),
+    expect: () => [
+      isA<AchievementsState>()
+          .having(
+            (s) => s.filterVariation,
+            'variation',
+            AchievementListFilterVariation.selector,
+          )
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.locked,
+          }),
+    ],
+  );
+
+  blocTest<AchievementsBloc, AchievementsState>(
+    'reload keeps the tabs variation and the selected category',
+    build: () => buildBlocWithLayout('tabs'),
+    seed: () => AchievementsState.fromDomain(
+      getAchievements.result,
+      filterVariation: AchievementListFilterVariation.tabs,
+      selectedStatusFilters: {AchievementListItemStatus.locked},
+    ),
+    act: (bloc) => bloc.add(const AchievementsStarted()),
+    expect: () => [
+      isA<AchievementsState>()
+          .having(
+            (s) => s.filterVariation,
+            'variation',
+            AchievementListFilterVariation.tabs,
+          )
+          .having((s) => s.selectedStatusFilters, 'filters', {
+            AchievementListItemStatus.locked,
+          }),
+      isA<AchievementsState>()
+          .having((s) => s.status, 'status', AchievementsStatus.ready)
+          .having(
+            (s) => s.filterVariation,
+            'variation',
+            AchievementListFilterVariation.tabs,
+          )
+          .having((s) => s.selectedStatusFilters, 'filters', {
             AchievementListItemStatus.locked,
           }),
     ],

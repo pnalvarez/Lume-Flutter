@@ -27,6 +27,7 @@ void main() {
     final config = NoOpRemoteConfig();
     expect(config.arcadeEnabled, isTrue);
     expect(config.achievementsEnabled, isFalse);
+    expect(config.achievementsFilterLayout, 'chips');
     expect(
       config.getBool(RemoteConfigKeys.arcadeEnabled, defaultValue: false),
       isTrue,
