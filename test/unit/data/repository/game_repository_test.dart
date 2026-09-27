@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/layers/data/models/finished_game_match_data.dart';
 import 'package:lume/layers/data/models/game_data.dart';
 import 'package:lume/layers/data/models/hub_game_data.dart';
 import 'package:lume/layers/data/repository/game_repository.dart';
@@ -13,6 +14,7 @@ void main() {
   late GameRepository sut;
 
   setUp(() {
+    provideDummy<FinishedGameMatchData>(const FinishedGameMatchData());
     dataSource = MockIGameDataSource();
     sut = GameRepository(dataSource);
   });
@@ -73,5 +75,50 @@ void main() {
     expect(games.single.slug, 'quiz_relampago');
     expect(games.single.hubSection, HubSection.general);
     expect(games.single.colorHex, '#F5A623');
+  });
+
+  test('startGameMatch returns the match id from the data source', () async {
+    when(
+      dataSource.startGameMatch(gameSlug: 'leilao_dicas'),
+    ).thenAnswer((_) async => 'match-1');
+
+    final matchId = await sut.startGameMatch(gameSlug: 'leilao_dicas');
+
+    expect(matchId, 'match-1');
+    verify(dataSource.startGameMatch(gameSlug: 'leilao_dicas')).called(1);
+  });
+
+  test('finishGameMatch maps xp earned from the data source', () async {
+    when(
+      dataSource.finishGameMatch(
+        matchId: 'match-1',
+        score: 80,
+        correctCount: 4,
+        totalQuestions: 5,
+        durationSeconds: 12,
+        metadata: const {'zero_hint_streak': 3},
+      ),
+    ).thenAnswer((_) async => const FinishedGameMatchData(xpEarned: 9));
+
+    final result = await sut.finishGameMatch(
+      matchId: 'match-1',
+      score: 80,
+      correctCount: 4,
+      totalQuestions: 5,
+      durationSeconds: 12,
+      metadata: const {'zero_hint_streak': 3},
+    );
+
+    expect(result.xpEarned, 9);
+    verify(
+      dataSource.finishGameMatch(
+        matchId: 'match-1',
+        score: 80,
+        correctCount: 4,
+        totalQuestions: 5,
+        durationSeconds: 12,
+        metadata: const {'zero_hint_streak': 3},
+      ),
+    ).called(1);
   });
 }

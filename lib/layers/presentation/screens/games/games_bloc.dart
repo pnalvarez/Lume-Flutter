@@ -84,9 +84,21 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   DateTime? _matchStartedAt;
   var _hubMatchFinished = false;
 
-  /// Correct Leilão de Dicas answers that did not reveal an extra hint.
-  var _zeroHintCorrects = 0;
+  /// Hub round whose pair progress already succeeded. Finish retries must not
+  /// save that pair again.
+  int? _persistedRoundIndex;
+  var _persistedRoundXp = 0;
+
+  /// Running zero-hint corrects. A miss or an extra hint resets it.
+  var _zeroHintStreak = 0;
+
+  /// Longest zero-hint run in this match. Sent as `zero_hint_streak`.
+  var _zeroHintBest = 0;
   int? _leilaoRecordedIndex;
+
+  /// Set when leaving should close the match and a finish attempt failed.
+  var _leaveFinishPending = false;
+  var _leaveCorrectCount = 0;
 
   static const _leilaoDicasSlug = 'leilao_dicas';
 
@@ -99,8 +111,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     _gameSlug = event.gameSlug;
     _matchStartedAt = DateTime.now();
     _hubMatchFinished = false;
-    _zeroHintCorrects = 0;
+    _persistedRoundIndex = null;
+    _persistedRoundXp = 0;
+    _zeroHintStreak = 0;
+    _zeroHintBest = 0;
     _leilaoRecordedIndex = null;
+    _leaveFinishPending = false;
+    _leaveCorrectCount = 0;
     final first = event.rounds.isEmpty ? null : event.rounds.first;
     final params = <String, Object>{
       AnalyticsParams.playMode: event.mode.name,
@@ -319,6 +336,10 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesRetrySave event,
     Emitter<GamesState> emit,
   ) async {
+    if (_leaveFinishPending) {
+      await _finishPendingLeave(emit);
+      return;
+    }
     final scorePct = state.pendingSaveScorePct;
     if (scorePct == null) return;
     await _persistAndAdvance(emit, scorePct: scorePct);
@@ -340,17 +361,26 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     );
 
     late final int xpAwarded;
-    try {
-      xpAwarded = await _persistRound(roundId: round.id, scorePct: scorePct);
-    } on Object {
-      emit(
-        state.copyWith(
-          status: GamesStatus.error,
-          errorMessage: trailSessionSaveError,
-          pendingSaveScorePct: scorePct,
-        ),
-      );
-      return;
+    if (_mode == GamesPlayMode.hub &&
+        _persistedRoundIndex == state.currentIndex) {
+      xpAwarded = _persistedRoundXp;
+    } else {
+      try {
+        xpAwarded = await _persistRound(roundId: round.id, scorePct: scorePct);
+      } on Object {
+        emit(
+          state.copyWith(
+            status: GamesStatus.error,
+            errorMessage: trailSessionSaveError,
+            pendingSaveScorePct: scorePct,
+          ),
+        );
+        return;
+      }
+      if (_mode == GamesPlayMode.hub) {
+        _persistedRoundIndex = state.currentIndex;
+        _persistedRoundXp = xpAwarded;
+      }
     }
 
     if (_isArcade) {
@@ -565,17 +595,82 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
-    if (_mode == GamesPlayMode.hub && state.completedCount > 0) {
-      try {
-        await _finishHubMatch(
-          correctCount: state.correctCount,
-          totalQuestions: state.rounds.length,
-        );
-      } on Object {
-        // Leaving still closes the screen when the match write fails.
-      }
+    if (_shouldFinishHubOnLeave()) {
+      _leaveFinishPending = true;
+      _leaveCorrectCount = _abandonCorrectCount();
+      await _finishPendingLeave(emit);
+      return;
     }
     emit(state.copyWith(goBack: true));
+  }
+
+  /// An open hub match with a saved round, or an answer still on screen,
+  /// has to be finished. An untouched session does not.
+  bool _shouldFinishHubOnLeave() {
+    final matchId = _matchId;
+    if (_mode != GamesPlayMode.hub ||
+        matchId == null ||
+        matchId.isEmpty ||
+        _hubMatchFinished) {
+      return false;
+    }
+    if (_persistedRoundIndex == state.currentIndex) return true;
+    if (state.answered) return true;
+    return state.completedCount > 0;
+  }
+
+  int _abandonCorrectCount() {
+    var correct = state.correctCount;
+    if (_persistedRoundIndex == state.currentIndex) {
+      if (state.pendingSaveScorePct == 100) correct += 1;
+    } else if (state.answered && state.isCorrect) {
+      correct += 1;
+    }
+    return correct;
+  }
+
+  /// Saves the on-screen answer when Next never ran, then closes the match.
+  /// A failed write stays on the session so retry can finish it.
+  Future<void> _finishPendingLeave(Emitter<GamesState> emit) async {
+    final round = state.currentRound;
+    final includeCurrent =
+        _persistedRoundIndex != state.currentIndex && state.answered;
+    try {
+      if (includeCurrent && round != null) {
+        final scorePct = state.isCorrect ? 100 : 0;
+        final xpAwarded = await _persistRound(
+          roundId: round.id,
+          scorePct: scorePct,
+        );
+        _persistedRoundIndex = state.currentIndex;
+        _persistedRoundXp = xpAwarded;
+        if (_gameSlug == _leilaoDicasSlug) {
+          _recordLeilaoRound(scorePct: scorePct);
+        }
+      }
+      await _finishHubMatch(
+        correctCount: _leaveCorrectCount,
+        totalQuestions: state.rounds.length,
+      );
+    } on Object {
+      emit(
+        state.copyWith(
+          status: GamesStatus.error,
+          errorMessage: trailSessionSaveError,
+          pendingSaveScorePct: state.pendingSaveScorePct ?? 0,
+        ),
+      );
+      return;
+    }
+    _leaveFinishPending = false;
+    emit(
+      state.copyWith(
+        status: GamesStatus.ready,
+        goBack: true,
+        clearError: true,
+        clearPendingSave: true,
+      ),
+    );
   }
 
   Future<void> _finishHubMatch({
@@ -597,7 +692,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           ? null
           : durationSeconds,
       metadata: _gameSlug == _leilaoDicasSlug
-          ? {'zero_hint_streak': _zeroHintCorrects}
+          ? {'zero_hint_streak': _zeroHintBest}
           : null,
     );
     _hubMatchFinished = true;
@@ -609,15 +704,20 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   }
 
   /// The first hint is shown automatically. A hint counts as used only when
-  /// the player reveals another one. Correct answers without that reveal
-  /// feed `leilao_zero_hint_streak`.
+  /// the player reveals another one. A miss or an extra hint breaks the run.
+  /// `leilao_zero_hint_streak` is the longest run in this match.
   void _recordLeilaoRound({required int scorePct}) {
     if (state.currentGame is! WhoAmIGameDomain) return;
     if (_leilaoRecordedIndex == state.currentIndex) return;
     _leilaoRecordedIndex = state.currentIndex;
     final usedHint = state.whoAmI.hintsVisible > 1;
     if (scorePct == 100 && !usedHint) {
-      _zeroHintCorrects += 1;
+      _zeroHintStreak += 1;
+      if (_zeroHintStreak > _zeroHintBest) {
+        _zeroHintBest = _zeroHintStreak;
+      }
+    } else {
+      _zeroHintStreak = 0;
     }
   }
 

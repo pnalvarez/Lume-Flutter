@@ -124,6 +124,10 @@ class _FinishGameMatch implements IFinishGameMatch {
       >[];
   Object? error;
 
+  /// Throws this many times, then succeeds. [error] throws on every call.
+  var failuresLeft = 0;
+  var attempts = 0;
+
   @override
   Future<FinishedGameMatchDomain> call({
     required String matchId,
@@ -133,6 +137,11 @@ class _FinishGameMatch implements IFinishGameMatch {
     int? durationSeconds,
     Map<String, Object?>? metadata,
   }) async {
+    attempts++;
+    if (failuresLeft > 0) {
+      failuresLeft--;
+      throw StateError('finish failed');
+    }
     if (error != null) throw error!;
     calls.add((
       matchId: matchId,
@@ -365,6 +374,134 @@ void main() {
       },
     );
 
+    blocTest<GamesBloc, GamesState>(
+      'hub abandon after an answer but before next finishes that answer',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesAbandoned());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.goBack, isTrue);
+        expect(savePair.calls, [(pairId: 10, scorePct: 100)]);
+        expect(finish.calls, [
+          (
+            matchId: 'match-1',
+            score: 50,
+            correctCount: 1,
+            totalQuestions: 2,
+            metadata: null,
+          ),
+        ]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub finish failure then retry saves the pair once and finishes once',
+      build: () {
+        finish.failuresLeft = 1;
+        return _createGamesBloc(savePair, finishGameMatch: finish);
+      },
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '10', game: _quiz1)],
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesRetrySave());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.sequenceCompleted, isTrue);
+        expect(savePair.calls, [(pairId: 10, scorePct: 100)]);
+        expect(finish.calls, [
+          (
+            matchId: 'match-1',
+            score: 100,
+            correctCount: 1,
+            totalQuestions: 1,
+            metadata: null,
+          ),
+        ]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub finish failure then leave closes with the saved round included',
+      build: () {
+        finish.failuresLeft = 1;
+        return _createGamesBloc(savePair, finishGameMatch: finish);
+      },
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '10', game: _quiz1)],
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesAbandoned());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.goBack, isTrue);
+        expect(savePair.calls, [(pairId: 10, scorePct: 100)]);
+        expect(finish.calls, [
+          (
+            matchId: 'match-1',
+            score: 100,
+            correctCount: 1,
+            totalQuestions: 1,
+            metadata: null,
+          ),
+        ]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub finish failure then leave stays on the session when finish fails again',
+      build: () {
+        finish.error = StateError('finish failed');
+        return _createGamesBloc(savePair, finishGameMatch: finish);
+      },
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '10', game: _quiz1)],
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesAbandoned());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.goBack, isFalse);
+        expect(bloc.state.status, GamesStatus.error);
+        expect(finish.attempts, 2);
+        expect(finish.calls, isEmpty);
+      },
+    );
+
     const leilaoRounds = [
       GameRound(
         id: '20',
@@ -440,6 +577,75 @@ void main() {
         bloc.add(const GamesNextPressed());
       },
       wait: const Duration(milliseconds: 20),
+      verify: (_) {
+        expect(finish.calls.single.metadata, {'zero_hint_streak': 1});
+      },
+    );
+
+    const streakRounds = [
+      GameRound(
+        id: '20',
+        game: WhoAmIGameDomain(
+          pairId: 20,
+          sortOrder: 1,
+          header: 'Who?',
+          hints: ['one', 'two'],
+          correctAnswer: 'Ada',
+          acceptedSynonyms: [],
+          explanation: 'e',
+        ),
+      ),
+      GameRound(
+        id: '21',
+        game: WhoAmIGameDomain(
+          pairId: 21,
+          sortOrder: 2,
+          header: 'Who?',
+          hints: ['one', 'two'],
+          correctAnswer: 'Ada',
+          acceptedSynonyms: [],
+          explanation: 'e',
+        ),
+      ),
+      GameRound(
+        id: '22',
+        game: WhoAmIGameDomain(
+          pairId: 22,
+          sortOrder: 3,
+          header: 'Who?',
+          hints: ['one', 'two'],
+          correctAnswer: 'Ada',
+          acceptedSynonyms: [],
+          explanation: 'e',
+        ),
+      ),
+    ];
+
+    blocTest<GamesBloc, GamesState>(
+      'leilao zero-hint streak resets after a miss',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: streakRounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+            gameSlug: 'leilao_dicas',
+          ),
+        );
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesWhoAmIAnswerChanged('Nope'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 30),
       verify: (_) {
         expect(finish.calls.single.metadata, {'zero_hint_streak': 1});
       },

@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:lume/layers/data/datasource/game_data_source.dart';
+import 'package:lume/layers/data/mappers/finished_game_match_mapper.dart';
 import 'package:lume/layers/data/mappers/hub_game_mapper.dart';
 import 'package:lume/layers/data/mappers/hub_game_round_mapper.dart';
 import 'package:lume/layers/data/mappers/trail_mapper.dart';
@@ -73,6 +74,6 @@ final class GameRepository implements IGameRepository {
       durationSeconds: durationSeconds,
       metadata: metadata,
     );
-    return FinishedGameMatchDomain(xpEarned: data.xpEarned);
+    return FinishedGameMatchMapper.toDomain(data);
   }
 }
