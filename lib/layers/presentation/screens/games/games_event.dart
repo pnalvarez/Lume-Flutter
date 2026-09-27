@@ -12,6 +12,8 @@ final class GamesStarted extends GamesEvent {
     required this.mode,
     this.onSaveRound,
     this.arcadeRecord = 0,
+    this.matchId,
+    this.gameSlug,
   });
 
   final List<GameRound> rounds;
@@ -22,6 +24,12 @@ final class GamesStarted extends GamesEvent {
 
   /// Arcade mode: personal best fetched by the hub before starting.
   final int arcadeRecord;
+
+  /// Hub mode: open `game_matches` id from `start_game_match`.
+  final String? matchId;
+
+  /// Hub mode: catalog slug, such as `leilao_dicas`.
+  final String? gameSlug;
 }
 
 final class GamesChoiceSelected extends GamesEvent {

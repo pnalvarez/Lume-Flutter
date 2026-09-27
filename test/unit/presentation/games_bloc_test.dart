@@ -12,10 +12,12 @@ import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
 import 'package:lume/layers/domain/models/arcade/arcade_domain.dart';
+import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
+import 'package:lume/layers/domain/usecases/finish_game_match.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
@@ -109,11 +111,46 @@ class _SaveArcadeRecord implements ISaveArcadeRecord {
   }
 }
 
+class _FinishGameMatch implements IFinishGameMatch {
+  final calls =
+      <
+        ({
+          String matchId,
+          int score,
+          int correctCount,
+          int totalQuestions,
+          Map<String, Object?>? metadata,
+        })
+      >[];
+  Object? error;
+
+  @override
+  Future<FinishedGameMatchDomain> call({
+    required String matchId,
+    required int score,
+    required int correctCount,
+    required int totalQuestions,
+    int? durationSeconds,
+    Map<String, Object?>? metadata,
+  }) async {
+    if (error != null) throw error!;
+    calls.add((
+      matchId: matchId,
+      score: score,
+      correctCount: correctCount,
+      totalQuestions: totalQuestions,
+      metadata: metadata,
+    ));
+    return const FinishedGameMatchDomain(xpEarned: 12);
+  }
+}
+
 GamesBloc _createGamesBloc(
   _SavePairProgress save, {
   _GetRandomGameRound? getRandomRound,
   _SaveArcadeRound? saveArcadeRound,
   _SaveArcadeRecord? saveArcadeRecord,
+  _FinishGameMatch? finishGameMatch,
   FakeAnalytics? analytics,
 }) => GamesBloc(
   PlayLightningQuiz(),
@@ -128,6 +165,7 @@ GamesBloc _createGamesBloc(
   getRandomRound ?? _GetRandomGameRound(),
   saveArcadeRound ?? _SaveArcadeRound(),
   saveArcadeRecord ?? _SaveArcadeRecord(),
+  finishGameMatch ?? _FinishGameMatch(),
   analytics ?? FakeAnalytics(),
 );
 
@@ -135,10 +173,12 @@ void main() {
   group('GamesBloc', () {
     late List<({String roundId, int scorePct})> saves;
     late _SavePairProgress savePair;
+    late _FinishGameMatch finish;
 
     setUp(() {
       saves = [];
       savePair = _SavePairProgress();
+      finish = _FinishGameMatch();
     });
 
     const rounds = [
@@ -240,6 +280,168 @@ void main() {
         expect(savePair.calls, [(pairId: 10, scorePct: 100)]);
         expect(saves, isEmpty);
         expect(bloc.state.xpAwardedToShow, 8);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub mode finishes the match when the session completes',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesChoiceSelected('1'));
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.sequenceCompleted, isTrue);
+        expect(finish.calls, [
+          (
+            matchId: 'match-1',
+            score: 100,
+            correctCount: 2,
+            totalQuestions: 2,
+            metadata: null,
+          ),
+        ]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub abandon finishes a partial match against the full session length',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('0'));
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesAbandoned());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.goBack, isTrue);
+        expect(finish.calls, [
+          (
+            matchId: 'match-1',
+            score: 50,
+            correctCount: 1,
+            totalQuestions: 2,
+            metadata: null,
+          ),
+        ]);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'hub abandon before any answer does not finish the match',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: rounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+          ),
+        );
+        bloc.add(const GamesAbandoned());
+      },
+      wait: const Duration(milliseconds: 10),
+      verify: (_) {
+        expect(finish.calls, isEmpty);
+      },
+    );
+
+    const leilaoRounds = [
+      GameRound(
+        id: '20',
+        game: WhoAmIGameDomain(
+          pairId: 20,
+          sortOrder: 1,
+          header: 'Who?',
+          hints: ['one', 'two'],
+          correctAnswer: 'Ada',
+          acceptedSynonyms: [],
+          explanation: 'e',
+        ),
+      ),
+      GameRound(
+        id: '21',
+        game: WhoAmIGameDomain(
+          pairId: 21,
+          sortOrder: 2,
+          header: 'Who?',
+          hints: ['one', 'two'],
+          correctAnswer: 'Ada',
+          acceptedSynonyms: [],
+          explanation: 'e',
+        ),
+      ),
+    ];
+
+    blocTest<GamesBloc, GamesState>(
+      'leilao counts correct answers that did not reveal a hint',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: leilaoRounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+            gameSlug: 'leilao_dicas',
+          ),
+        );
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (_) {
+        expect(finish.calls.single.metadata, {'zero_hint_streak': 2});
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'leilao ignores a correct answer after a hint is revealed',
+      build: () => _createGamesBloc(savePair, finishGameMatch: finish),
+      act: (bloc) async {
+        bloc.add(
+          const GamesStarted(
+            rounds: leilaoRounds,
+            mode: GamesPlayMode.hub,
+            matchId: 'match-1',
+            gameSlug: 'leilao_dicas',
+          ),
+        );
+        bloc.add(const GamesWhoAmIRevealHint());
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+        await Future<void>.delayed(const Duration(milliseconds: 5));
+        bloc.add(const GamesWhoAmIAnswerChanged('Ada'));
+        bloc.add(const GamesWhoAmISubmit());
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (_) {
+        expect(finish.calls.single.metadata, {'zero_hint_streak': 1});
       },
     );
   });

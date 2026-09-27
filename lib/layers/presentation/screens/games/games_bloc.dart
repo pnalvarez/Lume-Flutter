@@ -15,6 +15,7 @@ import 'package:lume/layers/domain/usecases/games/play_mysterious_word.dart';
 import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
+import 'package:lume/layers/domain/usecases/finish_game_match.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
@@ -39,6 +40,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._getRandomGameRound,
     this._saveArcadeRound,
     this._saveArcadeRecord,
+    this._finishGameMatch,
     this._analytics,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
@@ -72,16 +74,33 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IGetRandomGameRound _getRandomGameRound;
   final ISaveArcadeRound _saveArcadeRound;
   final ISaveArcadeRecord _saveArcadeRecord;
+  final IFinishGameMatch _finishGameMatch;
   final IAnalytics _analytics;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
+  String? _matchId;
+  String? _gameSlug;
+  DateTime? _matchStartedAt;
+  var _hubMatchFinished = false;
+
+  /// Correct Leilão de Dicas answers that did not reveal an extra hint.
+  var _zeroHintCorrects = 0;
+  int? _leilaoRecordedIndex;
+
+  static const _leilaoDicasSlug = 'leilao_dicas';
 
   bool get _isArcade => _mode == GamesPlayMode.arcade;
 
   Future<void> _onStarted(GamesStarted event, Emitter<GamesState> emit) async {
     _mode = event.mode;
     _onSaveRound = event.onSaveRound;
+    _matchId = event.matchId;
+    _gameSlug = event.gameSlug;
+    _matchStartedAt = DateTime.now();
+    _hubMatchFinished = false;
+    _zeroHintCorrects = 0;
+    _leilaoRecordedIndex = null;
     final first = event.rounds.isEmpty ? null : event.rounds.first;
     final params = <String, Object>{
       AnalyticsParams.playMode: event.mode.name,
@@ -339,10 +358,31 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       return;
     }
 
+    if (_gameSlug == _leilaoDicasSlug) {
+      _recordLeilaoRound(scorePct: scorePct);
+    }
+
     final nextCorrect = state.correctCount + (scorePct == 100 ? 1 : 0);
     final nextCompleted = state.completedCount + 1;
 
     if (state.isLastRound) {
+      if (_mode == GamesPlayMode.hub) {
+        try {
+          await _finishHubMatch(
+            correctCount: nextCorrect,
+            totalQuestions: state.rounds.length,
+          );
+        } on Object {
+          emit(
+            state.copyWith(
+              status: GamesStatus.error,
+              errorMessage: trailSessionSaveError,
+              pendingSaveScorePct: scorePct,
+            ),
+          );
+          return;
+        }
+      }
       emit(
         state.copyWith(
           status: GamesStatus.ready,
@@ -525,7 +565,60 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
+    if (_mode == GamesPlayMode.hub && state.completedCount > 0) {
+      try {
+        await _finishHubMatch(
+          correctCount: state.correctCount,
+          totalQuestions: state.rounds.length,
+        );
+      } on Object {
+        // Leaving still closes the screen when the match write fails.
+      }
+    }
     emit(state.copyWith(goBack: true));
+  }
+
+  Future<void> _finishHubMatch({
+    required int correctCount,
+    required int totalQuestions,
+  }) async {
+    final matchId = _matchId;
+    if (matchId == null || matchId.isEmpty || _hubMatchFinished) return;
+    final startedAt = _matchStartedAt;
+    final durationSeconds = startedAt == null
+        ? null
+        : DateTime.now().difference(startedAt).inSeconds;
+    await _finishGameMatch(
+      matchId: matchId,
+      score: _matchScore(correctCount, totalQuestions),
+      correctCount: correctCount,
+      totalQuestions: totalQuestions,
+      durationSeconds: durationSeconds == null || durationSeconds < 0
+          ? null
+          : durationSeconds,
+      metadata: _gameSlug == _leilaoDicasSlug
+          ? {'zero_hint_streak': _zeroHintCorrects}
+          : null,
+    );
+    _hubMatchFinished = true;
+  }
+
+  static int _matchScore(int correctCount, int totalQuestions) {
+    if (totalQuestions <= 0) return 0;
+    return ((correctCount * 100) / totalQuestions).round().clamp(0, 100);
+  }
+
+  /// The first hint is shown automatically. A hint counts as used only when
+  /// the player reveals another one. Correct answers without that reveal
+  /// feed `leilao_zero_hint_streak`.
+  void _recordLeilaoRound({required int scorePct}) {
+    if (state.currentGame is! WhoAmIGameDomain) return;
+    if (_leilaoRecordedIndex == state.currentIndex) return;
+    _leilaoRecordedIndex = state.currentIndex;
+    final usedHint = state.whoAmI.hintsVisible > 1;
+    if (scorePct == 100 && !usedHint) {
+      _zeroHintCorrects += 1;
+    }
   }
 
   void _onNavigationHandled(

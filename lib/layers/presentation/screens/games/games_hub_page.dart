@@ -58,11 +58,18 @@ class _GamesHubViewState extends State<_GamesHubView> {
           listener: (context, state) async {
             final rounds = state.openPlayRounds;
             if (rounds == null) return;
+            final matchId = state.openMatchId;
+            final gameSlug = state.openGameSlug;
 
             context.read<GamesHubBloc>().add(const GamesHubNavigationHandled());
 
             await context.router.push<void>(
-              GamesRoute(rounds: rounds, mode: GamesPlayMode.hub),
+              GamesRoute(
+                rounds: rounds,
+                mode: GamesPlayMode.hub,
+                matchId: matchId,
+                gameSlug: gameSlug,
+              ),
             );
           },
         ),

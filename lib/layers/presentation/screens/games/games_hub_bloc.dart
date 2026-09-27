@@ -7,6 +7,7 @@ import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
+import 'package:lume/layers/domain/usecases/start_game_match.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_card_ui.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
@@ -19,6 +20,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     this._getGameRound,
     this._getArcadeRecord,
     this._getRandomGameRound,
+    this._startGameMatch,
     this._remoteConfig,
     this._analytics,
   ) : super(const GamesHubState()) {
@@ -33,6 +35,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
   final IGetGameRound _getGameRound;
   final IGetArcadeRecord _getArcadeRecord;
   final IGetRandomGameRound _getRandomGameRound;
+  final IStartGameMatch _startGameMatch;
   final IRemoteConfig _remoteConfig;
   final IAnalytics _analytics;
 
@@ -90,9 +93,13 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         return;
       }
 
+      final matchId = await _startGameMatch(gameSlug: event.gameSlug);
+
       emit(
         state.copyWith(
           isLoadingGame: false,
+          openMatchId: matchId,
+          openGameSlug: event.gameSlug,
           openPlayRounds: [
             for (final game in round.games)
               GameRound(id: '${game.pairId}', game: game),
