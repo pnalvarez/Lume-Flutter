@@ -1,0 +1,1 @@
+enum TabContainerLayoutType { fixed, scrollable }
