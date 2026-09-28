@@ -1,6 +1,16 @@
+import 'dart:async';
+
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:lume/core/remote_config/remote_config_keys.dart';
+
+const _remoteConfigFetchTimeout = Duration(seconds: 10);
+
+Duration get _defaultSteadyMinimumFetchInterval =>
+    kDebugMode ? Duration.zero : const Duration(hours: 1);
+
+String? _accountSignal(String? accountId) =>
+    (accountId != null && accountId.isNotEmpty) ? accountId : null;
 
 /// Reads remote feature toggles and config values.
 ///
@@ -28,6 +38,10 @@ abstract interface class IRemoteConfig {
 
   /// Re-fetches from the backend when possible. Failures are swallowed.
   Future<void> refresh();
+
+  /// Sends [accountId] as the `account_id` custom signal and fetches when it
+  /// changed, so conditions match the current session. Null or empty clears it.
+  Future<void> syncAccountId(String? accountId);
 
   /// Debug / QA override. Pass `null` to clear a key.
   ///
@@ -135,6 +149,9 @@ final class NoOpRemoteConfig implements IRemoteConfig {
   Future<void> refresh() async {}
 
   @override
+  Future<void> syncAccountId(String? accountId) async {}
+
+  @override
   void setDebugOverride(String key, Object? value) {
     if (!RemoteConfigService.allowDebugOverrides) return;
     if (value == null) {
@@ -156,6 +173,8 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
   final FirebaseRemoteConfig _remoteConfig;
   final Map<String, Object> _defaults;
   final Map<String, Object> _overrides = {};
+  late final RemoteConfigAccountSignals _accountSignals =
+      RemoteConfigAccountSignals.firebase(_remoteConfig);
 
   @override
   Map<String, Object> get debugOverrides => Map.unmodifiable(_overrides);
@@ -220,6 +239,11 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
   }
 
   @override
+  Future<void> syncAccountId(String? accountId) {
+    return _accountSignals.sync(accountId);
+  }
+
+  @override
   void setDebugOverride(String key, Object? value) {
     if (!RemoteConfigService.allowDebugOverrides) return;
     if (value == null) {
@@ -235,6 +259,31 @@ final class RemoteConfigService {
   RemoteConfigService._();
 
   static IRemoteConfig client = NoOpRemoteConfig();
+
+  static StreamSubscription<void>? _accountSync;
+
+  /// Applies [accountId] whenever [sessionChanges] emits.
+  ///
+  /// The callback is read on each event so sign-out sends null and the next
+  /// sign-in sends that account.
+  static Future<void> bindAccountId({
+    required Stream<void> sessionChanges,
+    required String? Function() accountId,
+  }) async {
+    await _accountSync?.cancel();
+    _accountSync = sessionChanges.listen((_) {
+      unawaited(syncAccountId(accountId()));
+    });
+  }
+
+  /// Sends [accountId] on the installed client. Failures stay on defaults.
+  static Future<void> syncAccountId(String? accountId) async {
+    try {
+      await client.syncAccountId(accountId);
+    } on Object catch (error, stack) {
+      debugPrint('Remote Config account sync failed: $error\n$stack');
+    }
+  }
 
   /// Whether [IRemoteConfig.setDebugOverride] is honored.
   ///
@@ -254,9 +303,9 @@ final class RemoteConfigService {
 
   /// Initializes Remote Config when supported.
   ///
-  /// [accountId] is sent once, before the fetch, when a session already
-  /// exists. A logged-out start clears that signal so a previous account
-  /// does not keep matching. Firebase conditions on `account_id` use it.
+  /// [accountId] is applied before the first fetch. Call [bindAccountId] so
+  /// later sign-in and sign-out keep the `account_id` signal on the current
+  /// session. A missing id clears it so the previous account stops matching.
   ///
   /// Safe on every platform — failures fall back to [NoOpRemoteConfig] with
   /// in-app defaults so the app can still start.
@@ -270,29 +319,97 @@ final class RemoteConfigService {
       final remoteConfig = FirebaseRemoteConfig.instance;
       await remoteConfig.setConfigSettings(
         RemoteConfigSettings(
-          fetchTimeout: const Duration(seconds: 10),
-          minimumFetchInterval: kDebugMode
-              ? Duration.zero
-              : const Duration(hours: 1),
+          fetchTimeout: _remoteConfigFetchTimeout,
+          minimumFetchInterval: _defaultSteadyMinimumFetchInterval,
         ),
       );
       await remoteConfig.setDefaults(RemoteConfigDefaults.values);
-      await remoteConfig.setCustomSignals(<String, Object?>{
-        'account_id': (accountId != null && accountId.isNotEmpty)
-            ? accountId
-            : null,
-      });
+      final installed = FirebaseRemoteConfigClient(remoteConfig: remoteConfig);
       try {
-        await remoteConfig.fetchAndActivate();
+        await installed.syncAccountId(accountId);
       } on Object catch (error, stack) {
         debugPrint(
           'Remote Config fetch failed (using defaults): $error\n$stack',
         );
       }
-      client = FirebaseRemoteConfigClient(remoteConfig: remoteConfig);
+      client = installed;
     } on Object catch (error, stack) {
       client = NoOpRemoteConfig();
       debugPrint('Remote Config install failed: $error\n$stack');
+    }
+  }
+}
+
+/// Sends `account_id` and fetches when that account changes.
+///
+/// Fetches after an account change ignore the steady minimum interval so a
+/// sign-out or a different sign-in does not keep the previous account's values.
+final class RemoteConfigAccountSignals {
+  RemoteConfigAccountSignals({
+    required Future<void> Function(Map<String, Object?> signals) setSignals,
+    required Future<void> Function() fetchAndActivate,
+    required Future<void> Function(Duration minimumFetchInterval)
+    setMinimumFetchInterval,
+    Duration? steadyMinimumFetchInterval,
+  }) : _setSignals = setSignals,
+       _fetchAndActivate = fetchAndActivate,
+       _setMinimumFetchInterval = setMinimumFetchInterval,
+       _steadyMinimumFetchInterval =
+           steadyMinimumFetchInterval ?? _defaultSteadyMinimumFetchInterval;
+
+  factory RemoteConfigAccountSignals.firebase(
+    FirebaseRemoteConfig remoteConfig,
+  ) {
+    return RemoteConfigAccountSignals(
+      setSignals: remoteConfig.setCustomSignals,
+      fetchAndActivate: () async {
+        await remoteConfig.fetchAndActivate();
+      },
+      setMinimumFetchInterval: (minimumFetchInterval) {
+        return remoteConfig.setConfigSettings(
+          RemoteConfigSettings(
+            fetchTimeout: _remoteConfigFetchTimeout,
+            minimumFetchInterval: minimumFetchInterval,
+          ),
+        );
+      },
+    );
+  }
+
+  final Future<void> Function(Map<String, Object?> signals) _setSignals;
+  final Future<void> Function() _fetchAndActivate;
+  final Future<void> Function(Duration minimumFetchInterval)
+  _setMinimumFetchInterval;
+  final Duration _steadyMinimumFetchInterval;
+
+  var _hasAccountId = false;
+  String? _accountId;
+  Future<void> _queue = Future<void>.value();
+
+  Future<void> sync(String? accountId) {
+    final run = _queue.then((_) => _apply(accountId));
+    _queue = run.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return run;
+  }
+
+  Future<void> _apply(String? accountId) async {
+    final next = _accountSignal(accountId);
+    await _setSignals(<String, Object?>{'account_id': next});
+    if (_hasAccountId && _accountId == next) return;
+
+    await _setMinimumFetchInterval(Duration.zero);
+    try {
+      await _fetchAndActivate();
+      _hasAccountId = true;
+      _accountId = next;
+    } finally {
+      try {
+        await _setMinimumFetchInterval(_steadyMinimumFetchInterval);
+      } on Object catch (error, stack) {
+        debugPrint(
+          'Remote Config fetch interval restore failed: $error\n$stack',
+        );
+      }
     }
   }
 }

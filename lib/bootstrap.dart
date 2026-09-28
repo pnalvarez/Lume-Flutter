@@ -38,6 +38,11 @@ Future<void> bootstrap() async {
     await configureDependencies();
     final router = getIt<AppRouter>();
     final authSession = getIt<IAuthSessionProvider>();
+    await RemoteConfigService.bindAccountId(
+      sessionChanges: authSession.changes,
+      accountId: () => authSession.userId,
+    );
+    await RemoteConfigService.syncAccountId(authSession.userId);
     runApp(
       LumeApp(
         router: router,

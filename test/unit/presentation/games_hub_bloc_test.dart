@@ -149,6 +149,9 @@ class _RemoteConfig implements IRemoteConfig {
   Future<void> refresh() async {}
 
   @override
+  Future<void> syncAccountId(String? accountId) async {}
+
+  @override
   void setDebugOverride(String key, Object? value) {}
 }
 

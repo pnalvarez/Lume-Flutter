@@ -83,6 +83,8 @@ class _FakeRemoteConfig implements IRemoteConfig {
   @override
   Future<void> refresh() async {}
   @override
+  Future<void> syncAccountId(String? accountId) async {}
+  @override
   void setDebugOverride(String key, Object? value) {}
 }
 
