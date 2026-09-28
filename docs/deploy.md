@@ -98,7 +98,7 @@ Firebase project: **`lume-51a38`**
 | Android | `1:145151164143:android:2d2d7ec6d6ad0e73ca251a` | `android/app/google-services.json` | Yes |
 | iOS | `1:145151164143:ios:879a519584454d1eca251a` | `ios/Runner/GoogleService-Info.plist` | Yes |
 | macOS | Same Apple app / bundle `com.lume.learning.app` | `macos/Runner/GoogleService-Info.plist` (same plist as iOS) | Yes |
-| Web | `1:145151164143:web:b41d7e35fe2d9c0fca251a` | Registered in Firebase (no Crashlytics SDK) | **No** — Crashlytics has no web SDK |
+| Web | `1:145151164143:web:b41d7e35fe2d9c0fca251a` | `secrets.json` (`secrets.example.json`) | **No** — Crashlytics has no web SDK |
 | Windows / Linux | — | — | **No** |
 
 **Enable Crashlytics in the console** (one-time): open [Crashlytics for lume-51a38](https://console.firebase.google.com/project/lume-51a38/crashlytics), select the Android and iOS/macOS apps, and finish the onboarding if prompted. The dashboard populates after the first crash/report from a build with collection enabled.
@@ -119,7 +119,7 @@ flutter run -d <device> --release --dart-define=CRASHLYTICS_ENABLED=true
 
 App version / build number come from native store metadata — do not put PII in custom Crashlytics keys.
 
-**Web note:** The Firebase **web** app exists for future Firebase web features (Auth, Analytics, etc.). For web crash/error reporting, use a web-capable tool (e.g. Sentry) in a follow-up — not Crashlytics.
+**Web note:** Copy `secrets.example.json` to `secrets.json` (gitignored) and run with `--dart-define-from-file=secrets.json`. The IDE launch configs already pass that file. `DefaultFirebaseOptions.web` only reads those defines. Crashlytics still has no web SDK. For web crash/error reporting, use a web-capable tool (e.g. Sentry) in a follow-up.
 
 ### Firebase Remote Config
 
@@ -129,8 +129,8 @@ Firebase project: **`lume-51a38`**
 
 | Platform | Remote Config |
 |----------|---------------|
-| iOS / Android / macOS | Yes (`firebase_remote_config`) |
-| Web / Windows / Linux | **No** — in-app defaults + optional debug overrides only |
+| iOS / Android / macOS / Web | Yes (`firebase_remote_config`) |
+| Windows / Linux | **No** — in-app defaults + optional debug overrides only |
 
 **Enable Remote Config in the console** (one-time): open [Remote Config for lume-51a38](https://console.firebase.google.com/project/lume-51a38/config), add parameters, and publish.
 
@@ -290,6 +290,13 @@ Manual workflow runs leave the **macOS** checkbox off by default (macOS runners 
 | `VERCEL_TOKEN` | [Vercel → Account Settings → Tokens](https://vercel.com/account/tokens) (create a token with deploy access) |
 | `VERCEL_ORG_ID` | Team / personal account ID from Project Settings → General → “Project ID” panel (`orgId` in `.vercel/project.json` after `vercel link`) |
 | `VERCEL_PROJECT_ID` | Project ID from the same place (`projectId` in `.vercel/project.json`) |
+| `FIREBASE_WEB_API_KEY` | Web app API key from `secrets.json` |
+| `FIREBASE_WEB_APP_ID` | Web app id (`1:…:web:…`) |
+| `FIREBASE_WEB_MESSAGING_SENDER_ID` | Firebase project number |
+| `FIREBASE_WEB_PROJECT_ID` | Firebase project id |
+| `FIREBASE_WEB_AUTH_DOMAIN` | Web auth domain |
+| `FIREBASE_WEB_STORAGE_BUCKET` | Storage bucket |
+| `FIREBASE_WEB_MEASUREMENT_ID` | Analytics measurement id |
 
 One-time local setup (creates the Vercel project and prints the IDs):
 
@@ -302,7 +309,7 @@ cat .vercel/project.json   # copy orgId → VERCEL_ORG_ID, projectId → VERCEL_
 
 Do **not** commit `.vercel/` (keep it gitignored). SPA routing is handled by `web/vercel.json` (copied into `build/web` by Flutter).
 
-CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. Tag pushes always include Web; manual runs include it when the **Web** checkbox is enabled.
+CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. When the `FIREBASE_WEB_*` secrets above are set, the build writes `secrets.json` and passes `--dart-define-from-file=secrets.json`. Tag pushes always include Web; manual runs include it when the **Web** checkbox is enabled.
 
 Optional: override Supabase at build time with repository Variables / secrets and pass `--dart-define=SUPABASE_URL=…` / `SUPABASE_ANON_KEY=…` in the workflow (defaults in `AppConfig` match production today).
 
