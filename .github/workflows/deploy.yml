@@ -1,4 +1,4 @@
-# Deploy Lume to Firebase App Distribution (Android), TestFlight (iOS / macOS),
+# Deploy Lume to Firebase App Distribution (Android + iOS), TestFlight (iOS / macOS),
 # App Store Connect release candidate (iOS), and Vercel (Flutter web).
 #
 # Triggers:
@@ -60,6 +60,7 @@ concurrency:
 env:
   FLUTTER_CHANNEL: stable
   FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
+  FIREBASE_IOS_APP_ID: 1:145151164143:ios:879a519584454d1eca251a
   FIREBASE_TESTER_GROUPS: internal
   IOS_BUNDLE_ID: com.lume.learning.app
   MACOS_BUNDLE_ID: com.lume.learning.app
@@ -130,7 +131,7 @@ jobs:
             --token "$FIREBASE_TOKEN"
 
   deploy-ios:
-    name: iOS → TestFlight
+    name: iOS → TestFlight + Firebase
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' &&
@@ -347,6 +348,66 @@ jobs:
             echo "::error::TestFlight upload failed with a non-duplicate error (exit $status)."
             exit "$status"
           done
+
+      # Same archive as TestFlight, re-signed ad hoc. An App Store IPA cannot be
+      # installed from Firebase App Distribution.
+      - name: Distribute ad hoc IPA on Firebase App Distribution
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          IOS_ADHOC_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_ADHOC_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${FIREBASE_TOKEN:-}" ]]; then
+            echo "::error::Missing FIREBASE_TOKEN secret. See docs/deploy.md"
+            exit 1
+          fi
+          if [[ -z "${IOS_ADHOC_PROVISIONING_PROFILE_BASE64:-}" ]]; then
+            echo "::error::Missing IOS_ADHOC_PROVISIONING_PROFILE_BASE64 secret. See docs/deploy.md"
+            exit 1
+          fi
+
+          PROFILE_PATH="$RUNNER_TEMP/adhoc.mobileprovision"
+          PROFILE_PLIST="$RUNNER_TEMP/adhoc.plist"
+          echo "$IOS_ADHOC_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
+
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$PROFILE_PLIST")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$PROFILE_PLIST")
+          echo "Installing ad hoc profile: $NAME ($UUID)"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+
+          EXPORT_PLIST="$RUNNER_TEMP/ExportOptionsAdHoc.plist"
+          /usr/libexec/PlistBuddy -c 'Add :method string ad-hoc' "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c 'Add :teamID string L332B28T9P' "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c 'Add :signingStyle string manual' "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c 'Add :compileBitcode bool false' "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c 'Add :provisioningProfiles dict' "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:${IOS_BUNDLE_ID} string ${NAME}" "$EXPORT_PLIST"
+
+          ARCHIVE="build/ios/archive/Runner.xcarchive"
+          if [[ ! -d "$ARCHIVE" ]]; then
+            echo "::error::Missing $ARCHIVE from the TestFlight build."
+            exit 1
+          fi
+
+          rm -rf build/ios/ipa-adhoc
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE" \
+            -exportPath build/ios/ipa-adhoc \
+            -exportOptionsPlist "$EXPORT_PLIST"
+
+          IPA=$(ls build/ios/ipa-adhoc/*.ipa | head -n 1)
+          ls -la build/ios/ipa-adhoc/
+
+          npm install -g firebase-tools
+          RELEASE_NOTES="Tag ${GITHUB_REF_NAME} (${GITHUB_SHA:0:7})"
+          firebase appdistribution:distribute "$IPA" \
+            --app "$FIREBASE_IOS_APP_ID" \
+            --groups "$FIREBASE_TESTER_GROUPS" \
+            --release-notes "$RELEASE_NOTES" \
+            --token "$FIREBASE_TOKEN"
 
   # Manual only: after TestFlight upload, wait for ASC processing and attach the
   # build to the iOS App Store version (pubspec marketing version) as a release
