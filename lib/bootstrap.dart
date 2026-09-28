@@ -19,7 +19,6 @@ Future<void> bootstrap() async {
     WidgetsFlutterBinding.ensureInitialized();
     await CrashReporting.install();
     await AnalyticsService.install();
-    await RemoteConfigService.install();
 
     final config = AppConfig.fromEnvironment();
     await Supabase.initialize(
@@ -30,6 +29,10 @@ Future<void> bootstrap() async {
         authFlowType: AuthFlowType.pkce,
         detectSessionInUri: true,
       ),
+    );
+
+    await RemoteConfigService.install(
+      accountId: Supabase.instance.client.auth.currentUser?.id,
     );
 
     await configureDependencies();

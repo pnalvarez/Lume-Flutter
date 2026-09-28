@@ -254,9 +254,13 @@ final class RemoteConfigService {
 
   /// Initializes Remote Config when supported.
   ///
+  /// [accountId] is sent once, before the fetch, when a session already
+  /// exists. A logged-out start clears that signal so a previous account
+  /// does not keep matching. Firebase conditions on `account_id` use it.
+  ///
   /// Safe on every platform — failures fall back to [NoOpRemoteConfig] with
   /// in-app defaults so the app can still start.
-  static Future<void> install() async {
+  static Future<void> install({String? accountId}) async {
     if (!_isRemoteConfigTarget) {
       client = NoOpRemoteConfig();
       return;
@@ -273,6 +277,11 @@ final class RemoteConfigService {
         ),
       );
       await remoteConfig.setDefaults(RemoteConfigDefaults.values);
+      await remoteConfig.setCustomSignals(<String, Object?>{
+        'account_id': (accountId != null && accountId.isNotEmpty)
+            ? accountId
+            : null,
+      });
       try {
         await remoteConfig.fetchAndActivate();
       } on Object catch (error, stack) {
