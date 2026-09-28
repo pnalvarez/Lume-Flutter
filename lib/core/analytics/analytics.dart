@@ -186,8 +186,8 @@ final class AnalyticsService {
   static bool get _isAnalyticsTarget {
     // Analytics Flutter plugin supports mobile + web; keep parity with Remote
     // Config / Crashlytics for A/B (experiments need mobile Analytics).
-    if (kIsWeb) return false;
-    return defaultTargetPlatform == TargetPlatform.iOS ||
+    return kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.macOS;
   }
