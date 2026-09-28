@@ -30,6 +30,13 @@ final class AchievementsBloc
     Emitter<AchievementsState> emit,
   ) async {
     final keepItems = state.items.isNotEmpty;
+    final filterVariation = AchievementListFilterVariation.parse(
+      _remoteConfig.achievementsFilterLayout,
+    );
+    final selectedStatusFilters = _selectionFor(
+      filterVariation,
+      state.selectedStatusFilters,
+    );
 
     // Fire before any state change or RPC so the open is always counted,
     // even when the load fails.  Only on the first/fresh load (empty state)
@@ -45,13 +52,22 @@ final class AchievementsBloc
     }
 
     if (keepItems) {
-      emit(state.copyWith(isRefreshing: true, clearError: true));
+      emit(
+        state.copyWith(
+          isRefreshing: true,
+          clearError: true,
+          filterVariation: filterVariation,
+          selectedStatusFilters: selectedStatusFilters,
+        ),
+      );
     } else {
       emit(
         state.copyWith(
           status: AchievementsStatus.loading,
           isRefreshing: false,
           clearError: true,
+          filterVariation: filterVariation,
+          selectedStatusFilters: selectedStatusFilters,
         ),
       );
     }
@@ -62,7 +78,11 @@ final class AchievementsBloc
       // AchievementsFilterToggled that arrived during the RPC is preserved.
       final newState = AchievementsState.fromDomain(
         achievements,
-        selectedStatusFilters: state.selectedStatusFilters,
+        selectedStatusFilters: _selectionFor(
+          filterVariation,
+          state.selectedStatusFilters,
+        ),
+        filterVariation: filterVariation,
       );
       emit(newState);
 
@@ -106,10 +126,14 @@ final class AchievementsBloc
     AchievementsFilterToggled event,
     Emitter<AchievementsState> emit,
   ) {
-    final next = Set<AchievementListItemStatus>.of(state.selectedStatusFilters);
-    if (!next.add(event.status)) {
-      next.remove(event.status);
-    }
+    final next = switch (state.filterVariation) {
+      AchievementListFilterVariation.chips => _toggledChips(
+        state.selectedStatusFilters,
+        event.status,
+      ),
+      AchievementListFilterVariation.tabs ||
+      AchievementListFilterVariation.selector => {event.status},
+    };
     emit(state.copyWith(selectedStatusFilters: next));
 
     _logEvent(
@@ -120,6 +144,26 @@ final class AchievementsBloc
         AnalyticsParams.visibleCount: state.visibleItems.length,
       },
     );
+  }
+
+  static Set<AchievementListItemStatus> _selectionFor(
+    AchievementListFilterVariation variation,
+    Set<AchievementListItemStatus> current,
+  ) {
+    if (!variation.isExclusive) return current;
+    for (final status in achievementFilterCategories) {
+      if (current.contains(status)) return {status};
+    }
+    return {achievementFilterCategories.first};
+  }
+
+  static Set<AchievementListItemStatus> _toggledChips(
+    Set<AchievementListItemStatus> current,
+    AchievementListItemStatus status,
+  ) {
+    final next = Set<AchievementListItemStatus>.of(current);
+    if (!next.add(status)) next.remove(status);
+    return next;
   }
 
   /// Maps enum values to the snake_case strings required by the analytics
@@ -136,6 +180,7 @@ final class AchievementsBloc
     AchievementsFilterCleared event,
     Emitter<AchievementsState> emit,
   ) {
+    if (state.filterVariation.isExclusive) return;
     final previousCount = state.selectedStatusFilters.length;
     emit(state.copyWith(selectedStatusFilters: {}));
     _logEvent(

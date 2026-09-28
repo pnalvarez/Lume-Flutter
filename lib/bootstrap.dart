@@ -19,7 +19,6 @@ Future<void> bootstrap() async {
     WidgetsFlutterBinding.ensureInitialized();
     await CrashReporting.install();
     await AnalyticsService.install();
-    await RemoteConfigService.install();
 
     final config = AppConfig.fromEnvironment();
     await Supabase.initialize(
@@ -32,9 +31,18 @@ Future<void> bootstrap() async {
       ),
     );
 
+    await RemoteConfigService.install(
+      accountId: Supabase.instance.client.auth.currentUser?.id,
+    );
+
     await configureDependencies();
     final router = getIt<AppRouter>();
     final authSession = getIt<IAuthSessionProvider>();
+    await RemoteConfigService.bindAccountId(
+      sessionChanges: authSession.changes,
+      accountId: () => authSession.userId,
+    );
+    await RemoteConfigService.syncAccountId(authSession.userId);
     runApp(
       LumeApp(
         router: router,

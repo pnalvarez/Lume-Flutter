@@ -130,6 +130,9 @@ class _RemoteConfig implements IRemoteConfig {
   bool get achievementsEnabled => achievements;
 
   @override
+  String get achievementsFilterLayout => 'chips';
+
+  @override
   Map<String, Object> get debugOverrides => const {};
 
   @override
@@ -144,6 +147,9 @@ class _RemoteConfig implements IRemoteConfig {
 
   @override
   Future<void> refresh() async {}
+
+  @override
+  Future<void> syncAccountId(String? accountId) async {}
 
   @override
   void setDebugOverride(String key, Object? value) {}
