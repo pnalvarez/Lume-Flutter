@@ -295,7 +295,7 @@ final class RemoteConfigService {
   }
 
   static bool get _isRemoteConfigTarget {
-    if (kIsWeb) return false;
+    if (kIsWeb) return true;
     return defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.macOS;

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:lume/core/observability/crash_reporter.dart';
+import 'package:lume/core/observability/firebase_options.dart';
 
 /// Installs Crashlytics on iOS / Android / macOS and wires global error handlers.
 ///
@@ -30,11 +31,28 @@ final class CrashReporting {
         defaultTargetPlatform == TargetPlatform.macOS;
   }
 
-  /// Initializes Firebase Crashlytics when supported.
+  /// Initializes Firebase, then Crashlytics when that SDK exists.
   ///
-  /// Safe to call on every platform — failures are logged and ignored so the
-  /// app can still start (e.g. missing `GoogleService-Info.plist` on iOS).
+  /// Web uses [DefaultFirebaseOptions.web] (same Firebase project as the
+  /// native plist / `google-services.json`). Crashlytics stays off on web.
+  /// Failures are logged and ignored so the app can still start.
   static Future<void> install() async {
+    if (kIsWeb) {
+      if (!DefaultFirebaseOptions.hasWebConfig) {
+        debugPrint(
+          'Firebase web config missing. Pass --dart-define-from-file=secrets.json',
+        );
+      } else {
+        try {
+          await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+        } on Object catch (error, stack) {
+          debugPrint('Firebase web install failed: $error\n$stack');
+        }
+      }
+      reporter = const NoOpCrashReporter();
+      return;
+    }
+
     if (!_isCrashlyticsTarget) {
       reporter = const NoOpCrashReporter();
       return;
