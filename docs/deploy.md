@@ -3,7 +3,7 @@
 Deploys **Lume** to:
 
 - **Android** → [Firebase App Distribution](https://firebase.google.com/docs/app-distribution)
-- **iOS** → [TestFlight](https://developer.apple.com/testflight/)
+- **iOS** → [TestFlight](https://developer.apple.com/testflight/) and [Firebase App Distribution](https://firebase.google.com/docs/app-distribution) (ad hoc IPA)
 - **iOS App Store RC** → App Store Connect version (attach uploaded build; manual submit)
 - **macOS** → [TestFlight](https://developer.apple.com/testflight/) (same App Store Connect app / bundle ID)
 - **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
@@ -81,11 +81,16 @@ For local release builds, copy `android/key.properties.example` to `android/key.
 |--------|-------------|
 | `FIREBASE_TOKEN` | CI token from `firebase login:ci` |
 
-Enable **App Distribution** in the [Firebase console](https://console.firebase.google.com/project/lume-51a38/appdistribution) and create a tester group named `internal` (or change `FIREBASE_TESTER_GROUPS` in the workflow).
+Enable **App Distribution** in the [Firebase console](https://console.firebase.google.com/project/lume-51a38/appdistribution) and create a tester group named `internal` (or change `FIREBASE_TESTER_GROUPS` in the workflow). The same `FIREBASE_TOKEN` and `internal` group are used for Android and iOS.
 
 CI uploads a release **APK** (not AAB) so Firebase works without linking a Google Play Developer account. Switch to AAB only when you publish on Play Store and link Firebase to Play.
 
-Firebase Android app ID (already in workflow): `1:145151164143:android:2d2d7ec6d6ad0e73ca251a`
+| Platform | Firebase app ID | Binary |
+|----------|-----------------|--------|
+| Android | `1:145151164143:android:2d2d7ec6d6ad0e73ca251a` | Release APK |
+| iOS | `1:145151164143:ios:879a519584454d1eca251a` | Ad hoc IPA (re-signed from the TestFlight archive) |
+
+iOS testers install that ad hoc build from the Firebase tester page. The App Store IPA uploaded to TestFlight cannot be installed from App Distribution. Each tester device UDID must be in the ad hoc provisioning profile (`IOS_ADHOC_PROVISIONING_PROFILE_BASE64`). When a new tester registers, export their UDID from the [App Distribution testers page](https://console.firebase.google.com/project/lume-51a38/appdistribution), add the device in the Apple Developer portal, regenerate the ad hoc profile, and update the secret.
 
 ### Firebase Crashlytics
 
@@ -224,6 +229,7 @@ Until an experiment is running, `achievements_enabled` is controlled by Remote C
 | `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64` | Base64-encoded **Apple Distribution** certificate exported as `.p12` |
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password used when exporting the `.p12` |
 | `IOS_PROVISIONING_PROFILE_BASE64` | Base64-encoded **App Store Connect** `.mobileprovision` for `com.lume.learning.app` |
+| `IOS_ADHOC_PROVISIONING_PROFILE_BASE64` | Base64-encoded **Ad Hoc** `.mobileprovision` for `com.lume.learning.app` (Firebase App Distribution) |
 | `APP_STORE_CONNECT_API_KEY_ID` | App Store Connect API key ID (10 chars) |
 | `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID from App Store Connect → Users and Access → Integrations |
 | `APP_STORE_CONNECT_API_PRIVATE_KEY` | Full contents of the `.p8` API key file (include `BEGIN` / `END` lines) |
@@ -243,6 +249,14 @@ base64 -i YourAppStore.mobileprovision | pbcopy
 ```
 
 CI installs that profile and uses **manual** signing (team `L332B28T9P`) to build the IPA, then uploads with the App Store Connect API key.
+
+Create a second profile of type **Ad Hoc** (same App ID and Apple Distribution certificate, with tester device UDIDs), then:
+
+```bash
+base64 -i YourAdHoc.mobileprovision | pbcopy   # → IOS_ADHOC_PROVISIONING_PROFILE_BASE64
+```
+
+After TestFlight upload, CI re-exports the same archive with that ad hoc profile and uploads the IPA to Firebase App Distribution for the iOS app `1:145151164143:ios:879a519584454d1eca251a`, group `internal`. No App Distribution SDK is required for that install link.
 
 ### macOS / TestFlight
 
@@ -333,6 +347,8 @@ Optional: override Supabase at build time with repository Variables / secrets an
 **iOS: no signing certificate** — ensure the `.p12` contains an **Apple Distribution** cert (not Development).
 
 **iOS: no provisioning profile / No Accounts** — use an **App Store Connect** profile (not Development), set `IOS_PROVISIONING_PROFILE_BASE64`, and confirm the profile includes your Distribution certificate.
+
+**iOS: Firebase testers cannot install** — the Firebase upload must be the ad hoc IPA. Confirm `IOS_ADHOC_PROVISIONING_PROFILE_BASE64` is an Ad Hoc profile (not App Store) and that the tester UDID is registered on that profile.
 
 **iOS: upload failed** — confirm the app record exists in App Store Connect for bundle ID `com.lume.learning.app`.
 
