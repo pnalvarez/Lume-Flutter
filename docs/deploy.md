@@ -46,7 +46,7 @@ The RC job creates the App Store version for the pubspec marketing version when 
 
 If version `X.Y.Z` already exists in a non-editable state (e.g. Waiting for Review / Ready for Sale), bump the marketing version first.
 
-iOS and macOS **build numbers** (`CFBundleVersion`) are set automatically in CI: the workflow scans **all** App Store Connect builds for the app (shared across iOS + macOS), takes the highest numeric version, and uses **max + 1**. If upload still reports a duplicate, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
+iOS and macOS **build numbers** (`CFBundleVersion`) are set automatically in CI and **reset for each marketing version** in `pubspec.yaml`. The workflow scans App Store Connect builds for that version only (shared across iOS + macOS), then uses **max + 1**, or **1** when the version has no builds yet. Example: the first TestFlight of `1.2.3` is build `1`; the other platform, or a later upload of the same version, is `2`, then `3`. If both jobs pick the same number before the first upload is visible, CI rebuilds and retries up to two more times with the next numbers. You do not need to bump the `+N` suffix in `pubspec.yaml` for TestFlight uploads.
 
 ## GitHub secrets
 
@@ -358,7 +358,7 @@ Optional: override Supabase at build time with repository Variables / secrets an
 
 **macOS: no installer identity / Installer missing after import** — `MACOS_INSTALLER_CERTIFICATE_P12_BASE64` is probably still an Apple Distribution export. Re-export **3rd Party Mac Developer Installer** from Keychain, confirm `openssl … -subject` contains `Installer`, then update the secret. CI imports both certs in one step and fails early if Installer is missing.
 
-**Duplicate build number** — CI should auto-increment via App Store Connect (max build + 1 across iOS + macOS, with retries). If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
+**Duplicate build number** — CI should take max + 1 among builds of the current marketing version (or 1 if that version has none), shared by iOS and macOS, then retry the next numbers. If this still fails, confirm the API key can read builds for `com.lume.learning.app`.
 
 **App Store RC: version not editable** — bump `pubspec.yaml` marketing version, or cancel/finish the existing version in App Store Connect, then re-run with the RC checkbox.
 
