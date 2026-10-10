@@ -145,6 +145,7 @@ Known parameter keys (`RemoteConfigKeys`):
 |-----|------|----------------|--------|
 | `arcade_enabled` | Boolean | `true` | Shows / hides the Arcade CTA on Games Hub |
 | `achievements_enabled` | Boolean | `false` | Shows / hides Achievements tab, unlock host, and unlock toasts |
+| `enabled_game_slugs` | JSON array of strings | ten published slugs (below) | Readable allowlist only; does not hide Games Hub tiles or Arcade |
 
 Behavior:
 
@@ -153,7 +154,8 @@ Behavior:
 - QA without console:
   - `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
   - `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`)
-- Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)` or `setDebugOverride('achievements_enabled', true)` (debug builds, or `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`)
+- `enabled_game_slugs` default (missing or invalid JSON keeps this set; `[]` is an empty set; `galeria_conhecimento` is absent): `quiz_relampago`, `verdade_ou_mito`, `batalha_curiosidades`, `quem_sou_eu`, `leilao_dicas`, `linha_do_tempo`, `o_que_aconteceu_depois`, `conexoes_lume`, `palavra_misteriosa`, `completar_frase`
+- Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)`, `setDebugOverride('achievements_enabled', true)`, or `setDebugOverride('enabled_game_slugs', '["quiz_relampago"]')` (a `Set<String>` or `List<String>` also works). Honored in debug builds, or with `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`
 
 Do not put PII or secrets in Remote Config values.
 

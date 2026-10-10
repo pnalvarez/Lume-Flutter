@@ -31,6 +31,11 @@ void main() {
     expect(config.achievementsEnabled, isFalse);
     expect(config.achievementsFilterLayout, 'chips');
     expect(
+      config.enabledGameSlugs,
+      RemoteConfigDefaults.enabledGameSlugsDefault,
+    );
+    expect(config.enabledGameSlugs.contains('galeria_conhecimento'), isFalse);
+    expect(
       config.getBool(RemoteConfigKeys.arcadeEnabled, defaultValue: false),
       isTrue,
     );
@@ -55,6 +60,58 @@ void main() {
     expect(config.achievementsEnabled, isTrue);
     config.setDebugOverride(RemoteConfigKeys.achievementsEnabled, null);
     expect(config.achievementsEnabled, isFalse);
+  });
+
+  test('enabledGameSlugs parses JSON and falls back when invalid', () {
+    final config = NoOpRemoteConfig();
+    const key = RemoteConfigKeys.enabledGameSlugs;
+
+    config.setDebugOverride(
+      key,
+      '["quiz_relampago","quiz_relampago"," verdade_ou_mito "]',
+    );
+    expect(config.enabledGameSlugs, {'quiz_relampago', 'verdade_ou_mito'});
+
+    config.setDebugOverride(key, '[]');
+    expect(config.enabledGameSlugs, isEmpty);
+
+    config.setDebugOverride(key, <String>['leilao_dicas', 'quem_sou_eu']);
+    expect(config.enabledGameSlugs, {'leilao_dicas', 'quem_sou_eu'});
+
+    config.setDebugOverride(key, <String>{'conexoes_lume'});
+    expect(config.enabledGameSlugs, {'conexoes_lume'});
+
+    for (final invalid in [
+      'not-json',
+      '{"a":1}',
+      '[1]',
+      '["ok", 1]',
+      '[""]',
+      '["  "]',
+      '',
+    ]) {
+      config.setDebugOverride(key, invalid);
+      expect(
+        config.enabledGameSlugs,
+        RemoteConfigDefaults.enabledGameSlugsDefault,
+        reason: invalid,
+      );
+    }
+
+    config.setDebugOverride(key, 1);
+    expect(
+      config.enabledGameSlugs,
+      RemoteConfigDefaults.enabledGameSlugsDefault,
+    );
+
+    config.setDebugOverride(key, <String>{'palavra_misteriosa'});
+    expect(config.enabledGameSlugs, {'palavra_misteriosa'});
+    config.setDebugOverride(key, null);
+    expect(
+      config.enabledGameSlugs,
+      RemoteConfigDefaults.enabledGameSlugsDefault,
+    );
+    expect(config.debugOverrides, isEmpty);
   });
 
   test('refresh on NoOp completes without error', () async {
@@ -155,6 +212,10 @@ class _RecordingRemoteConfig implements IRemoteConfig {
 
   @override
   String get achievementsFilterLayout => 'chips';
+
+  @override
+  Set<String> get enabledGameSlugs =>
+      RemoteConfigDefaults.enabledGameSlugsDefault;
 
   @override
   Map<String, Object> get debugOverrides => const {};

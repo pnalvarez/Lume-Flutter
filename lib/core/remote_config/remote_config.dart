@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,25 @@ Duration get _defaultSteadyMinimumFetchInterval =>
 
 String? _accountSignal(String? accountId) =>
     (accountId != null && accountId.isNotEmpty) ? accountId : null;
+
+Set<String> _readEnabledGameSlugs(
+  Map<String, Object> overrides,
+  String Function(String key, {required String defaultValue}) readString,
+) {
+  final override = overrides[RemoteConfigKeys.enabledGameSlugs];
+  if (override is Set<String>) {
+    return RemoteConfigDefaults._setFromSlugStrings(override);
+  }
+  if (override is List<String>) {
+    return RemoteConfigDefaults._setFromSlugStrings(override);
+  }
+  return RemoteConfigDefaults.parseEnabledGameSlugs(
+    readString(
+      RemoteConfigKeys.enabledGameSlugs,
+      defaultValue: RemoteConfigDefaults.enabledGameSlugsJson,
+    ),
+  );
+}
 
 /// Reads remote feature toggles and config values.
 ///
@@ -29,6 +49,13 @@ abstract interface class IRemoteConfig {
   /// Valid values: `chips`, `tabs`, `selector`. Anything else is treated as
   /// `chips` by the achievements screen.
   String get achievementsFilterLayout;
+
+  /// Game slugs from [RemoteConfigKeys.enabledGameSlugs].
+  ///
+  /// Missing or invalid JSON falls back to
+  /// [RemoteConfigDefaults.enabledGameSlugsDefault]. An empty JSON array is an
+  /// empty set. Games Hub and Arcade do not read this value.
+  Set<String> get enabledGameSlugs;
 
   /// Boolean parameter with [defaultValue] when the key is missing.
   bool getBool(String key, {required bool defaultValue});
@@ -63,7 +90,62 @@ abstract final class RemoteConfigDefaults {
     RemoteConfigKeys.achievementsEnabled: achievementsEnabled,
     RemoteConfigKeys.achievementsListFilterVariation:
         achievementsListFilterVariation,
+    RemoteConfigKeys.enabledGameSlugs: enabledGameSlugsJson,
   };
+
+  /// Default slugs for [RemoteConfigKeys.enabledGameSlugs].
+  static const enabledGameSlugs = <String>[
+    'quiz_relampago',
+    'verdade_ou_mito',
+    'batalha_curiosidades',
+    'quem_sou_eu',
+    'leilao_dicas',
+    'linha_do_tempo',
+    'o_que_aconteceu_depois',
+    'conexoes_lume',
+    'palavra_misteriosa',
+    'completar_frase',
+  ];
+
+  /// Unmodifiable copy of [enabledGameSlugs].
+  static final Set<String> enabledGameSlugsDefault = Set<String>.unmodifiable(
+    enabledGameSlugs,
+  );
+
+  /// JSON string sent to Firebase `setDefaults` for [enabledGameSlugs].
+  static final String enabledGameSlugsJson = jsonEncode(enabledGameSlugs);
+
+  /// Parses a Remote Config JSON array of slugs.
+  ///
+  /// Empty, non-array, or non-string payloads return [enabledGameSlugsDefault].
+  /// A JSON empty array returns an empty set. Slugs are trimmed; duplicates
+  /// collapse.
+  static Set<String> parseEnabledGameSlugs(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return enabledGameSlugsDefault;
+    try {
+      final decoded = jsonDecode(trimmed);
+      if (decoded is! List) return enabledGameSlugsDefault;
+      final slugs = <String>[];
+      for (final item in decoded) {
+        if (item is! String) return enabledGameSlugsDefault;
+        slugs.add(item);
+      }
+      return _setFromSlugStrings(slugs);
+    } on Object {
+      return enabledGameSlugsDefault;
+    }
+  }
+
+  static Set<String> _setFromSlugStrings(Iterable<String> values) {
+    final slugs = <String>{};
+    for (final value in values) {
+      final slug = value.trim();
+      if (slug.isEmpty) return enabledGameSlugsDefault;
+      slugs.add(slug);
+    }
+    return Set<String>.unmodifiable(slugs);
+  }
 
   /// Parses a `--dart-define` bool. [fallback] when unset or unrecognized.
   ///
@@ -126,6 +208,10 @@ final class NoOpRemoteConfig implements IRemoteConfig {
     RemoteConfigKeys.achievementsListFilterVariation,
     defaultValue: RemoteConfigDefaults.achievementsListFilterVariation,
   );
+
+  @override
+  Set<String> get enabledGameSlugs =>
+      _readEnabledGameSlugs(_overrides, getString);
 
   @override
   bool getBool(String key, {required bool defaultValue}) {
@@ -196,6 +282,10 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
     RemoteConfigKeys.achievementsListFilterVariation,
     defaultValue: RemoteConfigDefaults.achievementsListFilterVariation,
   );
+
+  @override
+  Set<String> get enabledGameSlugs =>
+      _readEnabledGameSlugs(_overrides, getString);
 
   @override
   bool getBool(String key, {required bool defaultValue}) {
@@ -295,8 +385,8 @@ final class RemoteConfigService {
   }
 
   static bool get _isRemoteConfigTarget {
-    if (kIsWeb) return true;
-    return defaultTargetPlatform == TargetPlatform.iOS ||
+    return kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.macOS;
   }

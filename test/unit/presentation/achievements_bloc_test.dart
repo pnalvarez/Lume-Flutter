@@ -74,6 +74,10 @@ class _FakeRemoteConfig implements IRemoteConfig {
   bool get achievementsEnabled => true;
   @override
   String get achievementsFilterLayout => filterLayout;
+
+  @override
+  Set<String> get enabledGameSlugs =>
+      RemoteConfigDefaults.enabledGameSlugsDefault;
   @override
   Map<String, Object> get debugOverrides => const {};
   @override

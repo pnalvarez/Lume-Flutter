@@ -17,4 +17,11 @@ abstract final class RemoteConfigKeys {
   /// In-app default: `chips`.
   static const achievementsListFilterVariation =
       'achievements_list_filter_variation';
+
+  /// JSON array of game slugs the app may offer. `galeria_conhecimento` is off
+  /// until a later ticket turns it on.
+  ///
+  /// In-app default: the ten published slugs. Missing or invalid JSON keeps
+  /// that default.
+  static const enabledGameSlugs = 'enabled_game_slugs';
 }
