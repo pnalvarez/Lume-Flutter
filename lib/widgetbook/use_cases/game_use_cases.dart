@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 import 'package:lume_design_system/organisms/game/session_timer.dart';
@@ -16,6 +17,52 @@ Widget promptCardDefault(BuildContext context) {
           label: 'Text',
           initialValue: 'Which statement is true?',
         ),
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Default', type: ArtworkPromptCard)
+Widget artworkPromptCardDefault(BuildContext context) {
+  final url = context.knobs.string(label: 'Image URL', initialValue: '');
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: ArtworkPromptCard(
+        question: context.knobs.string(
+          label: 'Question',
+          initialValue: 'Which movement does this painting belong to?',
+        ),
+        imageUrl: url.isEmpty ? null : url,
+        image: url.isEmpty
+            ? const AssetImage('assets/onboarding/slide-1.jpg')
+            : null,
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Loading', type: ArtworkPromptCard)
+Widget artworkPromptCardLoading(BuildContext context) {
+  return const Scaffold(
+    body: Padding(
+      padding: EdgeInsets.all(24),
+      child: ArtworkPromptCard(
+        question: 'Which movement does this painting belong to?',
+        phase: ArtworkPromptImagePhase.loading,
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Error', type: ArtworkPromptCard)
+Widget artworkPromptCardError(BuildContext context) {
+  return const Scaffold(
+    body: Padding(
+      padding: EdgeInsets.all(24),
+      child: ArtworkPromptCard(
+        question: 'Which movement does this painting belong to?',
+        phase: ArtworkPromptImagePhase.error,
       ),
     ),
   );
