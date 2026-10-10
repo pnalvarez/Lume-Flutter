@@ -33,6 +33,10 @@ class _RemoteConfig implements IRemoteConfig {
   String get achievementsFilterLayout => 'chips';
 
   @override
+  Set<String> get enabledGameSlugs =>
+      RemoteConfigDefaults.enabledGameSlugsDefault;
+
+  @override
   Map<String, Object> get debugOverrides => const {};
 
   @override
