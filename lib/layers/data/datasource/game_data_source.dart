@@ -24,7 +24,9 @@ abstract interface class IGameDataSource {
     int limit = 5,
   });
 
-  Future<HubGameRoundData> fetchRandomGameRound();
+  Future<HubGameRoundData> fetchRandomGameRound({
+    required List<String> enabledSlugs,
+  });
 
   Future<String> startGameMatch({required String gameSlug});
 
@@ -95,9 +97,12 @@ final class GameDataSource implements IGameDataSource {
   }
 
   @override
-  Future<HubGameRoundData> fetchRandomGameRound() async {
+  Future<HubGameRoundData> fetchRandomGameRound({
+    required List<String> enabledSlugs,
+  }) async {
     final raw = await _apiClient.rpc<Map<String, dynamic>>(
       'get_random_game_round',
+      params: {'p_enabled_slugs': enabledSlugs},
     );
     return HubGameRoundData.fromJson(asJsonMap(raw));
   }

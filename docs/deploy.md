@@ -145,11 +145,12 @@ Known parameter keys (`RemoteConfigKeys`):
 |-----|------|----------------|--------|
 | `arcade_enabled` | Boolean | `true` | Shows / hides the Arcade CTA on Games Hub |
 | `achievements_enabled` | Boolean | `false` | Shows / hides Achievements tab, unlock host, and unlock toasts |
-| `enabled_game_slugs` | JSON array of strings | ten published slugs (below) | Readable allowlist only; does not hide Games Hub tiles or Arcade |
+| `enabled_game_slugs` | JSON array of strings | ten published slugs (below) | Games Hub tiles and Arcade rounds use only these slugs |
 
 Behavior:
 
-- Fetch on launch (`fetchAndActivate`); fetch failures keep defaults / last activated values
+- Fetch on launch (`fetchAndActivate`); fetch failures keep defaults / last activated values. A macOS debug/profile run is unsandboxed so Firebase can store its installations token; a sandboxed ad-hoc build fails that write (`SecItemAdd -34018`) and Arcade keeps the ten-slug default.
+- Games Hub load, a hub tile tap, and each Arcade round refresh Remote Config first, then keep only slugs in `enabled_game_slugs`
 - Debug: minimum fetch interval is `0`; release uses 1 hour
 - QA without console:
   - `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)

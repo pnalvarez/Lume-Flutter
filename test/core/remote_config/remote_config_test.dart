@@ -160,6 +160,19 @@ void main() {
     },
   );
 
+  test('account sync still fetches when custom signals fail', () async {
+    var fetches = 0;
+    final sync = RemoteConfigAccountSignals(
+      setSignals: (_) async => throw Exception('signals unavailable'),
+      fetchAndActivate: () async => fetches++,
+      setMinimumFetchInterval: (_) async {},
+    );
+
+    await sync.sync('user-a');
+
+    expect(fetches, 1);
+  });
+
   test(
     'bindAccountId syncs the current account on each session update',
     () async {

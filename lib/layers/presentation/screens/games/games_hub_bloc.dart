@@ -52,15 +52,20 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
       ),
     );
     try {
+      final allowed = await _enabledSlugs();
+      final showArcadeNow = _remoteConfig.arcadeEnabled;
       final games = await _getHubGames(forceRefresh: event.forceRefresh);
       emit(
         state.copyWith(
           isInitialLoading: false,
-          games: [for (final game in games) GamesHubCardUi.fromDomain(game)],
-          showArcade: showArcade,
+          games: [
+            for (final game in games)
+              if (allowed.contains(game.slug)) GamesHubCardUi.fromDomain(game),
+          ],
+          showArcade: showArcadeNow,
         ),
       );
-      if (showArcade) {
+      if (showArcadeNow) {
         _analytics.logEvent(AnalyticsEvents.arcadeCtaImpression);
       }
     } on Object {
@@ -82,6 +87,17 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
 
     emit(state.copyWith(isLoadingGame: true, clearGameRoundError: true));
     try {
+      final allowed = await _enabledSlugs();
+      if (!allowed.contains(event.gameSlug)) {
+        emit(
+          state.copyWith(
+            isLoadingGame: false,
+            gameRoundErrorMessage: gamesHubRoundEmpty,
+          ),
+        );
+        return;
+      }
+
       final round = await _getGameRound(gameSlug: event.gameSlug);
       if (round.games.isEmpty) {
         emit(
@@ -128,7 +144,10 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     emit(state.copyWith(isLoadingGame: true, clearGameRoundError: true));
     try {
       final record = await _getArcadeRecord();
-      final firstGame = await _getRandomGameRound();
+      final enabledSlugs = await _enabledSlugs();
+      final firstGame = await _getRandomGameRound(
+        enabledSlugs: enabledSlugs.toList(),
+      );
 
       if (firstGame == null) {
         emit(
@@ -157,6 +176,12 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         ),
       );
     }
+  }
+
+  /// Refreshes Remote Config, then returns the activated slug allowlist.
+  Future<Set<String>> _enabledSlugs() async {
+    await _remoteConfig.refresh();
+    return _remoteConfig.enabledGameSlugs;
   }
 
   void _onNavigationHandled(
