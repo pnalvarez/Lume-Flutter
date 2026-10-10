@@ -52,6 +52,7 @@ class _GetHubGames implements IGetHubGames {
 class _GetGameRound implements IGetGameRound {
   HubGameRoundDomain? result;
   Object? error;
+  final slugs = <String>[];
 
   @override
   Future<HubGameRoundDomain> call({
@@ -59,6 +60,7 @@ class _GetGameRound implements IGetGameRound {
     int limit = 5,
   }) async {
     if (error != null) throw error!;
+    slugs.add(gameSlug);
     return result ??
         HubGameRoundDomain(
           gameSlug: gameSlug,
@@ -98,9 +100,11 @@ class _GetRandomGameRound implements IGetRandomGameRound {
     explanation: 'Because',
   );
   Object? error;
+  final enabledSlugs = <List<String>>[];
 
   @override
-  Future<TrailGameDomain?> call() async {
+  Future<TrailGameDomain?> call({required List<String> enabledSlugs}) async {
+    this.enabledSlugs.add(enabledSlugs);
     if (error != null) throw error!;
     return result;
   }
@@ -122,6 +126,7 @@ class _StartGameMatch implements IStartGameMatch {
 class _RemoteConfig implements IRemoteConfig {
   bool arcade = true;
   bool achievements = false;
+  Set<String> slugs = RemoteConfigDefaults.enabledGameSlugsDefault;
 
   @override
   bool get arcadeEnabled => arcade;
@@ -133,8 +138,7 @@ class _RemoteConfig implements IRemoteConfig {
   String get achievementsFilterLayout => 'chips';
 
   @override
-  Set<String> get enabledGameSlugs =>
-      RemoteConfigDefaults.enabledGameSlugsDefault;
+  Set<String> get enabledGameSlugs => slugs;
 
   @override
   Map<String, Object> get debugOverrides => const {};
@@ -202,7 +206,10 @@ void main() {
 
   blocTest<GamesHubBloc, GamesHubState>(
     'loads hub games into general and visual sections',
-    build: buildBloc,
+    build: () {
+      remoteConfig.slugs = const {'quiz_relampago', 'giro_pelo_mundo'};
+      return buildBloc();
+    },
     act: (bloc) => bloc.add(const GamesHubStarted()),
     expect: () => [
       const GamesHubState(isInitialLoading: true, showArcade: true),
@@ -215,6 +222,21 @@ void main() {
     verify: (_) {
       expect(analytics.events, contains(AnalyticsEvents.arcadeCtaImpression));
     },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'omits hub games whose slug is outside the allowlist',
+    build: () {
+      remoteConfig.slugs = const {'quiz_relampago'};
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(const GamesHubStarted()),
+    expect: () => [
+      const GamesHubState(isInitialLoading: true, showArcade: true),
+      isA<GamesHubState>()
+          .having((s) => s.generalGames, 'general', hasLength(1))
+          .having((s) => s.visualGames, 'visual', isEmpty),
+    ],
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
@@ -275,6 +297,26 @@ void main() {
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
+    'does not fetch a hub round for a slug outside the allowlist',
+    build: () {
+      remoteConfig.slugs = const {'quiz_relampago'};
+      return buildBloc();
+    },
+    seed: () => const GamesHubState(isInitialLoading: false),
+    act: (bloc) => bloc.add(const GamesHubGamePressed('giro_pelo_mundo')),
+    expect: () => [
+      const GamesHubState(isInitialLoading: false, isLoadingGame: true),
+      const GamesHubState(
+        isInitialLoading: false,
+        gameRoundErrorMessage: gamesHubRoundEmpty,
+      ),
+    ],
+    verify: (_) {
+      expect(getGameRound.slugs, isEmpty);
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
     'emits round error when fetch fails',
     build: () {
       getGameRound.error = Exception('boom');
@@ -295,6 +337,7 @@ void main() {
     'arcade press loads the record and the opening round',
     build: () {
       getArcadeRecord.bestRounds = 7;
+      remoteConfig.slugs = const {'quiz_relampago'};
       return buildBloc();
     },
     seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
@@ -313,6 +356,9 @@ void main() {
     ],
     verify: (_) {
       expect(analytics.events, contains(AnalyticsEvents.arcadeOpened));
+      expect(getRandomGameRound.enabledSlugs.single.toSet(), {
+        'quiz_relampago',
+      });
     },
   );
 
@@ -320,6 +366,7 @@ void main() {
     'arcade press surfaces an error when no game is available',
     build: () {
       getRandomGameRound.result = null;
+      remoteConfig.slugs = const {};
       return buildBloc();
     },
     seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
@@ -336,5 +383,8 @@ void main() {
         showArcade: true,
       ),
     ],
+    verify: (_) {
+      expect(getRandomGameRound.enabledSlugs, [<String>[]]);
+    },
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/models/game_play/complete_sentence_play.dart';
 import 'package:lume/layers/domain/models/game_play/connections_play.dart';
 import 'package:lume/layers/domain/models/game_play/mysterious_word_play.dart';
@@ -42,6 +43,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._saveArcadeRecord,
     this._finishGameMatch,
     this._analytics,
+    this._remoteConfig,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -76,6 +78,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final ISaveArcadeRecord _saveArcadeRecord;
   final IFinishGameMatch _finishGameMatch;
   final IAnalytics _analytics;
+  final IRemoteConfig _remoteConfig;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
@@ -499,7 +502,10 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
 
     TrailGameDomain? nextGame;
     try {
-      nextGame = await _getRandomGameRound();
+      await _remoteConfig.refresh();
+      nextGame = await _getRandomGameRound(
+        enabledSlugs: _remoteConfig.enabledGameSlugs.toList(),
+      );
     } on Object {
       nextGame = null;
     }

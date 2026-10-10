@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/core/remote_config/remote_config_keys.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/domain/usecases/games/play_battle_of_curiosities.dart';
@@ -63,13 +65,15 @@ class _SavePairProgress implements ISavePairProgress {
 
 class _GetRandomGameRound implements IGetRandomGameRound {
   int calls = 0;
+  final enabledSlugs = <List<String>>[];
 
   /// Games handed out in order; a `null` entry (or running past the end) stops
   /// the run. Leave unset to hand out [_quiz2] forever.
   List<TrailGameDomain?>? queue;
 
   @override
-  Future<TrailGameDomain?> call() async {
+  Future<TrailGameDomain?> call({required List<String> enabledSlugs}) async {
+    this.enabledSlugs.add(enabledSlugs);
     final index = calls;
     calls++;
     final pending = queue;
@@ -161,6 +165,7 @@ GamesBloc _createGamesBloc(
   _SaveArcadeRecord? saveArcadeRecord,
   _FinishGameMatch? finishGameMatch,
   FakeAnalytics? analytics,
+  IRemoteConfig? remoteConfig,
 }) => GamesBloc(
   PlayLightningQuiz(),
   PlayTimeline(),
@@ -176,6 +181,7 @@ GamesBloc _createGamesBloc(
   saveArcadeRecord ?? _SaveArcadeRecord(),
   finishGameMatch ?? _FinishGameMatch(),
   analytics ?? FakeAnalytics(),
+  remoteConfig ?? NoOpRemoteConfig(),
 );
 
 void main() {
@@ -658,11 +664,17 @@ void main() {
     late _SaveArcadeRound saveRound;
     late _SaveArcadeRecord saveRecord;
 
+    late NoOpRemoteConfig remoteConfig;
+
     setUp(() {
       savePair = _SavePairProgress();
       getRandomRound = _GetRandomGameRound();
       saveRound = _SaveArcadeRound();
       saveRecord = _SaveArcadeRecord();
+      remoteConfig = NoOpRemoteConfig();
+      remoteConfig.setDebugOverride(RemoteConfigKeys.enabledGameSlugs, <String>[
+        'linha_do_tempo',
+      ]);
     });
 
     const firstRound = [GameRound(id: '10', game: _quiz1)];
@@ -672,6 +684,7 @@ void main() {
       getRandomRound: getRandomRound,
       saveArcadeRound: saveRound,
       saveArcadeRecord: saveRecord,
+      remoteConfig: remoteConfig,
     );
 
     blocTest<GamesBloc, GamesState>(
@@ -699,6 +712,7 @@ void main() {
         expect(bloc.state.sequenceCompleted, isFalse);
         expect(bloc.state.answered, isFalse);
         expect(saveRecord.calls, isEmpty);
+        expect(getRandomRound.enabledSlugs.single, ['linha_do_tempo']);
       },
     );
 

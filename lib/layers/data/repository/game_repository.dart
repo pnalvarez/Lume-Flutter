@@ -47,8 +47,12 @@ final class GameRepository implements IGameRepository {
   }
 
   @override
-  Future<HubGameRoundDomain> getRandomGameRound() async {
-    final data = await _dataSource.fetchRandomGameRound();
+  Future<HubGameRoundDomain> getRandomGameRound({
+    required List<String> enabledSlugs,
+  }) async {
+    final data = await _dataSource.fetchRandomGameRound(
+      enabledSlugs: enabledSlugs,
+    );
     return HubGameRoundMapper.toDomain(data);
   }
 

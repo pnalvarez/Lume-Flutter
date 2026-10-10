@@ -17,7 +17,12 @@ abstract interface class IGameRepository {
   });
 
   /// One random playable round picked by the backend, for arcade mode.
-  Future<HubGameRoundDomain> getRandomGameRound();
+  ///
+  /// [enabledSlugs] limits which catalog slugs may be chosen. An empty list
+  /// yields no round.
+  Future<HubGameRoundDomain> getRandomGameRound({
+    required List<String> enabledSlugs,
+  });
 
   /// Inserts an open `game_matches` row and returns its id.
   Future<String> startGameMatch({required String gameSlug});

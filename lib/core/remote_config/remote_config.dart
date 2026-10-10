@@ -54,7 +54,7 @@ abstract interface class IRemoteConfig {
   ///
   /// Missing or invalid JSON falls back to
   /// [RemoteConfigDefaults.enabledGameSlugsDefault]. An empty JSON array is an
-  /// empty set. Games Hub and Arcade do not read this value.
+  /// empty set. Games Hub tiles and Arcade rounds use this set.
   Set<String> get enabledGameSlugs;
 
   /// Boolean parameter with [defaultValue] when the key is missing.
@@ -322,7 +322,29 @@ final class FirebaseRemoteConfigClient implements IRemoteConfig {
   @override
   Future<void> refresh() async {
     try {
-      await _remoteConfig.fetchAndActivate();
+      await _remoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: _remoteConfigFetchTimeout,
+          minimumFetchInterval: Duration.zero,
+        ),
+      );
+      try {
+        await _remoteConfig.fetchAndActivate();
+      } finally {
+        await _remoteConfig.setConfigSettings(
+          RemoteConfigSettings(
+            fetchTimeout: _remoteConfigFetchTimeout,
+            minimumFetchInterval: _defaultSteadyMinimumFetchInterval,
+          ),
+        );
+      }
+      if (kDebugMode) {
+        final value = _remoteConfig.getValue(RemoteConfigKeys.enabledGameSlugs);
+        debugPrint(
+          'Remote Config ${RemoteConfigKeys.enabledGameSlugs} '
+          'source=${value.source.name} value=${value.asString()}',
+        );
+      }
     } on Object catch (error, stack) {
       debugPrint('Remote Config refresh failed: $error\n$stack');
     }
@@ -484,7 +506,11 @@ final class RemoteConfigAccountSignals {
 
   Future<void> _apply(String? accountId) async {
     final next = _accountSignal(accountId);
-    await _setSignals(<String, Object?>{'account_id': next});
+    try {
+      await _setSignals(<String, Object?>{'account_id': next});
+    } on Object catch (error, stack) {
+      debugPrint('Remote Config custom signals failed: $error\n$stack');
+    }
     if (_hasAccountId && _accountId == next) return;
 
     await _setMinimumFetchInterval(Duration.zero);

@@ -158,6 +158,45 @@ void main() {
     ).called(1);
   });
 
+  test('fetchRandomGameRound posts the enabled slug allowlist', () async {
+    when(
+      apiClient.rpc<Map<String, dynamic>>(
+        'get_random_game_round',
+        params: anyNamed('params'),
+        headers: anyNamed('headers'),
+      ),
+    ).thenAnswer(
+      (_) async => {
+        'game_slug': 'quiz_relampago',
+        'game_name': 'Quiz Relâmpago',
+        'games': <Object?>[],
+      },
+    );
+
+    final round = await sut.fetchRandomGameRound(
+      enabledSlugs: const ['quiz_relampago', 'verdade_ou_mito'],
+    );
+
+    expect(round.gameSlug, 'quiz_relampago');
+    expect(round.games, isEmpty);
+    verify(
+      apiClient.rpc<Map<String, dynamic>>(
+        'get_random_game_round',
+        params: {
+          'p_enabled_slugs': ['quiz_relampago', 'verdade_ou_mito'],
+        },
+      ),
+    ).called(1);
+
+    await sut.fetchRandomGameRound(enabledSlugs: const <String>[]);
+    verify(
+      apiClient.rpc<Map<String, dynamic>>(
+        'get_random_game_round',
+        params: {'p_enabled_slugs': <String>[]},
+      ),
+    ).called(1);
+  });
+
   test('finishGameMatch posts the score and drops the profile cache', () async {
     await storage.write(CacheKeys.profile, '{}');
     when(
