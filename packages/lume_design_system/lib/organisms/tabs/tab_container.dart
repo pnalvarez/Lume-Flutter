@@ -117,7 +117,7 @@ class _TabOption extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
-          style: (selected ? typ.body3Semibold : typ.body3Medium).copyWith(
+          style: (selected ? typ.body4Semibold : typ.body4Medium).copyWith(
             color: selected ? primary : colorScheme.onSurfaceVariant,
           ),
         ),
