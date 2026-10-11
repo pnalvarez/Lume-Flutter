@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
@@ -10,6 +14,7 @@ import 'package:lume_design_system/organisms/feedback/floating_notice.dart';
 import 'package:lume_design_system/organisms/feedback/lume_loading_overlay.dart';
 import 'package:lume_design_system/organisms/feedback/lume_snack_bar.dart';
 import 'package:lume_design_system/organisms/feedback/result_banner.dart';
+import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 import 'package:lume_design_system/organisms/game/prompt_card.dart';
 import 'package:lume_design_system/organisms/game/session_timer.dart';
@@ -268,6 +273,155 @@ void main() {
         _wrap(const PromptCard(eyebrow: 'Q1', text: 'What is 2+2?')),
       );
       expect(find.text('What is 2+2?'), findsOneWidget);
+    });
+
+    testWidgets('ArtworkPromptCard places the question above the image', (
+      tester,
+    ) async {
+      const question = 'Which movement does this painting belong to?';
+      await tester.pumpWidget(
+        _wrap(
+          SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: question,
+              image: MemoryImage(_samplePng),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(question), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text(question)).dy,
+        lessThan(tester.getTopLeft(find.byType(Image)).dy),
+      );
+      expect(
+        tester.widget<AspectRatio>(find.byType(AspectRatio)).aspectRatio,
+        ArtworkPromptCard.aspectRatio,
+      );
+    });
+
+    testWidgets('ArtworkPromptCard shows a loading well', (tester) async {
+      const question = 'Which movement does this painting belong to?';
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: question,
+              phase: ArtworkPromptImagePhase.loading,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(question), findsOneWidget);
+      expect(find.byType(CircularLoader), findsOneWidget);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsNothing);
+    });
+
+    testWidgets('ArtworkPromptCard shows an error well', (tester) async {
+      const question = 'Which movement does this painting belong to?';
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: question,
+              phase: ArtworkPromptImagePhase.error,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(question), findsOneWidget);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+      expect(find.byType(CircularLoader), findsNothing);
+    });
+
+    testWidgets('ArtworkPromptCard keeps a pending image in the loading well', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: 'Pending artwork',
+              image: _PendingImage(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Pending artwork'), findsOneWidget);
+      expect(find.byType(CircularLoader), findsOneWidget);
+    });
+
+    testWidgets('ArtworkPromptCard shows the error well when the image fails', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: 'Broken artwork',
+              image: _FailingImage(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Broken artwork'), findsOneWidget);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+    });
+
+    testWidgets('ArtworkPromptCard shows the error well without an image', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(question: 'Missing artwork'),
+          ),
+        ),
+      );
+
+      expect(find.text('Missing artwork'), findsOneWidget);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+    });
+
+    testWidgets('ArtworkPromptCard shows the error well for a blank url', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(question: 'Blank artwork', imageUrl: '  '),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+    });
+
+    testWidgets('ArtworkPromptCard shows the error well when the url fails', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: 'Remote artwork',
+              imageUrl: 'https://example.invalid/art.png',
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Remote artwork'), findsOneWidget);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
     });
 
     testWidgets('ChoiceGroup selects option', (tester) async {
@@ -534,4 +688,45 @@ void main() {
       );
     });
   });
+}
+
+/// 4×4 PNG. Contents are irrelevant; the card only needs a decodable image.
+final Uint8List _samplePng = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVR42mOQbrn1HxkzkC4AACd/J4ETnPSMAAAAAElFTkSuQmCC',
+);
+
+class _PendingImage extends ImageProvider<_PendingImage> {
+  const _PendingImage();
+
+  @override
+  Future<_PendingImage> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture(this);
+  }
+
+  @override
+  ImageStreamCompleter loadImage(
+    _PendingImage key,
+    ImageDecoderCallback decode,
+  ) {
+    return OneFrameImageStreamCompleter(Completer<ImageInfo>().future);
+  }
+}
+
+class _FailingImage extends ImageProvider<_FailingImage> {
+  const _FailingImage();
+
+  @override
+  Future<_FailingImage> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture(this);
+  }
+
+  @override
+  ImageStreamCompleter loadImage(
+    _FailingImage key,
+    ImageDecoderCallback decode,
+  ) {
+    return OneFrameImageStreamCompleter(
+      Future<ImageInfo>.error(StateError('decode failed')),
+    );
+  }
 }
