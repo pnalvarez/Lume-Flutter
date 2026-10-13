@@ -53,15 +53,13 @@ final class KnowledgeGalleryBloc
     }
 
     final answer = round.options[index];
-    final correct = answer == round.correctAnswer;
+    // Stay unanswered until submit_visual_answer returns. An early answered
+    // flag opens the root feedback dialog, and a failed write only clears
+    // this selection — it does not pop that route.
     emit(
       state.copyWith(
         submitting: true,
-        answered: true,
-        isCorrect: correct,
         selectedOptionId: event.optionId,
-        revealedCorrectAnswer: round.correctAnswer,
-        correctCount: state.correctCount + (correct ? 1 : 0),
         clearSnack: true,
       ),
     );
@@ -70,21 +68,19 @@ final class KnowledgeGalleryBloc
         questionId: round.questionId,
         answer: answer,
       );
-      final serverCorrect = result.correct;
       emit(
         state.copyWith(
           submitting: false,
-          isCorrect: serverCorrect,
+          answered: true,
+          isCorrect: result.correct,
           revealedCorrectAnswer: result.correctAnswer,
-          correctCount:
-              state.correctCount + (serverCorrect ? 1 : 0) - (correct ? 1 : 0),
+          correctCount: state.correctCount + (result.correct ? 1 : 0),
         ),
       );
     } on Object {
       emit(
         state.copyWith(
           submitting: false,
-          correctCount: state.correctCount - (correct ? 1 : 0),
           clearAnswer: true,
           snackMessage: trailSessionSaveError,
         ),

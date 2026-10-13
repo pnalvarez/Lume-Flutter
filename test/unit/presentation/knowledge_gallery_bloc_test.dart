@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
@@ -30,6 +32,8 @@ class _Submit implements ISubmitKnowledgeGalleryAnswer {
   final answers = <({int questionId, String answer})>[];
   var correct = true;
   String correctAnswer = 'Impressionismo';
+  Object? error;
+  Completer<void>? gate;
 
   @override
   Future<KnowledgeGalleryAnswerResult> call({
@@ -37,6 +41,10 @@ class _Submit implements ISubmitKnowledgeGalleryAnswer {
     required String answer,
   }) async {
     answers.add((questionId: questionId, answer: answer));
+    final pending = gate;
+    if (pending != null) await pending.future;
+    final failure = error;
+    if (failure != null) throw failure;
     return KnowledgeGalleryAnswerResult(
       correct: correct,
       correctAnswer: correctAnswer,
@@ -116,6 +124,51 @@ void main() {
       expect(bloc.state.sequenceCompleted, isTrue);
       expect(bloc.state.goBack, isFalse);
       expect(bloc.state.correctCount, 1);
+    },
+  );
+
+  blocTest<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+    'stays unanswered until submit_visual_answer returns',
+    build: build,
+    act: (bloc) async {
+      final gate = Completer<void>();
+      submit.gate = gate;
+      bloc.add(
+        const KnowledgeGalleryStarted(rounds: [_first], matchId: 'match-9'),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const KnowledgeGalleryOptionSelected('0'));
+      await bloc.stream.firstWhere((state) => state.submitting);
+      expect(bloc.state.answered, isFalse);
+      expect(bloc.state.correctCount, 0);
+      gate.complete();
+      await bloc.stream.firstWhere((state) => state.answered);
+    },
+    verify: (bloc) {
+      expect(bloc.state.submitting, isFalse);
+      expect(bloc.state.isCorrect, isTrue);
+      expect(bloc.state.correctCount, 1);
+    },
+  );
+
+  blocTest<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+    'a failed submit clears the selection and does not answer the round',
+    build: build,
+    act: (bloc) async {
+      submit.error = StateError('submit failed');
+      bloc.add(
+        const KnowledgeGalleryStarted(rounds: [_first], matchId: 'match-9'),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const KnowledgeGalleryOptionSelected('0'));
+      await bloc.stream.firstWhere((state) => state.snackMessage != null);
+    },
+    verify: (bloc) {
+      expect(bloc.state.answered, isFalse);
+      expect(bloc.state.submitting, isFalse);
+      expect(bloc.state.selectedOptionId, isNull);
+      expect(bloc.state.correctCount, 0);
+      expect(bloc.state.isCorrect, isFalse);
     },
   );
 

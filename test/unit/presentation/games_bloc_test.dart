@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/core/analytics/analytics.dart';
@@ -186,6 +188,8 @@ class _GetKnowledgeGalleryRound implements IGetKnowledgeGalleryRound {
 
 class _SubmitKnowledgeGalleryAnswer implements ISubmitKnowledgeGalleryAnswer {
   final answers = <String>[];
+  Object? error;
+  Completer<void>? gate;
   KnowledgeGalleryAnswerResult result = const KnowledgeGalleryAnswerResult(
     correct: true,
     correctAnswer: 'A',
@@ -197,6 +201,10 @@ class _SubmitKnowledgeGalleryAnswer implements ISubmitKnowledgeGalleryAnswer {
     required String answer,
   }) async {
     answers.add(answer);
+    final pending = gate;
+    if (pending != null) await pending.future;
+    final failure = error;
+    if (failure != null) throw failure;
     return result;
   }
 }
@@ -938,6 +946,115 @@ void main() {
         expect(bloc.state.arcade.scoredCount, 1);
         expect(bloc.state.sequenceCompleted, isFalse);
         expect(bloc.state.answered, isFalse);
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'a next queued during a failed gallery submit does not score or spend a life',
+      build: () {
+        final submit = _SubmitKnowledgeGalleryAnswer()
+          ..error = StateError('submit failed');
+        return _createGamesBloc(
+          savePair,
+          getRandomRound: getRandomRound,
+          saveArcadeRound: saveRound,
+          saveArcadeRecord: saveRecord,
+          submitGallery: submit,
+        );
+      },
+      act: (bloc) {
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            mode: GamesPlayMode.arcade,
+          ),
+        );
+        // Local hit: option 0 matches the gallery answer.
+        bloc.add(const GamesChoiceSelected('0'));
+        // Queued while submit_visual_answer is still in flight.
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.status, GamesStatus.error);
+        expect(bloc.state.answered, isFalse);
+        expect(bloc.state.arcade.scoredCount, 0);
+        expect(bloc.state.arcade.misses, 0);
+        expect(bloc.state.currentIndex, 0);
+        expect(bloc.state.completedCount, 0);
+        expect(bloc.state.sequenceCompleted, isFalse);
+        expect(saveRound.calls, isEmpty);
+      },
+    );
+
+    test(
+      'gallery stays unanswered until submit_visual_answer returns',
+      () async {
+        final gate = Completer<void>();
+        final submit = _SubmitKnowledgeGalleryAnswer()..gate = gate;
+        final bloc = _createGamesBloc(
+          savePair,
+          getRandomRound: getRandomRound,
+          saveArcadeRound: saveRound,
+          saveArcadeRecord: saveRecord,
+          submitGallery: submit,
+        );
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            mode: GamesPlayMode.arcade,
+          ),
+        );
+        await pumpEventQueue();
+        bloc.add(const GamesChoiceSelected('0'));
+        await bloc.stream.firstWhere(
+          (state) => state.choice.selectedOptionId == '0',
+        );
+        expect(bloc.state.answered, isFalse);
+        expect(bloc.state.status, GamesStatus.ready);
+        submit.result = const KnowledgeGalleryAnswerResult(
+          correct: false,
+          correctAnswer: 'Cubismo',
+        );
+        gate.complete();
+        await bloc.stream.firstWhere((state) => state.answered);
+        expect(bloc.state.isCorrect, isFalse);
+        expect(bloc.state.status, GamesStatus.ready);
+        await bloc.close();
+      },
+    );
+
+    blocTest<GamesBloc, GamesState>(
+      'a next queued during a failed gallery miss does not spend a life',
+      build: () {
+        final submit = _SubmitKnowledgeGalleryAnswer()
+          ..error = StateError('submit failed');
+        return _createGamesBloc(
+          savePair,
+          getRandomRound: getRandomRound,
+          saveArcadeRound: saveRound,
+          saveArcadeRecord: saveRecord,
+          submitGallery: submit,
+        );
+      },
+      act: (bloc) {
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            mode: GamesPlayMode.arcade,
+          ),
+        );
+        bloc.add(const GamesChoiceSelected('1'));
+        bloc.add(const GamesNextPressed());
+      },
+      wait: const Duration(milliseconds: 20),
+      verify: (bloc) {
+        expect(bloc.state.status, GamesStatus.error);
+        expect(bloc.state.answered, isFalse);
+        expect(bloc.state.arcade.scoredCount, 0);
+        expect(bloc.state.arcade.misses, 0);
+        expect(bloc.state.currentIndex, 0);
+        expect(bloc.state.sequenceCompleted, isFalse);
       },
     );
   });

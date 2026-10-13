@@ -350,7 +350,15 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesNextPressed event,
     Emitter<GamesState> emit,
   ) async {
-    if (!state.answered || state.status == GamesStatus.saving) return;
+    // Gallery stays unanswered until submit_visual_answer returns, so a
+    // Próximo queued during that call cannot score a guess that is still
+    // in flight or has already failed.
+    if (!state.answered ||
+        state.status == GamesStatus.saving ||
+        _gallerySubmitInFlight ||
+        _pendingGalleryOptionId != null) {
+      return;
+    }
     final scorePct = state.isCorrect ? 100 : 0;
     await _persistAndAdvance(emit, scorePct: scorePct);
   }
@@ -569,15 +577,15 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     final index = int.tryParse(optionId);
     if (index == null || index < 0 || index >= gallery.options.length) return;
     final answer = gallery.options[index];
-    final correct = answer == gallery.correctAnswer;
     _gallerySubmitInFlight = true;
     _pendingGalleryOptionId = optionId;
+    // Keep the round unanswered until the write returns. Marking it answered
+    // here opens the root feedback dialog, and a failed submit then replaces
+    // this surface without popping that route.
     emit(
       state.copyWith(
         status: GamesStatus.ready,
         choice: state.choice.copyWith(selectedOptionId: optionId),
-        answered: true,
-        isCorrect: correct,
         clearError: true,
       ),
     );
@@ -590,6 +598,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       emit(
         state.copyWith(
           status: GamesStatus.ready,
+          answered: true,
           isCorrect: result.correct,
           clearError: true,
         ),
@@ -599,6 +608,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         state.copyWith(
           status: GamesStatus.error,
           errorMessage: trailSessionSaveError,
+          answered: false,
+          isCorrect: false,
+          choice: state.choice.copyWith(clearSelectedOptionId: true),
         ),
       );
     } finally {
