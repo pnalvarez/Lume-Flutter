@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_card_ui.dart';
 
@@ -14,6 +15,7 @@ final class GamesHubState {
     this.openPlayRounds,
     this.openMatchId,
     this.openGameSlug,
+    this.openGalleryRounds,
     this.openArcadeRounds,
     this.arcadeRecord = 0,
     this.showArcade = false,
@@ -35,8 +37,11 @@ final class GamesHubState {
   /// Open `game_matches` id for [openPlayRounds]. Cleared with the rounds.
   final String? openMatchId;
 
-  /// Catalog slug for [openPlayRounds], such as `leilao_dicas`.
+  /// Catalog slug for [openPlayRounds] or [openGalleryRounds].
   final String? openGameSlug;
+
+  /// Set when the hub tile is Knowledge Gallery. Cleared with navigation.
+  final List<KnowledgeGalleryRound>? openGalleryRounds;
 
   /// Set after the arcade record and opening round load; cleared on navigation.
   final List<GameRound>? openArcadeRounds;
@@ -66,12 +71,14 @@ final class GamesHubState {
     List<GameRound>? openPlayRounds,
     String? openMatchId,
     String? openGameSlug,
+    List<KnowledgeGalleryRound>? openGalleryRounds,
     List<GameRound>? openArcadeRounds,
     int? arcadeRecord,
     bool? showArcade,
     bool clearInitialError = false,
     bool clearGameRoundError = false,
     bool clearOpenPlayRounds = false,
+    bool clearOpenGalleryRounds = false,
     bool clearOpenArcadeRounds = false,
   }) {
     return GamesHubState(
@@ -87,10 +94,15 @@ final class GamesHubState {
       openPlayRounds: clearOpenPlayRounds
           ? null
           : openPlayRounds ?? this.openPlayRounds,
-      openMatchId: clearOpenPlayRounds ? null : openMatchId ?? this.openMatchId,
-      openGameSlug: clearOpenPlayRounds
+      openMatchId: clearOpenPlayRounds || clearOpenGalleryRounds
+          ? null
+          : openMatchId ?? this.openMatchId,
+      openGameSlug: clearOpenPlayRounds || clearOpenGalleryRounds
           ? null
           : openGameSlug ?? this.openGameSlug,
+      openGalleryRounds: clearOpenGalleryRounds
+          ? null
+          : openGalleryRounds ?? this.openGalleryRounds,
       openArcadeRounds: clearOpenArcadeRounds
           ? null
           : openArcadeRounds ?? this.openArcadeRounds,
@@ -110,6 +122,7 @@ final class GamesHubState {
       listEquals(other.openPlayRounds, openPlayRounds) &&
       other.openMatchId == openMatchId &&
       other.openGameSlug == openGameSlug &&
+      listEquals(other.openGalleryRounds, openGalleryRounds) &&
       listEquals(other.openArcadeRounds, openArcadeRounds) &&
       other.arcadeRecord == arcadeRecord &&
       other.showArcade == showArcade;
@@ -124,6 +137,7 @@ final class GamesHubState {
     openPlayRounds == null ? null : Object.hashAll(openPlayRounds!),
     openMatchId,
     openGameSlug,
+    openGalleryRounds == null ? null : Object.hashAll(openGalleryRounds!),
     openArcadeRounds == null ? null : Object.hashAll(openArcadeRounds!),
     arcadeRecord,
     showArcade,

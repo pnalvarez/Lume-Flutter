@@ -5,6 +5,7 @@ import 'package:lume/layers/presentation/screens/games/complete_sentence/complet
 import 'package:lume/layers/presentation/screens/games/connections/connections_state.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_play_ui.dart';
+import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_state.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_state.dart';
 import 'package:lume/layers/presentation/screens/games/timeline/timeline_state.dart';
@@ -136,6 +137,38 @@ final class GamesState {
   }
 
   TrailGameDomain? get currentGame => currentRound?.game;
+
+  KnowledgeGalleryState? get knowledgeGalleryView {
+    final round = currentRound?.gallery;
+    if (round == null) return null;
+    final selected = choice.selectedOptionId;
+    String? correctOptionId;
+    if (answered) {
+      correctOptionId = knowledgeGalleryOptionId(
+        round.options,
+        round.correctAnswer,
+      );
+      if (correctOptionId == null && isCorrect) {
+        correctOptionId = selected;
+      }
+    }
+    return KnowledgeGalleryState(
+      prompt: round.prompt,
+      imageUrl: round.imageUrl,
+      options: round.options,
+      selectedOptionId: selected,
+      correctOptionId: correctOptionId,
+      answered: answered,
+      isCorrect: isCorrect,
+      explanation: answered
+          ? knowledgeGalleryFeedback(
+              isCorrect: isCorrect,
+              feedbackCorrect: round.feedbackCorrect,
+              feedbackIncorrect: round.feedbackIncorrect,
+            )
+          : null,
+    );
+  }
 
   bool get isLastRound =>
       rounds.isNotEmpty && currentIndex >= rounds.length - 1;

@@ -49,5 +49,9 @@ class AppRouter extends RootStackRouter {
       path: '/trail/:trailId/submodule/:submoduleId',
     ),
     AutoRoute(page: GamesRoute.page, path: '/games/play'),
+    AutoRoute(
+      page: KnowledgeGalleryRoute.page,
+      path: '/games/knowledge-gallery',
+    ),
   ];
 }

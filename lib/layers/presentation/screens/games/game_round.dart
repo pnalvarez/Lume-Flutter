@@ -1,23 +1,33 @@
 import 'package:flutter/foundation.dart';
+import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 
 /// One playable unit in a [GamesPage] sequence.
 ///
 /// [id] is opaque to the games screen — callers use it in [GamesRoundSave]
-/// (e.g. trail pair id as a string). [game] holds the playable content.
+/// (e.g. trail pair id as a string). A round is either a trail [game] or a
+/// Knowledge Gallery [gallery] question.
 @immutable
 final class GameRound {
-  const GameRound({required this.id, required this.game});
+  const GameRound({required this.id, this.game, this.gallery})
+    : assert(
+        (game != null) != (gallery != null),
+        'GameRound needs a trail game or a gallery question',
+      );
 
   final String id;
-  final TrailGameDomain game;
+  final TrailGameDomain? game;
+  final KnowledgeGalleryRound? gallery;
 
   @override
   bool operator ==(Object other) =>
-      other is GameRound && other.id == id && other.game == game;
+      other is GameRound &&
+      other.id == id &&
+      other.game == game &&
+      other.gallery == gallery;
 
   @override
-  int get hashCode => Object.hash(id, game);
+  int get hashCode => Object.hash(id, game, gallery);
 }
 
 /// Persists a finished round. Implemented by the caller (trail preview, hub, …).

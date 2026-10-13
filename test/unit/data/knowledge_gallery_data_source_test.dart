@@ -134,6 +134,14 @@ void main() {
     expect(api.calls, isNot(contains('save_pair_progress')));
   });
 
+  test('fetchRounds forwards a count of one', () async {
+    api.handler = (_) => [_roundJson()];
+
+    await sut.fetchRounds(count: 1);
+
+    expect((api.params.single! as Map)['p_count'], 1);
+  });
+
   test(
     'submitAnswer posts submit_visual_answer and not pair progress',
     () async {

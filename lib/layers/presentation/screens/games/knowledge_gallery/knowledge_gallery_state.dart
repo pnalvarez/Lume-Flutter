@@ -16,6 +16,8 @@ final class KnowledgeGalleryState {
     this.selectedOptionId,
     this.correctOptionId,
     this.answered = false,
+    this.isCorrect = false,
+    this.explanation,
   });
 
   final String prompt;
@@ -32,6 +34,10 @@ final class KnowledgeGalleryState {
   final String? selectedOptionId;
   final String? correctOptionId;
   final bool answered;
+  final bool isCorrect;
+
+  /// Feedback line shown after the answer, the same role as a trail explanation.
+  final String? explanation;
 
   ChoiceVisualState visualStateFor(String optionId) {
     return choiceOptionVisualState(
@@ -51,6 +57,8 @@ final class KnowledgeGalleryState {
     String? selectedOptionId,
     String? correctOptionId,
     bool? answered,
+    bool? isCorrect,
+    String? explanation,
   }) {
     return KnowledgeGalleryState(
       prompt: prompt ?? this.prompt,
@@ -61,6 +69,8 @@ final class KnowledgeGalleryState {
       selectedOptionId: selectedOptionId ?? this.selectedOptionId,
       correctOptionId: correctOptionId ?? this.correctOptionId,
       answered: answered ?? this.answered,
+      isCorrect: isCorrect ?? this.isCorrect,
+      explanation: explanation ?? this.explanation,
     );
   }
 
@@ -74,7 +84,9 @@ final class KnowledgeGalleryState {
       listEquals(other.options, options) &&
       other.selectedOptionId == selectedOptionId &&
       other.correctOptionId == correctOptionId &&
-      other.answered == answered;
+      other.answered == answered &&
+      other.isCorrect == isCorrect &&
+      other.explanation == explanation;
 
   @override
   int get hashCode => Object.hash(
@@ -86,5 +98,29 @@ final class KnowledgeGalleryState {
     selectedOptionId,
     correctOptionId,
     answered,
+    isCorrect,
+    explanation,
   );
+}
+
+/// Feedback copy for a revealed Knowledge Gallery answer.
+///
+/// Uses the correct line after a hit and the incorrect line after a miss.
+String? knowledgeGalleryFeedback({
+  required bool isCorrect,
+  String? feedbackCorrect,
+  String? feedbackIncorrect,
+}) {
+  final text = (isCorrect ? feedbackCorrect : feedbackIncorrect)?.trim();
+  if (text == null || text.isEmpty) return null;
+  return text;
+}
+
+/// Index of [answer] in [options], as `'0'`, `'1'`, and so on.
+///
+/// Null when [answer] is not listed.
+String? knowledgeGalleryOptionId(List<String> options, String answer) {
+  final index = options.indexOf(answer);
+  if (index < 0) return null;
+  return '$index';
 }

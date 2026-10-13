@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
+import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 import 'package:lume/layers/domain/models/game_play/complete_sentence_play.dart';
 import 'package:lume/layers/domain/models/game_play/connections_play.dart';
 import 'package:lume/layers/domain/models/game_play/mysterious_word_play.dart';
@@ -17,10 +18,11 @@ import 'package:lume/layers/domain/usecases/games/play_timeline.dart';
 import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
 import 'package:lume/layers/domain/usecases/finish_game_match.dart';
-import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
+import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
+import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_play_ui.dart';
@@ -38,12 +40,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._playConnections,
     this._playMysteriousWord,
     this._savePairProgress,
-    this._getRandomGameRound,
+    this._drawArcadeRound,
     this._saveArcadeRound,
     this._saveArcadeRecord,
     this._finishGameMatch,
     this._analytics,
     this._remoteConfig,
+    this._submitKnowledgeGalleryAnswer,
   ) : super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -73,12 +76,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IPlayConnections _playConnections;
   final IPlayMysteriousWord _playMysteriousWord;
   final ISavePairProgress _savePairProgress;
-  final IGetRandomGameRound _getRandomGameRound;
+  final IDrawArcadeRound _drawArcadeRound;
   final ISaveArcadeRound _saveArcadeRound;
   final ISaveArcadeRecord _saveArcadeRecord;
   final IFinishGameMatch _finishGameMatch;
   final IAnalytics _analytics;
   final IRemoteConfig _remoteConfig;
+  final ISubmitKnowledgeGalleryAnswer _submitKnowledgeGalleryAnswer;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
@@ -102,6 +106,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   /// Set when leaving should close the match and a finish attempt failed.
   var _leaveFinishPending = false;
   var _leaveCorrectCount = 0;
+  var _gallerySubmitInFlight = false;
+  String? _pendingGalleryOptionId;
 
   static const _leilaoDicasSlug = 'leilao_dicas';
 
@@ -127,7 +133,12 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       AnalyticsParams.roundsTotal: event.rounds.length,
     };
     if (first != null) {
-      params[AnalyticsParams.gameType] = first.game.gameType.wireValue;
+      final trailGame = first.game;
+      if (trailGame != null) {
+        params[AnalyticsParams.gameType] = trailGame.gameType.wireValue;
+      } else if (first.gallery != null) {
+        params[AnalyticsParams.gameType] = knowledgeGalleryGameSlug;
+      }
     }
     _analytics.logEvent(AnalyticsEvents.gameRoundStarted, parameters: params);
     emit(
@@ -138,8 +149,17 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     );
   }
 
-  void _onChoiceSelected(GamesChoiceSelected event, Emitter<GamesState> emit) {
-    if (state.answered) return;
+  Future<void> _onChoiceSelected(
+    GamesChoiceSelected event,
+    Emitter<GamesState> emit,
+  ) async {
+    if (state.answered || _gallerySubmitInFlight) return;
+
+    final gallery = state.currentRound?.gallery;
+    if (gallery != null) {
+      await _submitGalleryChoice(gallery, event.optionId, emit);
+      return;
+    }
 
     final outcome = switch (state.currentGame) {
       LightningQuizGameDomain game => _playLightningQuiz.selectOption(
@@ -343,6 +363,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       await _finishPendingLeave(emit);
       return;
     }
+    final pendingOption = _pendingGalleryOptionId;
+    final gallery = state.currentRound?.gallery;
+    if (pendingOption != null && gallery != null) {
+      emit(state.copyWith(status: GamesStatus.ready, clearError: true));
+      await _submitGalleryChoice(gallery, pendingOption, emit);
+      return;
+    }
     final scorePct = state.pendingSaveScorePct;
     if (scorePct == null) return;
     await _persistAndAdvance(emit, scorePct: scorePct);
@@ -459,6 +486,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     required int scorePct,
   }) async {
     if (_isArcade) {
+      if (state.currentRound?.gallery != null) return 0;
       final result = await _saveArcadeRound(
         pairId: int.parse(roundId),
         scorePct: scorePct,
@@ -500,18 +528,18 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       return;
     }
 
-    TrailGameDomain? nextGame;
+    GameRound? nextRound;
     try {
       await _remoteConfig.refresh();
-      nextGame = await _getRandomGameRound(
+      nextRound = await _drawArcadeRound(
         enabledSlugs: _remoteConfig.enabledGameSlugs.toList(),
       );
     } on Object {
-      nextGame = null;
+      nextRound = null;
     }
 
     // Out of content or offline: close the run so the score is not lost.
-    if (nextGame == null) {
+    if (nextRound == null) {
       await _endArcadeSession(emit, arcade: advanced);
       return;
     }
@@ -519,10 +547,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     emit(
       state.copyWith(
         status: GamesStatus.ready,
-        rounds: [
-          ...state.rounds,
-          GameRound(id: '${nextGame.pairId}', game: nextGame),
-        ],
+        rounds: [...state.rounds, nextRound],
         currentIndex: state.currentIndex + 1,
         correctCount: state.correctCount + (isHit ? 1 : 0),
         completedCount: state.completedCount + 1,
@@ -534,6 +559,51 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
+  }
+
+  Future<void> _submitGalleryChoice(
+    KnowledgeGalleryRound gallery,
+    String optionId,
+    Emitter<GamesState> emit,
+  ) async {
+    final index = int.tryParse(optionId);
+    if (index == null || index < 0 || index >= gallery.options.length) return;
+    final answer = gallery.options[index];
+    final correct = answer == gallery.correctAnswer;
+    _gallerySubmitInFlight = true;
+    _pendingGalleryOptionId = optionId;
+    emit(
+      state.copyWith(
+        status: GamesStatus.ready,
+        choice: state.choice.copyWith(selectedOptionId: optionId),
+        answered: true,
+        isCorrect: correct,
+        clearError: true,
+      ),
+    );
+    try {
+      final result = await _submitKnowledgeGalleryAnswer(
+        questionId: gallery.questionId,
+        answer: answer,
+      );
+      _pendingGalleryOptionId = null;
+      emit(
+        state.copyWith(
+          status: GamesStatus.ready,
+          isCorrect: result.correct,
+          clearError: true,
+        ),
+      );
+    } on Object {
+      emit(
+        state.copyWith(
+          status: GamesStatus.error,
+          errorMessage: trailSessionSaveError,
+        ),
+      );
+    } finally {
+      _gallerySubmitInFlight = false;
+    }
   }
 
   Future<void> _endArcadeSession(

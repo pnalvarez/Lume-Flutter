@@ -7,7 +7,9 @@ import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 
 /// Visual RPCs for a Knowledge Gallery match.
 abstract interface class IKnowledgeGalleryDataSource {
-  Future<List<KnowledgeGalleryRoundData>> fetchRounds();
+  Future<List<KnowledgeGalleryRoundData>> fetchRounds({
+    int count = knowledgeGalleryRoundsPerMatch,
+  });
 
   Future<KnowledgeGalleryAnswerData> submitAnswer({
     required int questionId,
@@ -23,13 +25,15 @@ final class KnowledgeGalleryDataSource implements IKnowledgeGalleryDataSource {
   final IAuthSessionProvider _session;
 
   @override
-  Future<List<KnowledgeGalleryRoundData>> fetchRounds() async {
+  Future<List<KnowledgeGalleryRoundData>> fetchRounds({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) async {
     final raw = await _apiClient.rpc<List<dynamic>>(
       'get_visual_game_items',
       params: {
         'p_user_id': _requireUserId(),
         'p_game_slug': knowledgeGalleryGameSlug,
-        'p_count': knowledgeGalleryRoundsPerMatch,
+        'p_count': count,
       },
     );
     return parseJsonList(raw, KnowledgeGalleryRoundData.fromJson);

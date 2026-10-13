@@ -4,7 +4,11 @@ import 'package:lume/common/strings/games_hub_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/core/remote_config/remote_config_keys.dart';
+import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
 import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/usecases/get_knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
 import 'package:lume/layers/domain/models/game/hub_game_round_domain.dart';
 import 'package:lume/layers/domain/models/arcade/arcade_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
@@ -13,6 +17,7 @@ import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/start_game_match.dart';
+import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_event.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
@@ -123,6 +128,60 @@ class _StartGameMatch implements IStartGameMatch {
   }
 }
 
+const _galleryRound = KnowledgeGalleryRound(
+  questionId: 9,
+  prompt: 'A qual movimento esta pintura pertence?',
+  imageUrl: 'https://cdn.example/art.jpg',
+  questionType: 'movement',
+  options: ['Impressionismo', 'Cubismo', 'Barroco', 'Romantismo'],
+  correctAnswer: 'Impressionismo',
+);
+
+class _GetKnowledgeGalleryRound implements IGetKnowledgeGalleryRound {
+  final counts = <int>[];
+  List<KnowledgeGalleryRound> rounds = const [_galleryRound];
+  Object? error;
+
+  @override
+  Future<List<KnowledgeGalleryRound>> call({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) async {
+    if (error != null) throw error!;
+    counts.add(count);
+    return rounds;
+  }
+}
+
+class _KnowledgeGalleryMatch implements IKnowledgeGalleryMatch {
+  var starts = 0;
+  String matchId = 'gallery-match';
+  final finishes =
+      <({String matchId, int score, int correctCount, int total})>[];
+
+  @override
+  Future<String> start() async {
+    starts++;
+    return matchId;
+  }
+
+  @override
+  Future<FinishedGameMatchDomain> finish({
+    required String matchId,
+    required int score,
+    required int correctCount,
+    int totalQuestions = knowledgeGalleryRoundsPerMatch,
+    int? durationSeconds,
+  }) async {
+    finishes.add((
+      matchId: matchId,
+      score: score,
+      correctCount: correctCount,
+      total: totalQuestions,
+    ));
+    return const FinishedGameMatchDomain();
+  }
+}
+
 class _RemoteConfig implements IRemoteConfig {
   bool arcade = true;
   bool achievements = false;
@@ -181,6 +240,8 @@ void main() {
   late _GetArcadeRecord getArcadeRecord;
   late _GetRandomGameRound getRandomGameRound;
   late _StartGameMatch startGameMatch;
+  late _GetKnowledgeGalleryRound getGallery;
+  late _KnowledgeGalleryMatch galleryMatch;
   late _RemoteConfig remoteConfig;
   late _Analytics analytics;
 
@@ -190,6 +251,8 @@ void main() {
     getArcadeRecord = _GetArcadeRecord();
     getRandomGameRound = _GetRandomGameRound();
     startGameMatch = _StartGameMatch();
+    getGallery = _GetKnowledgeGalleryRound();
+    galleryMatch = _KnowledgeGalleryMatch();
     remoteConfig = _RemoteConfig();
     analytics = _Analytics();
   });
@@ -198,10 +261,12 @@ void main() {
     getHubGames,
     getGameRound,
     getArcadeRecord,
-    getRandomGameRound,
+    DrawArcadeRound(getRandomGameRound, getGallery),
     startGameMatch,
     remoteConfig,
     analytics,
+    getGallery,
+    galleryMatch,
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
@@ -385,6 +450,106 @@ void main() {
     ],
     verify: (_) {
       expect(getRandomGameRound.enabledSlugs, [<String>[]]);
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'hides the gallery tile when its slug is outside the allowlist',
+    build: () {
+      remoteConfig.slugs = const {'quiz_relampago'};
+      getHubGames.result = [
+        ...getHubGames.result,
+        const HubGameDomain(
+          id: '3',
+          slug: knowledgeGalleryGameSlug,
+          name: 'Galeria do Conhecimento',
+          description: 'Visual',
+          icon: 'Image',
+          colorHex: '#7BC8A4',
+          hubSection: HubSection.visual,
+          orderIndex: 2,
+        ),
+      ];
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(const GamesHubStarted()),
+    verify: (bloc) {
+      expect(
+        bloc.state.games.map((game) => game.slug),
+        isNot(contains(knowledgeGalleryGameSlug)),
+      );
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'starts a five-question gallery match without get_game_round',
+    build: () {
+      remoteConfig.slugs = const {knowledgeGalleryGameSlug};
+      getGallery.rounds = List.filled(5, _galleryRound);
+      return buildBloc();
+    },
+    seed: () => const GamesHubState(isInitialLoading: false),
+    act: (bloc) =>
+        bloc.add(const GamesHubGamePressed(knowledgeGalleryGameSlug)),
+    verify: (bloc) {
+      expect(getGallery.counts, [knowledgeGalleryRoundsPerMatch]);
+      expect(getGameRound.slugs, isEmpty);
+      expect(startGameMatch.slugs, isEmpty);
+      expect(galleryMatch.starts, 1);
+      expect(bloc.state.openPlayRounds, isNull);
+      expect(bloc.state.openGalleryRounds, hasLength(5));
+      expect(bloc.state.openMatchId, 'gallery-match');
+      expect(bloc.state.openGameSlug, knowledgeGalleryGameSlug);
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'does not load gallery rounds when the slug is outside the allowlist',
+    build: () {
+      remoteConfig.slugs = const {'quiz_relampago'};
+      return buildBloc();
+    },
+    seed: () => const GamesHubState(isInitialLoading: false),
+    act: (bloc) =>
+        bloc.add(const GamesHubGamePressed(knowledgeGalleryGameSlug)),
+    verify: (_) {
+      expect(getGallery.counts, isEmpty);
+      expect(getGameRound.slugs, isEmpty);
+      expect(galleryMatch.starts, 0);
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'arcade can open a gallery question when the slug is allowlisted',
+    build: () {
+      remoteConfig.slugs = const {knowledgeGalleryGameSlug};
+      getGallery.rounds = const [_galleryRound];
+      return buildBloc();
+    },
+    seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
+    act: (bloc) => bloc.add(const GamesHubArcadePressed()),
+    verify: (bloc) {
+      expect(getGallery.counts, [1]);
+      expect(getRandomGameRound.enabledSlugs, isEmpty);
+      expect(bloc.state.openArcadeRounds, hasLength(1));
+      expect(bloc.state.openArcadeRounds!.single.id, '9');
+      expect(bloc.state.openArcadeRounds!.single.gallery, _galleryRound);
+    },
+  );
+
+  blocTest<GamesHubBloc, GamesHubState>(
+    'arcade does not fall through to trail games when gallery has no items',
+    build: () {
+      remoteConfig.slugs = const {knowledgeGalleryGameSlug};
+      getGallery.rounds = const [];
+      return buildBloc();
+    },
+    seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
+    act: (bloc) => bloc.add(const GamesHubArcadePressed()),
+    verify: (bloc) {
+      expect(getRandomGameRound.enabledSlugs, isEmpty);
+      expect(bloc.state.openArcadeRounds, isNull);
+      expect(bloc.state.gameRoundErrorMessage, gamesHubRoundEmpty);
     },
   );
 }

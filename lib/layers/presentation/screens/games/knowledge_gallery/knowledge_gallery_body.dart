@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
@@ -10,10 +11,14 @@ class KnowledgeGalleryBody extends StatelessWidget {
     super.key,
     required this.state,
     required this.onOptionSelected,
+    this.onNext,
   });
 
   final KnowledgeGalleryState state;
   final ValueChanged<String> onOptionSelected;
+
+  /// Shown after an answer when the caller is playing a sequence.
+  final VoidCallback? onNext;
 
   @override
   Widget build(BuildContext context) {
@@ -25,24 +30,34 @@ class KnowledgeGalleryBody extends StatelessWidget {
           state: state.visualStateFor('$i'),
         ),
     ];
+    final prompt = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ArtworkPromptCard(
+          question: state.prompt,
+          imageUrl: state.image == null ? state.imageUrl : null,
+          image: state.image,
+          phase: state.imagePhase,
+        ),
+        const SizedBox(height: AppSpacings.l),
+        ChoiceGroup(
+          options: options,
+          onSelected: state.answered ? null : onOptionSelected,
+        ),
+      ],
+    );
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ArtworkPromptCard(
-            question: state.prompt,
-            imageUrl: state.image == null ? state.imageUrl : null,
-            image: state.image,
-            phase: state.imagePhase,
-          ),
-          const SizedBox(height: AppSpacings.l),
-          ChoiceGroup(
-            options: options,
-            onSelected: state.answered ? null : onOptionSelected,
-          ),
-        ],
-      ),
+    final next = onNext;
+    if (next == null) {
+      return SingleChildScrollView(child: prompt);
+    }
+
+    return GameAnswerChrome(
+      answered: state.answered,
+      isCorrect: state.isCorrect,
+      explanation: state.explanation,
+      onNext: next,
+      child: prompt,
     );
   }
 }
