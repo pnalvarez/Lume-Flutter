@@ -39,6 +39,7 @@ class GamesBody extends StatelessWidget {
     required this.onConnectionsSubmit,
     required this.onMysteriousWordLetterPressed,
     required this.onNext,
+    this.onGalleryImageFailed,
     this.useCloseTrailing = false,
     this.onClose,
     this.onAbandoned,
@@ -76,6 +77,7 @@ class GamesBody extends StatelessWidget {
   final VoidCallback onConnectionsSubmit;
   final ValueChanged<String> onMysteriousWordLetterPressed;
   final VoidCallback onNext;
+  final VoidCallback? onGalleryImageFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +161,7 @@ class GamesBody extends StatelessWidget {
         state: gallery,
         onOptionSelected: onChoiceSelected,
         onNext: onNext,
+        onImageFailed: onGalleryImageFailed,
       );
     }
 

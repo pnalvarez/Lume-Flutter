@@ -104,6 +104,11 @@ final class GamesAbandoned extends GamesEvent {
   const GamesAbandoned();
 }
 
+/// Artwork failed to load on a Knowledge Gallery round hosted by Games.
+final class GamesGalleryImageFailed extends GamesEvent {
+  const GamesGalleryImageFailed();
+}
+
 final class GamesNavigationHandled extends GamesEvent {
   const GamesNavigationHandled();
 }

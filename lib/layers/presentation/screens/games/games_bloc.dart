@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/analytics/knowledge_gallery_analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
 import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 import 'package:lume/layers/domain/models/game_play/complete_sentence_play.dart';
@@ -47,7 +48,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._analytics,
     this._remoteConfig,
     this._submitKnowledgeGalleryAnswer,
-  ) : super(const GamesState()) {
+  ) : _galleryAnalytics = KnowledgeGalleryAnalytics(_analytics),
+      super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
     on<GamesWhoAmIAnswerChanged>(_onWhoAmIAnswerChanged);
@@ -63,6 +65,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     on<GamesNextPressed>(_onNextPressed);
     on<GamesRetrySave>(_onRetrySave);
     on<GamesAbandoned>(_onAbandoned);
+    on<GamesGalleryImageFailed>(_onGalleryImageFailed);
     on<GamesNavigationHandled>(_onNavigationHandled);
     on<GamesXpSnackBarShown>(_onXpSnackBarShown);
   }
@@ -83,6 +86,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IAnalytics _analytics;
   final IRemoteConfig _remoteConfig;
   final ISubmitKnowledgeGalleryAnswer _submitKnowledgeGalleryAnswer;
+  final KnowledgeGalleryAnalytics _galleryAnalytics;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
@@ -127,6 +131,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     _leilaoRecordedIndex = null;
     _leaveFinishPending = false;
     _leaveCorrectCount = 0;
+    _galleryAnalytics.reset();
     final first = event.rounds.isEmpty ? null : event.rounds.first;
     final params = <String, Object>{
       AnalyticsParams.playMode: event.mode.name,
@@ -147,6 +152,12 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         arcadeRecord: event.arcadeRecord,
       ),
     );
+    if (first?.gallery != null) {
+      _galleryAnalytics.roundStarted(
+        roundsTotal: event.rounds.length,
+        isArcade: _isArcade,
+      );
+    }
   }
 
   Future<void> _onChoiceSelected(
@@ -471,6 +482,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           AnalyticsParams.roundsTotal: state.rounds.length,
         },
       );
+      _galleryAnalytics.sessionCompleted(
+        correctCount: nextCorrect,
+        roundsTotal: state.rounds.length,
+        isArcade: _isArcade,
+      );
       return;
     }
 
@@ -487,6 +503,12 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
+    if (state.currentRound?.gallery != null) {
+      _galleryAnalytics.roundStarted(
+        roundsTotal: state.rounds.length,
+        isArcade: _isArcade,
+      );
+    }
   }
 
   Future<int> _persistRound({
@@ -567,6 +589,12 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
+    if (nextRound.gallery != null) {
+      _galleryAnalytics.roundStarted(
+        roundsTotal: state.rounds.length,
+        isArcade: _isArcade,
+      );
+    }
   }
 
   Future<void> _submitGalleryChoice(
@@ -577,6 +605,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     final index = int.tryParse(optionId);
     if (index == null || index < 0 || index >= gallery.options.length) return;
     final answer = gallery.options[index];
+    final roundIndex = state.currentIndex;
     _gallerySubmitInFlight = true;
     _pendingGalleryOptionId = optionId;
     // Keep the round unanswered until the write returns. Marking it answered
@@ -596,6 +625,12 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         answer: answer,
       );
       _pendingGalleryOptionId = null;
+      _galleryAnalytics.questionAnswered(
+        questionType: gallery.questionType,
+        isCorrect: result.correct,
+        roundIndex: roundIndex,
+        isArcade: _isArcade,
+      );
       emit(
         state.copyWith(
           status: GamesStatus.ready,
@@ -658,6 +693,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
+    _galleryAnalytics.sessionCompleted(
+      correctCount: finished.scoredCount,
+      roundsTotal: state.rounds.length,
+      isArcade: _isArcade,
+    );
   }
 
   Future<void> _onAbandoned(
@@ -675,6 +715,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           AnalyticsParams.roundsTotal: state.rounds.length,
         },
       );
+      _galleryAnalytics.sessionAbandoned(
+        roundIndex: state.currentIndex,
+        roundsTotal: state.rounds.length,
+        isArcade: _isArcade,
+      );
       await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
       return;
     }
@@ -686,6 +731,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
+    _galleryAnalytics.sessionAbandoned(
+      roundIndex: state.currentIndex,
+      roundsTotal: state.rounds.length,
+      isArcade: _isArcade,
+    );
     if (_shouldFinishHubOnLeave()) {
       _leaveFinishPending = true;
       _leaveCorrectCount = _abandonCorrectCount();
@@ -693,6 +743,17 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       return;
     }
     emit(state.copyWith(goBack: true));
+  }
+
+  void _onGalleryImageFailed(
+    GamesGalleryImageFailed event,
+    Emitter<GamesState> emit,
+  ) {
+    if (state.currentRound?.gallery == null) return;
+    _galleryAnalytics.imageFailed(
+      roundIndex: state.currentIndex,
+      isArcade: _isArcade,
+    );
   }
 
   /// An open hub match with a saved round, or an answer still on screen,
