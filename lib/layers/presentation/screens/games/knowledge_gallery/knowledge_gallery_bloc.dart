@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
+import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/core/analytics/knowledge_gallery_analytics.dart';
 import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
 import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_event.dart';
@@ -10,18 +12,21 @@ import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowled
 @injectable
 final class KnowledgeGalleryBloc
     extends Bloc<KnowledgeGalleryEvent, KnowledgeGalleryPlayState> {
-  KnowledgeGalleryBloc(this._submitAnswer, this._match)
-    : super(const KnowledgeGalleryPlayState()) {
+  KnowledgeGalleryBloc(this._submitAnswer, this._match, IAnalytics analytics)
+    : _galleryAnalytics = KnowledgeGalleryAnalytics(analytics),
+      super(const KnowledgeGalleryPlayState()) {
     on<KnowledgeGalleryStarted>(_onStarted);
     on<KnowledgeGalleryOptionSelected>(_onOptionSelected);
     on<KnowledgeGalleryNextPressed>(_onNextPressed);
     on<KnowledgeGalleryAbandoned>(_onAbandoned);
+    on<KnowledgeGalleryImageFailed>(_onImageFailed);
     on<KnowledgeGalleryNavigationHandled>(_onNavigationHandled);
     on<KnowledgeGallerySnackShown>(_onSnackShown);
   }
 
   final ISubmitKnowledgeGalleryAnswer _submitAnswer;
   final IKnowledgeGalleryMatch _match;
+  final KnowledgeGalleryAnalytics _galleryAnalytics;
 
   var _closed = false;
   var _closing = false;
@@ -38,6 +43,9 @@ final class KnowledgeGalleryBloc
       emit(state.copyWith(goBack: true));
       return;
     }
+    _galleryAnalytics
+      ..reset()
+      ..roundStarted(roundsTotal: event.rounds.length, isArcade: false);
     emit(
       KnowledgeGalleryPlayState(rounds: event.rounds, matchId: event.matchId),
     );
@@ -49,6 +57,7 @@ final class KnowledgeGalleryBloc
   ) async {
     if (!state.canSelect) return;
     final round = state.current;
+    final roundIndex = state.index;
     final index = int.tryParse(event.optionId);
     if (round == null ||
         index == null ||
@@ -72,6 +81,12 @@ final class KnowledgeGalleryBloc
       final result = await _submitAnswer(
         questionId: round.questionId,
         answer: answer,
+      );
+      _galleryAnalytics.questionAnswered(
+        questionType: round.questionType,
+        isCorrect: result.correct,
+        roundIndex: roundIndex,
+        isArcade: false,
       );
       emit(
         state.copyWith(
@@ -106,11 +121,23 @@ final class KnowledgeGalleryBloc
     Emitter<KnowledgeGalleryPlayState> emit,
   ) async {
     if (state.submitting || _closing) return;
+    _galleryAnalytics.sessionAbandoned(
+      roundIndex: state.index,
+      roundsTotal: state.rounds.length,
+      isArcade: false,
+    );
     if (state.hasProgress && state.matchId.isNotEmpty && !_closed) {
       await _closeMatch(emit, goBack: true);
       return;
     }
     emit(state.copyWith(goBack: true));
+  }
+
+  void _onImageFailed(
+    KnowledgeGalleryImageFailed event,
+    Emitter<KnowledgeGalleryPlayState> emit,
+  ) {
+    _galleryAnalytics.imageFailed(roundIndex: state.index, isArcade: false);
   }
 
   void _onNavigationHandled(
@@ -142,13 +169,21 @@ final class KnowledgeGalleryBloc
     _closing = true;
     try {
       final total = state.rounds.length;
+      final correctCount = state.correctCount;
       await _match.finish(
         matchId: state.matchId,
-        score: _scorePct(state.correctCount, total),
-        correctCount: state.correctCount,
+        score: _scorePct(correctCount, total),
+        correctCount: correctCount,
         totalQuestions: total,
       );
       _closed = true;
+      if (sequenceCompleted) {
+        _galleryAnalytics.sessionCompleted(
+          correctCount: correctCount,
+          roundsTotal: total,
+          isArcade: false,
+        );
+      }
       emit(
         state.copyWith(
           goBack: goBack,

@@ -19,6 +19,11 @@ class ArtworkPromptCard extends StatelessWidget {
   final ImageProvider? image;
   final ArtworkPromptImagePhase? phase;
 
+  /// Called once when the artwork cannot be shown (missing URL or load error).
+  ///
+  /// Not invoked for an explicit [ArtworkPromptImagePhase.error] pin.
+  final VoidCallback? onImageFailed;
+
   /// Width / height of the artwork frame.
   static const double aspectRatio = 4 / 3;
 
@@ -28,6 +33,7 @@ class ArtworkPromptCard extends StatelessWidget {
     this.imageUrl,
     this.image,
     this.phase,
+    this.onImageFailed,
   });
 
   @override
@@ -58,6 +64,7 @@ class ArtworkPromptCard extends StatelessWidget {
                 imageUrl: imageUrl,
                 image: image,
                 phase: phase,
+                onImageFailed: onImageFailed,
               ),
             ),
           ),
@@ -67,24 +74,57 @@ class ArtworkPromptCard extends StatelessWidget {
   }
 }
 
-class _ArtworkWell extends StatelessWidget {
+class _ArtworkWell extends StatefulWidget {
   final String? imageUrl;
   final ImageProvider? image;
   final ArtworkPromptImagePhase? phase;
+  final VoidCallback? onImageFailed;
 
-  const _ArtworkWell({this.imageUrl, this.image, this.phase});
+  const _ArtworkWell({
+    this.imageUrl,
+    this.image,
+    this.phase,
+    this.onImageFailed,
+  });
+
+  @override
+  State<_ArtworkWell> createState() => _ArtworkWellState();
+}
+
+class _ArtworkWellState extends State<_ArtworkWell> {
+  var _reported = false;
+
+  @override
+  void didUpdateWidget(covariant _ArtworkWell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl ||
+        oldWidget.image != widget.image ||
+        oldWidget.phase != widget.phase) {
+      _reported = false;
+    }
+  }
+
+  void _reportFailed() {
+    if (_reported) return;
+    _reported = true;
+    widget.onImageFailed?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (phase == ArtworkPromptImagePhase.loading) {
+    if (widget.phase == ArtworkPromptImagePhase.loading) {
       return const _ArtworkPlaceholder(loading: true);
     }
-    if (phase == ArtworkPromptImagePhase.error) {
+    if (widget.phase == ArtworkPromptImagePhase.error) {
       return const _ArtworkPlaceholder(loading: false);
     }
 
-    final provider = image ?? _networkImage(imageUrl);
+    final provider = widget.image ?? _networkImage(widget.imageUrl);
     if (provider == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _reportFailed();
+      });
       return const _ArtworkPlaceholder(loading: false);
     }
 
@@ -98,6 +138,10 @@ class _ArtworkWell extends StatelessWidget {
         return const _ArtworkPlaceholder(loading: true);
       },
       errorBuilder: (context, error, stackTrace) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _reportFailed();
+        });
         return const _ArtworkPlaceholder(loading: false);
       },
     );

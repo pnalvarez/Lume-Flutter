@@ -196,6 +196,11 @@ class _GamesViewState extends State<_GamesView> {
                       GamesChoiceSelected(optionId),
                     );
                   },
+                  onGalleryImageFailed: () {
+                    context.read<GamesBloc>().add(
+                      const GamesGalleryImageFailed(),
+                    );
+                  },
                   onWhoAmIAnswerChanged: (answer) {
                     context.read<GamesBloc>().add(
                       GamesWhoAmIAnswerChanged(answer),

@@ -60,6 +60,26 @@ abstract final class AnalyticsEvents {
   /// Fired when the user abandons a games play sequence.
   static const gameSessionAbandoned = 'game_session_abandoned';
 
+  // ── Knowledge Gallery (standalone hub play; not trail/arcade) ───────────
+
+  /// Fired when a Knowledge Gallery match starts.
+  static const knowledgeGalleryRoundStarted = 'knowledge_gallery_round_started';
+
+  /// Fired after each answered question in a Knowledge Gallery match.
+  static const knowledgeGalleryQuestionAnswered =
+      'knowledge_gallery_question_answered';
+
+  /// Fired when a Knowledge Gallery match finishes successfully.
+  static const knowledgeGallerySessionCompleted =
+      'knowledge_gallery_session_completed';
+
+  /// Fired when the user leaves a Knowledge Gallery match.
+  static const knowledgeGallerySessionAbandoned =
+      'knowledge_gallery_session_abandoned';
+
+  /// Fired when an artwork image fails to load (no URL in params).
+  static const knowledgeGalleryImageFailed = 'knowledge_gallery_image_failed';
+
   // ── Achievements ────────────────────────────────────────────────────────
 
   /// Fired when the Achievements tab/route becomes visible (exposure).
@@ -104,6 +124,13 @@ abstract final class AnalyticsParams {
   static const score = 'score';
   static const record = 'record';
   static const arcadeEnabled = 'arcade_enabled';
+  static const questionType = 'question_type';
+
+  /// `1` / `0` (Firebase Analytics params are String or num only).
+  static const isCorrect = 'is_correct';
+
+  /// `true` when Knowledge Gallery is played inside Arcade.
+  static const isArcade = 'is_arcade';
 
   // ── Achievements ────────────────────────────────────────────────────────
 

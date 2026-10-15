@@ -152,6 +152,11 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
                                   const KnowledgeGalleryNextPressed(),
                                 );
                               },
+                              onImageFailed: () {
+                                context.read<KnowledgeGalleryBloc>().add(
+                                  const KnowledgeGalleryImageFailed(),
+                                );
+                              },
                             ),
                           ),
                         ),

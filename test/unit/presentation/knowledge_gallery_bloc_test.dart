@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
 import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
 import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
@@ -9,6 +10,8 @@ import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_bloc.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_event.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_play_state.dart';
+
+import '../../helpers/fake_analytics.dart';
 
 const _first = KnowledgeGalleryRound(
   questionId: 1,
@@ -80,13 +83,16 @@ class _Match implements IKnowledgeGalleryMatch {
 void main() {
   late _Submit submit;
   late _Match match;
+  late FakeAnalytics analytics;
 
   setUp(() {
     submit = _Submit();
     match = _Match();
+    analytics = FakeAnalytics();
   });
 
-  KnowledgeGalleryBloc build() => KnowledgeGalleryBloc(submit, match);
+  KnowledgeGalleryBloc build() =>
+      KnowledgeGalleryBloc(submit, match, analytics);
 
   blocTest<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
     'plays each question, then closes the match on the last next',
@@ -124,6 +130,51 @@ void main() {
       expect(bloc.state.sequenceCompleted, isTrue);
       expect(bloc.state.goBack, isFalse);
       expect(bloc.state.correctCount, 1);
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
+        isTrue,
+      );
+      expect(
+        analytics.parametersFor(AnalyticsEvents.knowledgeGalleryRoundStarted),
+        {AnalyticsParams.roundsTotal: 2, AnalyticsParams.isArcade: false},
+      );
+      expect(
+        analytics.events
+            .where(
+              (e) => e.name == AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+            )
+            .length,
+        2,
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+        ),
+        {
+          AnalyticsParams.questionType: 'movement',
+          AnalyticsParams.isCorrect: 0,
+          AnalyticsParams.roundIndex: 1,
+          AnalyticsParams.isArcade: false,
+        },
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
+        isTrue,
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.knowledgeGallerySessionCompleted,
+        ),
+        {
+          AnalyticsParams.correctCount: 1,
+          AnalyticsParams.roundsTotal: 2,
+          AnalyticsParams.isArcade: false,
+        },
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
+        isFalse,
+      );
     },
   );
 
@@ -170,6 +221,10 @@ void main() {
       expect(bloc.state.selectedOptionId, isNull);
       expect(bloc.state.correctCount, 0);
       expect(bloc.state.isCorrect, isFalse);
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryQuestionAnswered),
+        isFalse,
+      );
     },
   );
 
@@ -214,6 +269,24 @@ void main() {
     verify: (bloc) {
       expect(match.finishes, isEmpty);
       expect(bloc.state.goBack, isTrue);
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
+        isTrue,
+      );
+      expect(
+        analytics.parametersFor(
+          AnalyticsEvents.knowledgeGallerySessionAbandoned,
+        ),
+        {
+          AnalyticsParams.roundIndex: 0,
+          AnalyticsParams.roundsTotal: 1,
+          AnalyticsParams.isArcade: false,
+        },
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
+        isFalse,
+      );
     },
   );
 
@@ -234,6 +307,36 @@ void main() {
       expect(match.finishes.single.correctCount, 1);
       expect(match.finishes.single.total, 2);
       expect(match.finishes.single.score, 50);
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
+        isTrue,
+      );
+      expect(
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
+        isFalse,
+      );
+    },
+  );
+
+  blocTest<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+    'image failed logs once per question index',
+    build: build,
+    act: (bloc) async {
+      bloc.add(
+        const KnowledgeGalleryStarted(rounds: [_first, _second], matchId: 'm'),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const KnowledgeGalleryImageFailed());
+      bloc.add(const KnowledgeGalleryImageFailed());
+      await pumpEventQueue();
+    },
+    verify: (_) {
+      expect(
+        analytics.events
+            .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
+            .length,
+        1,
+      );
     },
   );
 }

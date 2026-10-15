@@ -187,6 +187,9 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 | `onboarding_category_selected` | Onboarding categories saved |
 | `submodule_session_started` / `completed` / `abandoned` | Trail submodule session |
 | `game_round_started` / `game_session_completed` / `game_session_abandoned` | Games play sequence |
+| `knowledge_gallery_round_started` / `knowledge_gallery_session_completed` / `knowledge_gallery_session_abandoned` | Knowledge Gallery match (includes `is_arcade`) |
+| `knowledge_gallery_question_answered` | Gallery question graded (`question_type`, `is_correct`, `round_index`, `is_arcade`) |
+| `knowledge_gallery_image_failed` | Artwork image failed to load (no URL; includes `is_arcade`) |
 | `achievements_tab_impression` | Achievements tab first becomes visible (exposure; includes `achievements_enabled`) — fired by `DashboardBloc` on mount |
 | `achievements_opened` | User opens / navigates to the Achievements tab for the first time in a session (primary A/B goal; includes `achievements_enabled`) — fired before the RPC |
 | `achievements_list_viewed` | Achievements list renders successfully (includes `locked_count`, `in_progress_count`, `completed_count`) |

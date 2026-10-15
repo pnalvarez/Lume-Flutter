@@ -28,6 +28,11 @@ final class KnowledgeGalleryAbandoned extends KnowledgeGalleryEvent {
   const KnowledgeGalleryAbandoned();
 }
 
+/// Artwork failed to resolve or load. No URL — analytics only.
+final class KnowledgeGalleryImageFailed extends KnowledgeGalleryEvent {
+  const KnowledgeGalleryImageFailed();
+}
+
 final class KnowledgeGalleryNavigationHandled extends KnowledgeGalleryEvent {
   const KnowledgeGalleryNavigationHandled();
 }

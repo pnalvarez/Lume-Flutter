@@ -391,6 +391,46 @@ void main() {
       expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
     });
 
+    testWidgets('ArtworkPromptCard reports a missing image once', (
+      tester,
+    ) async {
+      var failed = 0;
+      await tester.pumpWidget(
+        _wrap(
+          SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: 'Missing artwork',
+              onImageFailed: () => failed++,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(failed, 1);
+    });
+
+    testWidgets('ArtworkPromptCard does not report an explicit error phase', (
+      tester,
+    ) async {
+      var failed = 0;
+      await tester.pumpWidget(
+        _wrap(
+          SingleChildScrollView(
+            child: ArtworkPromptCard(
+              question: 'Pinned error',
+              phase: ArtworkPromptImagePhase.error,
+              onImageFailed: () => failed++,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(failed, 0);
+    });
+
     testWidgets('ArtworkPromptCard shows the error well for a blank url', (
       tester,
     ) async {

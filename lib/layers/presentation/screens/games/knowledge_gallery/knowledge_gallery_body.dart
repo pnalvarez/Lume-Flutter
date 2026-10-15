@@ -12,6 +12,7 @@ class KnowledgeGalleryBody extends StatelessWidget {
     required this.state,
     required this.onOptionSelected,
     this.onNext,
+    this.onImageFailed,
   });
 
   final KnowledgeGalleryState state;
@@ -19,6 +20,9 @@ class KnowledgeGalleryBody extends StatelessWidget {
 
   /// Shown after an answer when the caller is playing a sequence.
   final VoidCallback? onNext;
+
+  /// Artwork failed to load. Optional so trail/arcade hosts stay silent.
+  final VoidCallback? onImageFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,7 @@ class KnowledgeGalleryBody extends StatelessWidget {
           imageUrl: state.image == null ? state.imageUrl : null,
           image: state.image,
           phase: state.imagePhase,
+          onImageFailed: onImageFailed,
         ),
         const SizedBox(height: AppSpacings.l),
         ChoiceGroup(
