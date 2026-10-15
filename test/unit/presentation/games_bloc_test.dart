@@ -1024,6 +1024,47 @@ void main() {
       },
     );
 
+    test(
+      'a choice queued during a failed gallery submit does not clear the error',
+      () async {
+        final gate = Completer<void>();
+        final submit = _SubmitKnowledgeGalleryAnswer()
+          ..gate = gate
+          ..error = StateError('submit failed');
+        final bloc = _createGamesBloc(
+          savePair,
+          getRandomRound: getRandomRound,
+          saveArcadeRound: saveRound,
+          saveArcadeRecord: saveRecord,
+          submitGallery: submit,
+        );
+        bloc.add(
+          const GamesStarted(
+            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            mode: GamesPlayMode.arcade,
+          ),
+        );
+        await pumpEventQueue();
+        bloc.add(const GamesChoiceSelected('0'));
+        await bloc.stream.firstWhere(
+          (state) => state.choice.selectedOptionId == '0',
+        );
+        expect(bloc.state.gallerySubmitting, isTrue);
+        expect(bloc.state.knowledgeGalleryView?.canSelect, isFalse);
+        expect(bloc.state.answered, isFalse);
+        bloc.add(const GamesChoiceSelected('1'));
+        await pumpEventQueue();
+        gate.complete();
+        await pumpEventQueue();
+        expect(submit.answers, ['Impressionismo']);
+        expect(bloc.state.status, GamesStatus.error);
+        expect(bloc.state.errorMessage, isNotNull);
+        expect(bloc.state.gallerySubmitting, isFalse);
+        expect(bloc.state.answered, isFalse);
+        await bloc.close();
+      },
+    );
+
     blocTest<GamesBloc, GamesState>(
       'a next queued during a failed gallery miss does not spend a life',
       build: () {

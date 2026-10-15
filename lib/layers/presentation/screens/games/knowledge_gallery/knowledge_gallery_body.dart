@@ -42,7 +42,7 @@ class KnowledgeGalleryBody extends StatelessWidget {
         const SizedBox(height: AppSpacings.l),
         ChoiceGroup(
           options: options,
-          onSelected: state.answered ? null : onOptionSelected,
+          onSelected: state.canSelect ? onOptionSelected : null,
         ),
       ],
     );

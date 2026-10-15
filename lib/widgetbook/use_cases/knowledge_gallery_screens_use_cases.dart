@@ -33,6 +33,28 @@ Widget knowledgeGalleryPlaying(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Knowledge Gallery',
+  name: 'Submitting',
+  type: KnowledgeGalleryBody,
+)
+Widget knowledgeGallerySubmitting(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: KnowledgeGalleryBody(
+      state: const KnowledgeGalleryState(
+        prompt: _prompt,
+        imageUrl: '',
+        image: _image,
+        options: _options,
+        selectedOptionId: '0',
+        phase: KnowledgeGalleryPhase.submitting,
+      ),
+      onOptionSelected: _noopString,
+    ),
+  );
+}
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Knowledge Gallery',
   name: 'Answered correct',
   type: KnowledgeGalleryBody,
 )
@@ -47,7 +69,7 @@ Widget knowledgeGalleryAnsweredCorrect(BuildContext context) {
         options: _options,
         selectedOptionId: '0',
         correctOptionId: '0',
-        answered: true,
+        phase: KnowledgeGalleryPhase.correct,
       ),
       onOptionSelected: _noopString,
     ),
@@ -70,7 +92,7 @@ Widget knowledgeGalleryAnsweredWrong(BuildContext context) {
         options: _options,
         selectedOptionId: '1',
         correctOptionId: '0',
-        answered: true,
+        phase: KnowledgeGalleryPhase.incorrect,
       ),
       onOptionSelected: _noopString,
     ),

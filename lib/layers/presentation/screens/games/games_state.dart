@@ -92,6 +92,7 @@ final class GamesState {
     this.correctCount = 0,
     this.answered = false,
     this.isCorrect = false,
+    this.gallerySubmitting = false,
     this.choice = const GamesChoiceUi(),
     this.whoAmI = const GamesWhoAmIUi(),
     this.completeSentence = const GamesCompleteSentenceUi(),
@@ -112,6 +113,10 @@ final class GamesState {
   final int correctCount;
   final bool answered;
   final bool isCorrect;
+
+  /// Knowledge Gallery `submit_visual_answer` is in flight. The round stays
+  /// unanswered, and [knowledgeGalleryView] refuses further taps.
+  final bool gallerySubmitting;
   final GamesChoiceUi choice;
   final GamesWhoAmIUi whoAmI;
   final GamesCompleteSentenceUi completeSentence;
@@ -142,13 +147,18 @@ final class GamesState {
     final round = currentRound?.gallery;
     if (round == null) return null;
     final selected = choice.selectedOptionId;
+    final phase = KnowledgeGalleryPhase.resolve(
+      submitting: gallerySubmitting,
+      answered: answered,
+      isCorrect: isCorrect,
+    );
     String? correctOptionId;
-    if (answered) {
+    if (phase.answered) {
       correctOptionId = knowledgeGalleryOptionId(
         round.options,
         round.correctAnswer,
       );
-      if (correctOptionId == null && isCorrect) {
+      if (correctOptionId == null && phase.isCorrect) {
         correctOptionId = selected;
       }
     }
@@ -158,11 +168,10 @@ final class GamesState {
       options: round.options,
       selectedOptionId: selected,
       correctOptionId: correctOptionId,
-      answered: answered,
-      isCorrect: isCorrect,
-      explanation: answered
+      phase: phase,
+      explanation: phase.answered
           ? knowledgeGalleryFeedback(
-              isCorrect: isCorrect,
+              isCorrect: phase.isCorrect,
               feedbackCorrect: round.feedbackCorrect,
               feedbackIncorrect: round.feedbackIncorrect,
             )
@@ -280,6 +289,7 @@ final class GamesState {
     int? correctCount,
     bool? answered,
     bool? isCorrect,
+    bool? gallerySubmitting,
     GamesChoiceUi? choice,
     GamesWhoAmIUi? whoAmI,
     GamesCompleteSentenceUi? completeSentence,
@@ -305,6 +315,9 @@ final class GamesState {
       correctCount: correctCount ?? this.correctCount,
       answered: resetPlayFields ? false : (answered ?? this.answered),
       isCorrect: resetPlayFields ? false : (isCorrect ?? this.isCorrect),
+      gallerySubmitting: resetPlayFields
+          ? false
+          : (gallerySubmitting ?? this.gallerySubmitting),
       choice: resetPlayFields ? const GamesChoiceUi() : (choice ?? this.choice),
       whoAmI: resetPlayFields ? const GamesWhoAmIUi() : (whoAmI ?? this.whoAmI),
       completeSentence: resetPlayFields
@@ -352,6 +365,7 @@ final class GamesState {
       other.correctCount == correctCount &&
       other.answered == answered &&
       other.isCorrect == isCorrect &&
+      other.gallerySubmitting == gallerySubmitting &&
       other.choice == choice &&
       other.whoAmI == whoAmI &&
       other.completeSentence == completeSentence &&
@@ -373,6 +387,7 @@ final class GamesState {
     correctCount,
     answered,
     isCorrect,
+    gallerySubmitting,
     choice,
     whoAmI,
     completeSentence,

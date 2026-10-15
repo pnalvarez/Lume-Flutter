@@ -5,6 +5,7 @@ import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
 import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_event.dart';
 import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_play_state.dart';
+import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
 
 @injectable
 final class KnowledgeGalleryBloc
@@ -25,6 +26,10 @@ final class KnowledgeGalleryBloc
   var _closed = false;
   var _closing = false;
 
+  /// A failed close must not leave the round stuck in [KnowledgeGalleryPhase.submitting].
+  KnowledgeGalleryPhase get _phaseAfterSubmit =>
+      state.submitting ? KnowledgeGalleryPhase.playing : state.phase;
+
   void _onStarted(
     KnowledgeGalleryStarted event,
     Emitter<KnowledgeGalleryPlayState> emit,
@@ -42,7 +47,7 @@ final class KnowledgeGalleryBloc
     KnowledgeGalleryOptionSelected event,
     Emitter<KnowledgeGalleryPlayState> emit,
   ) async {
-    if (state.answered || state.submitting) return;
+    if (!state.canSelect) return;
     final round = state.current;
     final index = int.tryParse(event.optionId);
     if (round == null ||
@@ -58,7 +63,7 @@ final class KnowledgeGalleryBloc
     // this selection — it does not pop that route.
     emit(
       state.copyWith(
-        submitting: true,
+        phase: KnowledgeGalleryPhase.submitting,
         selectedOptionId: event.optionId,
         clearSnack: true,
       ),
@@ -70,20 +75,16 @@ final class KnowledgeGalleryBloc
       );
       emit(
         state.copyWith(
-          submitting: false,
-          answered: true,
-          isCorrect: result.correct,
+          phase: result.correct
+              ? KnowledgeGalleryPhase.correct
+              : KnowledgeGalleryPhase.incorrect,
           revealedCorrectAnswer: result.correctAnswer,
           correctCount: state.correctCount + (result.correct ? 1 : 0),
         ),
       );
     } on Object {
       emit(
-        state.copyWith(
-          submitting: false,
-          clearAnswer: true,
-          snackMessage: trailSessionSaveError,
-        ),
+        state.copyWith(clearAnswer: true, snackMessage: trailSessionSaveError),
       );
     }
   }
@@ -92,7 +93,7 @@ final class KnowledgeGalleryBloc
     KnowledgeGalleryNextPressed event,
     Emitter<KnowledgeGalleryPlayState> emit,
   ) async {
-    if (!state.answered || state.submitting) return;
+    if (!state.answered) return;
     if (state.index >= state.rounds.length - 1) {
       await _closeMatch(emit, sequenceCompleted: true);
       return;
@@ -152,13 +153,16 @@ final class KnowledgeGalleryBloc
         state.copyWith(
           goBack: goBack,
           sequenceCompleted: sequenceCompleted,
-          submitting: false,
+          phase: _phaseAfterSubmit,
           clearSnack: true,
         ),
       );
     } on Object {
       emit(
-        state.copyWith(submitting: false, snackMessage: trailSessionSaveError),
+        state.copyWith(
+          phase: _phaseAfterSubmit,
+          snackMessage: trailSessionSaveError,
+        ),
       );
     } finally {
       _closing = false;

@@ -12,9 +12,7 @@ final class KnowledgeGalleryPlayState {
     this.correctCount = 0,
     this.selectedOptionId,
     this.revealedCorrectAnswer,
-    this.answered = false,
-    this.isCorrect = false,
-    this.submitting = false,
+    this.phase = KnowledgeGalleryPhase.playing,
     this.goBack = false,
     this.sequenceCompleted = false,
     this.snackMessage,
@@ -26,9 +24,7 @@ final class KnowledgeGalleryPlayState {
   final int correctCount;
   final String? selectedOptionId;
   final String? revealedCorrectAnswer;
-  final bool answered;
-  final bool isCorrect;
-  final bool submitting;
+  final KnowledgeGalleryPhase phase;
   final bool goBack;
 
   /// The five questions are finished and the score screen should stay up.
@@ -45,6 +41,14 @@ final class KnowledgeGalleryPlayState {
     if (rounds.isEmpty) return 0;
     return (index / rounds.length).clamp(0.0, 1.0);
   }
+
+  bool get canSelect => phase.canSelect;
+
+  bool get submitting => phase == KnowledgeGalleryPhase.submitting;
+
+  bool get answered => phase.answered;
+
+  bool get isCorrect => phase.isCorrect;
 
   bool get hasProgress => answered || index > 0;
 
@@ -67,8 +71,7 @@ final class KnowledgeGalleryPlayState {
       options: round.options,
       selectedOptionId: selectedOptionId,
       correctOptionId: correctOptionId,
-      answered: answered,
-      isCorrect: isCorrect,
+      phase: phase,
       explanation: answered
           ? knowledgeGalleryFeedback(
               isCorrect: isCorrect,
@@ -86,9 +89,7 @@ final class KnowledgeGalleryPlayState {
     int? correctCount,
     String? selectedOptionId,
     String? revealedCorrectAnswer,
-    bool? answered,
-    bool? isCorrect,
-    bool? submitting,
+    KnowledgeGalleryPhase? phase,
     bool? goBack,
     bool? sequenceCompleted,
     String? snackMessage,
@@ -106,9 +107,7 @@ final class KnowledgeGalleryPlayState {
       revealedCorrectAnswer: clearAnswer
           ? null
           : revealedCorrectAnswer ?? this.revealedCorrectAnswer,
-      answered: clearAnswer ? false : answered ?? this.answered,
-      isCorrect: clearAnswer ? false : isCorrect ?? this.isCorrect,
-      submitting: submitting ?? this.submitting,
+      phase: clearAnswer ? KnowledgeGalleryPhase.playing : phase ?? this.phase,
       goBack: goBack ?? this.goBack,
       sequenceCompleted: sequenceCompleted ?? this.sequenceCompleted,
       snackMessage: clearSnack ? null : snackMessage ?? this.snackMessage,
@@ -124,9 +123,7 @@ final class KnowledgeGalleryPlayState {
       other.correctCount == correctCount &&
       other.selectedOptionId == selectedOptionId &&
       other.revealedCorrectAnswer == revealedCorrectAnswer &&
-      other.answered == answered &&
-      other.isCorrect == isCorrect &&
-      other.submitting == submitting &&
+      other.phase == phase &&
       other.goBack == goBack &&
       other.sequenceCompleted == sequenceCompleted &&
       other.snackMessage == snackMessage;
@@ -139,9 +136,7 @@ final class KnowledgeGalleryPlayState {
     correctCount,
     selectedOptionId,
     revealedCorrectAnswer,
-    answered,
-    isCorrect,
-    submitting,
+    phase,
     goBack,
     sequenceCompleted,
     snackMessage,

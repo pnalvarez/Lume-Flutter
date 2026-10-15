@@ -585,6 +585,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     emit(
       state.copyWith(
         status: GamesStatus.ready,
+        gallerySubmitting: true,
         choice: state.choice.copyWith(selectedOptionId: optionId),
         clearError: true,
       ),
@@ -598,6 +599,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       emit(
         state.copyWith(
           status: GamesStatus.ready,
+          gallerySubmitting: false,
           answered: true,
           isCorrect: result.correct,
           clearError: true,
@@ -607,6 +609,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       emit(
         state.copyWith(
           status: GamesStatus.error,
+          gallerySubmitting: false,
           errorMessage: trailSessionSaveError,
           answered: false,
           isCorrect: false,

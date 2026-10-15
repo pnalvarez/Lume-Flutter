@@ -140,6 +140,7 @@ void main() {
       bloc.add(const KnowledgeGalleryOptionSelected('0'));
       await bloc.stream.firstWhere((state) => state.submitting);
       expect(bloc.state.answered, isFalse);
+      expect(bloc.state.view?.canSelect, isFalse);
       expect(bloc.state.correctCount, 0);
       gate.complete();
       await bloc.stream.firstWhere((state) => state.answered);
@@ -169,6 +170,35 @@ void main() {
       expect(bloc.state.selectedOptionId, isNull);
       expect(bloc.state.correctCount, 0);
       expect(bloc.state.isCorrect, isFalse);
+    },
+  );
+
+  test(
+    'a choice queued during a failed submit does not clear the error',
+    () async {
+      final gate = Completer<void>();
+      submit
+        ..gate = gate
+        ..error = StateError('submit failed');
+      final bloc = build();
+      bloc.add(
+        const KnowledgeGalleryStarted(rounds: [_first], matchId: 'match-9'),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const KnowledgeGalleryOptionSelected('0'));
+      await bloc.stream.firstWhere((state) => state.submitting);
+      expect(bloc.state.view?.canSelect, isFalse);
+      expect(bloc.state.answered, isFalse);
+      bloc.add(const KnowledgeGalleryOptionSelected('1'));
+      await pumpEventQueue();
+      gate.complete();
+      await pumpEventQueue();
+      expect(submit.answers, [(questionId: 1, answer: 'Impressionismo')]);
+      expect(bloc.state.snackMessage, isNotNull);
+      expect(bloc.state.selectedOptionId, isNull);
+      expect(bloc.state.answered, isFalse);
+      expect(bloc.state.submitting, isFalse);
+      await bloc.close();
     },
   );
 
