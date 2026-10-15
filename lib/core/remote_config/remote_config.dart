@@ -105,6 +105,7 @@ abstract final class RemoteConfigDefaults {
     'conexoes_lume',
     'palavra_misteriosa',
     'completar_frase',
+    'galeria_conhecimento',
   ];
 
   /// Unmodifiable copy of [enabledGameSlugs].

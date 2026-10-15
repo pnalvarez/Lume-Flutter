@@ -4,7 +4,9 @@ import 'package:lume/layers/domain/repository/knowledge_gallery_repository.dart'
 
 /// Loads the five rounds of one Knowledge Gallery match.
 abstract interface class IGetKnowledgeGalleryRound {
-  Future<List<KnowledgeGalleryRound>> call();
+  Future<List<KnowledgeGalleryRound>> call({
+    int count = knowledgeGalleryRoundsPerMatch,
+  });
 }
 
 @Injectable(as: IGetKnowledgeGalleryRound)
@@ -14,7 +16,9 @@ class GetKnowledgeGalleryRound implements IGetKnowledgeGalleryRound {
   final IKnowledgeGalleryRepository _repository;
 
   @override
-  Future<List<KnowledgeGalleryRound>> call() {
-    return _repository.getRounds();
+  Future<List<KnowledgeGalleryRound>> call({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) {
+    return _repository.getRounds(count: count);
   }
 }

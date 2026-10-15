@@ -11,8 +11,10 @@ final class KnowledgeGalleryRepository implements IKnowledgeGalleryRepository {
   final IKnowledgeGalleryDataSource _dataSource;
 
   @override
-  Future<List<KnowledgeGalleryRound>> getRounds() async {
-    final data = await _dataSource.fetchRounds();
+  Future<List<KnowledgeGalleryRound>> getRounds({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) async {
+    final data = await _dataSource.fetchRounds(count: count);
     return data.map(KnowledgeGalleryRoundMapper.toDomain).toList();
   }
 

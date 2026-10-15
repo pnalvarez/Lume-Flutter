@@ -4,6 +4,36 @@ import 'package:lume/layers/presentation/screens/games/shared/choice_option_visu
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 
+/// What the Knowledge Gallery round is showing.
+enum KnowledgeGalleryPhase {
+  playing,
+  submitting,
+  correct,
+  incorrect;
+
+  bool get canSelect => this == KnowledgeGalleryPhase.playing;
+
+  bool get answered =>
+      this == KnowledgeGalleryPhase.correct ||
+      this == KnowledgeGalleryPhase.incorrect;
+
+  bool get isCorrect => this == KnowledgeGalleryPhase.correct;
+
+  /// Maps the sequence flags onto one phase. A write in flight wins, so a
+  /// round cannot be answered and submitting at the same time.
+  static KnowledgeGalleryPhase resolve({
+    required bool submitting,
+    required bool answered,
+    required bool isCorrect,
+  }) {
+    if (submitting) return KnowledgeGalleryPhase.submitting;
+    if (!answered) return KnowledgeGalleryPhase.playing;
+    return isCorrect
+        ? KnowledgeGalleryPhase.correct
+        : KnowledgeGalleryPhase.incorrect;
+  }
+}
+
 /// One Knowledge Gallery round as the play surface should paint it.
 @immutable
 final class KnowledgeGalleryState {
@@ -15,7 +45,8 @@ final class KnowledgeGalleryState {
     this.imagePhase,
     this.selectedOptionId,
     this.correctOptionId,
-    this.answered = false,
+    this.phase = KnowledgeGalleryPhase.playing,
+    this.explanation,
   });
 
   final String prompt;
@@ -31,9 +62,28 @@ final class KnowledgeGalleryState {
   /// Index in [options], as `'0'` … `'3'`.
   final String? selectedOptionId;
   final String? correctOptionId;
-  final bool answered;
+  final KnowledgeGalleryPhase phase;
+
+  /// Feedback line shown after the answer, the same role as a trail explanation.
+  final String? explanation;
+
+  /// A choice can be tapped. False while the write is in flight or the round
+  /// is already answered, so the feedback dialog stays closed until the
+  /// server responds.
+  bool get canSelect => phase.canSelect;
+
+  bool get submitting => phase == KnowledgeGalleryPhase.submitting;
+
+  bool get answered => phase.answered;
+
+  bool get isCorrect => phase.isCorrect;
 
   ChoiceVisualState visualStateFor(String optionId) {
+    if (submitting) {
+      return selectedOptionId == optionId
+          ? ChoiceVisualState.selected
+          : ChoiceVisualState.disabled;
+    }
     return choiceOptionVisualState(
       answered: answered,
       selectedOptionId: selectedOptionId,
@@ -50,7 +100,8 @@ final class KnowledgeGalleryState {
     List<String>? options,
     String? selectedOptionId,
     String? correctOptionId,
-    bool? answered,
+    KnowledgeGalleryPhase? phase,
+    String? explanation,
   }) {
     return KnowledgeGalleryState(
       prompt: prompt ?? this.prompt,
@@ -60,7 +111,8 @@ final class KnowledgeGalleryState {
       options: options ?? this.options,
       selectedOptionId: selectedOptionId ?? this.selectedOptionId,
       correctOptionId: correctOptionId ?? this.correctOptionId,
-      answered: answered ?? this.answered,
+      phase: phase ?? this.phase,
+      explanation: explanation ?? this.explanation,
     );
   }
 
@@ -74,7 +126,8 @@ final class KnowledgeGalleryState {
       listEquals(other.options, options) &&
       other.selectedOptionId == selectedOptionId &&
       other.correctOptionId == correctOptionId &&
-      other.answered == answered;
+      other.phase == phase &&
+      other.explanation == explanation;
 
   @override
   int get hashCode => Object.hash(
@@ -85,6 +138,29 @@ final class KnowledgeGalleryState {
     Object.hashAll(options),
     selectedOptionId,
     correctOptionId,
-    answered,
+    phase,
+    explanation,
   );
+}
+
+/// Feedback copy for a revealed Knowledge Gallery answer.
+///
+/// Uses the correct line after a hit and the incorrect line after a miss.
+String? knowledgeGalleryFeedback({
+  required bool isCorrect,
+  String? feedbackCorrect,
+  String? feedbackIncorrect,
+}) {
+  final text = (isCorrect ? feedbackCorrect : feedbackIncorrect)?.trim();
+  if (text == null || text.isEmpty) return null;
+  return text;
+}
+
+/// Index of [answer] in [options], as `'0'`, `'1'`, and so on.
+///
+/// Null when [answer] is not listed.
+String? knowledgeGalleryOptionId(List<String> options, String answer) {
+  final index = options.indexOf(answer);
+  if (index < 0) return null;
+  return '$index';
 }

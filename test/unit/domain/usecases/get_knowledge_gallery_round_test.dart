@@ -9,9 +9,14 @@ class _Repository implements IKnowledgeGalleryRepository {
   final List<KnowledgeGalleryRound> rounds;
   var getCalls = 0;
 
+  int? count;
+
   @override
-  Future<List<KnowledgeGalleryRound>> getRounds() async {
+  Future<List<KnowledgeGalleryRound>> getRounds({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) async {
     getCalls++;
+    this.count = count;
     return rounds;
   }
 
@@ -41,5 +46,15 @@ void main() {
 
     expect(result, [round]);
     expect(repository.getCalls, 1);
+    expect(repository.count, knowledgeGalleryRoundsPerMatch);
+  });
+
+  test('forwards a smaller count for one arcade question', () async {
+    final repository = _Repository(const []);
+    final sut = GetKnowledgeGalleryRound(repository);
+
+    await sut(count: 1);
+
+    expect(repository.count, 1);
   });
 }

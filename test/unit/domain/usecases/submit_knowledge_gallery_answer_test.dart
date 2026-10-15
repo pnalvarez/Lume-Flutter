@@ -8,7 +8,9 @@ class _Repository implements IKnowledgeGalleryRepository {
   String? answer;
 
   @override
-  Future<List<KnowledgeGalleryRound>> getRounds() {
+  Future<List<KnowledgeGalleryRound>> getRounds({
+    int count = knowledgeGalleryRoundsPerMatch,
+  }) {
     throw UnimplementedError();
   }
 

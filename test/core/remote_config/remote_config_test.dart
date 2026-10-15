@@ -34,7 +34,7 @@ void main() {
       config.enabledGameSlugs,
       RemoteConfigDefaults.enabledGameSlugsDefault,
     );
-    expect(config.enabledGameSlugs.contains('galeria_conhecimento'), isFalse);
+    expect(config.enabledGameSlugs.contains('galeria_conhecimento'), isTrue);
     expect(
       config.getBool(RemoteConfigKeys.arcadeEnabled, defaultValue: false),
       isTrue,

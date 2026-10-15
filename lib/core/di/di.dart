@@ -18,13 +18,15 @@ import 'package:lume/layers/domain/usecases/get_achievements.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
+import 'package:lume/layers/domain/usecases/get_knowledge_gallery_round.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
-import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
+import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
 import 'package:lume/layers/domain/usecases/start_game_match.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/domain/usecases/watch_achievement_unlocks.dart';
 import 'package:lume/layers/domain/usecases/watch_level_up_events.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
+import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/games_hub_bloc.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_bloc.dart';
 
@@ -53,10 +55,12 @@ void _registerGamesHubBloc() {
       getIt<IGetHubGames>(),
       getIt<IGetGameRound>(),
       getIt<IGetArcadeRecord>(),
-      getIt<IGetRandomGameRound>(),
+      getIt<IDrawArcadeRound>(),
       getIt<IStartGameMatch>(),
       getIt<IRemoteConfig>(),
       getIt<IAnalytics>(),
+      getIt<IGetKnowledgeGalleryRound>(),
+      getIt<IKnowledgeGalleryMatch>(),
     ),
   );
 }

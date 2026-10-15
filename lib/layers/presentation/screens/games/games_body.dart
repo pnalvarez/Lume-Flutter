@@ -6,6 +6,7 @@ import 'package:lume/layers/presentation/screens/games/battle_of_curiosities/bat
 import 'package:lume/layers/presentation/screens/games/complete_sentence/complete_sentence_body.dart';
 import 'package:lume/layers/presentation/screens/games/connections/connections_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
+import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_body.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_body.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_body.dart';
 import 'package:lume/layers/presentation/screens/games/timeline/timeline_body.dart';
@@ -152,6 +153,15 @@ class GamesBody extends StatelessWidget {
   }
 
   Widget _buildRound(BuildContext context) {
+    final gallery = state.knowledgeGalleryView;
+    if (gallery != null) {
+      return KnowledgeGalleryBody(
+        state: gallery,
+        onOptionSelected: onChoiceSelected,
+        onNext: onNext,
+      );
+    }
+
     final game = state.currentGame;
     if (game == null) return const SizedBox.shrink();
 

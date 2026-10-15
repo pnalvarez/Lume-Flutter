@@ -34,7 +34,9 @@ class GameAnswerChrome extends StatefulWidget {
 class _GameAnswerChromeState extends State<GameAnswerChrome> {
   bool _feedbackDialogShown = false;
   bool _dialogVisible = false;
+  bool _dismissScheduled = false;
   NavigatorState? _rootNavigator;
+  Route<dynamic>? _dialogRoute;
 
   @override
   void didChangeDependencies() {
@@ -53,33 +55,64 @@ class _GameAnswerChromeState extends State<GameAnswerChrome> {
   @override
   void didUpdateWidget(covariant GameAnswerChrome oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.answered && widget.answered && !_feedbackDialogShown) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _presentFeedback());
-    }
-    if (!widget.answered) {
+    if (oldWidget.answered && !widget.answered) {
       _feedbackDialogShown = false;
+      _scheduleDismiss();
+    }
+    if (!oldWidget.answered &&
+        widget.answered &&
+        !_feedbackDialogShown &&
+        !_dialogVisible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _presentFeedback());
     }
   }
 
   @override
   void dispose() {
-    // Never pop the navigator from dispose — canPop() may pop the session
-    // route itself and re-enter PopScope handlers.
-    _dialogVisible = false;
+    // Pop only the feedback route, on the next frame. canPop() from dispose
+    // can pop the session itself and re-enter PopScope.
+    _scheduleDismiss();
     super.dispose();
   }
 
-  void _dismissFeedbackDialog() {
-    if (!_dialogVisible) return;
-    _dialogVisible = false;
+  void _scheduleDismiss() {
+    if (!_dialogVisible || _dismissScheduled) return;
+    _dismissScheduled = true;
+    final route = _dialogRoute;
     final navigator = _rootNavigator;
-    if (navigator != null && navigator.canPop()) {
-      navigator.pop();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dismissScheduled = false;
+      _removeDialogRoute(route, navigator);
+      if (mounted &&
+          widget.answered &&
+          !_feedbackDialogShown &&
+          !_dialogVisible) {
+        _presentFeedback();
+      }
+    });
+  }
+
+  void _dismissFeedbackDialog() {
+    _removeDialogRoute(_dialogRoute, _rootNavigator);
+  }
+
+  void _removeDialogRoute(Route<dynamic>? route, NavigatorState? navigator) {
+    if (!_dialogVisible && (route == null || !route.isActive)) return;
+    _dialogVisible = false;
+    if (identical(_dialogRoute, route)) _dialogRoute = null;
+    if (route == null || !route.isActive || navigator == null) return;
+    if (!navigator.mounted) return;
+    navigator.removeRoute(route);
   }
 
   Future<void> _presentFeedback() async {
-    if (_feedbackDialogShown || !mounted || !widget.answered) return;
+    if (_feedbackDialogShown ||
+        _dialogVisible ||
+        _dismissScheduled ||
+        !mounted ||
+        !widget.answered) {
+      return;
+    }
     _feedbackDialogShown = true;
 
     final cs = Theme.of(context).colorScheme;
@@ -99,26 +132,41 @@ class _GameAnswerChromeState extends State<GameAnswerChrome> {
             : LumeDialogTone.negative,
         title: widget.isCorrect ? trailGameCorrect : trailGameWrong,
         barrierDismissible: true,
-        content: hasContent
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (hasCorrectAnswer)
-                    Text(
-                      '$trailGameCorrectAnswerLabel $correctAnswer',
-                      style: typ.body3Semibold.copyWith(color: cs.onSurface),
-                    ),
-                  if (hasCorrectAnswer && hasExplanation)
-                    const SizedBox(height: AppSpacings.s),
-                  if (hasExplanation)
-                    Text(
-                      explanation,
-                      style: typ.body4Light.copyWith(color: cs.onSurface),
-                    ),
-                ],
-              )
-            : const SizedBox.shrink(),
+        content: Builder(
+          builder: (dialogContext) {
+            final route = ModalRoute.of(dialogContext);
+            _dialogRoute = route;
+            if (!mounted || !widget.answered || !_dialogVisible) {
+              final dialogNavigator = Navigator.of(dialogContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (route != null &&
+                    route.isActive &&
+                    dialogNavigator.mounted) {
+                  dialogNavigator.removeRoute(route);
+                }
+              });
+            }
+            if (!hasContent) return const SizedBox.shrink();
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (hasCorrectAnswer)
+                  Text(
+                    '$trailGameCorrectAnswerLabel $correctAnswer',
+                    style: typ.body3Semibold.copyWith(color: cs.onSurface),
+                  ),
+                if (hasCorrectAnswer && hasExplanation)
+                  const SizedBox(height: AppSpacings.s),
+                if (hasExplanation)
+                  Text(
+                    explanation,
+                    style: typ.body4Light.copyWith(color: cs.onSurface),
+                  ),
+              ],
+            );
+          },
+        ),
         actions: [
           Builder(
             builder: (dialogContext) => LumeButton(

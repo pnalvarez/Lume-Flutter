@@ -75,6 +75,21 @@ class _GamesHubViewState extends State<_GamesHubView> {
         ),
         BlocListener<GamesHubBloc, GamesHubState>(
           listenWhen: (previous, current) =>
+              previous.openGalleryRounds != current.openGalleryRounds,
+          listener: (context, state) async {
+            final rounds = state.openGalleryRounds;
+            final matchId = state.openMatchId;
+            if (rounds == null || matchId == null) return;
+
+            context.read<GamesHubBloc>().add(const GamesHubNavigationHandled());
+
+            await context.router.push<void>(
+              KnowledgeGalleryRoute(rounds: rounds, matchId: matchId),
+            );
+          },
+        ),
+        BlocListener<GamesHubBloc, GamesHubState>(
+          listenWhen: (previous, current) =>
               previous.openArcadeRounds != current.openArcadeRounds,
           listener: (context, state) async {
             final rounds = state.openArcadeRounds;
