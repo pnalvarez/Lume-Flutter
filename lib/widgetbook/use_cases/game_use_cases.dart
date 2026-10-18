@@ -88,17 +88,56 @@ Widget choiceGroupStates(BuildContext context) {
           ),
           ChoiceOption(
             id: '3',
+            label: 'Loading',
+            state: ChoiceVisualState.loading,
+          ),
+          ChoiceOption(
+            id: '4',
             label: 'Positive',
             state: ChoiceVisualState.positive,
           ),
           ChoiceOption(
-            id: '4',
+            id: '5',
             label: 'Negative',
             state: ChoiceVisualState.negative,
           ),
           ChoiceOption(
-            id: '5',
+            id: '6',
             label: 'Disabled',
+            state: ChoiceVisualState.disabled,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+@widgetbook.UseCase(name: 'Loading', type: ChoiceGroup)
+Widget choiceGroupLoading(BuildContext context) {
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: ChoiceGroup(
+        onSelected: (_) {},
+        options: const [
+          ChoiceOption(
+            id: '1',
+            label: 'Verifying…',
+            state: ChoiceVisualState.loading,
+          ),
+          ChoiceOption(
+            id: '2',
+            label: 'Other option',
+            state: ChoiceVisualState.disabled,
+          ),
+          ChoiceOption(
+            id: '3',
+            label: 'Another option',
+            state: ChoiceVisualState.disabled,
+          ),
+          ChoiceOption(
+            id: '4',
+            label: 'Last option',
             state: ChoiceVisualState.disabled,
           ),
         ],

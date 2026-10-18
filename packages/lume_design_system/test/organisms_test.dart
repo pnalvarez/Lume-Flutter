@@ -481,6 +481,40 @@ void main() {
       expect(id, 'b');
     });
 
+    testWidgets('ChoiceGroup loading shows spinner and blocks taps', (
+      tester,
+    ) async {
+      String? id;
+      await tester.pumpWidget(
+        _wrap(
+          ChoiceGroup(
+            options: const [
+              ChoiceOption(
+                id: 'a',
+                label: 'Loading',
+                state: ChoiceVisualState.loading,
+              ),
+              ChoiceOption(
+                id: 'b',
+                label: 'Disabled',
+                state: ChoiceVisualState.disabled,
+              ),
+            ],
+            onSelected: (v) => id = v,
+          ),
+        ),
+      );
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Loading'), findsNothing);
+
+      await tester.tap(find.byType(CircularProgressIndicator));
+      await tester.tap(find.text('Disabled'));
+      await tester.pump();
+
+      expect(id, isNull);
+    });
+
     testWidgets('SessionTimer shows display', (tester) async {
       await tester.pumpWidget(_wrap(const SessionTimer(display: '01:20')));
       expect(find.text('01:20'), findsOneWidget);
