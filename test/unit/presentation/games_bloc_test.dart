@@ -1143,11 +1143,18 @@ void main() {
 
     test('arcade abandon logs arcade_abandoned with score', () async {
       final analytics = FakeAnalytics();
+      // Pin slugs without Knowledge Gallery so the next-round draw cannot
+      // randomly pick an empty gallery and end the run before advance.
+      final remoteConfig = NoOpRemoteConfig();
+      remoteConfig.setDebugOverride(RemoteConfigKeys.enabledGameSlugs, <String>[
+        'linha_do_tempo',
+      ]);
       final bloc = _createGamesBloc(
         _SavePairProgress(),
         getRandomRound: _GetRandomGameRound(),
         saveArcadeRound: _SaveArcadeRound(),
         analytics: analytics,
+        remoteConfig: remoteConfig,
       );
       bloc.add(
         GamesStarted(

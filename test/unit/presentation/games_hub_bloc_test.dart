@@ -538,8 +538,10 @@ void main() {
   );
 
   blocTest<GamesHubBloc, GamesHubState>(
-    'arcade does not fall through to trail games when gallery has no items',
+    'arcade falls through to trail games when gallery has no items',
     build: () {
+      // Only the gallery slug → every roll selects it; empty gallery then
+      // falls through to a trail draw (with the gallery slug stripped).
       remoteConfig.slugs = const {knowledgeGalleryGameSlug};
       getGallery.rounds = const [];
       return buildBloc();
@@ -547,9 +549,11 @@ void main() {
     seed: () => const GamesHubState(isInitialLoading: false, showArcade: true),
     act: (bloc) => bloc.add(const GamesHubArcadePressed()),
     verify: (bloc) {
-      expect(getRandomGameRound.enabledSlugs, isEmpty);
-      expect(bloc.state.openArcadeRounds, isNull);
-      expect(bloc.state.gameRoundErrorMessage, gamesHubRoundEmpty);
+      expect(getRandomGameRound.enabledSlugs, [<String>[]]);
+      expect(bloc.state.openArcadeRounds, hasLength(1));
+      expect(bloc.state.openArcadeRounds!.single.game, isNotNull);
+      expect(bloc.state.openArcadeRounds!.single.gallery, isNull);
+      expect(bloc.state.gameRoundErrorMessage, isNull);
     },
   );
 }

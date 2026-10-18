@@ -32,9 +32,12 @@ class DrawArcadeRound implements IDrawArcadeRound {
           _random.nextInt(enabledSlugs.length),
         )) {
       final rounds = await _getKnowledgeGalleryRound(count: 1);
-      if (rounds.isEmpty) return null;
-      final round = rounds.first;
-      return GameRound(id: '${round.questionId}', gallery: round);
+      // Empty gallery must not end the arcade run — fall through to a trail
+      // draw so a missing visual question is treated as a miss on that slug.
+      if (rounds.isNotEmpty) {
+        final round = rounds.first;
+        return GameRound(id: '${round.questionId}', gallery: round);
+      }
     }
 
     final game = await _getRandomGameRound(
