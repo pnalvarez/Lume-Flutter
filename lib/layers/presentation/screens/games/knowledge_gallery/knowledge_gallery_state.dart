@@ -81,7 +81,7 @@ final class KnowledgeGalleryState {
   ChoiceVisualState visualStateFor(String optionId) {
     if (submitting) {
       return selectedOptionId == optionId
-          ? ChoiceVisualState.selected
+          ? ChoiceVisualState.loading
           : ChoiceVisualState.disabled;
     }
     return choiceOptionVisualState(

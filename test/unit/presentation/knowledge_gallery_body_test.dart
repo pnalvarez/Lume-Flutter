@@ -49,17 +49,42 @@ void main() {
     final taps = <String>[];
     await pumpBody(
       tester,
-      state: _state.copyWith(
+      state: const KnowledgeGalleryState(
+        prompt: 'A qual movimento esta pintura pertence?',
+        imageUrl: '',
+        imagePhase: ArtworkPromptImagePhase.error,
+        options: ['Impressionismo', 'Cubismo'],
         selectedOptionId: '0',
         phase: KnowledgeGalleryPhase.submitting,
       ),
       onOptionSelected: taps.add,
     );
 
-    await tester.tap(find.text('Impressionismo'));
+    await tester.tap(find.byType(CircularProgressIndicator));
     await tester.tap(find.text('Cubismo'));
     await tester.pump();
 
     expect(taps, isEmpty);
+  });
+
+  testWidgets('a submitting gallery shows a spinner on the selected option', (
+    tester,
+  ) async {
+    await pumpBody(
+      tester,
+      state: const KnowledgeGalleryState(
+        prompt: 'A qual movimento esta pintura pertence?',
+        imageUrl: '',
+        imagePhase: ArtworkPromptImagePhase.error,
+        options: ['Impressionismo', 'Cubismo'],
+        selectedOptionId: '0',
+        phase: KnowledgeGalleryPhase.submitting,
+      ),
+      onOptionSelected: (_) {},
+    );
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Impressionismo'), findsNothing);
+    expect(find.text('Cubismo'), findsOneWidget);
   });
 }
