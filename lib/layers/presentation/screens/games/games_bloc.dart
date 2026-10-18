@@ -704,6 +704,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesAbandoned event,
     Emitter<GamesState> emit,
   ) async {
+    // Session already closed (out of lives / no content) — do not double-log.
+    if (state.sequenceCompleted) return;
+
     // Leaving an arcade run is a valid ending: show the score instead of popping.
     if (_isArcade) {
       _analytics.logEvent(
