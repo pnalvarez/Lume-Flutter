@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 
 void main() {
-  const base = KnowledgeGalleryState(
+  const base = VisualChoiceGameState(
     prompt: 'Prompt',
     imageUrl: '',
     options: ['A', 'B', 'C', 'D'],
@@ -12,7 +12,7 @@ void main() {
   test('submitting maps the selected option to loading', () {
     final state = base.copyWith(
       selectedOptionId: '1',
-      phase: KnowledgeGalleryPhase.submitting,
+      phase: VisualChoiceGamePhase.submitting,
     );
 
     expect(state.visualStateFor('1'), ChoiceVisualState.loading);

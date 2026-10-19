@@ -3,54 +3,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
 import 'package:lume/core/di/di.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_leave_confirm.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_bloc.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_body.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_event.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_play_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_bloc.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_body.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_event.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_play_state.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
 import 'package:lume_design_system/organisms/navigation/page_header.dart';
 
 @RoutePage()
-class KnowledgeGalleryPage extends StatelessWidget {
-  const KnowledgeGalleryPage({
+class VisualChoiceGamePage extends StatelessWidget {
+  const VisualChoiceGamePage({
     super.key,
     required this.rounds,
     required this.matchId,
+    required this.config,
   });
 
-  final List<KnowledgeGalleryRound> rounds;
+  final List<VisualChoiceGameRound> rounds;
   final String matchId;
+
+  /// Visual game being played (slug + analytics event names).
+  final VisualChoiceGameConfig config;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          getIt<KnowledgeGalleryBloc>()
-            ..add(KnowledgeGalleryStarted(rounds: rounds, matchId: matchId)),
-      child: const _KnowledgeGalleryView(),
+      create: (_) => getIt<VisualChoiceGameBloc>()
+        ..add(
+          VisualChoiceGameStarted(
+            rounds: rounds,
+            matchId: matchId,
+            config: config,
+          ),
+        ),
+      child: const _VisualChoiceGameView(),
     );
   }
 }
 
-class _KnowledgeGalleryView extends StatefulWidget {
-  const _KnowledgeGalleryView();
+class _VisualChoiceGameView extends StatefulWidget {
+  const _VisualChoiceGameView();
 
   @override
-  State<_KnowledgeGalleryView> createState() => _KnowledgeGalleryViewState();
+  State<_VisualChoiceGameView> createState() => _VisualChoiceGameViewState();
 }
 
-class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
+class _VisualChoiceGameViewState extends State<_VisualChoiceGameView> {
   var _allowPop = false;
   var _confirming = false;
 
   Future<void> _requestExit() async {
     if (_allowPop || _confirming) return;
     final completed = context
-        .read<KnowledgeGalleryBloc>()
+        .read<VisualChoiceGameBloc>()
         .state
         .sequenceCompleted;
     if (completed) {
@@ -61,7 +71,7 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
     final leave = await confirmLeaveGamesSequence(context);
     _confirming = false;
     if (!leave || !mounted) return;
-    context.read<KnowledgeGalleryBloc>().add(const KnowledgeGalleryAbandoned());
+    context.read<VisualChoiceGameBloc>().add(const VisualChoiceGameAbandoned());
   }
 
   void _finishExit() {
@@ -81,16 +91,16 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
 
     return MultiBlocListener(
       listeners: [
-        BlocListener<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+        BlocListener<VisualChoiceGameBloc, VisualChoiceGamePlayState>(
           listenWhen: (previous, current) => !previous.goBack && current.goBack,
           listener: (context, state) {
-            context.read<KnowledgeGalleryBloc>().add(
-              const KnowledgeGalleryNavigationHandled(),
+            context.read<VisualChoiceGameBloc>().add(
+              const VisualChoiceGameNavigationHandled(),
             );
             _finishExit();
           },
         ),
-        BlocListener<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+        BlocListener<VisualChoiceGameBloc, VisualChoiceGamePlayState>(
           listenWhen: (previous, current) =>
               current.snackMessage != null &&
               current.snackMessage != previous.snackMessage,
@@ -100,8 +110,8 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(content: Text(message)));
-            context.read<KnowledgeGalleryBloc>().add(
-              const KnowledgeGallerySnackShown(),
+            context.read<VisualChoiceGameBloc>().add(
+              const VisualChoiceGameSnackShown(),
             );
           },
         ),
@@ -112,7 +122,7 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
           if (didPop) return;
           _requestExit();
         },
-        child: BlocBuilder<KnowledgeGalleryBloc, KnowledgeGalleryPlayState>(
+        child: BlocBuilder<VisualChoiceGameBloc, VisualChoiceGamePlayState>(
           builder: (context, state) {
             final view = state.view;
             return Stack(
@@ -140,21 +150,21 @@ class _KnowledgeGalleryViewState extends State<_KnowledgeGalleryView> {
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacings.l,
                             ),
-                            child: KnowledgeGalleryBody(
+                            child: VisualChoiceGameBody(
                               state: view,
                               onOptionSelected: (optionId) {
-                                context.read<KnowledgeGalleryBloc>().add(
-                                  KnowledgeGalleryOptionSelected(optionId),
+                                context.read<VisualChoiceGameBloc>().add(
+                                  VisualChoiceGameOptionSelected(optionId),
                                 );
                               },
                               onNext: () {
-                                context.read<KnowledgeGalleryBloc>().add(
-                                  const KnowledgeGalleryNextPressed(),
+                                context.read<VisualChoiceGameBloc>().add(
+                                  const VisualChoiceGameNextPressed(),
                                 );
                               },
                               onImageFailed: () {
-                                context.read<KnowledgeGalleryBloc>().add(
-                                  const KnowledgeGalleryImageFailed(),
+                                context.read<VisualChoiceGameBloc>().add(
+                                  const VisualChoiceGameImageFailed(),
                                 );
                               },
                             ),

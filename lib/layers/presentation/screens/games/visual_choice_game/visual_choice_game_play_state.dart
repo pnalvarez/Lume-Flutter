@@ -1,37 +1,37 @@
 import 'package:flutter/foundation.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_round.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 
 /// Five-question hub session. The painted round is [view].
 @immutable
-final class KnowledgeGalleryPlayState {
-  const KnowledgeGalleryPlayState({
+final class VisualChoiceGamePlayState {
+  const VisualChoiceGamePlayState({
     this.rounds = const [],
     this.matchId = '',
     this.index = 0,
     this.correctCount = 0,
     this.selectedOptionId,
     this.revealedCorrectAnswer,
-    this.phase = KnowledgeGalleryPhase.playing,
+    this.phase = VisualChoiceGamePhase.playing,
     this.goBack = false,
     this.sequenceCompleted = false,
     this.snackMessage,
   });
 
-  final List<KnowledgeGalleryRound> rounds;
+  final List<VisualChoiceGameRound> rounds;
   final String matchId;
   final int index;
   final int correctCount;
   final String? selectedOptionId;
   final String? revealedCorrectAnswer;
-  final KnowledgeGalleryPhase phase;
+  final VisualChoiceGamePhase phase;
   final bool goBack;
 
   /// The five questions are finished and the score screen should stay up.
   final bool sequenceCompleted;
   final String? snackMessage;
 
-  KnowledgeGalleryRound? get current {
+  VisualChoiceGameRound? get current {
     if (index < 0 || index >= rounds.length) return null;
     return rounds[index];
   }
@@ -44,7 +44,7 @@ final class KnowledgeGalleryPlayState {
 
   bool get canSelect => phase.canSelect;
 
-  bool get submitting => phase == KnowledgeGalleryPhase.submitting;
+  bool get submitting => phase == VisualChoiceGamePhase.submitting;
 
   bool get answered => phase.answered;
 
@@ -52,12 +52,12 @@ final class KnowledgeGalleryPlayState {
 
   bool get hasProgress => answered || index > 0;
 
-  KnowledgeGalleryState? get view {
+  VisualChoiceGameState? get view {
     final round = current;
     if (round == null) return null;
     String? correctOptionId;
     if (answered) {
-      correctOptionId = knowledgeGalleryOptionId(
+      correctOptionId = visualChoiceGameOptionId(
         round.options,
         revealedCorrectAnswer ?? round.correctAnswer,
       );
@@ -65,7 +65,7 @@ final class KnowledgeGalleryPlayState {
         correctOptionId = selectedOptionId;
       }
     }
-    return KnowledgeGalleryState(
+    return VisualChoiceGameState(
       prompt: round.prompt,
       imageUrl: round.imageUrl,
       options: round.options,
@@ -73,7 +73,7 @@ final class KnowledgeGalleryPlayState {
       correctOptionId: correctOptionId,
       phase: phase,
       explanation: answered
-          ? knowledgeGalleryFeedback(
+          ? visualChoiceGameFeedback(
               isCorrect: isCorrect,
               feedbackCorrect: round.feedbackCorrect,
               feedbackIncorrect: round.feedbackIncorrect,
@@ -82,21 +82,21 @@ final class KnowledgeGalleryPlayState {
     );
   }
 
-  KnowledgeGalleryPlayState copyWith({
-    List<KnowledgeGalleryRound>? rounds,
+  VisualChoiceGamePlayState copyWith({
+    List<VisualChoiceGameRound>? rounds,
     String? matchId,
     int? index,
     int? correctCount,
     String? selectedOptionId,
     String? revealedCorrectAnswer,
-    KnowledgeGalleryPhase? phase,
+    VisualChoiceGamePhase? phase,
     bool? goBack,
     bool? sequenceCompleted,
     String? snackMessage,
     bool clearAnswer = false,
     bool clearSnack = false,
   }) {
-    return KnowledgeGalleryPlayState(
+    return VisualChoiceGamePlayState(
       rounds: rounds ?? this.rounds,
       matchId: matchId ?? this.matchId,
       index: index ?? this.index,
@@ -107,7 +107,7 @@ final class KnowledgeGalleryPlayState {
       revealedCorrectAnswer: clearAnswer
           ? null
           : revealedCorrectAnswer ?? this.revealedCorrectAnswer,
-      phase: clearAnswer ? KnowledgeGalleryPhase.playing : phase ?? this.phase,
+      phase: clearAnswer ? VisualChoiceGamePhase.playing : phase ?? this.phase,
       goBack: goBack ?? this.goBack,
       sequenceCompleted: sequenceCompleted ?? this.sequenceCompleted,
       snackMessage: clearSnack ? null : snackMessage ?? this.snackMessage,
@@ -116,7 +116,7 @@ final class KnowledgeGalleryPlayState {
 
   @override
   bool operator ==(Object other) =>
-      other is KnowledgeGalleryPlayState &&
+      other is VisualChoiceGamePlayState &&
       listEquals(other.rounds, rounds) &&
       other.matchId == matchId &&
       other.index == index &&

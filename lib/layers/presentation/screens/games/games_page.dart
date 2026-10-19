@@ -196,9 +196,9 @@ class _GamesViewState extends State<_GamesView> {
                       GamesChoiceSelected(optionId),
                     );
                   },
-                  onGalleryImageFailed: () {
+                  onVisualImageFailed: () {
                     context.read<GamesBloc>().add(
-                      const GamesGalleryImageFailed(),
+                      const GamesVisualChoiceImageFailed(),
                     );
                   },
                   onWhoAmIAnswerChanged: (answer) {

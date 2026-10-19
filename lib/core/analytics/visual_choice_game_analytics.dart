@@ -1,12 +1,30 @@
 import 'package:lume/core/analytics/analytics.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
 
-/// Shared Knowledge Gallery funnel logging for hub and Games hosts.
+/// Shared visual-choice funnel logging for hub and Games hosts.
 ///
-/// Owns once-per-session outcome dedupe and once-per-index image-fail dedupe.
-final class KnowledgeGalleryAnalytics {
-  KnowledgeGalleryAnalytics(this._analytics);
+/// Event names come from the active [VisualChoiceGameConfig], so each
+/// visual game logs its own funnel. Owns once-per-session outcome dedupe
+/// and once-per-index image-fail dedupe.
+final class VisualChoiceGameAnalytics {
+  VisualChoiceGameAnalytics(
+    this._analytics, {
+    VisualChoiceGameConfig config = VisualChoiceGameConfig.knowledgeGallery,
+  }) : _config = config;
 
   final IAnalytics _analytics;
+  VisualChoiceGameConfig _config;
+
+  /// The config whose event names are currently logged.
+  VisualChoiceGameConfig get config => _config;
+
+  /// Logs subsequent events under [config]'s event names.
+  ///
+  /// Hub, standalone, and Arcade hosts call this when a sequence (or a new
+  /// Arcade round) belongs to a different visual game.
+  void useConfig(VisualChoiceGameConfig config) {
+    _config = config;
+  }
 
   var _touched = false;
   var _outcomeLogged = false;
@@ -22,7 +40,7 @@ final class KnowledgeGalleryAnalytics {
   void roundStarted({required int roundsTotal, required bool isArcade}) {
     _touched = true;
     _analytics.logEvent(
-      AnalyticsEvents.knowledgeGalleryRoundStarted,
+      _config.roundStartedEvent,
       parameters: {
         AnalyticsParams.roundsTotal: roundsTotal,
         AnalyticsParams.isArcade: isArcade,
@@ -38,7 +56,7 @@ final class KnowledgeGalleryAnalytics {
   }) {
     _touched = true;
     _analytics.logEvent(
-      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+      _config.questionAnsweredEvent,
       parameters: {
         AnalyticsParams.questionType: questionType,
         AnalyticsParams.isCorrect: isCorrect ? 1 : 0,
@@ -52,7 +70,7 @@ final class KnowledgeGalleryAnalytics {
     if (!_imageFailedIndexes.add(roundIndex)) return;
     _touched = true;
     _analytics.logEvent(
-      AnalyticsEvents.knowledgeGalleryImageFailed,
+      _config.imageFailedEvent,
       parameters: {AnalyticsParams.isArcade: isArcade},
     );
   }
@@ -65,7 +83,7 @@ final class KnowledgeGalleryAnalytics {
     if (!_touched || _outcomeLogged) return;
     _outcomeLogged = true;
     _analytics.logEvent(
-      AnalyticsEvents.knowledgeGallerySessionCompleted,
+      _config.sessionCompletedEvent,
       parameters: {
         AnalyticsParams.correctCount: correctCount,
         AnalyticsParams.roundsTotal: roundsTotal,
@@ -82,7 +100,7 @@ final class KnowledgeGalleryAnalytics {
     if (!_touched || _outcomeLogged) return;
     _outcomeLogged = true;
     _analytics.logEvent(
-      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+      _config.sessionAbandonedEvent,
       parameters: {
         AnalyticsParams.roundIndex: roundIndex,
         AnalyticsParams.roundsTotal: roundsTotal,
