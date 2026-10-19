@@ -2,9 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
-import 'package:lume/core/analytics/knowledge_gallery_analytics.dart';
+import 'package:lume/core/analytics/visual_choice_game_analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_round.dart';
 import 'package:lume/layers/domain/models/game_play/complete_sentence_play.dart';
 import 'package:lume/layers/domain/models/game_play/connections_play.dart';
 import 'package:lume/layers/domain/models/game_play/mysterious_word_play.dart';
@@ -22,7 +22,7 @@ import 'package:lume/layers/domain/usecases/finish_game_match.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
-import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
+import 'package:lume/layers/domain/usecases/submit_visual_choice_game_answer.dart';
 import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_event.dart';
@@ -47,8 +47,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     this._finishGameMatch,
     this._analytics,
     this._remoteConfig,
-    this._submitKnowledgeGalleryAnswer,
-  ) : _galleryAnalytics = KnowledgeGalleryAnalytics(_analytics),
+    this._submitVisualChoiceGameAnswer,
+  ) : _visualAnalytics = VisualChoiceGameAnalytics(_analytics),
       super(const GamesState()) {
     on<GamesStarted>(_onStarted);
     on<GamesChoiceSelected>(_onChoiceSelected);
@@ -65,7 +65,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     on<GamesNextPressed>(_onNextPressed);
     on<GamesRetrySave>(_onRetrySave);
     on<GamesAbandoned>(_onAbandoned);
-    on<GamesGalleryImageFailed>(_onGalleryImageFailed);
+    on<GamesVisualChoiceImageFailed>(_onVisualImageFailed);
     on<GamesNavigationHandled>(_onNavigationHandled);
     on<GamesXpSnackBarShown>(_onXpSnackBarShown);
   }
@@ -85,8 +85,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   final IFinishGameMatch _finishGameMatch;
   final IAnalytics _analytics;
   final IRemoteConfig _remoteConfig;
-  final ISubmitKnowledgeGalleryAnswer _submitKnowledgeGalleryAnswer;
-  final KnowledgeGalleryAnalytics _galleryAnalytics;
+  final ISubmitVisualChoiceGameAnswer _submitVisualChoiceGameAnswer;
+  final VisualChoiceGameAnalytics _visualAnalytics;
 
   GamesPlayMode _mode = GamesPlayMode.trail;
   GamesRoundSave? _onSaveRound;
@@ -110,12 +110,18 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
   /// Set when leaving should close the match and a finish attempt failed.
   var _leaveFinishPending = false;
   var _leaveCorrectCount = 0;
-  var _gallerySubmitInFlight = false;
-  String? _pendingGalleryOptionId;
+  var _visualSubmitInFlight = false;
+  String? _pendingVisualOptionId;
 
   static const _leilaoDicasSlug = 'leilao_dicas';
 
   bool get _isArcade => _mode == GamesPlayMode.arcade;
+
+  /// Logs later visual events under [round]'s config (slug + event names).
+  void _useVisualConfig(GameRound? round) {
+    final config = round?.visualConfig;
+    if (config != null) _visualAnalytics.useConfig(config);
+  }
 
   Future<void> _onStarted(GamesStarted event, Emitter<GamesState> emit) async {
     _mode = event.mode;
@@ -131,7 +137,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     _leilaoRecordedIndex = null;
     _leaveFinishPending = false;
     _leaveCorrectCount = 0;
-    _galleryAnalytics.reset();
+    _visualAnalytics.reset();
     final first = event.rounds.isEmpty ? null : event.rounds.first;
     final params = <String, Object>{
       AnalyticsParams.playMode: event.mode.name,
@@ -141,8 +147,8 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       final trailGame = first.game;
       if (trailGame != null) {
         params[AnalyticsParams.gameType] = trailGame.gameType.wireValue;
-      } else if (first.gallery != null) {
-        params[AnalyticsParams.gameType] = knowledgeGalleryGameSlug;
+      } else if (first.visualGameSlug case final visualSlug?) {
+        params[AnalyticsParams.gameType] = visualSlug;
       }
     }
     _analytics.logEvent(AnalyticsEvents.gameRoundStarted, parameters: params);
@@ -152,8 +158,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         arcadeRecord: event.arcadeRecord,
       ),
     );
-    if (first?.gallery != null) {
-      _galleryAnalytics.roundStarted(
+    if (first?.visual != null) {
+      _useVisualConfig(first);
+      _visualAnalytics.roundStarted(
         roundsTotal: event.rounds.length,
         isArcade: _isArcade,
       );
@@ -164,11 +171,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesChoiceSelected event,
     Emitter<GamesState> emit,
   ) async {
-    if (state.answered || _gallerySubmitInFlight) return;
+    if (state.answered || _visualSubmitInFlight) return;
 
-    final gallery = state.currentRound?.gallery;
-    if (gallery != null) {
-      await _submitGalleryChoice(gallery, event.optionId, emit);
+    final visual = state.currentRound?.visual;
+    if (visual != null) {
+      await _submitVisualChoice(visual, event.optionId, emit);
       return;
     }
 
@@ -361,13 +368,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     GamesNextPressed event,
     Emitter<GamesState> emit,
   ) async {
-    // Gallery stays unanswered until submit_visual_answer returns, so a
+    // A visual round stays unanswered until submit_visual_answer returns, so a
     // Próximo queued during that call cannot score a guess that is still
     // in flight or has already failed.
     if (!state.answered ||
         state.status == GamesStatus.saving ||
-        _gallerySubmitInFlight ||
-        _pendingGalleryOptionId != null) {
+        _visualSubmitInFlight ||
+        _pendingVisualOptionId != null) {
       return;
     }
     final scorePct = state.isCorrect ? 100 : 0;
@@ -382,11 +389,11 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       await _finishPendingLeave(emit);
       return;
     }
-    final pendingOption = _pendingGalleryOptionId;
-    final gallery = state.currentRound?.gallery;
-    if (pendingOption != null && gallery != null) {
+    final pendingOption = _pendingVisualOptionId;
+    final visual = state.currentRound?.visual;
+    if (pendingOption != null && visual != null) {
       emit(state.copyWith(status: GamesStatus.ready, clearError: true));
-      await _submitGalleryChoice(gallery, pendingOption, emit);
+      await _submitVisualChoice(visual, pendingOption, emit);
       return;
     }
     final scorePct = state.pendingSaveScorePct;
@@ -482,7 +489,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           AnalyticsParams.roundsTotal: state.rounds.length,
         },
       );
-      _galleryAnalytics.sessionCompleted(
+      _visualAnalytics.sessionCompleted(
         correctCount: nextCorrect,
         roundsTotal: state.rounds.length,
         isArcade: _isArcade,
@@ -503,8 +510,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
-    if (state.currentRound?.gallery != null) {
-      _galleryAnalytics.roundStarted(
+    if (state.currentRound?.visual != null) {
+      _useVisualConfig(state.currentRound);
+      _visualAnalytics.roundStarted(
         roundsTotal: state.rounds.length,
         isArcade: _isArcade,
       );
@@ -516,7 +524,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     required int scorePct,
   }) async {
     if (_isArcade) {
-      if (state.currentRound?.gallery != null) return 0;
+      if (state.currentRound?.visual != null) return 0;
       final result = await _saveArcadeRound(
         pairId: int.parse(roundId),
         scorePct: scorePct,
@@ -589,44 +597,46 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         clearXpAwardedToShow: xpAwarded <= 0,
       ),
     );
-    if (nextRound.gallery != null) {
-      _galleryAnalytics.roundStarted(
+    if (nextRound.visual != null) {
+      _useVisualConfig(nextRound);
+      _visualAnalytics.roundStarted(
         roundsTotal: state.rounds.length,
         isArcade: _isArcade,
       );
     }
   }
 
-  Future<void> _submitGalleryChoice(
-    KnowledgeGalleryRound gallery,
+  Future<void> _submitVisualChoice(
+    VisualChoiceGameRound visual,
     String optionId,
     Emitter<GamesState> emit,
   ) async {
     final index = int.tryParse(optionId);
-    if (index == null || index < 0 || index >= gallery.options.length) return;
-    final answer = gallery.options[index];
+    if (index == null || index < 0 || index >= visual.options.length) return;
+    final answer = visual.options[index];
     final roundIndex = state.currentIndex;
-    _gallerySubmitInFlight = true;
-    _pendingGalleryOptionId = optionId;
+    _useVisualConfig(state.currentRound);
+    _visualSubmitInFlight = true;
+    _pendingVisualOptionId = optionId;
     // Keep the round unanswered until the write returns. Marking it answered
     // here opens the root feedback dialog, and a failed submit then replaces
     // this surface without popping that route.
     emit(
       state.copyWith(
         status: GamesStatus.ready,
-        gallerySubmitting: true,
+        visualSubmitting: true,
         choice: state.choice.copyWith(selectedOptionId: optionId),
         clearError: true,
       ),
     );
     try {
-      final result = await _submitKnowledgeGalleryAnswer(
-        questionId: gallery.questionId,
+      final result = await _submitVisualChoiceGameAnswer(
+        questionId: visual.questionId,
         answer: answer,
       );
-      _pendingGalleryOptionId = null;
-      _galleryAnalytics.questionAnswered(
-        questionType: gallery.questionType,
+      _pendingVisualOptionId = null;
+      _visualAnalytics.questionAnswered(
+        questionType: visual.questionType,
         isCorrect: result.correct,
         roundIndex: roundIndex,
         isArcade: _isArcade,
@@ -634,7 +644,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       emit(
         state.copyWith(
           status: GamesStatus.ready,
-          gallerySubmitting: false,
+          visualSubmitting: false,
           answered: true,
           isCorrect: result.correct,
           clearError: true,
@@ -644,7 +654,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
       emit(
         state.copyWith(
           status: GamesStatus.error,
-          gallerySubmitting: false,
+          visualSubmitting: false,
           errorMessage: trailSessionSaveError,
           answered: false,
           isCorrect: false,
@@ -652,7 +662,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         ),
       );
     } finally {
-      _gallerySubmitInFlight = false;
+      _visualSubmitInFlight = false;
     }
   }
 
@@ -693,7 +703,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
-    _galleryAnalytics.sessionCompleted(
+    _visualAnalytics.sessionCompleted(
       correctCount: finished.scoredCount,
       roundsTotal: state.rounds.length,
       isArcade: _isArcade,
@@ -718,7 +728,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           AnalyticsParams.roundsTotal: state.rounds.length,
         },
       );
-      _galleryAnalytics.sessionAbandoned(
+      _visualAnalytics.sessionAbandoned(
         roundIndex: state.currentIndex,
         roundsTotal: state.rounds.length,
         isArcade: _isArcade,
@@ -734,7 +744,7 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
-    _galleryAnalytics.sessionAbandoned(
+    _visualAnalytics.sessionAbandoned(
       roundIndex: state.currentIndex,
       roundsTotal: state.rounds.length,
       isArcade: _isArcade,
@@ -748,12 +758,13 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
     emit(state.copyWith(goBack: true));
   }
 
-  void _onGalleryImageFailed(
-    GamesGalleryImageFailed event,
+  void _onVisualImageFailed(
+    GamesVisualChoiceImageFailed event,
     Emitter<GamesState> emit,
   ) {
-    if (state.currentRound?.gallery == null) return;
-    _galleryAnalytics.imageFailed(
+    if (state.currentRound?.visual == null) return;
+    _useVisualConfig(state.currentRound);
+    _visualAnalytics.imageFailed(
       roundIndex: state.currentIndex,
       isArcade: _isArcade,
     );

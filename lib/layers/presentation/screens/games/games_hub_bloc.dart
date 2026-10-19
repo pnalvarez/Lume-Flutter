@@ -3,12 +3,13 @@ import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/games_hub_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/remote_config/remote_config.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/models/game/hub_game_domain.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
-import 'package:lume/layers/domain/usecases/get_knowledge_gallery_round.dart';
-import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
+import 'package:lume/layers/domain/usecases/get_visual_choice_game_round.dart';
+import 'package:lume/layers/domain/usecases/visual_choice_game_match.dart';
 import 'package:lume/layers/domain/usecases/start_game_match.dart';
 import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
@@ -26,8 +27,8 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     this._startGameMatch,
     this._remoteConfig,
     this._analytics,
-    this._getKnowledgeGalleryRound,
-    this._knowledgeGalleryMatch,
+    this._getVisualChoiceGameRound,
+    this._visualChoiceGameMatch,
   ) : super(const GamesHubState()) {
     on<GamesHubStarted>(_onStarted);
     on<GamesHubGamePressed>(_onGamePressed);
@@ -43,8 +44,8 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
   final IStartGameMatch _startGameMatch;
   final IRemoteConfig _remoteConfig;
   final IAnalytics _analytics;
-  final IGetKnowledgeGalleryRound _getKnowledgeGalleryRound;
-  final IKnowledgeGalleryMatch _knowledgeGalleryMatch;
+  final IGetVisualChoiceGameRound _getVisualChoiceGameRound;
+  final IVisualChoiceGameMatch _visualChoiceGameMatch;
 
   Future<void> _onStarted(
     GamesHubStarted event,
@@ -105,8 +106,12 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
         return;
       }
 
-      if (event.gameSlug == knowledgeGalleryGameSlug) {
-        final rounds = await _getKnowledgeGalleryRound();
+      if (_isVisualGame(event.gameSlug)) {
+        final config = VisualChoiceGameConfig.forSlug(event.gameSlug);
+        final rounds = await _getVisualChoiceGameRound(
+          gameSlug: config.gameSlug,
+          count: config.roundsPerMatch,
+        );
         if (rounds.isEmpty) {
           emit(
             state.copyWith(
@@ -116,13 +121,16 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
           );
           return;
         }
-        final matchId = await _knowledgeGalleryMatch.start();
+        final matchId = await _visualChoiceGameMatch.start(
+          gameSlug: config.gameSlug,
+        );
         emit(
           state.copyWith(
             isLoadingGame: false,
             openMatchId: matchId,
             openGameSlug: event.gameSlug,
-            openGalleryRounds: rounds,
+            openVisualRounds: rounds,
+            openVisualConfig: config,
           ),
         );
         return;
@@ -204,6 +212,16 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     }
   }
 
+  /// Any allowlisted visual game takes the visual-choice path: catalog
+  /// tiles in the `visual` section, plus known visual slugs when the tile
+  /// list is not in state (e.g. a deep link or a seeded test state).
+  bool _isVisualGame(String gameSlug) {
+    if (VisualChoiceGameConfig.isVisualGameSlug(gameSlug)) return true;
+    return state.games.any(
+      (game) => game.slug == gameSlug && game.hubSection == HubSection.visual,
+    );
+  }
+
   /// Refreshes Remote Config, then returns the activated slug allowlist.
   Future<Set<String>> _enabledSlugs() async {
     await _remoteConfig.refresh();
@@ -217,7 +235,7 @@ final class GamesHubBloc extends Bloc<GamesHubEvent, GamesHubState> {
     emit(
       state.copyWith(
         clearOpenPlayRounds: true,
-        clearOpenGalleryRounds: true,
+        clearOpenVisualRounds: true,
         clearOpenArcadeRounds: true,
       ),
     );

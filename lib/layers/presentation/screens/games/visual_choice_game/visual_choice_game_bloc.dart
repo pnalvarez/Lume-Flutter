@@ -2,58 +2,59 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:lume/common/strings/trail_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
-import 'package:lume/core/analytics/knowledge_gallery_analytics.dart';
-import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
-import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_event.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_play_state.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/core/analytics/visual_choice_game_analytics.dart';
+import 'package:lume/layers/domain/usecases/visual_choice_game_match.dart';
+import 'package:lume/layers/domain/usecases/submit_visual_choice_game_answer.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_event.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_play_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 
 @injectable
-final class KnowledgeGalleryBloc
-    extends Bloc<KnowledgeGalleryEvent, KnowledgeGalleryPlayState> {
-  KnowledgeGalleryBloc(this._submitAnswer, this._match, IAnalytics analytics)
-    : _galleryAnalytics = KnowledgeGalleryAnalytics(analytics),
-      super(const KnowledgeGalleryPlayState()) {
-    on<KnowledgeGalleryStarted>(_onStarted);
-    on<KnowledgeGalleryOptionSelected>(_onOptionSelected);
-    on<KnowledgeGalleryNextPressed>(_onNextPressed);
-    on<KnowledgeGalleryAbandoned>(_onAbandoned);
-    on<KnowledgeGalleryImageFailed>(_onImageFailed);
-    on<KnowledgeGalleryNavigationHandled>(_onNavigationHandled);
-    on<KnowledgeGallerySnackShown>(_onSnackShown);
+final class VisualChoiceGameBloc
+    extends Bloc<VisualChoiceGameEvent, VisualChoiceGamePlayState> {
+  VisualChoiceGameBloc(this._submitAnswer, this._match, IAnalytics analytics)
+    : _visualAnalytics = VisualChoiceGameAnalytics(analytics),
+      super(const VisualChoiceGamePlayState()) {
+    on<VisualChoiceGameStarted>(_onStarted);
+    on<VisualChoiceGameOptionSelected>(_onOptionSelected);
+    on<VisualChoiceGameNextPressed>(_onNextPressed);
+    on<VisualChoiceGameAbandoned>(_onAbandoned);
+    on<VisualChoiceGameImageFailed>(_onImageFailed);
+    on<VisualChoiceGameNavigationHandled>(_onNavigationHandled);
+    on<VisualChoiceGameSnackShown>(_onSnackShown);
   }
 
-  final ISubmitKnowledgeGalleryAnswer _submitAnswer;
-  final IKnowledgeGalleryMatch _match;
-  final KnowledgeGalleryAnalytics _galleryAnalytics;
+  final ISubmitVisualChoiceGameAnswer _submitAnswer;
+  final IVisualChoiceGameMatch _match;
+  final VisualChoiceGameAnalytics _visualAnalytics;
 
   var _closed = false;
   var _closing = false;
 
-  /// A failed close must not leave the round stuck in [KnowledgeGalleryPhase.submitting].
-  KnowledgeGalleryPhase get _phaseAfterSubmit =>
-      state.submitting ? KnowledgeGalleryPhase.playing : state.phase;
+  /// A failed close must not leave the round stuck in [VisualChoiceGamePhase.submitting].
+  VisualChoiceGamePhase get _phaseAfterSubmit =>
+      state.submitting ? VisualChoiceGamePhase.playing : state.phase;
 
   void _onStarted(
-    KnowledgeGalleryStarted event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameStarted event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) {
     if (event.rounds.isEmpty) {
       emit(state.copyWith(goBack: true));
       return;
     }
-    _galleryAnalytics
+    _visualAnalytics
+      ..useConfig(event.config)
       ..reset()
       ..roundStarted(roundsTotal: event.rounds.length, isArcade: false);
     emit(
-      KnowledgeGalleryPlayState(rounds: event.rounds, matchId: event.matchId),
+      VisualChoiceGamePlayState(rounds: event.rounds, matchId: event.matchId),
     );
   }
 
   Future<void> _onOptionSelected(
-    KnowledgeGalleryOptionSelected event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameOptionSelected event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) async {
     if (!state.canSelect) return;
     final round = state.current;
@@ -72,7 +73,7 @@ final class KnowledgeGalleryBloc
     // this selection — it does not pop that route.
     emit(
       state.copyWith(
-        phase: KnowledgeGalleryPhase.submitting,
+        phase: VisualChoiceGamePhase.submitting,
         selectedOptionId: event.optionId,
         clearSnack: true,
       ),
@@ -82,7 +83,7 @@ final class KnowledgeGalleryBloc
         questionId: round.questionId,
         answer: answer,
       );
-      _galleryAnalytics.questionAnswered(
+      _visualAnalytics.questionAnswered(
         questionType: round.questionType,
         isCorrect: result.correct,
         roundIndex: roundIndex,
@@ -91,8 +92,8 @@ final class KnowledgeGalleryBloc
       emit(
         state.copyWith(
           phase: result.correct
-              ? KnowledgeGalleryPhase.correct
-              : KnowledgeGalleryPhase.incorrect,
+              ? VisualChoiceGamePhase.correct
+              : VisualChoiceGamePhase.incorrect,
           revealedCorrectAnswer: result.correctAnswer,
           correctCount: state.correctCount + (result.correct ? 1 : 0),
         ),
@@ -105,8 +106,8 @@ final class KnowledgeGalleryBloc
   }
 
   Future<void> _onNextPressed(
-    KnowledgeGalleryNextPressed event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameNextPressed event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) async {
     if (!state.answered) return;
     if (state.index >= state.rounds.length - 1) {
@@ -117,11 +118,11 @@ final class KnowledgeGalleryBloc
   }
 
   Future<void> _onAbandoned(
-    KnowledgeGalleryAbandoned event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameAbandoned event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) async {
     if (state.submitting || _closing) return;
-    _galleryAnalytics.sessionAbandoned(
+    _visualAnalytics.sessionAbandoned(
       roundIndex: state.index,
       roundsTotal: state.rounds.length,
       isArcade: false,
@@ -134,28 +135,28 @@ final class KnowledgeGalleryBloc
   }
 
   void _onImageFailed(
-    KnowledgeGalleryImageFailed event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameImageFailed event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) {
-    _galleryAnalytics.imageFailed(roundIndex: state.index, isArcade: false);
+    _visualAnalytics.imageFailed(roundIndex: state.index, isArcade: false);
   }
 
   void _onNavigationHandled(
-    KnowledgeGalleryNavigationHandled event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameNavigationHandled event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) {
     emit(state.copyWith(goBack: false));
   }
 
   void _onSnackShown(
-    KnowledgeGallerySnackShown event,
-    Emitter<KnowledgeGalleryPlayState> emit,
+    VisualChoiceGameSnackShown event,
+    Emitter<VisualChoiceGamePlayState> emit,
   ) {
     emit(state.copyWith(clearSnack: true));
   }
 
   Future<void> _closeMatch(
-    Emitter<KnowledgeGalleryPlayState> emit, {
+    Emitter<VisualChoiceGamePlayState> emit, {
     bool goBack = false,
     bool sequenceCompleted = false,
   }) async {
@@ -178,7 +179,7 @@ final class KnowledgeGalleryBloc
       );
       _closed = true;
       if (sequenceCompleted) {
-        _galleryAnalytics.sessionCompleted(
+        _visualAnalytics.sessionCompleted(
           correctCount: correctCount,
           roundsTotal: total,
           isArcade: false,

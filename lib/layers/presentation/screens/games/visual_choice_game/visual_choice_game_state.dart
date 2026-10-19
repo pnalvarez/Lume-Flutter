@@ -4,40 +4,40 @@ import 'package:lume/layers/presentation/screens/games/shared/choice_option_visu
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 
-/// What the Knowledge Gallery round is showing.
-enum KnowledgeGalleryPhase {
+/// What the visual-choice round is showing.
+enum VisualChoiceGamePhase {
   playing,
   submitting,
   correct,
   incorrect;
 
-  bool get canSelect => this == KnowledgeGalleryPhase.playing;
+  bool get canSelect => this == VisualChoiceGamePhase.playing;
 
   bool get answered =>
-      this == KnowledgeGalleryPhase.correct ||
-      this == KnowledgeGalleryPhase.incorrect;
+      this == VisualChoiceGamePhase.correct ||
+      this == VisualChoiceGamePhase.incorrect;
 
-  bool get isCorrect => this == KnowledgeGalleryPhase.correct;
+  bool get isCorrect => this == VisualChoiceGamePhase.correct;
 
   /// Maps the sequence flags onto one phase. A write in flight wins, so a
   /// round cannot be answered and submitting at the same time.
-  static KnowledgeGalleryPhase resolve({
+  static VisualChoiceGamePhase resolve({
     required bool submitting,
     required bool answered,
     required bool isCorrect,
   }) {
-    if (submitting) return KnowledgeGalleryPhase.submitting;
-    if (!answered) return KnowledgeGalleryPhase.playing;
+    if (submitting) return VisualChoiceGamePhase.submitting;
+    if (!answered) return VisualChoiceGamePhase.playing;
     return isCorrect
-        ? KnowledgeGalleryPhase.correct
-        : KnowledgeGalleryPhase.incorrect;
+        ? VisualChoiceGamePhase.correct
+        : VisualChoiceGamePhase.incorrect;
   }
 }
 
-/// One Knowledge Gallery round as the play surface should paint it.
+/// One visual-choice round as the play surface should paint it.
 @immutable
-final class KnowledgeGalleryState {
-  const KnowledgeGalleryState({
+final class VisualChoiceGameState {
+  const VisualChoiceGameState({
     required this.prompt,
     required this.imageUrl,
     required this.options,
@@ -45,7 +45,7 @@ final class KnowledgeGalleryState {
     this.imagePhase,
     this.selectedOptionId,
     this.correctOptionId,
-    this.phase = KnowledgeGalleryPhase.playing,
+    this.phase = VisualChoiceGamePhase.playing,
     this.explanation,
   });
 
@@ -62,7 +62,7 @@ final class KnowledgeGalleryState {
   /// Index in [options], as `'0'` … `'3'`.
   final String? selectedOptionId;
   final String? correctOptionId;
-  final KnowledgeGalleryPhase phase;
+  final VisualChoiceGamePhase phase;
 
   /// Feedback line shown after the answer, the same role as a trail explanation.
   final String? explanation;
@@ -72,7 +72,7 @@ final class KnowledgeGalleryState {
   /// server responds.
   bool get canSelect => phase.canSelect;
 
-  bool get submitting => phase == KnowledgeGalleryPhase.submitting;
+  bool get submitting => phase == VisualChoiceGamePhase.submitting;
 
   bool get answered => phase.answered;
 
@@ -92,7 +92,7 @@ final class KnowledgeGalleryState {
     );
   }
 
-  KnowledgeGalleryState copyWith({
+  VisualChoiceGameState copyWith({
     String? prompt,
     String? imageUrl,
     ImageProvider? image,
@@ -100,10 +100,10 @@ final class KnowledgeGalleryState {
     List<String>? options,
     String? selectedOptionId,
     String? correctOptionId,
-    KnowledgeGalleryPhase? phase,
+    VisualChoiceGamePhase? phase,
     String? explanation,
   }) {
-    return KnowledgeGalleryState(
+    return VisualChoiceGameState(
       prompt: prompt ?? this.prompt,
       imageUrl: imageUrl ?? this.imageUrl,
       image: image ?? this.image,
@@ -118,7 +118,7 @@ final class KnowledgeGalleryState {
 
   @override
   bool operator ==(Object other) =>
-      other is KnowledgeGalleryState &&
+      other is VisualChoiceGameState &&
       other.prompt == prompt &&
       other.imageUrl == imageUrl &&
       other.image == image &&
@@ -143,10 +143,10 @@ final class KnowledgeGalleryState {
   );
 }
 
-/// Feedback copy for a revealed Knowledge Gallery answer.
+/// Feedback copy for a revealed visual-choice answer.
 ///
 /// Uses the correct line after a hit and the incorrect line after a miss.
-String? knowledgeGalleryFeedback({
+String? visualChoiceGameFeedback({
   required bool isCorrect,
   String? feedbackCorrect,
   String? feedbackIncorrect,
@@ -159,7 +159,7 @@ String? knowledgeGalleryFeedback({
 /// Index of [answer] in [options], as `'0'`, `'1'`, and so on.
 ///
 /// Null when [answer] is not listed.
-String? knowledgeGalleryOptionId(List<String> options, String answer) {
+String? visualChoiceGameOptionId(List<String> options, String answer) {
   final index = options.indexOf(answer);
   if (index < 0) return null;
   return '$index';

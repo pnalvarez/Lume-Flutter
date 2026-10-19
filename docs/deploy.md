@@ -155,7 +155,7 @@ Behavior:
 - QA without console:
   - `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
   - `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`)
-- `enabled_game_slugs` default (missing or invalid JSON keeps this set; `[]` is an empty set): `quiz_relampago`, `verdade_ou_mito`, `batalha_curiosidades`, `quem_sou_eu`, `leilao_dicas`, `linha_do_tempo`, `o_que_aconteceu_depois`, `conexoes_lume`, `palavra_misteriosa`, `completar_frase`, `galeria_conhecimento`
+- `enabled_game_slugs` default (missing or invalid JSON keeps this set; `[]` is an empty set): `quiz_relampago`, `verdade_ou_mito`, `batalha_curiosidades`, `quem_sou_eu`, `leilao_dicas`, `linha_do_tempo`, `o_que_aconteceu_depois`, `conexoes_lume`, `palavra_misteriosa`, `completar_frase`, `galeria_conhecimento`, `rostos_historia`. To enable Rostos da História on published builds, the Firebase Console `enabled_game_slugs` value must also include `rostos_historia` (the console value wins over the in-app default once fetched) and `get_hub_games` must return its catalog row.
 - Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)`, `setDebugOverride('achievements_enabled', true)`, or `setDebugOverride('enabled_game_slugs', '["quiz_relampago"]')` (a `Set<String>` or `List<String>` also works). Honored in debug builds, or with `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`
 
 Do not put PII or secrets in Remote Config values.
@@ -187,8 +187,8 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 | `onboarding_category_selected` | Onboarding categories saved |
 | `submodule_session_started` / `completed` / `abandoned` | Trail submodule session |
 | `game_round_started` / `game_session_completed` / `game_session_abandoned` | Games play sequence |
-| `knowledge_gallery_round_started` / `knowledge_gallery_session_completed` / `knowledge_gallery_session_abandoned` | Knowledge Gallery match (includes `is_arcade`) |
-| `knowledge_gallery_question_answered` | Gallery question graded (`question_type`, `is_correct`, `round_index`, `is_arcade`) |
+| `knowledge_gallery_round_started` / `knowledge_gallery_session_completed` / `knowledge_gallery_session_abandoned` | Visual-choice match (Galeria do Conhecimento config; includes `is_arcade`) |
+| `knowledge_gallery_question_answered` | Visual-choice question graded (`question_type`, `is_correct`, `round_index`, `is_arcade`) |
 | `knowledge_gallery_image_failed` | Artwork image failed to load (no URL; includes `is_arcade`) |
 | `achievements_tab_impression` | Achievements tab first becomes visible (exposure; includes `achievements_enabled`) — fired by `DashboardBloc` on mount |
 | `achievements_opened` | User opens / navigates to the Achievements tab for the first time in a session (primary A/B goal; includes `achievements_enabled`) — fired before the RPC |

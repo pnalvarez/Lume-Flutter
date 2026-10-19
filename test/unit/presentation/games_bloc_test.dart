@@ -17,13 +17,14 @@ import 'package:lume/layers/domain/usecases/games/play_true_or_myth.dart';
 import 'package:lume/layers/domain/usecases/games/play_who_am_i.dart';
 import 'package:lume/layers/domain/models/arcade/arcade_domain.dart';
 import 'package:lume/layers/domain/models/game/finished_game_match_domain.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
-import 'package:lume/layers/domain/usecases/get_knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_round.dart';
+import 'package:lume/layers/domain/usecases/get_visual_choice_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_random_game_round.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/save_arcade_round.dart';
 import 'package:lume/layers/domain/usecases/save_pair_progress.dart';
-import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
+import 'package:lume/layers/domain/usecases/submit_visual_choice_game_answer.dart';
 import 'package:lume/layers/domain/usecases/finish_game_match.dart';
 import 'package:lume/layers/presentation/screens/games/arcade_round_draw.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
@@ -50,7 +51,7 @@ const _quiz2 = LightningQuizGameDomain(
   explanation: 'e2',
 );
 
-const _arcadeGalleryRound = KnowledgeGalleryRound(
+const _arcadeVisualRound = VisualChoiceGameRound(
   questionId: 9,
   prompt: 'A qual movimento esta pintura pertence?',
   imageUrl: 'https://cdn.example/art.jpg',
@@ -173,30 +174,31 @@ class _FinishGameMatch implements IFinishGameMatch {
   }
 }
 
-class _GetKnowledgeGalleryRound implements IGetKnowledgeGalleryRound {
+class _GetVisualChoiceGameRound implements IGetVisualChoiceGameRound {
   final counts = <int>[];
-  List<KnowledgeGalleryRound> rounds = const [];
+  List<VisualChoiceGameRound> rounds = const [];
 
   @override
-  Future<List<KnowledgeGalleryRound>> call({
-    int count = knowledgeGalleryRoundsPerMatch,
+  Future<List<VisualChoiceGameRound>> call({
+    required String gameSlug,
+    int count = visualChoiceGameRoundsPerMatch,
   }) async {
     counts.add(count);
     return rounds;
   }
 }
 
-class _SubmitKnowledgeGalleryAnswer implements ISubmitKnowledgeGalleryAnswer {
+class _SubmitVisualChoiceGameAnswer implements ISubmitVisualChoiceGameAnswer {
   final answers = <String>[];
   Object? error;
   Completer<void>? gate;
-  KnowledgeGalleryAnswerResult result = const KnowledgeGalleryAnswerResult(
+  VisualChoiceGameAnswerResult result = const VisualChoiceGameAnswerResult(
     correct: true,
     correctAnswer: 'A',
   );
 
   @override
-  Future<KnowledgeGalleryAnswerResult> call({
+  Future<VisualChoiceGameAnswerResult> call({
     required int questionId,
     required String answer,
   }) async {
@@ -217,8 +219,8 @@ GamesBloc _createGamesBloc(
   _FinishGameMatch? finishGameMatch,
   FakeAnalytics? analytics,
   IRemoteConfig? remoteConfig,
-  _GetKnowledgeGalleryRound? getGallery,
-  _SubmitKnowledgeGalleryAnswer? submitGallery,
+  _GetVisualChoiceGameRound? getVisual,
+  _SubmitVisualChoiceGameAnswer? submitVisual,
 }) => GamesBloc(
   PlayLightningQuiz(),
   PlayTimeline(),
@@ -231,14 +233,14 @@ GamesBloc _createGamesBloc(
   save,
   DrawArcadeRound(
     getRandomRound ?? _GetRandomGameRound(),
-    getGallery ?? _GetKnowledgeGalleryRound(),
+    getVisual ?? _GetVisualChoiceGameRound(),
   ),
   saveArcadeRound ?? _SaveArcadeRound(),
   saveArcadeRecord ?? _SaveArcadeRecord(),
   finishGameMatch ?? _FinishGameMatch(),
   analytics ?? FakeAnalytics(),
   remoteConfig ?? NoOpRemoteConfig(),
-  submitGallery ?? _SubmitKnowledgeGalleryAnswer(),
+  submitVisual ?? _SubmitVisualChoiceGameAnswer(),
 );
 
 void main() {
@@ -909,28 +911,34 @@ void main() {
     );
 
     blocTest<GamesBloc, GamesState>(
-      'a gallery hit skips pair save and can draw another gallery question',
+      'a visual hit skips pair save and can draw another visual question',
       build: () {
         remoteConfig.setDebugOverride(
           RemoteConfigKeys.enabledGameSlugs,
-          <String>[knowledgeGalleryGameSlug],
+          <String>[VisualChoiceGameSlugs.knowledgeGallery],
         );
-        final galleryFetch = _GetKnowledgeGalleryRound()
-          ..rounds = const [_arcadeGalleryRound];
+        final visualFetch = _GetVisualChoiceGameRound()
+          ..rounds = const [_arcadeVisualRound];
         return _createGamesBloc(
           savePair,
           getRandomRound: getRandomRound,
           saveArcadeRound: saveRound,
           saveArcadeRecord: saveRecord,
           remoteConfig: remoteConfig,
-          getGallery: galleryFetch,
-          submitGallery: _SubmitKnowledgeGalleryAnswer(),
+          getVisual: visualFetch,
+          submitVisual: _SubmitVisualChoiceGameAnswer(),
         );
       },
       act: (bloc) async {
         bloc.add(
           const GamesStarted(
-            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
             mode: GamesPlayMode.arcade,
           ),
         );
@@ -942,7 +950,7 @@ void main() {
         expect(saveRound.calls, isEmpty);
         expect(getRandomRound.enabledSlugs, isEmpty);
         expect(bloc.state.rounds, hasLength(2));
-        expect(bloc.state.currentRound?.gallery?.questionId, 9);
+        expect(bloc.state.currentRound?.visual?.questionId, 9);
         expect(bloc.state.arcade.scoredCount, 1);
         expect(bloc.state.sequenceCompleted, isFalse);
         expect(bloc.state.answered, isFalse);
@@ -950,26 +958,32 @@ void main() {
     );
 
     blocTest<GamesBloc, GamesState>(
-      'a next queued during a failed gallery submit does not score or spend a life',
+      'a next queued during a failed visual submit does not score or spend a life',
       build: () {
-        final submit = _SubmitKnowledgeGalleryAnswer()
+        final submit = _SubmitVisualChoiceGameAnswer()
           ..error = StateError('submit failed');
         return _createGamesBloc(
           savePair,
           getRandomRound: getRandomRound,
           saveArcadeRound: saveRound,
           saveArcadeRecord: saveRecord,
-          submitGallery: submit,
+          submitVisual: submit,
         );
       },
       act: (bloc) {
         bloc.add(
           const GamesStarted(
-            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
             mode: GamesPlayMode.arcade,
           ),
         );
-        // Local hit: option 0 matches the gallery answer.
+        // Local hit: option 0 matches the visual answer.
         bloc.add(const GamesChoiceSelected('0'));
         // Queued while submit_visual_answer is still in flight.
         bloc.add(const GamesNextPressed());
@@ -988,20 +1002,26 @@ void main() {
     );
 
     test(
-      'gallery stays unanswered until submit_visual_answer returns',
+      'visual stays unanswered until submit_visual_answer returns',
       () async {
         final gate = Completer<void>();
-        final submit = _SubmitKnowledgeGalleryAnswer()..gate = gate;
+        final submit = _SubmitVisualChoiceGameAnswer()..gate = gate;
         final bloc = _createGamesBloc(
           savePair,
           getRandomRound: getRandomRound,
           saveArcadeRound: saveRound,
           saveArcadeRecord: saveRecord,
-          submitGallery: submit,
+          submitVisual: submit,
         );
         bloc.add(
           const GamesStarted(
-            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
             mode: GamesPlayMode.arcade,
           ),
         );
@@ -1012,7 +1032,7 @@ void main() {
         );
         expect(bloc.state.answered, isFalse);
         expect(bloc.state.status, GamesStatus.ready);
-        submit.result = const KnowledgeGalleryAnswerResult(
+        submit.result = const VisualChoiceGameAnswerResult(
           correct: false,
           correctAnswer: 'Cubismo',
         );
@@ -1025,10 +1045,10 @@ void main() {
     );
 
     test(
-      'a choice queued during a failed gallery submit does not clear the error',
+      'a choice queued during a failed visual submit does not clear the error',
       () async {
         final gate = Completer<void>();
-        final submit = _SubmitKnowledgeGalleryAnswer()
+        final submit = _SubmitVisualChoiceGameAnswer()
           ..gate = gate
           ..error = StateError('submit failed');
         final bloc = _createGamesBloc(
@@ -1036,11 +1056,17 @@ void main() {
           getRandomRound: getRandomRound,
           saveArcadeRound: saveRound,
           saveArcadeRecord: saveRecord,
-          submitGallery: submit,
+          submitVisual: submit,
         );
         bloc.add(
           const GamesStarted(
-            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
             mode: GamesPlayMode.arcade,
           ),
         );
@@ -1049,8 +1075,8 @@ void main() {
         await bloc.stream.firstWhere(
           (state) => state.choice.selectedOptionId == '0',
         );
-        expect(bloc.state.gallerySubmitting, isTrue);
-        expect(bloc.state.knowledgeGalleryView?.canSelect, isFalse);
+        expect(bloc.state.visualSubmitting, isTrue);
+        expect(bloc.state.visualChoiceView?.canSelect, isFalse);
         expect(bloc.state.answered, isFalse);
         bloc.add(const GamesChoiceSelected('1'));
         await pumpEventQueue();
@@ -1059,29 +1085,35 @@ void main() {
         expect(submit.answers, ['Impressionismo']);
         expect(bloc.state.status, GamesStatus.error);
         expect(bloc.state.errorMessage, isNotNull);
-        expect(bloc.state.gallerySubmitting, isFalse);
+        expect(bloc.state.visualSubmitting, isFalse);
         expect(bloc.state.answered, isFalse);
         await bloc.close();
       },
     );
 
     blocTest<GamesBloc, GamesState>(
-      'a next queued during a failed gallery miss does not spend a life',
+      'a next queued during a failed visual miss does not spend a life',
       build: () {
-        final submit = _SubmitKnowledgeGalleryAnswer()
+        final submit = _SubmitVisualChoiceGameAnswer()
           ..error = StateError('submit failed');
         return _createGamesBloc(
           savePair,
           getRandomRound: getRandomRound,
           saveArcadeRound: saveRound,
           saveArcadeRecord: saveRecord,
-          submitGallery: submit,
+          submitVisual: submit,
         );
       },
       act: (bloc) {
         bloc.add(
           const GamesStarted(
-            rounds: [GameRound(id: '9', gallery: _arcadeGalleryRound)],
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
             mode: GamesPlayMode.arcade,
           ),
         );
@@ -1143,8 +1175,8 @@ void main() {
 
     test('arcade abandon logs arcade_abandoned with score', () async {
       final analytics = FakeAnalytics();
-      // Pin slugs without Knowledge Gallery so the next-round draw cannot
-      // randomly pick an empty gallery and end the run before advance.
+      // Pin slugs without a visual game so the next-round draw cannot
+      // randomly pick an empty visual round and end the run before advance.
       final remoteConfig = NoOpRemoteConfig();
       remoteConfig.setDebugOverride(RemoteConfigKeys.enabledGameSlugs, <String>[
         'linha_do_tempo',

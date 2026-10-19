@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_body.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_body.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
@@ -12,7 +12,7 @@ const _options = ['Impressionismo', 'Cubismo', 'Barroco', 'Romantismo'];
 
 const _image = AssetImage('assets/onboarding/slide-1.jpg');
 
-const _playing = KnowledgeGalleryState(
+const _playing = VisualChoiceGameState(
   prompt: _prompt,
   imageUrl: '',
   image: _image,
@@ -20,33 +20,33 @@ const _playing = KnowledgeGalleryState(
 );
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Knowledge Gallery',
+  path: '[Lume]/[Screens]/Visual Choice Game',
   name: 'Playing',
-  type: KnowledgeGalleryBody,
+  type: VisualChoiceGameBody,
 )
-Widget knowledgeGalleryPlaying(BuildContext context) {
+Widget visualChoiceGamePlaying(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: KnowledgeGalleryBody(state: _playing, onOptionSelected: _noopString),
+    child: VisualChoiceGameBody(state: _playing, onOptionSelected: _noopString),
   );
 }
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Knowledge Gallery',
+  path: '[Lume]/[Screens]/Visual Choice Game',
   name: 'Submitting',
-  type: KnowledgeGalleryBody,
+  type: VisualChoiceGameBody,
 )
-Widget knowledgeGallerySubmitting(BuildContext context) {
+Widget knowledgeVisualSubmitting(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: KnowledgeGalleryBody(
-      state: const KnowledgeGalleryState(
+    child: VisualChoiceGameBody(
+      state: const VisualChoiceGameState(
         prompt: _prompt,
         imageUrl: '',
         image: _image,
         options: _options,
         selectedOptionId: '0',
-        phase: KnowledgeGalleryPhase.submitting,
+        phase: VisualChoiceGamePhase.submitting,
       ),
       onOptionSelected: _noopString,
     ),
@@ -54,22 +54,22 @@ Widget knowledgeGallerySubmitting(BuildContext context) {
 }
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Knowledge Gallery',
+  path: '[Lume]/[Screens]/Visual Choice Game',
   name: 'Answered correct',
-  type: KnowledgeGalleryBody,
+  type: VisualChoiceGameBody,
 )
-Widget knowledgeGalleryAnsweredCorrect(BuildContext context) {
+Widget visualChoiceGameAnsweredCorrect(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: KnowledgeGalleryBody(
-      state: const KnowledgeGalleryState(
+    child: VisualChoiceGameBody(
+      state: const VisualChoiceGameState(
         prompt: _prompt,
         imageUrl: '',
         image: _image,
         options: _options,
         selectedOptionId: '0',
         correctOptionId: '0',
-        phase: KnowledgeGalleryPhase.correct,
+        phase: VisualChoiceGamePhase.correct,
       ),
       onOptionSelected: _noopString,
     ),
@@ -77,22 +77,22 @@ Widget knowledgeGalleryAnsweredCorrect(BuildContext context) {
 }
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Knowledge Gallery',
+  path: '[Lume]/[Screens]/Visual Choice Game',
   name: 'Answered wrong',
-  type: KnowledgeGalleryBody,
+  type: VisualChoiceGameBody,
 )
-Widget knowledgeGalleryAnsweredWrong(BuildContext context) {
+Widget visualChoiceGameAnsweredWrong(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: KnowledgeGalleryBody(
-      state: const KnowledgeGalleryState(
+    child: VisualChoiceGameBody(
+      state: const VisualChoiceGameState(
         prompt: _prompt,
         imageUrl: '',
         image: _image,
         options: _options,
         selectedOptionId: '1',
         correctOptionId: '0',
-        phase: KnowledgeGalleryPhase.incorrect,
+        phase: VisualChoiceGamePhase.incorrect,
       ),
       onOptionSelected: _noopString,
     ),
@@ -100,15 +100,15 @@ Widget knowledgeGalleryAnsweredWrong(BuildContext context) {
 }
 
 @widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Knowledge Gallery',
+  path: '[Lume]/[Screens]/Visual Choice Game',
   name: 'Image failed',
-  type: KnowledgeGalleryBody,
+  type: VisualChoiceGameBody,
 )
-Widget knowledgeGalleryImageFailed(BuildContext context) {
+Widget visualChoiceGameImageFailed(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: KnowledgeGalleryBody(
-      state: const KnowledgeGalleryState(
+    child: VisualChoiceGameBody(
+      state: const VisualChoiceGameState(
         prompt: _prompt,
         imageUrl: '',
         imagePhase: ArtworkPromptImagePhase.error,
