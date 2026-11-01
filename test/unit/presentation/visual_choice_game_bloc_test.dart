@@ -138,24 +138,24 @@ void main() {
       expect(bloc.state.goBack, isFalse);
       expect(bloc.state.correctCount, 1);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
         isTrue,
       );
       expect(
-        analytics.parametersFor(AnalyticsEvents.visualChoiceGameRoundStarted),
+        analytics.parametersFor(AnalyticsEvents.knowledgeGalleryRoundStarted),
         {AnalyticsParams.roundsTotal: 2, AnalyticsParams.isArcade: false},
       );
       expect(
         analytics.events
             .where(
-              (e) => e.name == AnalyticsEvents.visualChoiceGameQuestionAnswered,
+              (e) => e.name == AnalyticsEvents.knowledgeGalleryQuestionAnswered,
             )
             .length,
         2,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameQuestionAnswered,
+          AnalyticsEvents.knowledgeGalleryQuestionAnswered,
         ),
         {
           AnalyticsParams.questionType: 'movement',
@@ -165,12 +165,12 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isTrue,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameSessionCompleted,
+          AnalyticsEvents.knowledgeGallerySessionCompleted,
         ),
         {
           AnalyticsParams.correctCount: 1,
@@ -179,7 +179,7 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isFalse,
       );
     },
@@ -237,7 +237,7 @@ void main() {
       expect(bloc.state.correctCount, 0);
       expect(bloc.state.isCorrect, isFalse);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameQuestionAnswered),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryQuestionAnswered),
         isFalse,
       );
     },
@@ -293,12 +293,12 @@ void main() {
       expect(match.finishes, isEmpty);
       expect(bloc.state.goBack, isTrue);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isTrue,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameSessionAbandoned,
+          AnalyticsEvents.knowledgeGallerySessionAbandoned,
         ),
         {
           AnalyticsParams.roundIndex: 0,
@@ -307,7 +307,7 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isFalse,
       );
     },
@@ -335,11 +335,11 @@ void main() {
       expect(match.finishes.single.total, 2);
       expect(match.finishes.single.score, 50);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isTrue,
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isFalse,
       );
     },
@@ -359,7 +359,7 @@ void main() {
 
     expect(analytics.hasEvent('faces_of_history_round_started'), isTrue);
     expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
+      analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
       isFalse,
     );
     expect(
@@ -372,7 +372,7 @@ void main() {
     );
     expect(
       VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
-      AnalyticsEvents.visualChoiceGameRoundStarted,
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
     );
     await bloc.close();
   });
@@ -396,7 +396,7 @@ void main() {
     verify: (_) {
       expect(
         analytics.events
-            .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+            .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
             .length,
         1,
       );

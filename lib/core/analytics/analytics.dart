@@ -67,23 +67,23 @@ abstract final class AnalyticsEvents {
   // truth: the config's slug-prefixed event, not a second string literal.
 
   /// Fired when a Galeria do Conhecimento visual-choice match starts.
-  static final visualChoiceGameRoundStarted =
+  static final knowledgeGalleryRoundStarted =
       VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent;
 
   /// Fired after each answered question in a Galeria visual-choice match.
-  static final visualChoiceGameQuestionAnswered =
+  static final knowledgeGalleryQuestionAnswered =
       VisualChoiceGameConfig.knowledgeGallery.questionAnsweredEvent;
 
   /// Fired when a Galeria visual-choice match finishes successfully.
-  static final visualChoiceGameSessionCompleted =
+  static final knowledgeGallerySessionCompleted =
       VisualChoiceGameConfig.knowledgeGallery.sessionCompletedEvent;
 
   /// Fired when the user leaves a Galeria visual-choice match.
-  static final visualChoiceGameSessionAbandoned =
+  static final knowledgeGallerySessionAbandoned =
       VisualChoiceGameConfig.knowledgeGallery.sessionAbandonedEvent;
 
   /// Fired when an artwork image fails to load (no URL in params).
-  static final visualChoiceGameImageFailed =
+  static final knowledgeGalleryImageFailed =
       VisualChoiceGameConfig.knowledgeGallery.imageFailedEvent;
 
   // ── Visual-choice games (Faces of History config) ──────────────────────

@@ -20,19 +20,19 @@ void main() {
     visual.sessionCompleted(correctCount: 3, roundsTotal: 5, isArcade: true);
 
     expect(
-      analytics.parametersFor(AnalyticsEvents.visualChoiceGameRoundStarted),
+      analytics.parametersFor(AnalyticsEvents.knowledgeGalleryRoundStarted),
       {AnalyticsParams.roundsTotal: 5, AnalyticsParams.isArcade: true},
     );
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
           )
           .length,
       1,
     );
     expect(
-      analytics.parametersFor(AnalyticsEvents.visualChoiceGameSessionCompleted),
+      analytics.parametersFor(AnalyticsEvents.knowledgeGallerySessionCompleted),
       {
         AnalyticsParams.correctCount: 3,
         AnalyticsParams.roundsTotal: 5,
@@ -44,7 +44,7 @@ void main() {
   test('sessionAbandoned without a prior visual touch is a no-op', () {
     visual.sessionAbandoned(roundIndex: 0, roundsTotal: 2, isArcade: false);
     expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+      analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
       isFalse,
     );
   });
@@ -56,7 +56,7 @@ void main() {
 
     expect(
       analytics.events
-          .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+          .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
           .length,
       2,
     );
@@ -75,7 +75,7 @@ void main() {
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionAbandoned,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionAbandoned,
           )
           .length,
       1,
@@ -83,14 +83,14 @@ void main() {
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
           )
           .length,
       1,
     );
     expect(
       analytics.events
-          .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+          .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
           .length,
       2,
     );
@@ -114,12 +114,12 @@ void main() {
       isTrue,
     );
     expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
+      analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
       isFalse,
     );
     expect(
       VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
-      AnalyticsEvents.visualChoiceGameRoundStarted,
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
     );
     expect(
       VisualChoiceGameConfig.facesOfHistory.roundStartedEvent,
@@ -159,7 +159,7 @@ void main() {
     );
     expect(
       VisualChoiceGameConfig.forSlug('unknown_game').roundStartedEvent,
-      isNot(AnalyticsEvents.visualChoiceGameRoundStarted),
+      isNot(AnalyticsEvents.knowledgeGalleryRoundStarted),
     );
   });
 
@@ -203,9 +203,9 @@ void main() {
     expect(
       analytics.events.any(
         (e) =>
-            e.name == AnalyticsEvents.visualChoiceGameRoundStarted ||
-            e.name == AnalyticsEvents.visualChoiceGameQuestionAnswered ||
-            e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+            e.name == AnalyticsEvents.knowledgeGalleryRoundStarted ||
+            e.name == AnalyticsEvents.knowledgeGalleryQuestionAnswered ||
+            e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
       ),
       isFalse,
     );
