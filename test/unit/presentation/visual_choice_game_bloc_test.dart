@@ -345,23 +345,7 @@ void main() {
     },
   );
 
-  test('logs the started event named by the config slug prefix', () async {
-    const config = VisualChoiceGameConfig.facesOfHistory;
-    final bloc = build();
-    bloc.add(
-      const VisualChoiceGameStarted(
-        rounds: [_first],
-        matchId: 'm',
-        config: config,
-      ),
-    );
-    await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
-
-    expect(analytics.hasEvent('faces_of_history_round_started'), isTrue);
-    expect(
-      analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
-      isFalse,
-    );
+  test('config lookup resolves known slugs to their static configs', () {
     expect(
       VisualChoiceGameConfig.forSlug(VisualChoiceGameSlugs.knowledgeGallery),
       VisualChoiceGameConfig.knowledgeGallery,
@@ -370,9 +354,89 @@ void main() {
       VisualChoiceGameConfig.forSlug(VisualChoiceGameSlugs.facesOfHistory),
       VisualChoiceGameConfig.facesOfHistory,
     );
-    expect(
-      VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
+  });
+
+  test(
+    'Faces of History session logs only faces_of_history_* events',
+    () async {
+      final bloc = build();
+      bloc.add(
+        const VisualChoiceGameStarted(
+          rounds: [_first, _second],
+          matchId: 'm',
+          config: VisualChoiceGameConfig.facesOfHistory,
+        ),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const VisualChoiceGameImageFailed());
+      bloc.add(const VisualChoiceGameImageFailed());
+      await pumpEventQueue();
+      bloc.add(const VisualChoiceGameOptionSelected('0'));
+      await bloc.stream.firstWhere((state) => state.answered);
+      bloc.add(const VisualChoiceGameAbandoned());
+      await bloc.stream.firstWhere((state) => state.goBack);
+
+      expect(analytics.events.map((e) => e.name).toList(), [
+        AnalyticsEvents.facesOfHistoryRoundStarted,
+        AnalyticsEvents.facesOfHistoryImageFailed,
+        AnalyticsEvents.facesOfHistoryQuestionAnswered,
+        AnalyticsEvents.facesOfHistorySessionAbandoned,
+      ]);
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistoryRoundStarted),
+        {AnalyticsParams.roundsTotal: 2, AnalyticsParams.isArcade: false},
+      );
+      // Once per question index, flag only: never an image URL.
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistoryImageFailed),
+        {AnalyticsParams.isArcade: false},
+      );
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionAbandoned),
+        {
+          AnalyticsParams.roundIndex: 0,
+          AnalyticsParams.roundsTotal: 2,
+          AnalyticsParams.isArcade: false,
+        },
+      );
+      expect(
+        analytics.events.any((e) => e.name.startsWith('knowledge_gallery_')),
+        isFalse,
+      );
+      expect(
+        analytics.events.any((e) => e.name.startsWith('game_round_')),
+        isFalse,
+      );
+      await bloc.close();
+    },
+  );
+
+  test('Galeria session logs only knowledge_gallery_* events', () async {
+    final bloc = build();
+    bloc.add(
+      const VisualChoiceGameStarted(
+        rounds: [_first, _second],
+        matchId: 'm',
+        config: VisualChoiceGameConfig.knowledgeGallery,
+      ),
+    );
+    await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+    bloc.add(const VisualChoiceGameImageFailed());
+    await pumpEventQueue();
+    bloc.add(const VisualChoiceGameOptionSelected('0'));
+    await bloc.stream.firstWhere((state) => state.answered);
+    bloc.add(const VisualChoiceGameAbandoned());
+    await bloc.stream.firstWhere((state) => state.goBack);
+
+    expect(analytics.events.map((e) => e.name).toList(), [
       AnalyticsEvents.knowledgeGalleryRoundStarted,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    ]);
+    expect(
+      analytics.events.any((e) => e.name.startsWith('faces_of_history_')),
+      isFalse,
     );
     await bloc.close();
   });

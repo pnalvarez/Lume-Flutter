@@ -218,14 +218,80 @@ void main() {
         AnalyticsParams.isArcade: false,
       },
     );
+    faces
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: false);
+
+    // Completed already logged this session, so abandon stays a no-op.
     expect(
-      analytics.events.any(
-        (e) =>
-            e.name == AnalyticsEvents.knowledgeGalleryRoundStarted ||
-            e.name == AnalyticsEvents.knowledgeGalleryQuestionAnswered ||
-            e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
-      ),
+      analytics.hasEvent(AnalyticsEvents.facesOfHistorySessionAbandoned),
       isFalse,
     );
+    expect(
+      analytics.events
+          .where((e) => e.name == AnalyticsEvents.facesOfHistoryImageFailed)
+          .length,
+      1,
+    );
+    expect(analytics.parametersFor(AnalyticsEvents.facesOfHistoryImageFailed), {
+      AnalyticsParams.isArcade: false,
+    });
+    expect(
+      analytics.events.every((e) => e.name.startsWith('faces_of_history_')),
+      isTrue,
+    );
+  });
+
+  test(
+    'Faces of History abandon logs round_index, rounds_total, is_arcade',
+    () {
+      final faces = VisualChoiceGameAnalytics(
+        analytics,
+        config: VisualChoiceGameConfig.facesOfHistory,
+      );
+
+      faces
+        ..roundStarted(roundsTotal: 3, isArcade: true)
+        ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: true)
+        ..sessionAbandoned(roundIndex: 2, roundsTotal: 3, isArcade: true);
+
+      expect(
+        analytics.events
+            .where(
+              (e) => e.name == AnalyticsEvents.facesOfHistorySessionAbandoned,
+            )
+            .length,
+        1,
+      );
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionAbandoned),
+        {
+          AnalyticsParams.roundIndex: 1,
+          AnalyticsParams.roundsTotal: 3,
+          AnalyticsParams.isArcade: true,
+        },
+      );
+    },
+  );
+
+  test('Galeria session still emits only knowledge_gallery_* events', () {
+    visual
+      ..roundStarted(roundsTotal: 2, isArcade: false)
+      ..questionAnswered(
+        questionType: 'artwork',
+        isCorrect: false,
+        roundIndex: 0,
+        isArcade: false,
+      )
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 2, isArcade: false);
+
+    expect(analytics.events.map((e) => e.name).toList(), [
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    ]);
   });
 }
