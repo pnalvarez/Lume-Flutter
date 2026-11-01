@@ -117,7 +117,7 @@ void main() {
     );
     expect(
       VisualChoiceGameConfig.facesOfHistory.eventPrefix,
-      VisualChoiceGameEventPrefix.facesOfHistory,
+      VisualChoiceGameEventPrefix.facesOfHistory.value,
     );
     expect(
       VisualChoiceGameAnalyticsEvent.questionAnswered.eventName(
@@ -125,9 +125,15 @@ void main() {
       ),
       'faces_of_history_question_answered',
     );
+    // A slug outside the known catalog (a new hub visual game not yet
+    // given its own enum entry) gets its own prefix, never Galeria's.
     expect(
       VisualChoiceGameConfig.forSlug('unknown_game').roundStartedEvent,
-      AnalyticsEvents.visualChoiceGameRoundStarted,
+      'unknown_game_round_started',
+    );
+    expect(
+      VisualChoiceGameConfig.forSlug('unknown_game').roundStartedEvent,
+      isNot(AnalyticsEvents.visualChoiceGameRoundStarted),
     );
   });
 }

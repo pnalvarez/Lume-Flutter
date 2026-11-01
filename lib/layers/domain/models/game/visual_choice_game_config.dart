@@ -39,11 +39,18 @@ enum VisualChoiceGameEventPrefix {
   /// Prefix prepended to every analytics event suffix of the game.
   final String value;
 
-  /// The prefix for [gameSlug]; unknown slugs keep the Galeria prefix.
-  static VisualChoiceGameEventPrefix forSlug(String gameSlug) {
+  /// The prefix for [gameSlug].
+  ///
+  /// The hub opens any catalog tile in the `visual` section as a visual
+  /// game (see `_isVisualGame` in games_hub_bloc.dart), so a new game can
+  /// reach here before it gets an entry above. Falling back to Galeria's
+  /// prefix would merge that game's funnel into Galeria's, so an unlisted
+  /// slug instead gets its own prefix derived from the slug itself.
+  static String forSlug(String gameSlug) {
     return switch (gameSlug) {
-      VisualChoiceGameSlugs.facesOfHistory => facesOfHistory,
-      _ => knowledgeGallery,
+      VisualChoiceGameSlugs.knowledgeGallery => knowledgeGallery.value,
+      VisualChoiceGameSlugs.facesOfHistory => facesOfHistory.value,
+      _ => '${gameSlug}_',
     };
   }
 }
@@ -67,7 +74,7 @@ enum VisualChoiceGameAnalyticsEvent {
 
   /// Full Firebase event name of this event for [gameSlug].
   String eventName(String gameSlug) =>
-      '${VisualChoiceGameEventPrefix.forSlug(gameSlug).value}$suffix';
+      '${VisualChoiceGameEventPrefix.forSlug(gameSlug)}$suffix';
 }
 
 /// Play configuration for one visual-choice game.
@@ -113,8 +120,7 @@ final class VisualChoiceGameConfig {
   final int roundsPerMatch;
 
   /// Analytics prefix resolved from [gameSlug].
-  VisualChoiceGameEventPrefix get eventPrefix =>
-      VisualChoiceGameEventPrefix.forSlug(gameSlug);
+  String get eventPrefix => VisualChoiceGameEventPrefix.forSlug(gameSlug);
 
   /// Analytics event logged when a play sequence starts.
   String get roundStartedEvent =>
