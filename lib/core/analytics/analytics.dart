@@ -80,6 +80,26 @@ abstract final class AnalyticsEvents {
   /// Fired when an artwork image fails to load (no URL in params).
   static const visualChoiceGameImageFailed = 'knowledge_gallery_image_failed';
 
+  // ── Visual-choice games (Faces of History config) ──────────────────────
+
+  /// Fired when a Rostos da História visual-choice match starts.
+  static const facesOfHistoryRoundStarted = 'faces_of_history_round_started';
+
+  /// Fired after each answered question in a Faces of History match.
+  static const facesOfHistoryQuestionAnswered =
+      'faces_of_history_question_answered';
+
+  /// Fired when a Faces of History match finishes successfully.
+  static const facesOfHistorySessionCompleted =
+      'faces_of_history_session_completed';
+
+  /// Fired when the user leaves a Faces of History match.
+  static const facesOfHistorySessionAbandoned =
+      'faces_of_history_session_abandoned';
+
+  /// Fired when a Faces of History artwork image fails to load (no URL).
+  static const facesOfHistoryImageFailed = 'faces_of_history_image_failed';
+
   // ── Achievements ────────────────────────────────────────────────────────
 
   /// Fired when the Achievements tab/route becomes visible (exposure).

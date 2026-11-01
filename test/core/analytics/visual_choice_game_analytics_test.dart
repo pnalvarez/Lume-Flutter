@@ -105,8 +105,14 @@ void main() {
     faces.roundStarted(roundsTotal: 5, isArcade: false);
     faces.imageFailed(roundIndex: 0, isArcade: false);
 
-    expect(analytics.hasEvent('faces_of_history_round_started'), isTrue);
-    expect(analytics.hasEvent('faces_of_history_image_failed'), isTrue);
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryRoundStarted),
+      isTrue,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryImageFailed),
+      isTrue,
+    );
     expect(
       analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
       isFalse,
@@ -114,6 +120,26 @@ void main() {
     expect(
       VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
       AnalyticsEvents.visualChoiceGameRoundStarted,
+    );
+    expect(
+      VisualChoiceGameConfig.facesOfHistory.roundStartedEvent,
+      AnalyticsEvents.facesOfHistoryRoundStarted,
+    );
+    expect(
+      VisualChoiceGameConfig.facesOfHistory.questionAnsweredEvent,
+      AnalyticsEvents.facesOfHistoryQuestionAnswered,
+    );
+    expect(
+      VisualChoiceGameConfig.facesOfHistory.sessionCompletedEvent,
+      AnalyticsEvents.facesOfHistorySessionCompleted,
+    );
+    expect(
+      VisualChoiceGameConfig.facesOfHistory.sessionAbandonedEvent,
+      AnalyticsEvents.facesOfHistorySessionAbandoned,
+    );
+    expect(
+      VisualChoiceGameConfig.facesOfHistory.imageFailedEvent,
+      AnalyticsEvents.facesOfHistoryImageFailed,
     );
     expect(
       VisualChoiceGameConfig.facesOfHistory.eventPrefix,
@@ -134,6 +160,54 @@ void main() {
     expect(
       VisualChoiceGameConfig.forSlug('unknown_game').roundStartedEvent,
       isNot(AnalyticsEvents.visualChoiceGameRoundStarted),
+    );
+  });
+
+  test('Faces of History funnel fires only faces_of_history_* events', () {
+    final faces = VisualChoiceGameAnalytics(
+      analytics,
+      config: VisualChoiceGameConfig.facesOfHistory,
+    );
+
+    faces
+      ..roundStarted(roundsTotal: 3, isArcade: false)
+      ..questionAnswered(
+        questionType: 'figure',
+        isCorrect: true,
+        roundIndex: 0,
+        isArcade: false,
+      )
+      ..sessionCompleted(correctCount: 1, roundsTotal: 3, isArcade: false);
+
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryRoundStarted),
+      isTrue,
+    );
+    expect(
+      analytics.parametersFor(AnalyticsEvents.facesOfHistoryQuestionAnswered),
+      {
+        AnalyticsParams.questionType: 'figure',
+        AnalyticsParams.isCorrect: 1,
+        AnalyticsParams.roundIndex: 0,
+        AnalyticsParams.isArcade: false,
+      },
+    );
+    expect(
+      analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionCompleted),
+      {
+        AnalyticsParams.correctCount: 1,
+        AnalyticsParams.roundsTotal: 3,
+        AnalyticsParams.isArcade: false,
+      },
+    );
+    expect(
+      analytics.events.any(
+        (e) =>
+            e.name == AnalyticsEvents.visualChoiceGameRoundStarted ||
+            e.name == AnalyticsEvents.visualChoiceGameQuestionAnswered ||
+            e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+      ),
+      isFalse,
     );
   });
 }
