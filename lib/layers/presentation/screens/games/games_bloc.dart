@@ -703,11 +703,10 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
         AnalyticsParams.roundsTotal: state.rounds.length,
       },
     );
-    _visualAnalytics.sessionCompleted(
-      correctCount: finished.scoredCount,
-      roundsTotal: state.rounds.length,
-      isArcade: _isArcade,
-    );
+    // No per-game session_completed here: an Arcade run can interleave
+    // several visual games (and non-visual rounds), so the whole-run score
+    // would misattribute to whichever visual config was last touched.
+    // gameSessionCompleted above already covers the run.
   }
 
   Future<void> _onAbandoned(
@@ -728,11 +727,9 @@ final class GamesBloc extends Bloc<GamesEvent, GamesState> {
           AnalyticsParams.roundsTotal: state.rounds.length,
         },
       );
-      _visualAnalytics.sessionAbandoned(
-        roundIndex: state.currentIndex,
-        roundsTotal: state.rounds.length,
-        isArcade: _isArcade,
-      );
+      // No per-game session_abandoned here: same mixed-run attribution
+      // issue as in _endArcadeSession — arcadeAbandoned above already
+      // covers the run.
       await _endArcadeSession(emit, arcade: state.arcade, abandoned: true);
       return;
     }

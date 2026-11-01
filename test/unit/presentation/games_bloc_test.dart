@@ -1213,5 +1213,87 @@ void main() {
       expect(analytics.hasEvent(AnalyticsEvents.gameSessionCompleted), isFalse);
       await bloc.close();
     });
+
+    test(
+      'arcade mixing visual slugs logs no per-game session outcome',
+      () async {
+        final analytics = FakeAnalytics();
+        final remoteConfig = NoOpRemoteConfig();
+        // Only slug left for the draw, so round 2 deterministically switches
+        // to Rostos da História after round 1 played as Galeria.
+        remoteConfig.setDebugOverride(RemoteConfigKeys.enabledGameSlugs, <String>[
+          VisualChoiceGameSlugs.facesOfHistory,
+        ]);
+        final visualFetch = _GetVisualChoiceGameRound()
+          ..rounds = const [_arcadeVisualRound];
+        final bloc = _createGamesBloc(
+          _SavePairProgress(),
+          analytics: analytics,
+          remoteConfig: remoteConfig,
+          getVisual: visualFetch,
+          submitVisual: _SubmitVisualChoiceGameAnswer(),
+        );
+        bloc.add(
+          const GamesStarted(
+            rounds: [
+              GameRound(
+                id: '9',
+                visual: _arcadeVisualRound,
+                visualConfig: VisualChoiceGameConfig.knowledgeGallery,
+              ),
+            ],
+            mode: GamesPlayMode.arcade,
+          ),
+        );
+        await pumpEventQueue();
+        // Round 1 (Galeria do Conhecimento): correct hit.
+        bloc.add(const GamesChoiceSelected('0'));
+        await pumpEventQueue();
+        bloc.add(const GamesNextPressed());
+        await pumpEventQueue();
+        expect(
+          bloc.state.currentRound?.visualConfig,
+          VisualChoiceGameConfig.facesOfHistory,
+        );
+        // Round 2 (Rostos da História): correct hit, then leave the run.
+        bloc.add(const GamesChoiceSelected('0'));
+        await pumpEventQueue();
+        bloc.add(const GamesAbandoned());
+        await pumpEventQueue();
+
+        expect(analytics.hasEvent(AnalyticsEvents.arcadeAbandoned), isTrue);
+        const knowledgeGallery = VisualChoiceGameConfig.knowledgeGallery;
+        const facesOfHistory = VisualChoiceGameConfig.facesOfHistory;
+        expect(analytics.hasEvent(knowledgeGallery.roundStartedEvent), isTrue);
+        expect(analytics.hasEvent(facesOfHistory.roundStartedEvent), isTrue);
+        expect(
+          analytics.hasEvent(knowledgeGallery.questionAnsweredEvent),
+          isTrue,
+        );
+        expect(
+          analytics.hasEvent(facesOfHistory.questionAnsweredEvent),
+          isTrue,
+        );
+        // Neither game's whole-run score is attributed to it alone —
+        // arcadeAbandoned above already covers the mixed run.
+        expect(
+          analytics.hasEvent(knowledgeGallery.sessionAbandonedEvent),
+          isFalse,
+        );
+        expect(
+          analytics.hasEvent(facesOfHistory.sessionAbandonedEvent),
+          isFalse,
+        );
+        expect(
+          analytics.hasEvent(knowledgeGallery.sessionCompletedEvent),
+          isFalse,
+        );
+        expect(
+          analytics.hasEvent(facesOfHistory.sessionCompletedEvent),
+          isFalse,
+        );
+        await bloc.close();
+      },
+    );
   });
 }
