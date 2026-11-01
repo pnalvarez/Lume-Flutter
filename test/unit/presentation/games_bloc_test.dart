@@ -1221,9 +1221,10 @@ void main() {
         final remoteConfig = NoOpRemoteConfig();
         // Only slug left for the draw, so round 2 deterministically switches
         // to Rostos da História after round 1 played as Galeria.
-        remoteConfig.setDebugOverride(RemoteConfigKeys.enabledGameSlugs, <String>[
-          VisualChoiceGameSlugs.facesOfHistory,
-        ]);
+        remoteConfig.setDebugOverride(
+          RemoteConfigKeys.enabledGameSlugs,
+          <String>[VisualChoiceGameSlugs.facesOfHistory],
+        );
         final visualFetch = _GetVisualChoiceGameRound()
           ..rounds = const [_arcadeVisualRound];
         final bloc = _createGamesBloc(
