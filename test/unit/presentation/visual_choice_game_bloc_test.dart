@@ -138,24 +138,24 @@ void main() {
       expect(bloc.state.goBack, isFalse);
       expect(bloc.state.correctCount, 1);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
         isTrue,
       );
       expect(
-        analytics.parametersFor(AnalyticsEvents.visualChoiceGameRoundStarted),
+        analytics.parametersFor(AnalyticsEvents.knowledgeGalleryRoundStarted),
         {AnalyticsParams.roundsTotal: 2, AnalyticsParams.isArcade: false},
       );
       expect(
         analytics.events
             .where(
-              (e) => e.name == AnalyticsEvents.visualChoiceGameQuestionAnswered,
+              (e) => e.name == AnalyticsEvents.knowledgeGalleryQuestionAnswered,
             )
             .length,
         2,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameQuestionAnswered,
+          AnalyticsEvents.knowledgeGalleryQuestionAnswered,
         ),
         {
           AnalyticsParams.questionType: 'movement',
@@ -165,12 +165,12 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isTrue,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameSessionCompleted,
+          AnalyticsEvents.knowledgeGallerySessionCompleted,
         ),
         {
           AnalyticsParams.correctCount: 1,
@@ -179,7 +179,7 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isFalse,
       );
     },
@@ -237,7 +237,7 @@ void main() {
       expect(bloc.state.correctCount, 0);
       expect(bloc.state.isCorrect, isFalse);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameQuestionAnswered),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGalleryQuestionAnswered),
         isFalse,
       );
     },
@@ -293,12 +293,12 @@ void main() {
       expect(match.finishes, isEmpty);
       expect(bloc.state.goBack, isTrue);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isTrue,
       );
       expect(
         analytics.parametersFor(
-          AnalyticsEvents.visualChoiceGameSessionAbandoned,
+          AnalyticsEvents.knowledgeGallerySessionAbandoned,
         ),
         {
           AnalyticsParams.roundIndex: 0,
@@ -307,7 +307,7 @@ void main() {
         },
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isFalse,
       );
     },
@@ -335,33 +335,17 @@ void main() {
       expect(match.finishes.single.total, 2);
       expect(match.finishes.single.score, 50);
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
         isTrue,
       );
       expect(
-        analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionCompleted),
+        analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionCompleted),
         isFalse,
       );
     },
   );
 
-  test('logs the started event named by the config slug prefix', () async {
-    const config = VisualChoiceGameConfig.facesOfHistory;
-    final bloc = build();
-    bloc.add(
-      const VisualChoiceGameStarted(
-        rounds: [_first],
-        matchId: 'm',
-        config: config,
-      ),
-    );
-    await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
-
-    expect(analytics.hasEvent('faces_of_history_round_started'), isTrue);
-    expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
-      isFalse,
-    );
+  test('config lookup resolves known slugs to their static configs', () {
     expect(
       VisualChoiceGameConfig.forSlug(VisualChoiceGameSlugs.knowledgeGallery),
       VisualChoiceGameConfig.knowledgeGallery,
@@ -370,9 +354,89 @@ void main() {
       VisualChoiceGameConfig.forSlug(VisualChoiceGameSlugs.facesOfHistory),
       VisualChoiceGameConfig.facesOfHistory,
     );
+  });
+
+  test(
+    'Faces of History session logs only faces_of_history_* events',
+    () async {
+      final bloc = build();
+      bloc.add(
+        const VisualChoiceGameStarted(
+          rounds: [_first, _second],
+          matchId: 'm',
+          config: VisualChoiceGameConfig.facesOfHistory,
+        ),
+      );
+      await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+      bloc.add(const VisualChoiceGameImageFailed());
+      bloc.add(const VisualChoiceGameImageFailed());
+      await pumpEventQueue();
+      bloc.add(const VisualChoiceGameOptionSelected('0'));
+      await bloc.stream.firstWhere((state) => state.answered);
+      bloc.add(const VisualChoiceGameAbandoned());
+      await bloc.stream.firstWhere((state) => state.goBack);
+
+      expect(analytics.events.map((e) => e.name).toList(), [
+        AnalyticsEvents.facesOfHistoryRoundStarted,
+        AnalyticsEvents.facesOfHistoryImageFailed,
+        AnalyticsEvents.facesOfHistoryQuestionAnswered,
+        AnalyticsEvents.facesOfHistorySessionAbandoned,
+      ]);
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistoryRoundStarted),
+        {AnalyticsParams.roundsTotal: 2, AnalyticsParams.isArcade: false},
+      );
+      // Once per question index, flag only: never an image URL.
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistoryImageFailed),
+        {AnalyticsParams.isArcade: false},
+      );
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionAbandoned),
+        {
+          AnalyticsParams.roundIndex: 0,
+          AnalyticsParams.roundsTotal: 2,
+          AnalyticsParams.isArcade: false,
+        },
+      );
+      expect(
+        analytics.events.any((e) => e.name.startsWith('knowledge_gallery_')),
+        isFalse,
+      );
+      expect(
+        analytics.events.any((e) => e.name.startsWith('game_round_')),
+        isFalse,
+      );
+      await bloc.close();
+    },
+  );
+
+  test('Galeria session logs only knowledge_gallery_* events', () async {
+    final bloc = build();
+    bloc.add(
+      const VisualChoiceGameStarted(
+        rounds: [_first, _second],
+        matchId: 'm',
+        config: VisualChoiceGameConfig.knowledgeGallery,
+      ),
+    );
+    await bloc.stream.firstWhere((state) => state.rounds.isNotEmpty);
+    bloc.add(const VisualChoiceGameImageFailed());
+    await pumpEventQueue();
+    bloc.add(const VisualChoiceGameOptionSelected('0'));
+    await bloc.stream.firstWhere((state) => state.answered);
+    bloc.add(const VisualChoiceGameAbandoned());
+    await bloc.stream.firstWhere((state) => state.goBack);
+
+    expect(analytics.events.map((e) => e.name).toList(), [
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    ]);
     expect(
-      VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
-      AnalyticsEvents.visualChoiceGameRoundStarted,
+      analytics.events.any((e) => e.name.startsWith('faces_of_history_')),
+      isFalse,
     );
     await bloc.close();
   });
@@ -396,7 +460,7 @@ void main() {
     verify: (_) {
       expect(
         analytics.events
-            .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+            .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
             .length,
         1,
       );

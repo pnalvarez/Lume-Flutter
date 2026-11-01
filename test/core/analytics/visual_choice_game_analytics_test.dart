@@ -20,19 +20,19 @@ void main() {
     visual.sessionCompleted(correctCount: 3, roundsTotal: 5, isArcade: true);
 
     expect(
-      analytics.parametersFor(AnalyticsEvents.visualChoiceGameRoundStarted),
+      analytics.parametersFor(AnalyticsEvents.knowledgeGalleryRoundStarted),
       {AnalyticsParams.roundsTotal: 5, AnalyticsParams.isArcade: true},
     );
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
           )
           .length,
       1,
     );
     expect(
-      analytics.parametersFor(AnalyticsEvents.visualChoiceGameSessionCompleted),
+      analytics.parametersFor(AnalyticsEvents.knowledgeGallerySessionCompleted),
       {
         AnalyticsParams.correctCount: 3,
         AnalyticsParams.roundsTotal: 5,
@@ -44,7 +44,7 @@ void main() {
   test('sessionAbandoned without a prior visual touch is a no-op', () {
     visual.sessionAbandoned(roundIndex: 0, roundsTotal: 2, isArcade: false);
     expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameSessionAbandoned),
+      analytics.hasEvent(AnalyticsEvents.knowledgeGallerySessionAbandoned),
       isFalse,
     );
   });
@@ -56,7 +56,7 @@ void main() {
 
     expect(
       analytics.events
-          .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+          .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
           .length,
       2,
     );
@@ -75,7 +75,7 @@ void main() {
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionAbandoned,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionAbandoned,
           )
           .length,
       1,
@@ -83,14 +83,14 @@ void main() {
     expect(
       analytics.events
           .where(
-            (e) => e.name == AnalyticsEvents.visualChoiceGameSessionCompleted,
+            (e) => e.name == AnalyticsEvents.knowledgeGallerySessionCompleted,
           )
           .length,
       1,
     );
     expect(
       analytics.events
-          .where((e) => e.name == AnalyticsEvents.visualChoiceGameImageFailed)
+          .where((e) => e.name == AnalyticsEvents.knowledgeGalleryImageFailed)
           .length,
       2,
     );
@@ -105,20 +105,64 @@ void main() {
     faces.roundStarted(roundsTotal: 5, isArcade: false);
     faces.imageFailed(roundIndex: 0, isArcade: false);
 
-    expect(analytics.hasEvent('faces_of_history_round_started'), isTrue);
-    expect(analytics.hasEvent('faces_of_history_image_failed'), isTrue);
     expect(
-      analytics.hasEvent(AnalyticsEvents.visualChoiceGameRoundStarted),
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryRoundStarted),
+      isTrue,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryImageFailed),
+      isTrue,
+    );
+    expect(
+      analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
       isFalse,
     );
+    // The config derives names from the slug prefix; the AnalyticsEvents
+    // literals are the wire contract, so a prefix typo fails here.
+    final gallery = VisualChoiceGameConfig.knowledgeGallery;
     expect(
-      VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
-      AnalyticsEvents.visualChoiceGameRoundStarted,
+      gallery.roundStartedEvent,
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.eventPrefix,
-      VisualChoiceGameEventPrefix.facesOfHistory.value,
+      gallery.questionAnsweredEvent,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
     );
+    expect(
+      gallery.sessionCompletedEvent,
+      AnalyticsEvents.knowledgeGallerySessionCompleted,
+    );
+    expect(
+      gallery.sessionAbandonedEvent,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    );
+    expect(
+      gallery.imageFailedEvent,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+    );
+    final facesConfig = VisualChoiceGameConfig.facesOfHistory;
+    expect(
+      facesConfig.roundStartedEvent,
+      AnalyticsEvents.facesOfHistoryRoundStarted,
+    );
+    expect(
+      facesConfig.questionAnsweredEvent,
+      AnalyticsEvents.facesOfHistoryQuestionAnswered,
+    );
+    expect(
+      facesConfig.sessionCompletedEvent,
+      AnalyticsEvents.facesOfHistorySessionCompleted,
+    );
+    expect(
+      facesConfig.sessionAbandonedEvent,
+      AnalyticsEvents.facesOfHistorySessionAbandoned,
+    );
+    expect(
+      facesConfig.imageFailedEvent,
+      AnalyticsEvents.facesOfHistoryImageFailed,
+    );
+    expect(gallery.eventPrefix, 'knowledge_gallery_');
+    expect(facesConfig.eventPrefix, 'faces_of_history_');
     expect(
       VisualChoiceGameAnalyticsEvent.questionAnswered.eventName(
         VisualChoiceGameSlugs.facesOfHistory,
@@ -133,7 +177,121 @@ void main() {
     );
     expect(
       VisualChoiceGameConfig.forSlug('unknown_game').roundStartedEvent,
-      isNot(AnalyticsEvents.visualChoiceGameRoundStarted),
+      isNot(AnalyticsEvents.knowledgeGalleryRoundStarted),
     );
+  });
+
+  test('Faces of History funnel fires only faces_of_history_* events', () {
+    final faces = VisualChoiceGameAnalytics(
+      analytics,
+      config: VisualChoiceGameConfig.facesOfHistory,
+    );
+
+    faces
+      ..roundStarted(roundsTotal: 3, isArcade: false)
+      ..questionAnswered(
+        questionType: 'figure',
+        isCorrect: true,
+        roundIndex: 0,
+        isArcade: false,
+      )
+      ..sessionCompleted(correctCount: 1, roundsTotal: 3, isArcade: false);
+
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistoryRoundStarted),
+      isTrue,
+    );
+    expect(
+      analytics.parametersFor(AnalyticsEvents.facesOfHistoryQuestionAnswered),
+      {
+        AnalyticsParams.questionType: 'figure',
+        AnalyticsParams.isCorrect: 1,
+        AnalyticsParams.roundIndex: 0,
+        AnalyticsParams.isArcade: false,
+      },
+    );
+    expect(
+      analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionCompleted),
+      {
+        AnalyticsParams.correctCount: 1,
+        AnalyticsParams.roundsTotal: 3,
+        AnalyticsParams.isArcade: false,
+      },
+    );
+    faces
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: false);
+
+    // Completed already logged this session, so abandon stays a no-op.
+    expect(
+      analytics.hasEvent(AnalyticsEvents.facesOfHistorySessionAbandoned),
+      isFalse,
+    );
+    expect(
+      analytics.events
+          .where((e) => e.name == AnalyticsEvents.facesOfHistoryImageFailed)
+          .length,
+      1,
+    );
+    expect(analytics.parametersFor(AnalyticsEvents.facesOfHistoryImageFailed), {
+      AnalyticsParams.isArcade: false,
+    });
+    expect(
+      analytics.events.every((e) => e.name.startsWith('faces_of_history_')),
+      isTrue,
+    );
+  });
+
+  test(
+    'Faces of History abandon logs round_index, rounds_total, is_arcade',
+    () {
+      final faces = VisualChoiceGameAnalytics(
+        analytics,
+        config: VisualChoiceGameConfig.facesOfHistory,
+      );
+
+      faces
+        ..roundStarted(roundsTotal: 3, isArcade: true)
+        ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: true)
+        ..sessionAbandoned(roundIndex: 2, roundsTotal: 3, isArcade: true);
+
+      expect(
+        analytics.events
+            .where(
+              (e) => e.name == AnalyticsEvents.facesOfHistorySessionAbandoned,
+            )
+            .length,
+        1,
+      );
+      expect(
+        analytics.parametersFor(AnalyticsEvents.facesOfHistorySessionAbandoned),
+        {
+          AnalyticsParams.roundIndex: 1,
+          AnalyticsParams.roundsTotal: 3,
+          AnalyticsParams.isArcade: true,
+        },
+      );
+    },
+  );
+
+  test('Galeria session still emits only knowledge_gallery_* events', () {
+    visual
+      ..roundStarted(roundsTotal: 2, isArcade: false)
+      ..questionAnswered(
+        questionType: 'artwork',
+        isCorrect: false,
+        roundIndex: 0,
+        isArcade: false,
+      )
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 2, isArcade: false);
+
+    expect(analytics.events.map((e) => e.name).toList(), [
+      AnalyticsEvents.knowledgeGalleryRoundStarted,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    ]);
   });
 }

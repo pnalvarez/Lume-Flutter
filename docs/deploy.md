@@ -190,6 +190,9 @@ Custom events used as A/B goals and funnel metrics (`AnalyticsEvents`):
 | `knowledge_gallery_round_started` / `knowledge_gallery_session_completed` / `knowledge_gallery_session_abandoned` | Visual-choice match (Galeria do Conhecimento config; includes `is_arcade`) |
 | `knowledge_gallery_question_answered` | Visual-choice question graded (`question_type`, `is_correct`, `round_index`, `is_arcade`) |
 | `knowledge_gallery_image_failed` | Artwork image failed to load (no URL; includes `is_arcade`) |
+| `faces_of_history_round_started` / `faces_of_history_session_completed` / `faces_of_history_session_abandoned` | Visual-choice match (Rostos da História config; includes `is_arcade`) |
+| `faces_of_history_question_answered` | Visual-choice question graded (`question_type`, `is_correct`, `round_index`, `is_arcade`) |
+| `faces_of_history_image_failed` | Artwork image failed to load (no URL; includes `is_arcade`) |
 | `achievements_tab_impression` | Achievements tab first becomes visible (exposure; includes `achievements_enabled`) — fired by `DashboardBloc` on mount |
 | `achievements_opened` | User opens / navigates to the Achievements tab for the first time in a session (primary A/B goal; includes `achievements_enabled`) — fired before the RPC |
 | `achievements_list_viewed` | Achievements list renders successfully (includes `locked_count`, `in_progress_count`, `completed_count`) |

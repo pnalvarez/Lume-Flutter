@@ -61,24 +61,47 @@ abstract final class AnalyticsEvents {
   static const gameSessionAbandoned = 'game_session_abandoned';
 
   // ── Visual-choice games (Galeria config; standalone hub play) ──────────
+  //
+  // Wire names are literals like every other event. VisualChoiceGameConfig
+  // derives the same names from the slug prefix; a test asserts they match.
 
   /// Fired when a Galeria do Conhecimento visual-choice match starts.
-  static const visualChoiceGameRoundStarted = 'knowledge_gallery_round_started';
+  static const knowledgeGalleryRoundStarted = 'knowledge_gallery_round_started';
 
   /// Fired after each answered question in a Galeria visual-choice match.
-  static const visualChoiceGameQuestionAnswered =
+  static const knowledgeGalleryQuestionAnswered =
       'knowledge_gallery_question_answered';
 
   /// Fired when a Galeria visual-choice match finishes successfully.
-  static const visualChoiceGameSessionCompleted =
+  static const knowledgeGallerySessionCompleted =
       'knowledge_gallery_session_completed';
 
   /// Fired when the user leaves a Galeria visual-choice match.
-  static const visualChoiceGameSessionAbandoned =
+  static const knowledgeGallerySessionAbandoned =
       'knowledge_gallery_session_abandoned';
 
   /// Fired when an artwork image fails to load (no URL in params).
-  static const visualChoiceGameImageFailed = 'knowledge_gallery_image_failed';
+  static const knowledgeGalleryImageFailed = 'knowledge_gallery_image_failed';
+
+  // ── Visual-choice games (Faces of History config) ──────────────────────
+
+  /// Fired when a Rostos da História visual-choice match starts.
+  static const facesOfHistoryRoundStarted = 'faces_of_history_round_started';
+
+  /// Fired after each answered question in a Faces of History match.
+  static const facesOfHistoryQuestionAnswered =
+      'faces_of_history_question_answered';
+
+  /// Fired when a Faces of History match finishes successfully.
+  static const facesOfHistorySessionCompleted =
+      'faces_of_history_session_completed';
+
+  /// Fired when the user leaves a Faces of History match.
+  static const facesOfHistorySessionAbandoned =
+      'faces_of_history_session_abandoned';
+
+  /// Fired when a Faces of History artwork image fails to load (no URL).
+  static const facesOfHistoryImageFailed = 'faces_of_history_image_failed';
 
   // ── Achievements ────────────────────────────────────────────────────────
 
