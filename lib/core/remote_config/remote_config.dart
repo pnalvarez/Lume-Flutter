@@ -106,6 +106,7 @@ abstract final class RemoteConfigDefaults {
     'palavra_misteriosa',
     'completar_frase',
     'galeria_conhecimento',
+    'rostos_historia',
   ];
 
   /// Unmodifiable copy of [enabledGameSlugs].

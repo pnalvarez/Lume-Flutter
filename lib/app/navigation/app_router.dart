@@ -50,8 +50,8 @@ class AppRouter extends RootStackRouter {
     ),
     AutoRoute(page: GamesRoute.page, path: '/games/play'),
     AutoRoute(
-      page: KnowledgeGalleryRoute.page,
-      path: '/games/knowledge-gallery',
+      page: VisualChoiceGameRoute.page,
+      path: '/games/visual-choice-game',
     ),
   ];
 }

@@ -291,11 +291,17 @@ void main() {
       );
 
       expect(find.text(question), findsOneWidget);
-      expect(find.byType(Image), findsOneWidget);
+      // Blurred cover backdrop + full-image foreground.
+      expect(find.byType(Image), findsNWidgets(2));
       expect(
         tester.getTopLeft(find.text(question)).dy,
-        lessThan(tester.getTopLeft(find.byType(Image)).dy),
+        lessThan(tester.getTopLeft(find.byType(Image).first).dy),
       );
+      final fits = tester
+          .widgetList<Image>(find.byType(Image))
+          .map((image) => image.fit)
+          .toList();
+      expect(fits, containsAll(<BoxFit>[BoxFit.cover, BoxFit.contain]));
       expect(
         tester.widget<AspectRatio>(find.byType(AspectRatio)).aspectRatio,
         ArtworkPromptCard.aspectRatio,

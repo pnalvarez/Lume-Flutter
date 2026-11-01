@@ -18,9 +18,9 @@ import 'package:lume/layers/domain/usecases/get_achievements.dart';
 import 'package:lume/layers/domain/usecases/get_arcade_record.dart';
 import 'package:lume/layers/domain/usecases/get_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_hub_games.dart';
-import 'package:lume/layers/domain/usecases/get_knowledge_gallery_round.dart';
+import 'package:lume/layers/domain/usecases/get_visual_choice_game_round.dart';
 import 'package:lume/layers/domain/usecases/get_profile.dart';
-import 'package:lume/layers/domain/usecases/knowledge_gallery_match.dart';
+import 'package:lume/layers/domain/usecases/visual_choice_game_match.dart';
 import 'package:lume/layers/domain/usecases/start_game_match.dart';
 import 'package:lume/layers/domain/usecases/sign_out.dart';
 import 'package:lume/layers/domain/usecases/watch_achievement_unlocks.dart';
@@ -59,8 +59,8 @@ void _registerGamesHubBloc() {
       getIt<IStartGameMatch>(),
       getIt<IRemoteConfig>(),
       getIt<IAnalytics>(),
-      getIt<IGetKnowledgeGalleryRound>(),
-      getIt<IKnowledgeGalleryMatch>(),
+      getIt<IGetVisualChoiceGameRound>(),
+      getIt<IVisualChoiceGameMatch>(),
     ),
   );
 }

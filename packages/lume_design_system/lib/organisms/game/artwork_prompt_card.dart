@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:lume_design_system/atoms/colors/colors.dart';
 import 'package:lume_design_system/atoms/spacing/radius.dart';
@@ -12,7 +14,11 @@ import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 /// [ArtworkPromptCard.imageUrl] and shows loading or error on its own.
 enum ArtworkPromptImagePhase { loading, error }
 
-/// Question above a fixed 4:3 artwork image, with loading and error wells.
+/// Question above a fixed 4:3 artwork frame, with loading and error wells.
+///
+/// The whole image stays visible (`BoxFit.contain`) over a blurred,
+/// frame-filling copy of itself, so portrait photos (people) and landscape
+/// paintings are never cropped by the frame.
 class ArtworkPromptCard extends StatelessWidget {
   final String question;
   final String? imageUrl;
@@ -128,22 +134,49 @@ class _ArtworkWellState extends State<_ArtworkWell> {
       return const _ArtworkPlaceholder(loading: false);
     }
 
-    return Image(
-      image: provider,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (wasSynchronouslyLoaded || frame != null) return child;
-        return const _ArtworkPlaceholder(loading: true);
-      },
-      errorBuilder: (context, error, stackTrace) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          _reportFailed();
-        });
-        return const _ArtworkPlaceholder(loading: false);
-      },
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Blurred cover copy fills the frame behind the whole image, so
+        // the contain fit below leaves no empty bars. Silent on error —
+        // the foreground image owns failure reporting.
+        ImageFiltered(
+          imageFilter: ui.ImageFilter.blur(
+            sigmaX: 20,
+            sigmaY: 20,
+            tileMode: ui.TileMode.clamp,
+          ),
+          child: Image(
+            image: provider,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded || frame != null) return child;
+              return const SizedBox.expand();
+            },
+            errorBuilder: (context, error, stackTrace) =>
+                const SizedBox.expand(),
+          ),
+        ),
+        Image(
+          image: provider,
+          fit: BoxFit.contain,
+          width: double.infinity,
+          height: double.infinity,
+          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+            if (wasSynchronouslyLoaded || frame != null) return child;
+            return const _ArtworkPlaceholder(loading: true);
+          },
+          errorBuilder: (context, error, stackTrace) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _reportFailed();
+            });
+            return const _ArtworkPlaceholder(loading: false);
+          },
+        ),
+      ],
     );
   }
 

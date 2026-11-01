@@ -35,6 +35,7 @@ void main() {
       RemoteConfigDefaults.enabledGameSlugsDefault,
     );
     expect(config.enabledGameSlugs.contains('galeria_conhecimento'), isTrue);
+    expect(config.enabledGameSlugs.contains('rostos_historia'), isTrue);
     expect(
       config.getBool(RemoteConfigKeys.arcadeEnabled, defaultValue: false),
       isTrue,

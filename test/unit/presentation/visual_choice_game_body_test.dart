@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_body.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_body.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
-const _state = KnowledgeGalleryState(
+const _state = VisualChoiceGameState(
   prompt: 'A qual movimento esta pintura pertence?',
   imageUrl: '',
   imagePhase: ArtworkPromptImagePhase.loading,
@@ -15,7 +15,7 @@ const _state = KnowledgeGalleryState(
 void main() {
   Future<void> pumpBody(
     WidgetTester tester, {
-    required KnowledgeGalleryState state,
+    required VisualChoiceGameState state,
     required ValueChanged<String> onOptionSelected,
   }) async {
     await tester.binding.setSurfaceSize(const Size(400, 1400));
@@ -24,7 +24,7 @@ void main() {
       MaterialApp(
         theme: lumeLightTheme(),
         home: Scaffold(
-          body: KnowledgeGalleryBody(
+          body: VisualChoiceGameBody(
             state: state,
             onOptionSelected: onOptionSelected,
           ),
@@ -33,7 +33,7 @@ void main() {
     );
   }
 
-  testWidgets('an idle gallery reports the tapped choice', (tester) async {
+  testWidgets('an idle visual round reports the tapped choice', (tester) async {
     final taps = <String>[];
     await pumpBody(tester, state: _state, onOptionSelected: taps.add);
 
@@ -43,19 +43,19 @@ void main() {
     expect(taps, ['1']);
   });
 
-  testWidgets('a submitting gallery ignores further choice taps', (
+  testWidgets('a submitting visual round ignores further choice taps', (
     tester,
   ) async {
     final taps = <String>[];
     await pumpBody(
       tester,
-      state: const KnowledgeGalleryState(
+      state: const VisualChoiceGameState(
         prompt: 'A qual movimento esta pintura pertence?',
         imageUrl: '',
         imagePhase: ArtworkPromptImagePhase.error,
         options: ['Impressionismo', 'Cubismo'],
         selectedOptionId: '0',
-        phase: KnowledgeGalleryPhase.submitting,
+        phase: VisualChoiceGamePhase.submitting,
       ),
       onOptionSelected: taps.add,
     );
@@ -67,24 +67,25 @@ void main() {
     expect(taps, isEmpty);
   });
 
-  testWidgets('a submitting gallery shows a spinner on the selected option', (
-    tester,
-  ) async {
-    await pumpBody(
-      tester,
-      state: const KnowledgeGalleryState(
-        prompt: 'A qual movimento esta pintura pertence?',
-        imageUrl: '',
-        imagePhase: ArtworkPromptImagePhase.error,
-        options: ['Impressionismo', 'Cubismo'],
-        selectedOptionId: '0',
-        phase: KnowledgeGalleryPhase.submitting,
-      ),
-      onOptionSelected: (_) {},
-    );
+  testWidgets(
+    'a submitting visual round shows a spinner on the selected option',
+    (tester) async {
+      await pumpBody(
+        tester,
+        state: const VisualChoiceGameState(
+          prompt: 'A qual movimento esta pintura pertence?',
+          imageUrl: '',
+          imagePhase: ArtworkPromptImagePhase.error,
+          options: ['Impressionismo', 'Cubismo'],
+          selectedOptionId: '0',
+          phase: VisualChoiceGamePhase.submitting,
+        ),
+        onOptionSelected: (_) {},
+      );
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text('Impressionismo'), findsNothing);
-    expect(find.text('Cubismo'), findsOneWidget);
-  });
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Impressionismo'), findsNothing);
+      expect(find.text('Cubismo'), findsOneWidget);
+    },
+  );
 }

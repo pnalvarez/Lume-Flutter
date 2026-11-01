@@ -4,8 +4,8 @@ import 'package:lume/core/auth/auth_session_provider.dart';
 import 'package:lume/core/network/api_client.dart';
 import 'package:lume/core/network/api_response.dart';
 import 'package:lume/core/network/http_method.dart';
-import 'package:lume/layers/data/datasource/knowledge_gallery_data_source.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
+import 'package:lume/layers/data/datasource/visual_choice_game_data_source.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
 
 class _Session implements IAuthSessionProvider {
   _Session(this.userId);
@@ -111,35 +111,41 @@ Map<String, Object?> _roundJson() {
 
 void main() {
   late _ApiClient api;
-  late KnowledgeGalleryDataSource sut;
+  late VisualChoiceGameDataSource sut;
 
   setUp(() {
     api = _ApiClient();
-    sut = KnowledgeGalleryDataSource(api, _Session('user-1'));
+    sut = VisualChoiceGameDataSource(api, _Session('user-1'));
   });
 
   test('fetchRounds asks for five galeria_conhecimento items', () async {
     api.handler = (_) => [_roundJson()];
 
-    final rounds = await sut.fetchRounds();
+    final rounds = await sut.fetchRounds(
+      gameSlug: VisualChoiceGameSlugs.knowledgeGallery,
+    );
 
     expect(rounds.single.options, ['Van Gogh', 'Da Vinci', 'Picasso', 'Monet']);
     expect(api.calls, ['get_visual_game_items']);
     expect(api.params.single, {
       'p_user_id': 'user-1',
-      'p_game_slug': knowledgeGalleryGameSlug,
-      'p_count': knowledgeGalleryRoundsPerMatch,
+      'p_game_slug': VisualChoiceGameSlugs.knowledgeGallery,
+      'p_count': visualChoiceGameRoundsPerMatch,
     });
     expect(api.calls, isNot(contains('get_game_round')));
     expect(api.calls, isNot(contains('save_pair_progress')));
   });
 
-  test('fetchRounds forwards a count of one', () async {
+  test('fetchRounds forwards an arbitrary visual slug and count', () async {
     api.handler = (_) => [_roundJson()];
 
-    await sut.fetchRounds(count: 1);
+    await sut.fetchRounds(gameSlug: 'rostos_historia', count: 1);
 
     expect((api.params.single! as Map)['p_count'], 1);
+    expect(
+      (api.params.single! as Map)['p_game_slug'],
+      VisualChoiceGameSlugs.facesOfHistory,
+    );
   });
 
   test(
@@ -168,9 +174,12 @@ void main() {
   );
 
   test('requires a signed-in user', () async {
-    sut = KnowledgeGalleryDataSource(api, _Session(null));
+    sut = VisualChoiceGameDataSource(api, _Session(null));
 
-    expect(sut.fetchRounds(), throwsStateError);
+    expect(
+      sut.fetchRounds(gameSlug: VisualChoiceGameSlugs.knowledgeGallery),
+      throwsStateError,
+    );
     expect(api.calls, isEmpty);
   });
 }

@@ -60,25 +60,25 @@ abstract final class AnalyticsEvents {
   /// Fired when the user abandons a games play sequence.
   static const gameSessionAbandoned = 'game_session_abandoned';
 
-  // ── Knowledge Gallery (standalone hub play; not trail/arcade) ───────────
+  // ── Visual-choice games (Galeria config; standalone hub play) ──────────
 
-  /// Fired when a Knowledge Gallery match starts.
-  static const knowledgeGalleryRoundStarted = 'knowledge_gallery_round_started';
+  /// Fired when a Galeria do Conhecimento visual-choice match starts.
+  static const visualChoiceGameRoundStarted = 'knowledge_gallery_round_started';
 
-  /// Fired after each answered question in a Knowledge Gallery match.
-  static const knowledgeGalleryQuestionAnswered =
+  /// Fired after each answered question in a Galeria visual-choice match.
+  static const visualChoiceGameQuestionAnswered =
       'knowledge_gallery_question_answered';
 
-  /// Fired when a Knowledge Gallery match finishes successfully.
-  static const knowledgeGallerySessionCompleted =
+  /// Fired when a Galeria visual-choice match finishes successfully.
+  static const visualChoiceGameSessionCompleted =
       'knowledge_gallery_session_completed';
 
-  /// Fired when the user leaves a Knowledge Gallery match.
-  static const knowledgeGallerySessionAbandoned =
+  /// Fired when the user leaves a Galeria visual-choice match.
+  static const visualChoiceGameSessionAbandoned =
       'knowledge_gallery_session_abandoned';
 
   /// Fired when an artwork image fails to load (no URL in params).
-  static const knowledgeGalleryImageFailed = 'knowledge_gallery_image_failed';
+  static const visualChoiceGameImageFailed = 'knowledge_gallery_image_failed';
 
   // ── Achievements ────────────────────────────────────────────────────────
 
@@ -129,7 +129,7 @@ abstract final class AnalyticsParams {
   /// `1` / `0` (Firebase Analytics params are String or num only).
   static const isCorrect = 'is_correct';
 
-  /// `true` when Knowledge Gallery is played inside Arcade.
+  /// `true` when a visual-choice game is played inside Arcade.
   static const isArcade = 'is_arcade';
 
   // ── Achievements ────────────────────────────────────────────────────────

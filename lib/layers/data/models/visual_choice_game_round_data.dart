@@ -1,8 +1,8 @@
 import 'package:lume/layers/data/json_map.dart';
 
 /// One row from `get_visual_game_items`.
-final class KnowledgeGalleryRoundData {
-  const KnowledgeGalleryRoundData({
+final class VisualChoiceGameRoundData {
+  const VisualChoiceGameRoundData({
     required this.questionId,
     required this.promptText,
     required this.imageUrl,
@@ -15,8 +15,8 @@ final class KnowledgeGalleryRoundData {
     required this.feedbackIncorrect,
   });
 
-  factory KnowledgeGalleryRoundData.fromJson(Map<String, dynamic> json) {
-    return KnowledgeGalleryRoundData(
+  factory VisualChoiceGameRoundData.fromJson(Map<String, dynamic> json) {
+    return VisualChoiceGameRoundData(
       questionId: _requireInt(json, 'question_id'),
       promptText: _requireString(json, 'prompt_text'),
       imageUrl: _optionalString(json['image_url']) ?? '',
@@ -45,15 +45,15 @@ final class KnowledgeGalleryRoundData {
 }
 
 /// JSON body returned by `submit_visual_answer`.
-final class KnowledgeGalleryAnswerData {
-  const KnowledgeGalleryAnswerData({
+final class VisualChoiceGameAnswerData {
+  const VisualChoiceGameAnswerData({
     required this.correct,
     required this.correctAnswer,
     required this.feedback,
     required this.curiosity,
   });
 
-  factory KnowledgeGalleryAnswerData.fromJson(Map<String, dynamic> json) {
+  factory VisualChoiceGameAnswerData.fromJson(Map<String, dynamic> json) {
     final error = json['error'];
     if (error != null) {
       throw FormatException('submit_visual_answer failed: $error');
@@ -62,7 +62,7 @@ final class KnowledgeGalleryAnswerData {
     if (correct is! bool) {
       throw FormatException('submit_visual_answer missing correct');
     }
-    return KnowledgeGalleryAnswerData(
+    return VisualChoiceGameAnswerData(
       correct: correct,
       correctAnswer: _optionalString(json['correct_answer']) ?? '',
       feedback: _optionalString(json['feedback']),

@@ -1,27 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lume/layers/domain/models/game/knowledge_gallery_round.dart';
-import 'package:lume/layers/domain/repository/knowledge_gallery_repository.dart';
-import 'package:lume/layers/domain/usecases/submit_knowledge_gallery_answer.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_round.dart';
+import 'package:lume/layers/domain/repository/visual_choice_game_repository.dart';
+import 'package:lume/layers/domain/usecases/submit_visual_choice_game_answer.dart';
 
-class _Repository implements IKnowledgeGalleryRepository {
+class _Repository implements IVisualChoiceGameRepository {
   int? questionId;
   String? answer;
 
   @override
-  Future<List<KnowledgeGalleryRound>> getRounds({
-    int count = knowledgeGalleryRoundsPerMatch,
+  Future<List<VisualChoiceGameRound>> getRounds({
+    required String gameSlug,
+    int count = visualChoiceGameRoundsPerMatch,
   }) {
     throw UnimplementedError();
   }
 
   @override
-  Future<KnowledgeGalleryAnswerResult> submitAnswer({
+  Future<VisualChoiceGameAnswerResult> submitAnswer({
     required int questionId,
     required String answer,
   }) async {
     this.questionId = questionId;
     this.answer = answer;
-    return const KnowledgeGalleryAnswerResult(
+    return const VisualChoiceGameAnswerResult(
       correct: false,
       correctAnswer: 'Da Vinci',
       feedback: 'Look at the brushwork.',
@@ -33,7 +35,7 @@ class _Repository implements IKnowledgeGalleryRepository {
 void main() {
   test('delegates the answer to the repository', () async {
     final repository = _Repository();
-    final sut = SubmitKnowledgeGalleryAnswer(repository);
+    final sut = SubmitVisualChoiceGameAnswer(repository);
 
     final result = await sut(questionId: 7, answer: 'Monet');
 

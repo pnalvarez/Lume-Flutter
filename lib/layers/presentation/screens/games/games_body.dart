@@ -6,7 +6,7 @@ import 'package:lume/layers/presentation/screens/games/battle_of_curiosities/bat
 import 'package:lume/layers/presentation/screens/games/complete_sentence/complete_sentence_body.dart';
 import 'package:lume/layers/presentation/screens/games/connections/connections_body.dart';
 import 'package:lume/layers/presentation/screens/games/games_state.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_body.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_body.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_body.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_body.dart';
 import 'package:lume/layers/presentation/screens/games/timeline/timeline_body.dart';
@@ -39,7 +39,7 @@ class GamesBody extends StatelessWidget {
     required this.onConnectionsSubmit,
     required this.onMysteriousWordLetterPressed,
     required this.onNext,
-    this.onGalleryImageFailed,
+    this.onVisualImageFailed,
     this.useCloseTrailing = false,
     this.onClose,
     this.onAbandoned,
@@ -77,7 +77,7 @@ class GamesBody extends StatelessWidget {
   final VoidCallback onConnectionsSubmit;
   final ValueChanged<String> onMysteriousWordLetterPressed;
   final VoidCallback onNext;
-  final VoidCallback? onGalleryImageFailed;
+  final VoidCallback? onVisualImageFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -155,13 +155,13 @@ class GamesBody extends StatelessWidget {
   }
 
   Widget _buildRound(BuildContext context) {
-    final gallery = state.knowledgeGalleryView;
-    if (gallery != null) {
-      return KnowledgeGalleryBody(
-        state: gallery,
+    final visual = state.visualChoiceView;
+    if (visual != null) {
+      return VisualChoiceGameBody(
+        state: visual,
         onOptionSelected: onChoiceSelected,
         onNext: onNext,
-        onImageFailed: onGalleryImageFailed,
+        onImageFailed: onVisualImageFailed,
       );
     }
 

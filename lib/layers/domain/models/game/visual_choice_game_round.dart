@@ -1,14 +1,8 @@
-/// Catalog slug for Galeria do Conhecimento.
-const knowledgeGalleryGameSlug = 'galeria_conhecimento';
-
-/// Questions in one Knowledge Gallery match.
-const knowledgeGalleryRoundsPerMatch = 5;
-
 /// One visual question. [options] stay in `get_visual_game_items` order.
 ///
 /// `period` is stored on the artwork and is not part of a match.
-class KnowledgeGalleryRound {
-  const KnowledgeGalleryRound({
+class VisualChoiceGameRound {
+  const VisualChoiceGameRound({
     required this.questionId,
     required this.prompt,
     required this.imageUrl,
@@ -32,9 +26,9 @@ class KnowledgeGalleryRound {
   final String? feedbackIncorrect;
 }
 
-/// Server result of one submitted Knowledge Gallery answer.
-class KnowledgeGalleryAnswerResult {
-  const KnowledgeGalleryAnswerResult({
+/// Server result of one submitted visual-choice answer.
+class VisualChoiceGameAnswerResult {
+  const VisualChoiceGameAnswerResult({
     required this.correct,
     required this.correctAnswer,
     this.feedback,

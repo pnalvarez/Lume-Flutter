@@ -5,7 +5,7 @@ import 'package:lume/layers/presentation/screens/games/complete_sentence/complet
 import 'package:lume/layers/presentation/screens/games/connections/connections_state.dart';
 import 'package:lume/layers/presentation/screens/games/game_round.dart';
 import 'package:lume/layers/presentation/screens/games/games_play_ui.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 import 'package:lume/layers/presentation/screens/games/lightning_quiz/lightning_quiz_state.dart';
 import 'package:lume/layers/presentation/screens/games/mysterious_word/mysterious_word_state.dart';
 import 'package:lume/layers/presentation/screens/games/timeline/timeline_state.dart';
@@ -92,7 +92,7 @@ final class GamesState {
     this.correctCount = 0,
     this.answered = false,
     this.isCorrect = false,
-    this.gallerySubmitting = false,
+    this.visualSubmitting = false,
     this.choice = const GamesChoiceUi(),
     this.whoAmI = const GamesWhoAmIUi(),
     this.completeSentence = const GamesCompleteSentenceUi(),
@@ -114,9 +114,9 @@ final class GamesState {
   final bool answered;
   final bool isCorrect;
 
-  /// Knowledge Gallery `submit_visual_answer` is in flight. The round stays
-  /// unanswered, and [knowledgeGalleryView] refuses further taps.
-  final bool gallerySubmitting;
+  /// Visual-choice `submit_visual_answer` is in flight. The round stays
+  /// unanswered, and [visualChoiceView] refuses further taps.
+  final bool visualSubmitting;
   final GamesChoiceUi choice;
   final GamesWhoAmIUi whoAmI;
   final GamesCompleteSentenceUi completeSentence;
@@ -143,18 +143,18 @@ final class GamesState {
 
   TrailGameDomain? get currentGame => currentRound?.game;
 
-  KnowledgeGalleryState? get knowledgeGalleryView {
-    final round = currentRound?.gallery;
+  VisualChoiceGameState? get visualChoiceView {
+    final round = currentRound?.visual;
     if (round == null) return null;
     final selected = choice.selectedOptionId;
-    final phase = KnowledgeGalleryPhase.resolve(
-      submitting: gallerySubmitting,
+    final phase = VisualChoiceGamePhase.resolve(
+      submitting: visualSubmitting,
       answered: answered,
       isCorrect: isCorrect,
     );
     String? correctOptionId;
     if (phase.answered) {
-      correctOptionId = knowledgeGalleryOptionId(
+      correctOptionId = visualChoiceGameOptionId(
         round.options,
         round.correctAnswer,
       );
@@ -162,7 +162,7 @@ final class GamesState {
         correctOptionId = selected;
       }
     }
-    return KnowledgeGalleryState(
+    return VisualChoiceGameState(
       prompt: round.prompt,
       imageUrl: round.imageUrl,
       options: round.options,
@@ -170,7 +170,7 @@ final class GamesState {
       correctOptionId: correctOptionId,
       phase: phase,
       explanation: phase.answered
-          ? knowledgeGalleryFeedback(
+          ? visualChoiceGameFeedback(
               isCorrect: phase.isCorrect,
               feedbackCorrect: round.feedbackCorrect,
               feedbackIncorrect: round.feedbackIncorrect,
@@ -289,7 +289,7 @@ final class GamesState {
     int? correctCount,
     bool? answered,
     bool? isCorrect,
-    bool? gallerySubmitting,
+    bool? visualSubmitting,
     GamesChoiceUi? choice,
     GamesWhoAmIUi? whoAmI,
     GamesCompleteSentenceUi? completeSentence,
@@ -315,9 +315,9 @@ final class GamesState {
       correctCount: correctCount ?? this.correctCount,
       answered: resetPlayFields ? false : (answered ?? this.answered),
       isCorrect: resetPlayFields ? false : (isCorrect ?? this.isCorrect),
-      gallerySubmitting: resetPlayFields
+      visualSubmitting: resetPlayFields
           ? false
-          : (gallerySubmitting ?? this.gallerySubmitting),
+          : (visualSubmitting ?? this.visualSubmitting),
       choice: resetPlayFields ? const GamesChoiceUi() : (choice ?? this.choice),
       whoAmI: resetPlayFields ? const GamesWhoAmIUi() : (whoAmI ?? this.whoAmI),
       completeSentence: resetPlayFields
@@ -365,7 +365,7 @@ final class GamesState {
       other.correctCount == correctCount &&
       other.answered == answered &&
       other.isCorrect == isCorrect &&
-      other.gallerySubmitting == gallerySubmitting &&
+      other.visualSubmitting == visualSubmitting &&
       other.choice == choice &&
       other.whoAmI == whoAmI &&
       other.completeSentence == completeSentence &&
@@ -387,7 +387,7 @@ final class GamesState {
     correctCount,
     answered,
     isCorrect,
-    gallerySubmitting,
+    visualSubmitting,
     choice,
     whoAmI,
     completeSentence,

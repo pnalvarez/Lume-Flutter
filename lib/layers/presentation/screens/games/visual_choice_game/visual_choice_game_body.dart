@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:lume/layers/presentation/screens/games/knowledge_gallery/knowledge_gallery_state.dart';
+import 'package:lume/layers/presentation/screens/games/visual_choice_game/visual_choice_game_state.dart';
 import 'package:lume/layers/presentation/screens/games/shared/game_answer_chrome.dart';
 import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/organisms/game/artwork_prompt_card.dart';
 import 'package:lume_design_system/organisms/game/choice_group.dart';
 
-/// Knowledge Gallery play surface. No Bloc, GetIt, or router.
-class KnowledgeGalleryBody extends StatelessWidget {
-  const KnowledgeGalleryBody({
+/// Visual-choice play surface. No Bloc, GetIt, or router.
+class VisualChoiceGameBody extends StatelessWidget {
+  const VisualChoiceGameBody({
     super.key,
     required this.state,
     required this.onOptionSelected,
@@ -15,7 +15,7 @@ class KnowledgeGalleryBody extends StatelessWidget {
     this.onImageFailed,
   });
 
-  final KnowledgeGalleryState state;
+  final VisualChoiceGameState state;
   final ValueChanged<String> onOptionSelected;
 
   /// Shown after an answer when the caller is playing a sequence.
