@@ -117,34 +117,52 @@ void main() {
       analytics.hasEvent(AnalyticsEvents.knowledgeGalleryRoundStarted),
       isFalse,
     );
+    // The config derives names from the slug prefix; the AnalyticsEvents
+    // literals are the wire contract, so a prefix typo fails here.
+    final gallery = VisualChoiceGameConfig.knowledgeGallery;
     expect(
-      VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent,
+      gallery.roundStartedEvent,
       AnalyticsEvents.knowledgeGalleryRoundStarted,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.roundStartedEvent,
+      gallery.questionAnsweredEvent,
+      AnalyticsEvents.knowledgeGalleryQuestionAnswered,
+    );
+    expect(
+      gallery.sessionCompletedEvent,
+      AnalyticsEvents.knowledgeGallerySessionCompleted,
+    );
+    expect(
+      gallery.sessionAbandonedEvent,
+      AnalyticsEvents.knowledgeGallerySessionAbandoned,
+    );
+    expect(
+      gallery.imageFailedEvent,
+      AnalyticsEvents.knowledgeGalleryImageFailed,
+    );
+    final facesConfig = VisualChoiceGameConfig.facesOfHistory;
+    expect(
+      facesConfig.roundStartedEvent,
       AnalyticsEvents.facesOfHistoryRoundStarted,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.questionAnsweredEvent,
+      facesConfig.questionAnsweredEvent,
       AnalyticsEvents.facesOfHistoryQuestionAnswered,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.sessionCompletedEvent,
+      facesConfig.sessionCompletedEvent,
       AnalyticsEvents.facesOfHistorySessionCompleted,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.sessionAbandonedEvent,
+      facesConfig.sessionAbandonedEvent,
       AnalyticsEvents.facesOfHistorySessionAbandoned,
     );
     expect(
-      VisualChoiceGameConfig.facesOfHistory.imageFailedEvent,
+      facesConfig.imageFailedEvent,
       AnalyticsEvents.facesOfHistoryImageFailed,
     );
-    expect(
-      VisualChoiceGameConfig.facesOfHistory.eventPrefix,
-      VisualChoiceGameEventPrefix.facesOfHistory.value,
-    );
+    expect(gallery.eventPrefix, 'knowledge_gallery_');
+    expect(facesConfig.eventPrefix, 'faces_of_history_');
     expect(
       VisualChoiceGameAnalyticsEvent.questionAnswered.eventName(
         VisualChoiceGameSlugs.facesOfHistory,
