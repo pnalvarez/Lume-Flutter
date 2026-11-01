@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lume/layers/domain/models/game/visual_choice_game_config.dart';
 
 /// Product analytics used for funnels and Firebase A/B Testing goals.
 ///
@@ -61,44 +62,51 @@ abstract final class AnalyticsEvents {
   static const gameSessionAbandoned = 'game_session_abandoned';
 
   // ── Visual-choice games (Galeria config; standalone hub play) ──────────
+  //
+  // Derived from VisualChoiceGameConfig so the wire name has one source of
+  // truth: the config's slug-prefixed event, not a second string literal.
 
   /// Fired when a Galeria do Conhecimento visual-choice match starts.
-  static const visualChoiceGameRoundStarted = 'knowledge_gallery_round_started';
+  static final visualChoiceGameRoundStarted =
+      VisualChoiceGameConfig.knowledgeGallery.roundStartedEvent;
 
   /// Fired after each answered question in a Galeria visual-choice match.
-  static const visualChoiceGameQuestionAnswered =
-      'knowledge_gallery_question_answered';
+  static final visualChoiceGameQuestionAnswered =
+      VisualChoiceGameConfig.knowledgeGallery.questionAnsweredEvent;
 
   /// Fired when a Galeria visual-choice match finishes successfully.
-  static const visualChoiceGameSessionCompleted =
-      'knowledge_gallery_session_completed';
+  static final visualChoiceGameSessionCompleted =
+      VisualChoiceGameConfig.knowledgeGallery.sessionCompletedEvent;
 
   /// Fired when the user leaves a Galeria visual-choice match.
-  static const visualChoiceGameSessionAbandoned =
-      'knowledge_gallery_session_abandoned';
+  static final visualChoiceGameSessionAbandoned =
+      VisualChoiceGameConfig.knowledgeGallery.sessionAbandonedEvent;
 
   /// Fired when an artwork image fails to load (no URL in params).
-  static const visualChoiceGameImageFailed = 'knowledge_gallery_image_failed';
+  static final visualChoiceGameImageFailed =
+      VisualChoiceGameConfig.knowledgeGallery.imageFailedEvent;
 
   // ── Visual-choice games (Faces of History config) ──────────────────────
 
   /// Fired when a Rostos da História visual-choice match starts.
-  static const facesOfHistoryRoundStarted = 'faces_of_history_round_started';
+  static final facesOfHistoryRoundStarted =
+      VisualChoiceGameConfig.facesOfHistory.roundStartedEvent;
 
   /// Fired after each answered question in a Faces of History match.
-  static const facesOfHistoryQuestionAnswered =
-      'faces_of_history_question_answered';
+  static final facesOfHistoryQuestionAnswered =
+      VisualChoiceGameConfig.facesOfHistory.questionAnsweredEvent;
 
   /// Fired when a Faces of History match finishes successfully.
-  static const facesOfHistorySessionCompleted =
-      'faces_of_history_session_completed';
+  static final facesOfHistorySessionCompleted =
+      VisualChoiceGameConfig.facesOfHistory.sessionCompletedEvent;
 
   /// Fired when the user leaves a Faces of History match.
-  static const facesOfHistorySessionAbandoned =
-      'faces_of_history_session_abandoned';
+  static final facesOfHistorySessionAbandoned =
+      VisualChoiceGameConfig.facesOfHistory.sessionAbandonedEvent;
 
   /// Fired when a Faces of History artwork image fails to load (no URL).
-  static const facesOfHistoryImageFailed = 'faces_of_history_image_failed';
+  static final facesOfHistoryImageFailed =
+      VisualChoiceGameConfig.facesOfHistory.imageFailedEvent;
 
   // ── Achievements ────────────────────────────────────────────────────────
 
