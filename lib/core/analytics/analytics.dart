@@ -103,6 +103,23 @@ abstract final class AnalyticsEvents {
   /// Fired when a Faces of History artwork image fails to load (no URL).
   static const facesOfHistoryImageFailed = 'faces_of_history_image_failed';
 
+  // ── Visual-choice games (World Tour / Giro pelo Mundo config) ───────────
+
+  /// Fired when a Giro pelo Mundo visual-choice match starts.
+  static const worldTourRoundStarted = 'giro_pelo_mundo_round_started';
+
+  /// Fired after each answered question in a Giro pelo Mundo match.
+  static const worldTourQuestionAnswered = 'giro_pelo_mundo_question_answered';
+
+  /// Fired when a Giro pelo Mundo match finishes successfully.
+  static const worldTourSessionCompleted = 'giro_pelo_mundo_session_completed';
+
+  /// Fired when the user leaves a Giro pelo Mundo match.
+  static const worldTourSessionAbandoned = 'giro_pelo_mundo_session_abandoned';
+
+  /// Fired when a Giro pelo Mundo image fails to load (no URL in params).
+  static const worldTourImageFailed = 'giro_pelo_mundo_image_failed';
+
   // ── Achievements ────────────────────────────────────────────────────────
 
   /// Fired when the Achievements tab/route becomes visible (exposure).
