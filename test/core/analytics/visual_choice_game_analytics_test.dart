@@ -275,6 +275,108 @@ void main() {
     },
   );
 
+  test('Giro pelo Mundo funnel fires only giro_pelo_mundo_* events', () {
+    final worldTour = VisualChoiceGameAnalytics(
+      analytics,
+      config: VisualChoiceGameConfig.worldTour,
+    );
+
+    worldTour
+      ..roundStarted(roundsTotal: 3, isArcade: false)
+      ..questionAnswered(
+        questionType: 'landmark',
+        isCorrect: true,
+        roundIndex: 0,
+        isArcade: false,
+      )
+      ..sessionCompleted(correctCount: 1, roundsTotal: 3, isArcade: false);
+
+    expect(analytics.hasEvent(AnalyticsEvents.worldTourRoundStarted), isTrue);
+    expect(analytics.parametersFor(AnalyticsEvents.worldTourQuestionAnswered), {
+      AnalyticsParams.questionType: 'landmark',
+      AnalyticsParams.isCorrect: 1,
+      AnalyticsParams.roundIndex: 0,
+      AnalyticsParams.isArcade: false,
+    });
+    expect(analytics.parametersFor(AnalyticsEvents.worldTourSessionCompleted), {
+      AnalyticsParams.correctCount: 1,
+      AnalyticsParams.roundsTotal: 3,
+      AnalyticsParams.isArcade: false,
+    });
+    worldTour
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..imageFailed(roundIndex: 0, isArcade: false)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: false);
+
+    // Completed already logged this session, so abandon stays a no-op.
+    expect(
+      analytics.hasEvent(AnalyticsEvents.worldTourSessionAbandoned),
+      isFalse,
+    );
+    expect(
+      analytics.events
+          .where((e) => e.name == AnalyticsEvents.worldTourImageFailed)
+          .length,
+      1,
+    );
+    expect(analytics.parametersFor(AnalyticsEvents.worldTourImageFailed), {
+      AnalyticsParams.isArcade: false,
+    });
+    expect(
+      analytics.events.every((e) => e.name.startsWith('giro_pelo_mundo_')),
+      isTrue,
+    );
+  });
+
+  test('Giro pelo Mundo abandon logs round_index, rounds_total, is_arcade', () {
+    final worldTour = VisualChoiceGameAnalytics(
+      analytics,
+      config: VisualChoiceGameConfig.worldTour,
+    );
+
+    worldTour
+      ..roundStarted(roundsTotal: 3, isArcade: true)
+      ..sessionAbandoned(roundIndex: 1, roundsTotal: 3, isArcade: true)
+      ..sessionAbandoned(roundIndex: 2, roundsTotal: 3, isArcade: true);
+
+    expect(
+      analytics.events
+          .where((e) => e.name == AnalyticsEvents.worldTourSessionAbandoned)
+          .length,
+      1,
+    );
+    expect(analytics.parametersFor(AnalyticsEvents.worldTourSessionAbandoned), {
+      AnalyticsParams.roundIndex: 1,
+      AnalyticsParams.roundsTotal: 3,
+      AnalyticsParams.isArcade: true,
+    });
+  });
+
+  test('Giro pelo Mundo event names match the config slug prefix', () {
+    final worldTourConfig = VisualChoiceGameConfig.worldTour;
+    expect(
+      worldTourConfig.roundStartedEvent,
+      AnalyticsEvents.worldTourRoundStarted,
+    );
+    expect(
+      worldTourConfig.questionAnsweredEvent,
+      AnalyticsEvents.worldTourQuestionAnswered,
+    );
+    expect(
+      worldTourConfig.sessionCompletedEvent,
+      AnalyticsEvents.worldTourSessionCompleted,
+    );
+    expect(
+      worldTourConfig.sessionAbandonedEvent,
+      AnalyticsEvents.worldTourSessionAbandoned,
+    );
+    expect(
+      worldTourConfig.imageFailedEvent,
+      AnalyticsEvents.worldTourImageFailed,
+    );
+    expect(worldTourConfig.eventPrefix, 'giro_pelo_mundo_');
+  });
+
   test('Galeria session still emits only knowledge_gallery_* events', () {
     visual
       ..roundStarted(roundsTotal: 2, isArcade: false)
