@@ -107,6 +107,7 @@ abstract final class RemoteConfigDefaults {
     'completar_frase',
     'galeria_conhecimento',
     'rostos_historia',
+    'giro_pelo_mundo',
   ];
 
   /// Unmodifiable copy of [enabledGameSlugs].

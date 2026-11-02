@@ -11,6 +11,11 @@ abstract final class VisualChoiceGameSlugs {
   /// still depends on the catalog row being returned by `get_hub_games`.
   /// Logs under the `faces_of_history_*` analytics prefix.
   static const facesOfHistory = 'rostos_historia';
+
+  /// Giro pelo Mundo. In the default slug allowlist; tile visibility
+  /// still depends on the catalog row being returned by `get_hub_games`.
+  /// Logs under the `giro_pelo_mundo_*` analytics prefix.
+  static const worldTour = 'giro_pelo_mundo';
 }
 
 /// Questions in one visual-choice hub match.
@@ -24,6 +29,7 @@ const visualChoiceGameRoundsPerMatch = 5;
 const visualChoiceGameSlugs = <String>{
   VisualChoiceGameSlugs.knowledgeGallery,
   VisualChoiceGameSlugs.facesOfHistory,
+  VisualChoiceGameSlugs.worldTour,
 };
 
 /// Firebase event-name prefix for a visual-choice game.
@@ -32,7 +38,8 @@ const visualChoiceGameSlugs = <String>{
 /// only needs a slug entry here to get distinct analytics.
 enum VisualChoiceGameEventPrefix {
   knowledgeGallery('knowledge_gallery_'),
-  facesOfHistory('faces_of_history_');
+  facesOfHistory('faces_of_history_'),
+  worldTour('giro_pelo_mundo_');
 
   const VisualChoiceGameEventPrefix(this.value);
 
@@ -50,6 +57,7 @@ enum VisualChoiceGameEventPrefix {
     return switch (gameSlug) {
       VisualChoiceGameSlugs.knowledgeGallery => knowledgeGallery.value,
       VisualChoiceGameSlugs.facesOfHistory => facesOfHistory.value,
+      VisualChoiceGameSlugs.worldTour => worldTour.value,
       _ => '${gameSlug}_',
     };
   }
@@ -100,11 +108,17 @@ final class VisualChoiceGameConfig {
     gameSlug: VisualChoiceGameSlugs.facesOfHistory,
   );
 
+  /// Config for Giro pelo Mundo.
+  static const worldTour = VisualChoiceGameConfig(
+    gameSlug: VisualChoiceGameSlugs.worldTour,
+  );
+
   /// Config for any visual [gameSlug].
   factory VisualChoiceGameConfig.forSlug(String gameSlug) {
     return switch (gameSlug) {
       VisualChoiceGameSlugs.knowledgeGallery => knowledgeGallery,
       VisualChoiceGameSlugs.facesOfHistory => facesOfHistory,
+      VisualChoiceGameSlugs.worldTour => worldTour,
       _ => VisualChoiceGameConfig(gameSlug: gameSlug),
     };
   }
