@@ -1,0 +1,1363 @@
+{
+  "source": "/Users/pedroalvarez/Documents/Lume/Games/giro_pelo_mundo_conteudo (1).xlsx",
+  "bucket": "knowledge-gallery",
+  "public_base": "https://mizgtuwtuaculchwizkm.supabase.co/storage/v1/object/public/knowledge-gallery",
+  "counts": {
+    "flags": 50,
+    "landmarks": 50,
+    "silhouettes": 50,
+    "total": 150
+  },
+  "items": [
+    {
+      "slug": "brasil",
+      "title": "Brasil",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Brazil, shown perfectly flat and facing the viewer. Ratio 7:10. Green field with a large yellow rhombus centered. Inside the rhombus, a dark blue circle (celestial globe) with 27 small white five-pointed stars of different sizes arranged like a night sky, crossed slightly above its middle by a curved white band with the words 'ORDEM E PROGRESSO' in green capital letters. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/brasil.png",
+      "storage_path": "giro_pelo_mundo/brasil/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "argentina",
+      "title": "Argentina",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Argentina, shown perfectly flat and facing the viewer. Ratio 9:14. Three equal horizontal bands: light sky blue, white, light sky blue. Centered in the white band, a golden 'Sun of May' with a human face and 32 rays alternating straight and wavy. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/argentina.png",
+      "storage_path": "giro_pelo_mundo/argentina/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "chile",
+      "title": "Chile",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Chile, shown perfectly flat and facing the viewer. Ratio 2:3. Two equal horizontal bands: white on top, red on the bottom. A blue square in the upper hoist-side corner, the same height as the white band, with a single white five-pointed star centered in it. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/chile.png",
+      "storage_path": "giro_pelo_mundo/chile/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "peru",
+      "title": "Peru",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Peru, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal vertical bands: red, white, red. No coat of arms. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/peru.png",
+      "storage_path": "giro_pelo_mundo/peru/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "colombia",
+      "title": "Colômbia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Colombia, shown perfectly flat and facing the viewer. Ratio 2:3. Three horizontal bands: yellow on top occupying the upper half, then blue and red, each occupying one quarter of the height. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/colombia.png",
+      "storage_path": "giro_pelo_mundo/colombia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "uruguai",
+      "title": "Uruguai",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Uruguay, shown perfectly flat and facing the viewer. Ratio 2:3. Nine equal horizontal stripes alternating white and blue, starting and ending with white. A white square in the upper hoist-side corner spanning the first five stripes, containing a golden 'Sun of May' with a human face and 16 rays alternating straight and wavy. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/uruguai.png",
+      "storage_path": "giro_pelo_mundo/uruguai/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "costa-rica",
+      "title": "Costa Rica",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Costa Rica, shown perfectly flat and facing the viewer. Ratio 3:5. Five horizontal bands: blue, white, a double-height red band in the middle, white, blue (proportions 1:1:2:1:1). No coat of arms. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/costa-rica.png",
+      "storage_path": "giro_pelo_mundo/costa-rica/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "mexico",
+      "title": "México",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Mexico, shown perfectly flat and facing the viewer. Ratio 4:7. Three equal vertical bands: green, white, red. Centered in the white band, the national coat of arms: a brown golden eagle perched on a prickly pear cactus, devouring a snake, the cactus growing from a rock in a lake, framed below by a semicircular wreath of green oak and laurel branches tied with a green, white and red ribbon. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/mexico.png",
+      "storage_path": "giro_pelo_mundo/mexico/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "estados-unidos",
+      "title": "Estados Unidos",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of the United States, shown perfectly flat and facing the viewer. Ratio 10:19. Thirteen equal horizontal stripes alternating red and white, starting and ending with red. A blue rectangle in the upper hoist-side corner covering the top seven stripes, containing 50 small white five-pointed stars in 9 staggered rows alternating 6 and 5 stars. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/estados-unidos.png",
+      "storage_path": "giro_pelo_mundo/estados-unidos/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "canada",
+      "title": "Canadá",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Canada, shown perfectly flat and facing the viewer. Ratio 1:2. Red vertical bands on the left and right, each one quarter of the width; a white square in the center with a stylized red eleven-pointed maple leaf. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/canada.png",
+      "storage_path": "giro_pelo_mundo/canada/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "cuba",
+      "title": "Cuba",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Cuba, shown perfectly flat and facing the viewer. Ratio 1:2. Five equal horizontal stripes alternating blue and white, starting with blue. A red equilateral triangle on the hoist side with a white five-pointed star in its center. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/cuba.png",
+      "storage_path": "giro_pelo_mundo/cuba/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "jamaica",
+      "title": "Jamaica",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Jamaica, shown perfectly flat and facing the viewer. Ratio 1:2. A gold diagonal cross (saltire) dividing the flag into four triangles: green triangles at the top and bottom, black triangles at the left and right. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/jamaica.png",
+      "storage_path": "giro_pelo_mundo/jamaica/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "portugal",
+      "title": "Portugal",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Portugal, shown perfectly flat and facing the viewer. Ratio 2:3. Vertically divided: green on the hoist side (two-fifths of the width) and red on the fly side (three-fifths). Centered on the dividing line, a yellow armillary sphere with the Portuguese shield over it: a white shield with five small blue shields arranged in a cross, surrounded by a red border containing seven yellow castles. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/portugal.png",
+      "storage_path": "giro_pelo_mundo/portugal/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "espanha",
+      "title": "Espanha",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Spain, shown perfectly flat and facing the viewer. Ratio 2:3. Three horizontal bands: red, a double-height yellow band, red (1:2:1). The Spanish coat of arms on the yellow band, positioned toward the hoist side: a crowned shield flanked by two white columns wrapped with red ribbons. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/espanha.png",
+      "storage_path": "giro_pelo_mundo/espanha/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "franca",
+      "title": "França",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of France, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal vertical bands: blue on the hoist side, white, red. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/franca.png",
+      "storage_path": "giro_pelo_mundo/franca/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "italia",
+      "title": "Itália",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Italy, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal vertical bands: green on the hoist side, white, red. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/italia.png",
+      "storage_path": "giro_pelo_mundo/italia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "alemanha",
+      "title": "Alemanha",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Germany, shown perfectly flat and facing the viewer. Ratio 3:5. Three equal horizontal bands: black on top, red, gold. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/alemanha.png",
+      "storage_path": "giro_pelo_mundo/alemanha/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "reino-unido",
+      "title": "Reino Unido",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of the United Kingdom, shown perfectly flat and facing the viewer. Ratio 1:2. The Union Jack: dark blue field; a red upright cross edged in white; a white diagonal cross (saltire) with a narrower red diagonal cross on it, offset from the center line. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/reino-unido.png",
+      "storage_path": "giro_pelo_mundo/reino-unido/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "irlanda",
+      "title": "Irlanda",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Ireland, shown perfectly flat and facing the viewer. Ratio 1:2. Three equal vertical bands: green on the hoist side, white, orange. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/irlanda.png",
+      "storage_path": "giro_pelo_mundo/irlanda/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "paises-baixos",
+      "title": "Países Baixos",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of the Netherlands, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal horizontal bands: red on top, white, blue. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/paises-baixos.png",
+      "storage_path": "giro_pelo_mundo/paises-baixos/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "belgica",
+      "title": "Bélgica",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Belgium, shown perfectly flat and facing the viewer. Ratio 13:15 (almost square). Three equal vertical bands: black on the hoist side, yellow, red. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/belgica.png",
+      "storage_path": "giro_pelo_mundo/belgica/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "suica",
+      "title": "Suíça",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Switzerland, shown perfectly flat and facing the viewer. Square ratio 1:1. Red square field with a bold white equilateral cross in the center; the arms of the cross do not touch the edges. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/suica.png",
+      "storage_path": "giro_pelo_mundo/suica/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "grecia",
+      "title": "Grécia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Greece, shown perfectly flat and facing the viewer. Ratio 2:3. Nine equal horizontal stripes alternating blue and white, starting and ending with blue. A blue square in the upper hoist-side corner spanning the first five stripes, with a white upright cross. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/grecia.png",
+      "storage_path": "giro_pelo_mundo/grecia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "suecia",
+      "title": "Suécia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Sweden, shown perfectly flat and facing the viewer. Ratio 5:8. Blue field with a yellow Nordic cross extending to the edges, the vertical arm shifted toward the hoist side. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/suecia.png",
+      "storage_path": "giro_pelo_mundo/suecia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "noruega",
+      "title": "Noruega",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Norway, shown perfectly flat and facing the viewer. Ratio 8:11. Red field with a blue Nordic cross outlined in white, extending to the edges, the vertical arm shifted toward the hoist side. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/noruega.png",
+      "storage_path": "giro_pelo_mundo/noruega/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "russia",
+      "title": "Rússia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Russia, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal horizontal bands: white on top, blue, red. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/russia.png",
+      "storage_path": "giro_pelo_mundo/russia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "polonia",
+      "title": "Polônia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Poland, shown perfectly flat and facing the viewer. Ratio 5:8. Two equal horizontal bands: white on top, red on the bottom. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/polonia.png",
+      "storage_path": "giro_pelo_mundo/polonia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "japao",
+      "title": "Japão",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Japan, shown perfectly flat and facing the viewer. Ratio 2:3. White field with a single crimson red circle in the exact center, its diameter three-fifths of the flag's height. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/japao.png",
+      "storage_path": "giro_pelo_mundo/japao/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "china",
+      "title": "China",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of China, shown perfectly flat and facing the viewer. Ratio 2:3. Red field. In the upper hoist-side corner, one large yellow five-pointed star and four smaller yellow five-pointed stars arranged in an arc to its right, each small star rotated so one point faces the large star. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/china.png",
+      "storage_path": "giro_pelo_mundo/china/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "coreia-do-sul",
+      "title": "Coreia do Sul",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of South Korea, shown perfectly flat and facing the viewer. Ratio 2:3. White field. In the center, a circle divided by an S-shaped wave: red upper half and blue lower half. Four black trigrams of three bars each, one near each corner, angled toward the center: top-left three solid bars; top-right broken, solid, broken; bottom-left solid, broken, solid; bottom-right three broken bars. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/coreia-do-sul.png",
+      "storage_path": "giro_pelo_mundo/coreia-do-sul/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "india",
+      "title": "Índia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of India, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal horizontal bands: saffron on top, white, green. Centered in the white band, a navy blue wheel with 24 spokes (Ashoka Chakra). Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/india.png",
+      "storage_path": "giro_pelo_mundo/india/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "tailandia",
+      "title": "Tailândia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Thailand, shown perfectly flat and facing the viewer. Ratio 2:3. Five horizontal stripes: red, white, a double-height blue stripe in the middle, white, red (1:1:2:1:1). Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/tailandia.png",
+      "storage_path": "giro_pelo_mundo/tailandia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "vietna",
+      "title": "Vietnã",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Vietnam, shown perfectly flat and facing the viewer. Ratio 2:3. Red field with one large yellow five-pointed star centered. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/vietna.png",
+      "storage_path": "giro_pelo_mundo/vietna/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "indonesia",
+      "title": "Indonésia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Indonesia, shown perfectly flat and facing the viewer. Ratio 2:3. Two equal horizontal bands: red on top, white on the bottom. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/indonesia.png",
+      "storage_path": "giro_pelo_mundo/indonesia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "filipinas",
+      "title": "Filipinas",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of the Philippines, shown perfectly flat and facing the viewer. Ratio 1:2. Two equal horizontal bands: blue on top, red on the bottom. A white equilateral triangle on the hoist side containing a golden-yellow sun with eight rays in its center and a small golden-yellow five-pointed star in each of the triangle's three corners. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/filipinas.png",
+      "storage_path": "giro_pelo_mundo/filipinas/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "turquia",
+      "title": "Turquia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Turkey, shown perfectly flat and facing the viewer. Ratio 2:3. Red field with a white crescent moon opening toward the fly side and a white five-pointed star just to the right of the crescent, both positioned toward the hoist side. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/turquia.png",
+      "storage_path": "giro_pelo_mundo/turquia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "emirados-arabes-unidos",
+      "title": "Emirados Árabes Unidos",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of the United Arab Emirates, shown perfectly flat and facing the viewer. Ratio 1:2. A vertical red band on the hoist side, one quarter of the width; to its right, three equal horizontal bands: green on top, white, black. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/emirados-arabes-unidos.png",
+      "storage_path": "giro_pelo_mundo/emirados-arabes-unidos/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "camboja",
+      "title": "Camboja",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Cambodia, shown perfectly flat and facing the viewer. Ratio 2:3. Three horizontal bands: blue, a double-height red band in the middle, blue (1:2:1). Centered on the red band, a white stylized image of the Angkor Wat temple with three visible towers, outlined in black. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/camboja.png",
+      "storage_path": "giro_pelo_mundo/camboja/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nepal",
+      "title": "Nepal",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Nepal, shown perfectly flat and facing the viewer. NOT rectangular: the flag is made of two stacked red triangular pennants, the upper one slightly smaller, with a dark blue border around the whole shape. A white crescent moon with rays in the upper pennant and a white twelve-rayed sun in the lower pennant. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/nepal.png",
+      "storage_path": "giro_pelo_mundo/nepal/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "egito",
+      "title": "Egito",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Egypt, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal horizontal bands: red on top, white, black. Centered in the white band, a golden eagle facing the hoist side, with a shield on its chest, standing on a small golden scroll (render any writing on the scroll as simple decorative lines). Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/egito.png",
+      "storage_path": "giro_pelo_mundo/egito/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "africa-do-sul",
+      "title": "África do Sul",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of South Africa, shown perfectly flat and facing the viewer. Ratio 2:3. A green horizontal Y shape lying on its side and opening toward the fly, bordered in white on the outside and gold on the inside; the hoist-side triangle inside the Y is black; the area above the Y is red and the area below is blue. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/africa-do-sul.png",
+      "storage_path": "giro_pelo_mundo/africa-do-sul/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "quenia",
+      "title": "Quênia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Kenya, shown perfectly flat and facing the viewer. Ratio 2:3. Three horizontal bands: black, red, green, separated by thin white stripes. Centered, a traditional red, black and white Maasai shield with two crossed white spears behind it. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/quenia.png",
+      "storage_path": "giro_pelo_mundo/quenia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nigeria",
+      "title": "Nigéria",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Nigeria, shown perfectly flat and facing the viewer. Ratio 1:2. Three equal vertical bands: green, white, green. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/nigeria.png",
+      "storage_path": "giro_pelo_mundo/nigeria/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "etiopia",
+      "title": "Etiópia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Ethiopia, shown perfectly flat and facing the viewer. Ratio 1:2. Three equal horizontal bands: green on top, yellow, red. Centered, a blue disc with a yellow five-pointed star drawn as an outline (pentagram) and five short yellow rays between its points. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/etiopia.png",
+      "storage_path": "giro_pelo_mundo/etiopia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "gana",
+      "title": "Gana",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Ghana, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal horizontal bands: red on top, gold, green. A black five-pointed star centered in the gold band. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/gana.png",
+      "storage_path": "giro_pelo_mundo/gana/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "tanzania",
+      "title": "Tanzânia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Tanzania, shown perfectly flat and facing the viewer. Ratio 2:3. Divided diagonally from the lower hoist corner to the upper fly corner by a black band edged in yellow; the upper hoist triangle is green and the lower fly triangle is light blue. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/tanzania.png",
+      "storage_path": "giro_pelo_mundo/tanzania/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "senegal",
+      "title": "Senegal",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Senegal, shown perfectly flat and facing the viewer. Ratio 2:3. Three equal vertical bands: green, yellow, red. A green five-pointed star centered in the yellow band. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/senegal.png",
+      "storage_path": "giro_pelo_mundo/senegal/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "madagascar",
+      "title": "Madagascar",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Madagascar, shown perfectly flat and facing the viewer. Ratio 2:3. A vertical white band on the hoist side, one third of the width; to its right, two equal horizontal bands: red on top, green on the bottom. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/madagascar.png",
+      "storage_path": "giro_pelo_mundo/madagascar/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "australia",
+      "title": "Austrália",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of Australia, shown perfectly flat and facing the viewer. Ratio 1:2. Dark blue field. The Union Jack in the upper hoist-side quarter; a large white seven-pointed star below the Union Jack; on the fly half, the Southern Cross made of five white stars: four seven-pointed stars and one small five-pointed star. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/australia.png",
+      "storage_path": "giro_pelo_mundo/australia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nova-zelandia",
+      "title": "Nova Zelândia",
+      "kind": "flag",
+      "prompt": "Flat vector illustration of the official national flag of New Zealand, shown perfectly flat and facing the viewer. Ratio 1:2. Dark blue field. The Union Jack in the upper hoist-side quarter; on the fly half, four red five-pointed stars outlined in white, forming the Southern Cross. Use the exact official colors and proportions. No waving, no flagpole, no shadows, no texture, no border, no text or extra symbols beyond what is described, centered on a plain light gray (#EEEEEE) background.",
+      "relpath": "flags/nova-zelandia.png",
+      "storage_path": "giro_pelo_mundo/nova-zelandia/flag.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "brasil",
+      "title": "Brasil",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Christ the Redeemer statue on top of Corcovado mountain in Rio de Janeiro, arms outstretched, with Sugarloaf Mountain and Guanabara Bay in the background, sunny day. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/brasil.png",
+      "storage_path": "giro_pelo_mundo/brasil/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "argentina",
+      "title": "Argentina",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Perito Moreno Glacier in Patagonia, a massive wall of blue and white ice meeting the turquoise water of Lake Argentino, with snowy mountains behind. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/argentina.png",
+      "storage_path": "giro_pelo_mundo/argentina/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "chile",
+      "title": "Chile",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of several moai stone statues of Easter Island (Rapa Nui) standing in a row on a stone platform, green grassy landscape and the Pacific Ocean behind, golden hour. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/chile.png",
+      "storage_path": "giro_pelo_mundo/chile/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "peru",
+      "title": "Peru",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Inca ruins of Machu Picchu seen from above, stone terraces and buildings on a mountain ridge, with the peak of Huayna Picchu behind, surrounded by green Andean mountains and light clouds. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/peru.png",
+      "storage_path": "giro_pelo_mundo/peru/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "colombia",
+      "title": "Colômbia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of a colorful colonial street in the walled old town of Cartagena, Colombia, with yellow, blue and orange houses, wooden balconies covered in pink bougainvillea, and the old stone city wall. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/colombia.png",
+      "storage_path": "giro_pelo_mundo/colombia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "uruguai",
+      "title": "Uruguai",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of a cobblestone street in the historic quarter of Colonia del Sacramento, Uruguay, with low colonial houses, old trees and a white lighthouse in the background. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/uruguai.png",
+      "storage_path": "giro_pelo_mundo/uruguai/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "costa-rica",
+      "title": "Costa Rica",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Arenal Volcano in Costa Rica, a perfectly conical volcano rising above green tropical rainforest and a lake, with a few clouds around its peak. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/costa-rica.png",
+      "storage_path": "giro_pelo_mundo/costa-rica/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "mexico",
+      "title": "México",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the El Castillo pyramid (Temple of Kukulcán) at Chichén Itzá, a stepped Mayan pyramid with a temple on top and staircases on each side, on a green lawn under a blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/mexico.png",
+      "storage_path": "giro_pelo_mundo/mexico/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "estados-unidos",
+      "title": "Estados Unidos",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Statue of Liberty on Liberty Island in New York Harbor, green copper statue holding a torch up high, water around the island, clear blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/estados-unidos.png",
+      "storage_path": "giro_pelo_mundo/estados-unidos/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "canada",
+      "title": "Canadá",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Moraine Lake in Banff National Park, Canada, bright turquoise glacial water surrounded by the jagged snowy peaks of the Valley of the Ten Peaks and pine forest. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/canada.png",
+      "storage_path": "giro_pelo_mundo/canada/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "cuba",
+      "title": "Cuba",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of a colorful street in Old Havana, Cuba, with pastel colonial buildings and a shiny vintage 1950s American convertible car parked on the street. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/cuba.png",
+      "storage_path": "giro_pelo_mundo/cuba/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "jamaica",
+      "title": "Jamaica",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Dunn's River Falls in Jamaica, a wide cascading waterfall flowing over natural terraced limestone rocks through tropical vegetation directly into the turquoise Caribbean Sea. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/jamaica.png",
+      "storage_path": "giro_pelo_mundo/jamaica/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "portugal",
+      "title": "Portugal",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Belém Tower in Lisbon, a white limestone fortified tower in Manueline style with ornate balconies and turrets, standing at the edge of the Tagus River. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/portugal.png",
+      "storage_path": "giro_pelo_mundo/portugal/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "espanha",
+      "title": "Espanha",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Sagrada Família basilica in Barcelona, with its tall ornate spires and intricate stone facades designed by Antoni Gaudí, blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/espanha.png",
+      "storage_path": "giro_pelo_mundo/espanha/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "franca",
+      "title": "França",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Eiffel Tower in Paris seen from the Champ de Mars gardens, tall wrought-iron lattice tower, blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/franca.png",
+      "storage_path": "giro_pelo_mundo/franca/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "italia",
+      "title": "Itália",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Colosseum in Rome, the ancient oval stone amphitheater with its arched outer walls partly ruined, blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/italia.png",
+      "storage_path": "giro_pelo_mundo/italia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "alemanha",
+      "title": "Alemanha",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Brandenburg Gate in Berlin, a neoclassical sandstone gate with twelve Doric columns and the Quadriga sculpture of a chariot pulled by four horses on top. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/alemanha.png",
+      "storage_path": "giro_pelo_mundo/alemanha/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "reino-unido",
+      "title": "Reino Unido",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Elizabeth Tower (Big Ben clock tower) next to the Houses of Parliament in London, seen from across the River Thames, Gothic Revival architecture. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/reino-unido.png",
+      "storage_path": "giro_pelo_mundo/reino-unido/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "irlanda",
+      "title": "Irlanda",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Cliffs of Moher in Ireland, tall vertical dark cliffs dropping into the Atlantic Ocean, green grass on top, dramatic cloudy sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/irlanda.png",
+      "storage_path": "giro_pelo_mundo/irlanda/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "paises-baixos",
+      "title": "Países Baixos",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the traditional windmills of Kinderdijk in the Netherlands, a row of brick and thatched windmills along a calm canal with flat green fields. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/paises-baixos.png",
+      "storage_path": "giro_pelo_mundo/paises-baixos/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "belgica",
+      "title": "Bélgica",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Grand-Place in Brussels, a large cobblestone square surrounded by ornate gilded Baroque guildhalls and the Gothic Town Hall with its tall spire. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/belgica.png",
+      "storage_path": "giro_pelo_mundo/belgica/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "suica",
+      "title": "Suíça",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Chapel Bridge (Kapellbrücke) in Lucerne, a long covered wooden footbridge with flower boxes crossing the Reuss River diagonally, with the octagonal stone Water Tower, and mountains in the background. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/suica.png",
+      "storage_path": "giro_pelo_mundo/suica/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "grecia",
+      "title": "Grécia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Parthenon on the Acropolis of Athens, an ancient white marble temple with Doric columns on a rocky hill, blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/grecia.png",
+      "storage_path": "giro_pelo_mundo/grecia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "suecia",
+      "title": "Suécia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the colorful old town Gamla Stan in Stockholm, a small square with tall narrow buildings painted red, orange and yellow. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/suecia.png",
+      "storage_path": "giro_pelo_mundo/suecia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "noruega",
+      "title": "Noruega",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Geirangerfjord in Norway, a deep narrow fjord with steep green mountain walls and waterfalls falling into dark blue water. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/noruega.png",
+      "storage_path": "giro_pelo_mundo/noruega/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "russia",
+      "title": "Rússia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Saint Basil's Cathedral on Red Square in Moscow, with its colorful striped and patterned onion domes. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/russia.png",
+      "storage_path": "giro_pelo_mundo/russia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "polonia",
+      "title": "Polônia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Main Market Square in Kraków, Poland, with the Gothic St. Mary's Basilica with two unequal towers and the Renaissance Cloth Hall. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/polonia.png",
+      "storage_path": "giro_pelo_mundo/polonia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "japao",
+      "title": "Japão",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Mount Fuji, a snow-capped symmetrical volcano, seen behind the red five-story Chureito Pagoda with pink cherry blossoms in the foreground, clear sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/japao.png",
+      "storage_path": "giro_pelo_mundo/japao/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "china",
+      "title": "China",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Great Wall of China winding along the ridges of green mountains, with watchtowers, seen from above on a clear day. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/china.png",
+      "storage_path": "giro_pelo_mundo/china/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "coreia-do-sul",
+      "title": "Coreia do Sul",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Gyeongbokgung Palace in Seoul, a traditional Korean palace hall with colorful painted wooden eaves and curved tiled roofs, with mountains behind. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/coreia-do-sul.png",
+      "storage_path": "giro_pelo_mundo/coreia-do-sul/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "india",
+      "title": "Índia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Taj Mahal in Agra, the white marble mausoleum with a large central dome and four minarets, reflected in a long pool, clear sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/india.png",
+      "storage_path": "giro_pelo_mundo/india/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "tailandia",
+      "title": "Tailândia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Wat Arun (Temple of Dawn) in Bangkok, a tall central prang tower decorated with colorful porcelain, on the bank of the Chao Phraya River at sunset. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/tailandia.png",
+      "storage_path": "giro_pelo_mundo/tailandia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "vietna",
+      "title": "Vietnã",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Ha Long Bay in Vietnam, emerald green water with many tall limestone karst islands covered in vegetation and a traditional wooden junk boat with brown sails. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/vietna.png",
+      "storage_path": "giro_pelo_mundo/vietna/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "indonesia",
+      "title": "Indonésia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Borobudur temple in Java, a huge terraced Buddhist stone monument with many bell-shaped stupas on its upper levels, at sunrise with misty volcanoes in the background. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/indonesia.png",
+      "storage_path": "giro_pelo_mundo/indonesia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "filipinas",
+      "title": "Filipinas",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Banaue rice terraces in the Philippines, green stepped rice paddies carved into steep mountainsides. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/filipinas.png",
+      "storage_path": "giro_pelo_mundo/filipinas/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "turquia",
+      "title": "Turquia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Cappadocia, Turkey, at sunrise, with many colorful hot air balloons floating over unusual rock formations called fairy chimneys. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/turquia.png",
+      "storage_path": "giro_pelo_mundo/turquia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "emirados-arabes-unidos",
+      "title": "Emirados Árabes Unidos",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Burj Khalifa skyscraper in Dubai, an extremely tall needle-like silver tower rising far above the surrounding city skyline, clear sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/emirados-arabes-unidos.png",
+      "storage_path": "giro_pelo_mundo/emirados-arabes-unidos/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "camboja",
+      "title": "Camboja",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Angkor Wat temple in Cambodia at sunrise, the stone temple with its five lotus-bud shaped towers reflected in a pond. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/camboja.png",
+      "storage_path": "giro_pelo_mundo/camboja/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nepal",
+      "title": "Nepal",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Boudhanath Stupa in Kathmandu, a giant white dome topped by a golden tower painted with a pair of large eyes, with strings of colorful Buddhist prayer flags. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/nepal.png",
+      "storage_path": "giro_pelo_mundo/nepal/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "egito",
+      "title": "Egito",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Pyramids of Giza in Egypt, three large pyramids in the desert with the Great Sphinx in the foreground, clear blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/egito.png",
+      "storage_path": "giro_pelo_mundo/egito/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "africa-do-sul",
+      "title": "África do Sul",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Table Mountain in Cape Town, South Africa, a mountain with a perfectly flat top rising behind the city and the harbor. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/africa-do-sul.png",
+      "storage_path": "giro_pelo_mundo/africa-do-sul/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "quenia",
+      "title": "Quênia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Masai Mara savanna in Kenya, golden grassland with scattered acacia trees and a large herd of wildebeest and some zebras. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/quenia.png",
+      "storage_path": "giro_pelo_mundo/quenia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nigeria",
+      "title": "Nigéria",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Zuma Rock in Nigeria, a huge smooth dome-shaped granite monolith rising from green vegetation. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/nigeria.png",
+      "storage_path": "giro_pelo_mundo/nigeria/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "etiopia",
+      "title": "Etiópia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Church of Saint George in Lalibela, Ethiopia, a cross-shaped church carved down into solid red rock, seen from above. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/etiopia.png",
+      "storage_path": "giro_pelo_mundo/etiopia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "gana",
+      "title": "Gana",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Cape Coast Castle in Ghana, a large white-washed historic fort next to the ocean and palm trees. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/gana.png",
+      "storage_path": "giro_pelo_mundo/gana/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "tanzania",
+      "title": "Tanzânia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Mount Kilimanjaro in Tanzania, a massive mountain with a snow-capped flat summit rising above the savanna and clouds. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/tanzania.png",
+      "storage_path": "giro_pelo_mundo/tanzania/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "senegal",
+      "title": "Senegal",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Lake Retba (Pink Lake) in Senegal, a lake with bright pink water, white salt piles on the shore and traditional wooden boats. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/senegal.png",
+      "storage_path": "giro_pelo_mundo/senegal/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "madagascar",
+      "title": "Madagascar",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Avenue of the Baobabs in Madagascar, a dirt road lined by giant baobab trees with thick trunks and small crowns, at sunset. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/madagascar.png",
+      "storage_path": "giro_pelo_mundo/madagascar/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "australia",
+      "title": "Austrália",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of the Sydney Opera House, with its white sail-shaped shell roofs on the harbor and the Sydney Harbour Bridge in the background, blue sky. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/australia.png",
+      "storage_path": "giro_pelo_mundo/australia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "nova-zelandia",
+      "title": "Nova Zelândia",
+      "kind": "landmark",
+      "prompt": "Realistic high-quality photograph of Milford Sound in New Zealand, a fjord with steep green cliffs, waterfalls and the pointed Mitre Peak rising from dark water. Wide shot, sharp detail, natural colors. No people in the foreground, no text, no signs, no logos, no flags, no watermark.",
+      "relpath": "landmarks/nova-zelandia.png",
+      "storage_path": "giro_pelo_mundo/nova-zelandia/landmark.png",
+      "aspect_ratio": "4:3"
+    },
+    {
+      "slug": "brasil",
+      "title": "Brasil",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Brazil as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A very large country covering much of eastern South America: wide in the north, with a pointed eastern bulge into the Atlantic Ocean, narrowing toward the south. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/brasil.png",
+      "storage_path": "giro_pelo_mundo/brasil/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "argentina",
+      "title": "Argentina",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Argentina as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long country in southern South America, wide in the north and tapering to a narrow point in the far south, including the eastern part of the island of Tierra del Fuego. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/argentina.png",
+      "storage_path": "giro_pelo_mundo/argentina/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "chile",
+      "title": "Chile",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Chile as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An extremely long and narrow vertical strip along the western coast of South America, with a fragmented coastline of many small islands and fjords in the far south. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/chile.png",
+      "storage_path": "giro_pelo_mundo/chile/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "peru",
+      "title": "Peru",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Peru as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A country on the Pacific coast of western South America, with a long coastline running northwest to southeast, wider in the north, and a small notch of Lake Titicaca on the southeastern border. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/peru.png",
+      "storage_path": "giro_pelo_mundo/peru/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "colombia",
+      "title": "Colômbia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Colombia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A country in the northwestern corner of South America with coastlines on both the Caribbean to the north and the Pacific to the west, the Guajira peninsula pointing northeast, and a long southern extension toward the Amazon. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/colombia.png",
+      "storage_path": "giro_pelo_mundo/colombia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "uruguai",
+      "title": "Uruguai",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Uruguay as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A small, compact, roughly rounded country in southeastern South America, with the wide Río de la Plata estuary along its southern edge and the Atlantic coast to the southeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/uruguai.png",
+      "storage_path": "giro_pelo_mundo/uruguai/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "costa-rica",
+      "title": "Costa Rica",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Costa Rica as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A narrow Central American country between two oceans: a Caribbean coast on the northeast and a Pacific coast on the southwest with two prominent peninsulas (Nicoya in the northwest and Osa in the south). Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/costa-rica.png",
+      "storage_path": "giro_pelo_mundo/costa-rica/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "mexico",
+      "title": "México",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Mexico as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A large country in southern North America, wide in the north and narrowing to the southeast, with the long thin Baja California peninsula on the northwest and the Yucatán peninsula curving north in the southeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/mexico.png",
+      "storage_path": "giro_pelo_mundo/mexico/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "estados-unidos",
+      "title": "Estados Unidos",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of the United States as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Only the 48 contiguous states (exclude Alaska and Hawaii): a wide, roughly rectangular landmass across North America, with the Florida peninsula pointing south in the southeast and the Great Lakes notch in the northeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/estados-unidos.png",
+      "storage_path": "giro_pelo_mundo/estados-unidos/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "canada",
+      "title": "Canadá",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Canada as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A very large country covering northern North America, with a highly fragmented northern edge of many Arctic islands, the large Hudson Bay inlet in the center-north, and a mostly straight southern border. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/canada.png",
+      "storage_path": "giro_pelo_mundo/canada/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "cuba",
+      "title": "Cuba",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Cuba as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long, narrow island in the Caribbean Sea shaped like an elongated curve oriented west to east, with the small Isla de la Juventud off its southwestern coast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/cuba.png",
+      "storage_path": "giro_pelo_mundo/cuba/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "jamaica",
+      "title": "Jamaica",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Jamaica as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An elongated oval-shaped island in the Caribbean Sea, oriented west to east, with a slightly irregular coastline. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/jamaica.png",
+      "storage_path": "giro_pelo_mundo/jamaica/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "portugal",
+      "title": "Portugal",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Portugal as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Mainland only (no Azores or Madeira): a narrow, roughly rectangular country on the western edge of the Iberian Peninsula, taller than wide, with the Atlantic coastline on the west and south. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/portugal.png",
+      "storage_path": "giro_pelo_mundo/portugal/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "espanha",
+      "title": "Espanha",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Spain as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Mainland only (no islands): a roughly square country occupying most of the Iberian Peninsula, with a straight-edged gap on the western side where Portugal is, and the Pyrenees forming the northeastern border. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/espanha.png",
+      "storage_path": "giro_pelo_mundo/espanha/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "franca",
+      "title": "França",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of France as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Mainland only (no Corsica or overseas territories): a roughly hexagon-shaped country in Western Europe, with the Brittany peninsula pointing west into the Atlantic. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/franca.png",
+      "storage_path": "giro_pelo_mundo/franca/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "italia",
+      "title": "Itália",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Italy as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A boot-shaped peninsula extending southeast into the Mediterranean Sea, with the island of Sicily near the toe and the island of Sardinia to the west. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/italia.png",
+      "storage_path": "giro_pelo_mundo/italia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "alemanha",
+      "title": "Alemanha",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Germany as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A compact country in central Europe, slightly taller than wide, with an irregular outline and a northern coastline split in two by the base of the Jutland peninsula. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/alemanha.png",
+      "storage_path": "giro_pelo_mundo/alemanha/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "reino-unido",
+      "title": "Reino Unido",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of the United Kingdom as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. The island of Great Britain (with Scotland's jagged northern coastline and nearby islands) plus Northern Ireland, which is only the northeastern part of the separate island of Ireland to the west. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/reino-unido.png",
+      "storage_path": "giro_pelo_mundo/reino-unido/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "irlanda",
+      "title": "Irlanda",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Ireland as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. The Republic of Ireland: most of the island of Ireland, excluding Northern Ireland in the northeast corner, with a rugged western Atlantic coastline full of bays. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/irlanda.png",
+      "storage_path": "giro_pelo_mundo/irlanda/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "paises-baixos",
+      "title": "Países Baixos",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of the Netherlands as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A small country on the North Sea coast, with the large IJsselmeer lake cutting into the middle of its northern half and a chain of thin Wadden islands along the northern coast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/paises-baixos.png",
+      "storage_path": "giro_pelo_mundo/paises-baixos/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "belgica",
+      "title": "Bélgica",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Belgium as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A small, roughly triangular country in Western Europe with a short straight North Sea coastline in the northwest and a narrow southeastern tip. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/belgica.png",
+      "storage_path": "giro_pelo_mundo/belgica/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "suica",
+      "title": "Suíça",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Switzerland as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A small landlocked country in the Alps, wider than tall, with an irregular outline and a crescent-shaped lake (Lake Geneva) on the southwestern border. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/suica.png",
+      "storage_path": "giro_pelo_mundo/suica/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "grecia",
+      "title": "Grécia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Greece as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A southeastern European country with a highly jagged mainland: the three-fingered Chalkidiki peninsula in the north, the Peloponnese peninsula in the south, the long island of Crete below, and many small Aegean islands. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/grecia.png",
+      "storage_path": "giro_pelo_mundo/grecia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "suecia",
+      "title": "Suécia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Sweden as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long country on the eastern side of the Scandinavian Peninsula, stretching north to south with a long Baltic Sea coastline and the islands of Gotland and Öland off the southeast coast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/suecia.png",
+      "storage_path": "giro_pelo_mundo/suecia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "noruega",
+      "title": "Noruega",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Norway as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long narrow country along the western and northern edge of the Scandinavian Peninsula, with an extremely jagged fjord coastline, wide in the south and thinning as it curves to the northeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/noruega.png",
+      "storage_path": "giro_pelo_mundo/noruega/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "russia",
+      "title": "Rússia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Russia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An enormous, elongated country spanning northern Eurasia from Eastern Europe to the Pacific, with a highly irregular Arctic coastline, the Kamchatka peninsula in the far east, and a small separate exclave on the Baltic coast in the far west. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/russia.png",
+      "storage_path": "giro_pelo_mundo/russia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "polonia",
+      "title": "Polônia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Poland as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A compact, roughly rounded country in Central Europe with a smooth Baltic Sea coastline along the north. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/polonia.png",
+      "storage_path": "giro_pelo_mundo/polonia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "japao",
+      "title": "Japão",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Japan as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long curved archipelago in East Asia made of four main islands arcing from northeast to southwest (a large northern island, a long curved central island, and two smaller southern islands), plus smaller islands. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/japao.png",
+      "storage_path": "giro_pelo_mundo/japao/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "china",
+      "title": "China",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of China as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Mainland China plus Hainan island: a very large country in East Asia with a broad irregular shape often compared to a rooster, a long eastern Pacific coastline, and the small Hainan island off the southern coast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/china.png",
+      "storage_path": "giro_pelo_mundo/china/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "coreia-do-sul",
+      "title": "Coreia do Sul",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of South Korea as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. The southern half of the Korean Peninsula, with a straight-ish northern border, a jagged southern and western coastline full of small islands, and a single oval island (Jeju) off the southern tip. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/coreia-do-sul.png",
+      "storage_path": "giro_pelo_mundo/coreia-do-sul/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "india",
+      "title": "Índia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of India as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A large country in South Asia with a triangular southern peninsula pointing down into the Indian Ocean, a wide northern section along the Himalayas, and a narrow eastern extension on the far side. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/india.png",
+      "storage_path": "giro_pelo_mundo/india/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "tailandia",
+      "title": "Tailândia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Thailand as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A Southeast Asian country often compared to an elephant's head, with a broad northern body and a long narrow trunk-like strip running south down the Malay Peninsula. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/tailandia.png",
+      "storage_path": "giro_pelo_mundo/tailandia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "vietna",
+      "title": "Vietnã",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Vietnam as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long, narrow S-shaped country along the eastern edge of the Indochinese Peninsula, wider at the north and south, with an extremely thin middle section. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/vietna.png",
+      "storage_path": "giro_pelo_mundo/vietna/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "indonesia",
+      "title": "Indonésia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Indonesia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A vast archipelago stretching west to east along the equator between mainland Asia and Australia: a long diagonal western island, a long thin southern island, the southern part of a large central island, an island with a distinctive four-armed K shape, and the western half of a large eastern island. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/indonesia.png",
+      "storage_path": "giro_pelo_mundo/indonesia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "filipinas",
+      "title": "Filipinas",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of the Philippines as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An archipelago in Southeast Asia made of many islands: a large irregular northern island, a cluster of medium islands in the center, a long thin island to the west, and a large rounded island in the south. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/filipinas.png",
+      "storage_path": "giro_pelo_mundo/filipinas/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "turquia",
+      "title": "Turquia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Turkey as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A wide, roughly rectangular country made mostly of the Anatolian peninsula, with the Black Sea along the north and the Mediterranean along the south, plus a small separate European part in the northwest across a narrow strait. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/turquia.png",
+      "storage_path": "giro_pelo_mundo/turquia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "emirados-arabes-unidos",
+      "title": "Emirados Árabes Unidos",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of the United Arab Emirates as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A small wedge-shaped country on the southeastern Arabian Peninsula, with a long curved northwestern coastline on the Persian Gulf and a short eastern coastline. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/emirados-arabes-unidos.png",
+      "storage_path": "giro_pelo_mundo/emirados-arabes-unidos/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "camboja",
+      "title": "Camboja",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Cambodia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A compact, roughly rounded country in Southeast Asia with a short coastline on the southwest and a large lake shape in the center-west. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/camboja.png",
+      "storage_path": "giro_pelo_mundo/camboja/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "nepal",
+      "title": "Nepal",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Nepal as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A long, narrow, roughly rectangular landlocked country oriented from northwest to southeast along the Himalayas. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/nepal.png",
+      "storage_path": "giro_pelo_mundo/nepal/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "egito",
+      "title": "Egito",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Egypt as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An almost square country in northeastern Africa with straight western and southern borders, a Mediterranean coast on the north, and the triangular Sinai Peninsula in the northeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/egito.png",
+      "storage_path": "giro_pelo_mundo/egito/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "africa-do-sul",
+      "title": "África do Sul",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of South Africa as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A country at the southern tip of Africa with long coastlines on both the Atlantic and Indian Oceans, with a small rounded hole in the east (another country completely surrounded by it). Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/africa-do-sul.png",
+      "storage_path": "giro_pelo_mundo/africa-do-sul/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "quenia",
+      "title": "Quênia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Kenya as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. An East African country with a roughly square shape, a short diagonal Indian Ocean coastline in the southeast, and a long lake notch in the northwest. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/quenia.png",
+      "storage_path": "giro_pelo_mundo/quenia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "nigeria",
+      "title": "Nigéria",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Nigeria as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A roughly square West African country with a southern coastline on the Gulf of Guinea featuring a rounded river delta. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/nigeria.png",
+      "storage_path": "giro_pelo_mundo/nigeria/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "etiopia",
+      "title": "Etiópia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Ethiopia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A large landlocked country in the Horn of Africa, broad and irregular, with a pointed extension to the east. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/etiopia.png",
+      "storage_path": "giro_pelo_mundo/etiopia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "gana",
+      "title": "Gana",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Ghana as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A roughly rectangular West African country, taller than wide, with a southern coastline on the Gulf of Guinea and a large branching lake in the east. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/gana.png",
+      "storage_path": "giro_pelo_mundo/gana/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "tanzania",
+      "title": "Tanzânia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Tanzania as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A roughly square East African country with an Indian Ocean coastline to the east, a few islands just offshore, and borders touching large lakes in the north, west and southwest. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/tanzania.png",
+      "storage_path": "giro_pelo_mundo/tanzania/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "senegal",
+      "title": "Senegal",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Senegal as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A West African country on the Atlantic coast with a pointed western tip, and a long thin separate strip (another country) cutting deep into its southern half from the coast along a river. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/senegal.png",
+      "storage_path": "giro_pelo_mundo/senegal/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "madagascar",
+      "title": "Madagascar",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Madagascar as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A large elongated island oriented north to south in the Indian Ocean, with a relatively smooth eastern coast and a pointed northern tip. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/madagascar.png",
+      "storage_path": "giro_pelo_mundo/madagascar/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "australia",
+      "title": "Austrália",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of Australia as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. A large continent-sized landmass, roughly rounded, with a peninsula pointing north in the northeast, a deep square gulf in the north, and a separate island off the southeast. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/australia.png",
+      "storage_path": "giro_pelo_mundo/australia/silhouette.png",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "slug": "nova-zelandia",
+      "title": "Nova Zelândia",
+      "kind": "silhouette",
+      "prompt": "Clean educational map illustration showing ONLY the outline shape of New Zealand as a single solid flat shape filled with soft blue (#A3CEEF) with a thin dark blue (#2A4A66) outline, centered on a plain off-white (#FAFBFD) background, north at the top. Two main long islands in the South Pacific arranged diagonally from northeast to southwest, the northern one with a long thin northern arm, plus a small island at the southern tip. Geographically accurate proportions. Do not show neighboring countries, water, labels, names, cities, rivers, grid lines, compass or any text.",
+      "relpath": "silhouettes/nova-zelandia.png",
+      "storage_path": "giro_pelo_mundo/nova-zelandia/silhouette.png",
+      "aspect_ratio": "1:1"
+    }
+  ]
+}

@@ -61,3 +61,6 @@ app.*.map.json
 .vercel
 .env*
 /secrets.json
+
+# Giro pelo Mundo generated binaries (hosted on Supabase; mapping is committed)
+tool/content/**/images/
