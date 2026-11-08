@@ -8,6 +8,8 @@ SQL for making Lume History-only. Applied to the shared Supabase project `mizgtu
 - `snapshots/` — pre-pivot definitions and data. Running a snapshot file restores the old behaviour.
 - `NN_<name>.sql` — forward migrations, numbered in apply order.
 - `NN_<name>.rollback.sql` — the undo for the matching forward file.
+- `AUTHORING.md` + `_trail_seed_skeleton.sql` — Phase 5 (#181) trail authoring template and mix targets.
+- `NN_trail_<slug>.sql` — one seed per new History trail (#182–#187), after `03_…`.
 
 ## Conventions
 
@@ -37,8 +39,26 @@ supabase db query --linked -f tool/seeds/history_pivot/NN_name.rollback.sql   # 
 
 1. `01_history_scope_rpcs.sql`
 2. `02_history_scope_achievements.sql` (needs `_is_app_modulo` from step 1)
+3. `03_fix_history_connections.sql` (optional editorial; can follow)
 
-Rollback is the reverse: snapshot `01_…` then `02_…rollback`, then snapshot `00_…` then `01_…rollback`.
+## Phase 5 — new trails (after owner go-ahead)
+
+See `AUTHORING.md`. Apply order:
+
+4. `04_trail_grecia_roma.sql` (#182)
+5. `05_trail_idade_media.sql` (#183)
+6. `06_trail_renascimento_navegacoes.sql` (#184)
+7. `07_trail_era_revolucoes.sql` (#185)
+8. `08_trail_brasil_republica.sql` (#186)
+9. `09_trail_seculo_xx_guerras.sql` (#187)
+10. `10_achievements_new_trails.sql` (#188) — needs the six modules present
+11. `11_set_trail_images.sql` — cover `imagem_url`s (binaries live in Storage only)
+12. `12_restrict_trilhas_imagens_policies.sql` (#192) — drop temp public write; keep public read
+
+Rollback a trail with its matching `.rollback.sql` (deletes that trail’s rows only).
+Rollback Phase 1+2 is the reverse: snapshot `01_…` then `02_…rollback`, then snapshot `00_…` then `01_…rollback`.
+
+**Applied to production** on 2026-11-08 (01→11). New History modules: ids 34–39.
 
 ## Inventory notes (captured 2026-11-07)
 
