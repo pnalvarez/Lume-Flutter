@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lume/app/navigation/app_router.gr.dart';
 import 'package:lume/common/strings/profile_strings.dart';
 import 'package:lume/core/di/di.dart';
+import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart'
+    show PersonalInfoEntry;
 import 'package:lume/layers/presentation/screens/profile/profile_bloc.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_body.dart';
 import 'package:lume/layers/presentation/screens/profile/profile_event.dart';
@@ -74,8 +76,10 @@ class _ProfileViewState extends State<_ProfileView>
             switch (destination) {
               case ProfileDestination.login:
                 context.router.replaceAll([const LoginRoute()]);
-              case ProfileDestination.settings:
-                context.router.push(const SettingsRoute());
+              case ProfileDestination.personalInfo:
+                context.router.push(
+                  const PersonalInfoRoute(entry: PersonalInfoEntry.profile),
+                );
             }
           },
         ),
@@ -85,8 +89,10 @@ class _ProfileViewState extends State<_ProfileView>
           return ProfileBody(
             state: state,
             onRetry: _reload,
-            onSettingsPressed: () {
-              context.read<ProfileBloc>().add(const ProfileSettingsPressed());
+            onPersonalInfoPressed: () {
+              context.read<ProfileBloc>().add(
+                const ProfilePersonalInfoPressed(),
+              );
             },
             onSignOutPressed: () async {
               final confirmed = await _confirmSignOut(context);

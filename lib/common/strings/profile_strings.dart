@@ -1,5 +1,5 @@
 const String profileTitle = 'Perfil';
-const String profileSettingsTooltip = 'Preferências';
+const String profileSettingsTooltip = 'Informações pessoais';
 const String profileSignOutTooltip = 'Sair';
 const String profileSignOutTitle = 'Sair da conta?';
 const String profileSignOutBody =
@@ -19,12 +19,6 @@ const String profileLoadingNamePlaceholder = 'Explorador';
 const String profileLoadError = 'Não foi possível carregar o perfil.';
 const String profileRetry = 'Tentar novamente';
 const String profileDisplayNameFallback = 'Explorador';
-
-// --- Settings ---------------------------------------------------------------
-
-const String settingsTitle = 'Configurações';
-const String settingsPersonalInfoTitle = 'Informações pessoais';
-const String settingsPersonalInfoDescription = 'Nome, sobrenome e idade';
 
 String profileMemberSince(String? memberSince) =>
     'Membro desde ${memberSince ?? '—'}';

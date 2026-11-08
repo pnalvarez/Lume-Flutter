@@ -7,14 +7,14 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_icon_button.dart';
 import 'package:lume_design_system/molecules/loaders/display_as_loader.dart';
 
-/// Profile page header: avatar, name, membership line, settings + sign-out.
+/// Profile page header: avatar, name, membership line, personal info + sign-out.
 ///
 /// No Bloc, router, or GetIt — safe for Widgetbook.
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
     super.key,
     required this.displayName,
-    required this.onSettingsPressed,
+    required this.onPersonalInfoPressed,
     required this.onSignOutPressed,
     this.memberSince,
     this.isLoading = false,
@@ -24,7 +24,7 @@ class ProfileHeader extends StatelessWidget {
 
   /// Formatted membership date (e.g. `01/08/2026`). Null shows an em dash.
   final String? memberSince;
-  final VoidCallback onSettingsPressed;
+  final VoidCallback onPersonalInfoPressed;
   final VoidCallback onSignOutPressed;
   final bool isLoading;
 
@@ -119,7 +119,7 @@ class ProfileHeader extends StatelessWidget {
           variant: LumeIconButtonVariant.outline,
           iconColor: cs.onSurfaceVariant,
           tooltip: profileSettingsTooltip,
-          onPressed: onSettingsPressed,
+          onPressed: onPersonalInfoPressed,
         ),
         const SizedBox(width: AppSpacings.xs),
         LumeIconButton(
