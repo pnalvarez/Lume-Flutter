@@ -234,14 +234,12 @@ void main() {
         });
         final client = ApiClient(dio: dio);
 
-        await client.rpc<Map<String, dynamic>>(
-          'get_categories_with_preferences',
-        );
+        await client.rpc<Map<String, dynamic>>('get_trail_bootstrap');
 
         expect(
           captured.uri.toString(),
           'https://mizgtuwtuaculchwizkm.supabase.co/rest/v1/rpc/'
-          'get_categories_with_preferences',
+          'get_trail_bootstrap',
         );
       },
     );

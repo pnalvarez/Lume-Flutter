@@ -11,7 +11,6 @@ class ModuleData {
     required this.title,
     required this.emoji,
     required this.color,
-    this.categoryId,
     this.description,
   });
 
@@ -20,7 +19,6 @@ class ModuleData {
   final String title;
   final String emoji;
   final String color;
-  final int? categoryId;
   final String? description;
 
   factory ModuleData.fromJson(Map<String, dynamic> json) =>

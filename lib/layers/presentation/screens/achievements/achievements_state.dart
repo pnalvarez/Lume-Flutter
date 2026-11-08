@@ -25,7 +25,7 @@ enum AchievementListFilterVariation {
 }
 
 /// Display order for the three status filters.
-const achievementFilterCategories = <AchievementListItemStatus>[
+const achievementFilterStatuses = <AchievementListItemStatus>[
   AchievementListItemStatus.completed,
   AchievementListItemStatus.inProgress,
   AchievementListItemStatus.locked,

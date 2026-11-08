@@ -109,7 +109,7 @@ void main() {
   );
 
   blocTest<ProfileBloc, ProfileState>(
-    'settings opens category preferences',
+    'settings opens settings',
     build: buildBloc,
     act: (bloc) => bloc.add(const ProfileSettingsPressed()),
     expect: () => [

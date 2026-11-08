@@ -25,8 +25,6 @@ const String profileDisplayNameFallback = 'Explorador';
 const String settingsTitle = 'Configurações';
 const String settingsPersonalInfoTitle = 'Informações pessoais';
 const String settingsPersonalInfoDescription = 'Nome, sobrenome e idade';
-const String settingsCategoriesTitle = 'Categorias';
-const String settingsCategoriesDescription = 'Temas que você quer aprender';
 
 String profileMemberSince(String? memberSince) =>
     'Membro desde ${memberSince ?? '—'}';

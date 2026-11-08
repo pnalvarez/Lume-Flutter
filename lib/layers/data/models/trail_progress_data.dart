@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lume/layers/data/models/category_data.dart';
 import 'package:lume/layers/data/models/trail_catalog_data.dart';
 
 part 'trail_progress_data.g.dart';
@@ -80,7 +79,6 @@ class TrailBootstrapData {
   const TrailBootstrapData({
     this.trailStartedAt,
     this.modules = const [],
-    this.categories = const [],
     this.levels = const [],
     this.submodules = const [],
     this.submodulePairs = const [],
@@ -92,9 +90,6 @@ class TrailBootstrapData {
 
   @JsonKey(defaultValue: <ModuleData>[])
   final List<ModuleData> modules;
-
-  @JsonKey(defaultValue: <CategoryData>[])
-  final List<CategoryData> categories;
 
   @JsonKey(defaultValue: <LevelData>[])
   final List<LevelData> levels;
