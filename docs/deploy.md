@@ -155,7 +155,7 @@ Behavior:
 - QA without console:
   - `--dart-define=REMOTE_CONFIG_ARCADE_ENABLED=false` (or `true`)
   - `--dart-define=REMOTE_CONFIG_ACHIEVEMENTS_ENABLED=true` (or `false`)
-- `enabled_game_slugs` default (missing or invalid JSON keeps this set; `[]` is an empty set): `quiz_relampago`, `verdade_ou_mito`, `batalha_curiosidades`, `quem_sou_eu`, `leilao_dicas`, `linha_do_tempo`, `o_que_aconteceu_depois`, `conexoes_lume`, `palavra_misteriosa`, `completar_frase`, `galeria_conhecimento`, `rostos_historia`. To enable Rostos da História on published builds, the Firebase Console `enabled_game_slugs` value must also include `rostos_historia` (the console value wins over the in-app default once fetched) and `get_hub_games` must return its catalog row.
+- `enabled_game_slugs` default (missing or invalid JSON keeps this set; `[]` is an empty set): `quiz_relampago`, `verdade_ou_mito`, `batalha_curiosidades`, `quem_sou_eu`, `leilao_dicas`, `linha_do_tempo`, `o_que_aconteceu_depois`, `conexoes_lume`, `palavra_misteriosa`, `completar_frase`, `galeria_conhecimento`, `rostos_historia`, `giro_pelo_mundo`. To enable Rostos da História on published builds, the Firebase Console `enabled_game_slugs` value must also include `rostos_historia` (the console value wins over the in-app default once fetched) and `get_hub_games` must return its catalog row.
 - Debug overrides: `getIt<IRemoteConfig>().setDebugOverride('arcade_enabled', false)`, `setDebugOverride('achievements_enabled', true)`, or `setDebugOverride('enabled_game_slugs', '["quiz_relampago"]')` (a `Set<String>` or `List<String>` also works). Honored in debug builds, or with `--dart-define=REMOTE_CONFIG_DEBUG_OVERRIDES=true`
 
 Do not put PII or secrets in Remote Config values.
