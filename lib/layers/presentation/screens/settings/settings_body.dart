@@ -10,12 +10,10 @@ class SettingsBody extends StatelessWidget {
     super.key,
     required this.onBack,
     required this.onPersonalInfoPressed,
-    required this.onCategoriesPressed,
   });
 
   final VoidCallback onBack;
   final VoidCallback onPersonalInfoPressed;
-  final VoidCallback onCategoriesPressed;
 
   static const double _maxWidth = 480;
 
@@ -50,17 +48,6 @@ class SettingsBody extends StatelessWidget {
                     leadingIconColor: cs.primary,
                     title: settingsPersonalInfoTitle,
                     description: settingsPersonalInfoDescription,
-                  ),
-                ),
-                const SizedBox(height: AppSpacings.m),
-                ListItem(
-                  trait: ListItemTrait.neutral,
-                  onTap: onCategoriesPressed,
-                  input: IconTitleDescriptionInput(
-                    leadingIcon: Icons.category_outlined,
-                    leadingIconColor: cs.primary,
-                    title: settingsCategoriesTitle,
-                    description: settingsCategoriesDescription,
                   ),
                 ),
               ],

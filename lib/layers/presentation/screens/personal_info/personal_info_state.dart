@@ -5,7 +5,7 @@ enum PersonalInfoEntry { onboarding, settings }
 
 enum PersonalInfoStatus { ready, loading, error }
 
-enum PersonalInfoDestination { selectCategory, popToProfile }
+enum PersonalInfoDestination { home, popToProfile }
 
 @immutable
 final class PersonalInfoState {

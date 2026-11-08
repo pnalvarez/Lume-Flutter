@@ -10,9 +10,5 @@ void _noop() {}
   type: SettingsBody,
 )
 Widget settingsBodyDefault(BuildContext context) {
-  return SettingsBody(
-    onBack: _noop,
-    onPersonalInfoPressed: _noop,
-    onCategoriesPressed: _noop,
-  );
+  return SettingsBody(onBack: _noop, onPersonalInfoPressed: _noop);
 }

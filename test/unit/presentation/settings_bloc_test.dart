@@ -19,19 +19,6 @@ void main() {
   );
 
   blocTest<SettingsBloc, SettingsState>(
-    'categories press sets destination',
-    build: SettingsBloc.new,
-    act: (bloc) => bloc.add(const SettingsCategoriesPressed()),
-    expect: () => [
-      isA<SettingsState>().having(
-        (s) => s.destination,
-        'destination',
-        SettingsDestination.selectCategory,
-      ),
-    ],
-  );
-
-  blocTest<SettingsBloc, SettingsState>(
     'navigation handled clears destination',
     build: SettingsBloc.new,
     seed: () =>

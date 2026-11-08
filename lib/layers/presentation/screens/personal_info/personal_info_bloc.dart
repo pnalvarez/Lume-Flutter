@@ -107,7 +107,7 @@ final class PersonalInfoBloc
           isSubmitting: false,
           destination: state.isSettingsEntry
               ? PersonalInfoDestination.popToProfile
-              : PersonalInfoDestination.selectCategory,
+              : PersonalInfoDestination.home,
         ),
       );
     } on Object catch (error) {

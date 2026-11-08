@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum SettingsDestination { personalInfo, selectCategory }
+enum SettingsDestination { personalInfo }
 
 @immutable
 final class SettingsState {

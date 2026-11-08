@@ -59,7 +59,7 @@ PersonalInfoBloc _bloc({
 
 void main() {
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'onboarding submit saves and navigates to select category',
+    'onboarding submit saves and navigates home',
     build: _bloc,
     act: (bloc) {
       bloc
@@ -81,7 +81,7 @@ void main() {
           .having(
             (s) => s.destination,
             'destination',
-            PersonalInfoDestination.selectCategory,
+            PersonalInfoDestination.home,
           ),
     ],
   );
@@ -190,7 +190,7 @@ void main() {
       ..add(const PersonalInfoAgeChanged('28'))
       ..add(const PersonalInfoSubmitted());
     await bloc.stream.firstWhere(
-      (s) => s.destination == PersonalInfoDestination.selectCategory,
+      (s) => s.destination == PersonalInfoDestination.home,
     );
     expect(
       analytics.hasEvent(AnalyticsEvents.onboardingPersonalInfoCompleted),

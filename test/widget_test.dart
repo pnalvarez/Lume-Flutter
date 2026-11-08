@@ -12,7 +12,6 @@ import 'package:lume/core/di/di.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
 import 'package:lume/layers/domain/usecases/has_seen_onboarding.dart';
-import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/restore_session.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_bloc.dart';
 import 'package:lume/layers/presentation/screens/splash/splash_page.dart';
@@ -37,11 +36,6 @@ class _PendingHasCompletedPersonalInfo implements IHasCompletedPersonalInfo {
   Future<bool> call({bool forceRefresh = false}) => Completer<bool>().future;
 }
 
-class _PendingHasSelectedCategories implements IHasSelectedCategories {
-  @override
-  Future<bool> call({bool forceRefresh = false}) => Completer<bool>().future;
-}
-
 void main() {
   setUp(() async {
     await getIt.reset();
@@ -51,15 +45,11 @@ void main() {
       ..registerFactory<IHasCompletedPersonalInfo>(
         _PendingHasCompletedPersonalInfo.new,
       )
-      ..registerFactory<IHasSelectedCategories>(
-        _PendingHasSelectedCategories.new,
-      )
       ..registerFactory<SplashBloc>(
         () => SplashBloc(
           getIt<IRestoreSession>(),
           getIt<IHasSeenOnboarding>(),
           getIt<IHasCompletedPersonalInfo>(),
-          getIt<IHasSelectedCategories>(),
         ),
       );
   });

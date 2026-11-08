@@ -6,7 +6,6 @@ import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/models/auth/auth_user.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
-import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/observe_auth_state.dart';
 import 'package:lume/layers/domain/usecases/resend_confirmation_email.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_bloc.dart';
@@ -43,15 +42,6 @@ class _HasPersonalInfo implements IHasCompletedPersonalInfo {
   Future<bool> call({bool forceRefresh = false}) async => value;
 }
 
-class _HasSelected implements IHasSelectedCategories {
-  _HasSelected(this.value);
-
-  final bool value;
-
-  @override
-  Future<bool> call({bool forceRefresh = false}) async => value;
-}
-
 AuthSession _confirmed() {
   return const AuthSession(
     user: AuthUser(id: '1', email: 'a@b.c', isEmailConfirmed: true),
@@ -63,13 +53,11 @@ ConfirmEmailBloc _bloc(
   _Resend resend,
   StreamController<AuthSession?> sessions, {
   bool hasPersonalInfo = true,
-  bool hasSelected = false,
 }) {
   return ConfirmEmailBloc(
     resend,
     _Observe(sessions),
     _HasPersonalInfo(hasPersonalInfo),
-    _HasSelected(hasSelected),
   );
 }
 
@@ -108,29 +96,8 @@ void main() {
   );
 
   blocTest<ConfirmEmailBloc, ConfirmEmailState>(
-    'confirmed session without categories goes to select category',
-    build: () =>
-        _bloc(resend, sessions, hasPersonalInfo: true, hasSelected: false),
-    act: (bloc) async {
-      bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
-      await pumpEventQueue();
-      sessions.add(_confirmed());
-      await pumpEventQueue();
-    },
-    expect: () => [
-      isA<ConfirmEmailState>().having((s) => s.email, 'email', 'a@b.c'),
-      isA<ConfirmEmailState>().having(
-        (s) => s.destination,
-        'destination',
-        ConfirmEmailDestination.selectCategory,
-      ),
-    ],
-  );
-
-  blocTest<ConfirmEmailBloc, ConfirmEmailState>(
-    'confirmed session with categories goes home',
-    build: () =>
-        _bloc(resend, sessions, hasPersonalInfo: true, hasSelected: true),
+    'confirmed session with personal info goes home',
+    build: () => _bloc(resend, sessions, hasPersonalInfo: true),
     act: (bloc) async {
       bloc.add(const ConfirmEmailStarted(email: 'a@b.c'));
       await pumpEventQueue();

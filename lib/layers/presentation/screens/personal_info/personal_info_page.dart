@@ -54,8 +54,8 @@ class _PersonalInfoView extends StatelessWidget {
           const PersonalInfoNavigationHandled(),
         );
         switch (destination) {
-          case PersonalInfoDestination.selectCategory:
-            context.router.replaceAll([SelectCategoryRoute()]);
+          case PersonalInfoDestination.home:
+            context.router.replaceAll([const DashboardRoute()]);
           case PersonalInfoDestination.popToProfile:
             context.router.popUntilRouteWithName(DashboardRoute.name);
         }
