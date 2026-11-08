@@ -52,6 +52,7 @@ jobs:
             4. Missing or weak tests for changed behavior.
             5. Flutter specifics: async gaps / BuildContext misuse, disposed
                controllers, unnecessary rebuilds.
+            6. Check architecture, style rules and business rules integrity in the code review
 
             Skip style nitpicks that `dart format` / `flutter analyze` cover.
             Do not commit screenshots or binary evidence files (see CLAUDE.md).
