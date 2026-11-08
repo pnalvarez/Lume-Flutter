@@ -95,6 +95,41 @@ void main() {
       );
     });
 
+    test('History-only: confirmed users with personal info go home with no '
+        'category/preferences gate', () {
+      // AuthGate has no preference/category inputs — routing is personal-info
+      // then home only (see SplashDestination values below).
+      expect(
+        AuthGate.splashDestination(
+          hasSession: true,
+          isEmailConfirmed: true,
+          isPasswordRecovery: false,
+          hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: true,
+        ),
+        SplashDestination.home,
+      );
+      expect(SplashDestination.values, [
+        SplashDestination.onboarding,
+        SplashDestination.login,
+        SplashDestination.home,
+        SplashDestination.personalInfo,
+      ]);
+    });
+
+    test('new users without personal info go Personal Info before Home', () {
+      expect(
+        AuthGate.splashDestination(
+          hasSession: true,
+          isEmailConfirmed: true,
+          isPasswordRecovery: false,
+          hasSeenOnboarding: true,
+          hasCompletedPersonalInfo: false,
+        ),
+        SplashDestination.personalInfo,
+      );
+    });
+
     test('sends everyone else to onboarding or login', () {
       expect(
         AuthGate.splashDestination(
