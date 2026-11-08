@@ -87,13 +87,13 @@ void main() {
   );
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'settings start loads existing profile values',
+    'profile start loads existing profile values',
     build: _bloc,
     act: (bloc) =>
-        bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings)),
+        bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile)),
     expect: () => [
       isA<PersonalInfoState>()
-          .having((s) => s.entry, 'entry', PersonalInfoEntry.settings)
+          .having((s) => s.entry, 'entry', PersonalInfoEntry.profile)
           .having((s) => s.status, 'status', PersonalInfoStatus.loading),
       isA<PersonalInfoState>()
           .having((s) => s.status, 'status', PersonalInfoStatus.ready)
@@ -104,10 +104,10 @@ void main() {
   );
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'settings submit saves and pops to profile',
+    'profile submit saves and pops to profile',
     build: _bloc,
     act: (bloc) async {
-      bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+      bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile));
       await pumpEventQueue();
       bloc.add(const PersonalInfoSubmitted());
     },
@@ -199,10 +199,10 @@ void main() {
     await bloc.close();
   });
 
-  test('settings submit does not log onboarding event', () async {
+  test('profile submit does not log onboarding event', () async {
     final analytics = FakeAnalytics();
     final bloc = _bloc(analytics: analytics);
-    bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+    bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile));
     await pumpEventQueue();
     bloc.add(const PersonalInfoSubmitted());
     await bloc.stream.firstWhere(

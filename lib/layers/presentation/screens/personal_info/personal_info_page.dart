@@ -64,10 +64,10 @@ class _PersonalInfoView extends StatelessWidget {
         builder: (context, state) {
           return PersonalInfoBody(
             state: state,
-            onBack: state.isSettingsEntry
+            onBack: state.isProfileEntry
                 ? () => context.router.maybePop()
                 : null,
-            onRetry: state.isSettingsEntry
+            onRetry: state.isProfileEntry
                 ? () {
                     context.read<PersonalInfoBloc>().add(
                       PersonalInfoStarted(entry: entry),
