@@ -1,0 +1,63 @@
+# Automated Claude code review on every PR.
+# Requires the CLAUDE_CODE_OAUTH_TOKEN repository secret.
+# Not a required check: a failure here never blocks merging.
+
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Claude review
+    # Skip drafts, and fork PRs (secrets are not exposed to forks).
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request for a Flutter/Dart app (Supabase backend,
+            SQL seed migrations under tool/seeds). Follow CLAUDE.md.
+
+            Focus on, in order:
+            1. Correctness bugs and regressions.
+            2. Security (secrets, RLS/SQL policies, unsafe input handling).
+            3. SQL migrations: idempotency, existence of a matching rollback file.
+            4. Missing or weak tests for changed behavior.
+            5. Flutter specifics: async gaps / BuildContext misuse, disposed
+               controllers, unnecessary rebuilds.
+            6. Check architecture, style rules and business rules integrity in the code review
+
+            Skip style nitpicks that `dart format` / `flutter analyze` cover.
+            Do not commit screenshots or binary evidence files (see CLAUDE.md).
+
+            Post inline comments for specific issues and one short summary
+            comment. If nothing is wrong, say so briefly.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
