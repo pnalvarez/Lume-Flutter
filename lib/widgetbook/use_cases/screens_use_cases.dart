@@ -706,7 +706,7 @@ const _sampleHubGames = [
     id: '1',
     slug: 'quiz_relampago',
     title: 'Quiz Relâmpago',
-    description: 'Perguntas rápidas de todas as trilhas',
+    description: 'Perguntas rápidas de História',
     colorHex: '#F5A623',
     hubSection: HubSection.general,
   ),
