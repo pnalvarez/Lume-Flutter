@@ -371,13 +371,7 @@ Widget personalInfoProfileLoading(BuildContext context) {
 
 // --- Select category --------------------------------------------------------
 
-const _sampleCategories = [
-  CategoryDomain(id: 1, name: 'História'),
-  CategoryDomain(id: 2, name: 'Filosofia'),
-  CategoryDomain(id: 3, name: 'Arte'),
-  CategoryDomain(id: 4, name: 'Ciência'),
-  CategoryDomain(id: 5, name: 'Música'),
-];
+const _sampleCategories = [CategoryDomain(id: 1, name: 'História')];
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Select category',
@@ -390,7 +384,7 @@ Widget selectCategoryOnboardingReady(BuildContext context) {
       entry: SelectCategoryEntry.onboarding,
       status: SelectCategoryStatus.ready,
       categories: _sampleCategories,
-      selectedIds: {1, 3},
+      selectedIds: {1},
     ),
     onRetry: _noop,
     onToggle: _noopInt,
@@ -410,7 +404,7 @@ Widget selectCategoryProfileReady(BuildContext context) {
       entry: SelectCategoryEntry.profile,
       status: SelectCategoryStatus.ready,
       categories: _sampleCategories,
-      selectedIds: {1, 3},
+      selectedIds: {1},
     ),
     onRetry: _noop,
     onToggle: _noopInt,
@@ -812,7 +806,7 @@ const _sampleHubGames = [
     id: '1',
     slug: 'quiz_relampago',
     title: 'Quiz Relâmpago',
-    description: 'Perguntas rápidas de todas as trilhas',
+    description: 'Perguntas rápidas de História',
     colorHex: '#F5A623',
     hubSection: HubSection.general,
   ),

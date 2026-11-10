@@ -1,10 +1,10 @@
 const String gamesHubTitle = 'Jogos Lume';
-const String gamesHubSubtitle = 'Jogue com o conteúdo das trilhas';
+const String gamesHubSubtitle = 'Jogue com o conteúdo de História';
 const String gamesHubSectionGeneral = 'Geral';
 const String gamesHubSectionVisual = 'Jogos visuais';
 const String gamesHubArcadeTitle = 'Modo Arcade';
 const String gamesHubArcadeSubtitle =
-    'Jogos aleatórios de todas as trilhas. Acerte em sequência para pontuar mais.';
+    'Jogos aleatórios das trilhas de História. Acerte em sequência para pontuar mais.';
 const String gamesHubLoadError =
     'Não foi possível carregar os jogos. Tente novamente.';
 const String gamesHubRetry = 'Tentar novamente';

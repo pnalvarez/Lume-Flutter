@@ -96,7 +96,7 @@ Widget brandHeaderDefault(BuildContext context) {
   final title = context.knobs.string(label: 'Title', initialValue: 'Olá, Ana');
   final subtitle = context.knobs.string(
     label: 'Subtitle',
-    initialValue: 'Vamos aprender algo novo hoje?',
+    initialValue: 'Vamos explorar História hoje?',
   );
   return Scaffold(
     body: Column(
