@@ -64,3 +64,8 @@ app.*.map.json
 
 # Giro pelo Mundo generated binaries (hosted on Supabase; mapping is committed)
 tool/content/**/images/
+
+# Local generated trail cover work (never commit binaries)
+tool/seeds/history_pivot/.image_work/
+tool/seeds/history_pivot/generators/__pycache__/
+
