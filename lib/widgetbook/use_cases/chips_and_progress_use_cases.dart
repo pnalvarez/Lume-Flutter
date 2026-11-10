@@ -131,7 +131,7 @@ Widget selectableChipStates(BuildContext context) {
         children: [
           SelectableChip(label: label, selected: selected, onPressed: () {}),
           SelectableChip(
-            label: 'Filosofia',
+            label: 'Idade Média',
             selected: !selected,
             onPressed: () {},
           ),
@@ -165,9 +165,9 @@ class _SelectableChipGroupDemo extends StatefulWidget {
 class _SelectableChipGroupDemoState extends State<_SelectableChipGroupDemo> {
   static const _options = [
     SelectableChipOption(id: 1, label: 'História'),
-    SelectableChipOption(id: 2, label: 'Ciência'),
-    SelectableChipOption(id: 3, label: 'Cultura'),
-    SelectableChipOption(id: 4, label: 'Esporte'),
+    SelectableChipOption(id: 2, label: 'Arte'),
+    SelectableChipOption(id: 3, label: 'Música'),
+    SelectableChipOption(id: 4, label: 'Mundial'),
   ];
 
   var _selected = <int>{1, 3};

@@ -69,22 +69,18 @@ void main() {
   });
 
   group('AuthGate.splashDestination', () {
-    test(
-      'sends a confirmed session with personal info and categories home',
-      () {
-        expect(
-          AuthGate.splashDestination(
-            hasSession: true,
-            isEmailConfirmed: true,
-            isPasswordRecovery: false,
-            hasSeenOnboarding: false,
-            hasCompletedPersonalInfo: true,
-            hasSelectedCategories: true,
-          ),
-          SplashDestination.home,
-        );
-      },
-    );
+    test('sends a confirmed session with personal info home', () {
+      expect(
+        AuthGate.splashDestination(
+          hasSession: true,
+          isEmailConfirmed: true,
+          isPasswordRecovery: false,
+          hasSeenOnboarding: false,
+          hasCompletedPersonalInfo: true,
+        ),
+        SplashDestination.home,
+      );
+    });
 
     test('sends a confirmed session without personal info first', () {
       expect(
@@ -94,23 +90,8 @@ void main() {
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
           hasCompletedPersonalInfo: false,
-          hasSelectedCategories: false,
         ),
         SplashDestination.personalInfo,
-      );
-    });
-
-    test('sends a confirmed session without categories to select category', () {
-      expect(
-        AuthGate.splashDestination(
-          hasSession: true,
-          isEmailConfirmed: true,
-          isPasswordRecovery: false,
-          hasSeenOnboarding: true,
-          hasCompletedPersonalInfo: true,
-          hasSelectedCategories: false,
-        ),
-        SplashDestination.selectCategory,
       );
     });
 
@@ -122,7 +103,6 @@ void main() {
           isPasswordRecovery: false,
           hasSeenOnboarding: false,
           hasCompletedPersonalInfo: false,
-          hasSelectedCategories: false,
         ),
         SplashDestination.onboarding,
       );
@@ -133,7 +113,6 @@ void main() {
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
           hasCompletedPersonalInfo: false,
-          hasSelectedCategories: false,
         ),
         SplashDestination.login,
       );
@@ -144,7 +123,6 @@ void main() {
           isPasswordRecovery: false,
           hasSeenOnboarding: true,
           hasCompletedPersonalInfo: false,
-          hasSelectedCategories: false,
         ),
         SplashDestination.login,
       );

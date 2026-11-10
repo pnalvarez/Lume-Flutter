@@ -5,7 +5,7 @@ import 'package:lume/layers/domain/models/profile/profile_domain.dart';
 
 enum ProfileStatus { loading, ready, error }
 
-enum ProfileDestination { login, settings }
+enum ProfileDestination { login, personalInfo }
 
 @immutable
 final class ProfileStatTileUi {

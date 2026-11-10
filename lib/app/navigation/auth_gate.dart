@@ -1,6 +1,6 @@
 /// Cold-start destinations after session restore. Recovery is handled by
 /// [RecoveryGuard] after this decision.
-enum SplashDestination { onboarding, login, home, personalInfo, selectCategory }
+enum SplashDestination { onboarding, login, home, personalInfo }
 
 /// Pure routing decisions for [AuthGuard] and [RecoveryGuard].
 abstract final class AuthGate {
@@ -21,14 +21,13 @@ abstract final class AuthGate {
     return isPasswordRecovery && !isDefinePasswordRoute;
   }
 
-  /// Confirmed sessions: personal info → category prefs → home.
+  /// Confirmed sessions: personal info → home.
   static SplashDestination splashDestination({
     required bool hasSession,
     required bool isEmailConfirmed,
     required bool isPasswordRecovery,
     required bool hasSeenOnboarding,
     required bool hasCompletedPersonalInfo,
-    required bool hasSelectedCategories,
   }) {
     if (allowsAuthenticatedRoute(
       hasSession: hasSession,
@@ -38,9 +37,7 @@ abstract final class AuthGate {
       if (!hasCompletedPersonalInfo) {
         return SplashDestination.personalInfo;
       }
-      return hasSelectedCategories
-          ? SplashDestination.home
-          : SplashDestination.selectCategory;
+      return SplashDestination.home;
     }
     return hasSeenOnboarding
         ? SplashDestination.login

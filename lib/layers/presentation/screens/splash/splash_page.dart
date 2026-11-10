@@ -48,6 +48,5 @@ PageRouteInfo<void> _routeFor(SplashDestination destination) {
     SplashDestination.login => const LoginRoute(),
     SplashDestination.home => const DashboardRoute(),
     SplashDestination.personalInfo => PersonalInfoRoute(),
-    SplashDestination.selectCategory => SelectCategoryRoute(),
   };
 }

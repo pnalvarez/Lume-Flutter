@@ -54,8 +54,8 @@ class _PersonalInfoView extends StatelessWidget {
           const PersonalInfoNavigationHandled(),
         );
         switch (destination) {
-          case PersonalInfoDestination.selectCategory:
-            context.router.replaceAll([SelectCategoryRoute()]);
+          case PersonalInfoDestination.home:
+            context.router.replaceAll([const DashboardRoute()]);
           case PersonalInfoDestination.popToProfile:
             context.router.popUntilRouteWithName(DashboardRoute.name);
         }
@@ -64,10 +64,10 @@ class _PersonalInfoView extends StatelessWidget {
         builder: (context, state) {
           return PersonalInfoBody(
             state: state,
-            onBack: state.isSettingsEntry
+            onBack: state.isProfileEntry
                 ? () => context.router.maybePop()
                 : null,
-            onRetry: state.isSettingsEntry
+            onRetry: state.isProfileEntry
                 ? () {
                     context.read<PersonalInfoBloc>().add(
                       PersonalInfoStarted(entry: entry),
