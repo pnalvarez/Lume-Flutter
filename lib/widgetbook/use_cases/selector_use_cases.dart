@@ -3,7 +3,7 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/organisms/selector/selector.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
-const _options = ['História', 'Ciência', 'Cultura', 'Investimentos'];
+const _options = ['Brasil 1500–1889', 'História Mundial', 'Arte', 'Música'];
 
 @widgetbook.UseCase(
   name: 'With chevron',
@@ -41,7 +41,7 @@ class _SelectorPreviewState extends State<_SelectorPreview> {
       body: Padding(
         padding: const EdgeInsets.all(AppSpacings.xl2),
         child: Selector(
-          bottomsheetTitle: 'Escolha uma opção',
+          bottomsheetTitle: 'Escolha uma trilha',
           selectedOption: _selected,
           hasChevronDown: widget.hasChevronDown,
           options: _options,

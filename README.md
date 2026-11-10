@@ -1,8 +1,8 @@
 # Lume
 
-**Learn with games and trails.**
+**Learn History with games and trails.**
 
-Lume is a multiplatform Flutter app for playful, structured learning. Players follow educational **trails** (levels → submodules → games), play short mini-games, earn **XP**, and level up — with an arcade mode for quick sessions outside the trail path.
+Lume is a multiplatform Flutter app focused on **History**. Players follow educational **trails** (levels → submodules → games), play short mini-games, earn **XP**, and level up — with an arcade mode for quick sessions outside the trail path.
 
 | Platform | Distribution |
 |----------|----------------|
@@ -16,8 +16,8 @@ Lume is a multiplatform Flutter app for playful, structured learning. Players fo
 ## Features
 
 - **Auth** — email sign-up / sign-in, email confirmation, password recovery (Supabase Auth + PKCE)
-- **Onboarding & preferences** — first-run flow and category selection
-- **Learning trails** — bootstrap progress, trail detail, submodule sessions
+- **Onboarding** — first-run flow and personal info
+- **History trails** — bootstrap progress, trail detail, submodule sessions
 - **Mini-games**
   - Lightning Quiz
   - Who Am I

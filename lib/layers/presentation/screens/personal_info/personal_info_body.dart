@@ -74,7 +74,7 @@ class _PersonalInfoBodyState extends State<PersonalInfoBody> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final state = widget.state;
-    final showHeader = state.isSettingsEntry && widget.onBack != null;
+    final showHeader = state.isProfileEntry && widget.onBack != null;
 
     return Scaffold(
       backgroundColor: cs.surface,
@@ -124,7 +124,7 @@ class _PersonalInfoBodyState extends State<PersonalInfoBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (!state.isSettingsEntry) ...[
+                    if (!state.isProfileEntry) ...[
                       Text(
                         personalInfoTitle,
                         style: typ.headlineM.copyWith(color: cs.onSurface),

@@ -41,7 +41,7 @@ Widget profileBodyReady(BuildContext context) {
   return ProfileBody(
     state: _readyState(),
     onRetry: _noop,
-    onSettingsPressed: _noop,
+    onPersonalInfoPressed: _noop,
     onSignOutPressed: _noop,
   );
 }
@@ -55,7 +55,7 @@ Widget profileBodyLoading(BuildContext context) {
   return ProfileBody(
     state: const ProfileState(),
     onRetry: _noop,
-    onSettingsPressed: _noop,
+    onPersonalInfoPressed: _noop,
     onSignOutPressed: _noop,
   );
 }
@@ -72,7 +72,7 @@ Widget profileBodyError(BuildContext context) {
       errorMessage: profileLoadError,
     ),
     onRetry: _noop,
-    onSettingsPressed: _noop,
+    onPersonalInfoPressed: _noop,
     onSignOutPressed: _noop,
   );
 }
@@ -98,7 +98,7 @@ Widget profileHeaderDefault(BuildContext context) {
       child: ProfileHeader(
         displayName: name,
         memberSince: memberSince,
-        onSettingsPressed: _noop,
+        onPersonalInfoPressed: _noop,
         onSignOutPressed: _noop,
       ),
     ),
@@ -117,7 +117,7 @@ Widget profileHeaderWithMembership(BuildContext context) {
       child: ProfileHeader(
         displayName: 'Ada Lovelace',
         memberSince: '01/08/2026',
-        onSettingsPressed: _noop,
+        onPersonalInfoPressed: _noop,
         onSignOutPressed: _noop,
       ),
     ),
@@ -137,7 +137,7 @@ Widget profileHeaderLoading(BuildContext context) {
         displayName: 'Ada Lovelace',
         memberSince: '01/08/2026',
         isLoading: true,
-        onSettingsPressed: _noop,
+        onPersonalInfoPressed: _noop,
         onSignOutPressed: _noop,
       ),
     ),

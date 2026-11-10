@@ -45,14 +45,12 @@ class _SignUp implements ISignUpWithEmail {
 }
 
 class _HasPersonalInfo implements IHasCompletedPersonalInfo {
-  _HasPersonalInfo(this.value, {this.error});
+  _HasPersonalInfo(this.value);
 
   final bool value;
-  final Object? error;
 
   @override
   Future<bool> call({bool forceRefresh = false}) async {
-    if (error != null) throw error!;
     return value;
   }
 }
