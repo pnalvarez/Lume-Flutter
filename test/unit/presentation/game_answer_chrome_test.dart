@@ -8,18 +8,18 @@ void main() {
   testWidgets('clearing answered dismisses the feedback dialog', (
     tester,
   ) async {
-    final host = _Host();
-    await tester.pumpWidget(host);
+    final host = GlobalKey<_HostState>();
+    await tester.pumpWidget(_Host(key: host));
     await tester.pumpAndSettle();
     expect(find.text(trailGameCorrect), findsOneWidget);
 
-    host.state.answered = false;
-    host.state.rebuild();
+    host.currentState!.answered = false;
+    host.currentState!.rebuild();
     await tester.pumpAndSettle();
     expect(find.text(trailGameCorrect), findsNothing);
 
-    host.state.answered = true;
-    host.state.rebuild();
+    host.currentState!.answered = true;
+    host.currentState!.rebuild();
     await tester.pumpAndSettle();
     expect(find.text(trailGameCorrect), findsOneWidget);
   });
@@ -27,19 +27,19 @@ void main() {
   testWidgets(
     'removing the play surface dismisses the dialog before the next one',
     (tester) async {
-      final host = _Host();
-      await tester.pumpWidget(host);
+      final host = GlobalKey<_HostState>();
+      await tester.pumpWidget(_Host(key: host));
       await tester.pumpAndSettle();
       expect(find.text(trailGameCorrect), findsOneWidget);
 
-      host.state.showChrome = false;
-      host.state.rebuild();
+      host.currentState!.showChrome = false;
+      host.currentState!.rebuild();
       await tester.pumpAndSettle();
       expect(find.text(trailGameCorrect), findsNothing);
 
-      host.state.showChrome = true;
-      host.state.answered = true;
-      host.state.rebuild();
+      host.currentState!.showChrome = true;
+      host.currentState!.answered = true;
+      host.currentState!.rebuild();
       await tester.pumpAndSettle();
       expect(find.text(trailGameCorrect), findsOneWidget);
     },
@@ -47,12 +47,10 @@ void main() {
 }
 
 class _Host extends StatefulWidget {
-  _Host();
-
-  final _HostState state = _HostState();
+  const _Host({super.key});
 
   @override
-  State<_Host> createState() => state;
+  State<_Host> createState() => _HostState();
 }
 
 class _HostState extends State<_Host> {

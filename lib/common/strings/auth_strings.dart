@@ -10,7 +10,7 @@ const String authEmailPlaceholder = 'email';
 
 // --- Login / sign-up --------------------------------------------------------
 
-const String loginSubtitle = 'Microlearning com jogos';
+const String loginSubtitle = 'História com jogos';
 const String loginPasswordPlaceholder = 'senha';
 const String loginForgotPassword = 'Esqueci minha senha';
 const String loginCtaSignIn = 'Entrar';
@@ -94,13 +94,13 @@ const String onboardingXpLabel = 'XP';
 const String onboardingXpProgress = '820 / 1000';
 const String onboardingSlide1Title = 'Você aprende pouco e esquece rápido ⚡';
 const String onboardingSlide1Body =
-    'A maioria das pessoas não tem tempo — nem paciência — pra sentar e estudar. O resultado? Um repertório raso, que não acompanha as conversas que importam. O Lume resolve isso em 5 minutos por dia.';
+    'A maioria das pessoas não tem tempo — nem paciência — pra sentar e estudar História. O resultado? Um repertório raso, que não acompanha as conversas que importam. O Lume resolve isso em 5 minutos por dia.';
 const String onboardingSlide1Alt =
     'Ilustração representando esquecimento e aprendizado raso';
 const String onboardingSlide2Title =
     'Trilhas, revisões e jogos pra você chegar ao topo 🏆';
 const String onboardingSlide2Body =
-    'Desbloqueie trilhas de História, Filosofia, Arte, Ciência, Música, Literatura, Geografia e muito mais. Fixe o conteúdo em quizzes de revisão. Jogue Quiz Relâmpago, Verdade ou Mito e Batalha de Curiosidades. Ganhe XP, suba de nível e chegue ao nível máximo enquanto constrói um repertório que enriquece sua vida.';
+    'Desbloqueie trilhas de História. Fixe o conteúdo em quizzes de revisão. Jogue Quiz Relâmpago, Verdade ou Mito e Batalha de Curiosidades. Ganhe XP, suba de nível e chegue ao nível máximo enquanto constrói repertório de História.';
 const String onboardingSlide2Alt =
     'Ilustração de gamificação com barra de XP, troféu e estrelas';
 
@@ -117,7 +117,7 @@ const String homeSignOut = 'Sair';
 
 const String personalInfoTitle = 'Preencha suas informações';
 const String personalInfoSubtitle =
-    'Usamos esses dados para personalizar sua experiência no Lume.';
+    'Usamos nome, sobrenome e idade no seu perfil e nas conquistas.';
 const String personalInfoFirstNameLabel = 'Nome';
 const String personalInfoFirstNamePlaceholder = 'Seu nome';
 const String personalInfoLastNameLabel = 'Sobrenome';
@@ -131,28 +131,3 @@ const String personalInfoLoadError =
 const String personalInfoRetry = 'Tentar novamente';
 const String personalInfoSaveError =
     'Não foi possível salvar suas informações. Tente novamente.';
-
-// --- Select category --------------------------------------------------------
-
-const String selectCategoryTitle = 'O que você quer aprender?';
-const String selectCategorySubtitle =
-    'Escolha os temas que mais te interessam. Você pode mudar depois.';
-const String selectCategorySelectAll = 'Selecionar tudo';
-const String selectCategoryCta = 'Começar agora';
-const String selectCategorySaveCta = 'Salvar';
-const String selectCategoryLoadError =
-    'Não foi possível carregar as categorias. Tente novamente.';
-const String selectCategoryRetry = 'Tentar novamente';
-const String selectCategorySaveError = 'Erro ao salvar preferências';
-const String selectCategorySessionExpired =
-    'Sessão expirada. Faça login novamente.';
-
-/// Invisible sizing copy for [DisplayAsLoader] when no categories are cached yet.
-const selectCategoryLoadingChipLabels = [
-  'Categoria exemplo',
-  'Tema de estudo',
-  'Área de interesse',
-  'Outro tema',
-  'Mais um tema',
-  'Categoria',
-];
