@@ -10,14 +10,12 @@ import 'package:lume/layers/presentation/screens/personal_info/personal_info_sta
 import '../../helpers/fake_analytics.dart';
 
 class _GetProfile implements IGetProfile {
-  _GetProfile(this.profile, {this.error});
+  _GetProfile(this.profile);
 
   final ProfileDomain profile;
-  final Object? error;
 
   @override
   Future<ProfileDomain> call({bool forceRefresh = false}) async {
-    if (error != null) throw error!;
     return profile;
   }
 }

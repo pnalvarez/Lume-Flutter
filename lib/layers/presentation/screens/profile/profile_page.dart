@@ -78,7 +78,7 @@ class _ProfileViewState extends State<_ProfileView>
                 context.router.replaceAll([const LoginRoute()]);
               case ProfileDestination.personalInfo:
                 context.router.push(
-                  const PersonalInfoRoute(entry: PersonalInfoEntry.profile),
+                  PersonalInfoRoute(entry: PersonalInfoEntry.profile),
                 );
             }
           },
