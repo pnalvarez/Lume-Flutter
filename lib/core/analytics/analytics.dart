@@ -39,9 +39,6 @@ abstract final class AnalyticsEvents {
   static const onboardingPersonalInfoCompleted =
       'onboarding_personal_info_completed';
 
-  /// Fired when onboarding categories are saved (not profile edit).
-  static const onboardingCategorySelected = 'onboarding_category_selected';
-
   /// Fired when a submodule session starts loading.
   static const submoduleSessionStarted = 'submodule_session_started';
 
@@ -149,7 +146,6 @@ abstract final class AnalyticsParams {
   static const mode = 'mode';
   static const destination = 'destination';
   static const errorCode = 'error_code';
-  static const categoryId = 'category_id';
   static const trailId = 'trail_id';
   static const submoduleId = 'submodule_id';
   static const pairId = 'pair_id';

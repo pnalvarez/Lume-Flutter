@@ -1,4 +1,3 @@
-import 'package:lume/layers/domain/models/category/category_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/game_type.dart';
 
@@ -7,7 +6,6 @@ class TrailBootstrapDomain {
   const TrailBootstrapDomain({
     this.trailStartedAt,
     this.modules = const [],
-    this.categories = const [],
     this.levels = const [],
     this.submodules = const [],
     this.submodulePairs = const [],
@@ -17,7 +15,6 @@ class TrailBootstrapDomain {
 
   final DateTime? trailStartedAt;
   final List<ModuleDomain> modules;
-  final List<CategoryDomain> categories;
   final List<LevelDomain> levels;
   final List<SubmoduleDomain> submodules;
   final List<SubmodulePairDomain> submodulePairs;
@@ -32,7 +29,6 @@ class ModuleDomain {
     required this.title,
     required this.emoji,
     required this.color,
-    this.categoryId,
     this.description,
   });
 
@@ -41,7 +37,6 @@ class ModuleDomain {
   final String title;
   final String emoji;
   final String color;
-  final int? categoryId;
   final String? description;
 }
 

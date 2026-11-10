@@ -5,7 +5,6 @@ import 'package:lume/layers/domain/models/game/game_trail_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/data/models/game_data.dart';
-import 'package:lume/layers/data/mappers/category_mapper.dart';
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart';
 
 abstract final class TrailMapper {
@@ -15,10 +14,6 @@ abstract final class TrailMapper {
     return TrailBootstrapDomain(
       trailStartedAt: data.trailStartedAt,
       modules: [for (final module in data.modules) toModuleDomain(module)],
-      categories: [
-        for (final category in data.categories)
-          CategoryMapper.toDomain(category),
-      ],
       levels: [for (final level in data.levels) toLevelDomain(level)],
       submodules: [
         for (final submodule in data.submodules) toSubmoduleDomain(submodule),
@@ -128,7 +123,6 @@ abstract final class TrailMapper {
       title: data.title,
       emoji: data.emoji,
       color: data.color,
-      categoryId: data.categoryId,
       description: data.description,
     );
   }
