@@ -10,6 +10,7 @@ import 'package:lume/layers/presentation/screens/achievements/achievement_list_i
 import 'package:lume/layers/presentation/screens/achievements/achievements_bloc.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_event.dart';
 import 'package:lume/layers/presentation/screens/achievements/achievements_state.dart';
+
 import '../../helpers/fake_analytics.dart';
 
 class _GetAchievements implements IGetAchievements {
@@ -373,7 +374,7 @@ void main() {
   );
 
   blocTest<AchievementsBloc, AchievementsState>(
-    'tabs layout selects the first category when none is selected',
+    'tabs layout selects the first status when none is selected',
     build: () => buildBlocWithLayout('tabs'),
     act: (bloc) => bloc.add(const AchievementsStarted()),
     expect: () => [
@@ -419,7 +420,7 @@ void main() {
   );
 
   blocTest<AchievementsBloc, AchievementsState>(
-    'reload keeps the tabs variation and the selected category',
+    'reload keeps the tabs variation and the selected status',
     build: () => buildBlocWithLayout('tabs'),
     seed: () => AchievementsState.fromDomain(
       getAchievements.result,
