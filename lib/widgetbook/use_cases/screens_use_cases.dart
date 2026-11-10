@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lume/common/strings/achievement_strings.dart';
 import 'package:lume/common/strings/auth_strings.dart';
-import 'package:lume/layers/domain/models/category/category_domain.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_body.dart';
 import 'package:lume/layers/presentation/screens/auth/confirm_email/confirm_email_state.dart';
 import 'package:lume/layers/presentation/screens/auth/define_password/define_password_body.dart';
@@ -24,8 +23,6 @@ import 'package:lume/layers/presentation/screens/games/games_hub_state.dart';
 import 'package:lume/layers/presentation/screens/onboarding/onboarding_body.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_body.dart';
 import 'package:lume/layers/presentation/screens/personal_info/personal_info_state.dart';
-import 'package:lume/layers/presentation/screens/select_category/select_category_body.dart';
-import 'package:lume/layers/presentation/screens/select_category/select_category_state.dart';
 import 'package:lume/layers/presentation/screens/trail/home/home_body.dart';
 import 'package:lume/layers/presentation/screens/trail/home/home_state.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -331,13 +328,13 @@ Widget personalInfoEmpty(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Personal info',
-  name: 'Settings prefilled',
+  name: 'Profile prefilled',
   type: PersonalInfoBody,
 )
-Widget personalInfoSettingsPrefilled(BuildContext context) {
+Widget personalInfoProfilePrefilled(BuildContext context) {
   return PersonalInfoBody(
     state: const PersonalInfoState(
-      entry: PersonalInfoEntry.settings,
+      entry: PersonalInfoEntry.profile,
       firstName: 'Ada',
       lastName: 'Lovelace',
       age: '28',
@@ -352,116 +349,19 @@ Widget personalInfoSettingsPrefilled(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Personal info',
-  name: 'Settings loading',
+  name: 'Profile loading',
   type: PersonalInfoBody,
 )
-Widget personalInfoSettingsLoading(BuildContext context) {
+Widget personalInfoProfileLoading(BuildContext context) {
   return PersonalInfoBody(
     state: const PersonalInfoState(
-      entry: PersonalInfoEntry.settings,
+      entry: PersonalInfoEntry.profile,
       status: PersonalInfoStatus.loading,
     ),
     onBack: _noop,
     onFirstNameChanged: _noopString,
     onLastNameChanged: _noopString,
     onAgeChanged: _noopString,
-    onSubmit: _noop,
-  );
-}
-
-// --- Select category --------------------------------------------------------
-
-const _sampleCategories = [CategoryDomain(id: 1, name: 'História')];
-
-@widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Select category',
-  name: 'Onboarding ready',
-  type: SelectCategoryBody,
-)
-Widget selectCategoryOnboardingReady(BuildContext context) {
-  return SelectCategoryBody(
-    state: SelectCategoryState(
-      entry: SelectCategoryEntry.onboarding,
-      status: SelectCategoryStatus.ready,
-      categories: _sampleCategories,
-      selectedIds: {1},
-    ),
-    onRetry: _noop,
-    onToggle: _noopInt,
-    onSelectAllToggled: _noop,
-    onSubmit: _noop,
-  );
-}
-
-@widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Select category',
-  name: 'Profile ready',
-  type: SelectCategoryBody,
-)
-Widget selectCategoryProfileReady(BuildContext context) {
-  return SelectCategoryBody(
-    state: SelectCategoryState(
-      entry: SelectCategoryEntry.profile,
-      status: SelectCategoryStatus.ready,
-      categories: _sampleCategories,
-      selectedIds: {1},
-    ),
-    onRetry: _noop,
-    onToggle: _noopInt,
-    onSelectAllToggled: _noop,
-    onSubmit: _noop,
-    onBack: _noop,
-  );
-}
-
-@widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Select category',
-  name: 'Loading',
-  type: SelectCategoryBody,
-)
-Widget selectCategoryLoading(BuildContext context) {
-  return SelectCategoryBody(
-    state: const SelectCategoryState(),
-    onRetry: _noop,
-    onToggle: _noopInt,
-    onSelectAllToggled: _noop,
-    onSubmit: _noop,
-  );
-}
-
-@widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Select category',
-  name: 'Profile loading',
-  type: SelectCategoryBody,
-)
-Widget selectCategoryProfileLoading(BuildContext context) {
-  return SelectCategoryBody(
-    state: const SelectCategoryState(
-      entry: SelectCategoryEntry.profile,
-      status: SelectCategoryStatus.loading,
-    ),
-    onRetry: _noop,
-    onToggle: _noopInt,
-    onSelectAllToggled: _noop,
-    onSubmit: _noop,
-    onBack: _noop,
-  );
-}
-
-@widgetbook.UseCase(
-  path: '[Lume]/[Screens]/Select category',
-  name: 'Error',
-  type: SelectCategoryBody,
-)
-Widget selectCategoryError(BuildContext context) {
-  return SelectCategoryBody(
-    state: const SelectCategoryState(
-      status: SelectCategoryStatus.error,
-      errorMessage: selectCategoryLoadError,
-    ),
-    onRetry: _noop,
-    onToggle: _noopInt,
-    onSelectAllToggled: _noop,
     onSubmit: _noop,
   );
 }

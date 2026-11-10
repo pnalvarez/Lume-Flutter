@@ -131,28 +131,3 @@ const String personalInfoLoadError =
 const String personalInfoRetry = 'Tentar novamente';
 const String personalInfoSaveError =
     'Não foi possível salvar suas informações. Tente novamente.';
-
-// --- Select category --------------------------------------------------------
-
-const String selectCategoryTitle = 'O que você quer aprender?';
-const String selectCategorySubtitle =
-    'Escolha o que mais te interessa. Você pode mudar depois.';
-const String selectCategorySelectAll = 'Selecionar tudo';
-const String selectCategoryCta = 'Começar agora';
-const String selectCategorySaveCta = 'Salvar';
-const String selectCategoryLoadError =
-    'Não foi possível carregar as categorias. Tente novamente.';
-const String selectCategoryRetry = 'Tentar novamente';
-const String selectCategorySaveError = 'Erro ao salvar preferências';
-const String selectCategorySessionExpired =
-    'Sessão expirada. Faça login novamente.';
-
-/// Invisible sizing copy for [DisplayAsLoader] when no categories are cached yet.
-const selectCategoryLoadingChipLabels = [
-  'História do Brasil',
-  'História Mundial',
-  'Arte na História',
-  'Música na História',
-  'Idade Média',
-  'História',
-];

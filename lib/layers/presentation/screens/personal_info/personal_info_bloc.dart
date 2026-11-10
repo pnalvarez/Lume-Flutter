@@ -32,14 +32,14 @@ final class PersonalInfoBloc
     emit(
       state.copyWith(
         entry: event.entry,
-        status: event.entry == PersonalInfoEntry.settings
+        status: event.entry == PersonalInfoEntry.profile
             ? PersonalInfoStatus.loading
             : PersonalInfoStatus.ready,
         clearError: true,
       ),
     );
 
-    if (event.entry != PersonalInfoEntry.settings) return;
+    if (event.entry != PersonalInfoEntry.profile) return;
 
     try {
       final profile = await _getProfile(forceRefresh: true);
@@ -99,15 +99,15 @@ final class PersonalInfoBloc
         lastName: state.lastName.trim(),
         age: age,
       );
-      if (!state.isSettingsEntry) {
+      if (!state.isProfileEntry) {
         _analytics.logEvent(AnalyticsEvents.onboardingPersonalInfoCompleted);
       }
       emit(
         state.copyWith(
           isSubmitting: false,
-          destination: state.isSettingsEntry
+          destination: state.isProfileEntry
               ? PersonalInfoDestination.popToProfile
-              : PersonalInfoDestination.selectCategory,
+              : PersonalInfoDestination.home,
         ),
       );
     } on Object catch (error) {

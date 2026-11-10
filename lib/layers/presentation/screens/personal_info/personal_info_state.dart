@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:lume/common/strings/auth_strings.dart';
 
-enum PersonalInfoEntry { onboarding, settings }
+enum PersonalInfoEntry { onboarding, profile }
 
 enum PersonalInfoStatus { ready, loading, error }
 
-enum PersonalInfoDestination { selectCategory, popToProfile }
+enum PersonalInfoDestination { home, popToProfile }
 
 @immutable
 final class PersonalInfoState {
@@ -29,12 +29,12 @@ final class PersonalInfoState {
   final String? errorMessage;
   final PersonalInfoDestination? destination;
 
-  bool get isSettingsEntry => entry == PersonalInfoEntry.settings;
+  bool get isProfileEntry => entry == PersonalInfoEntry.profile;
 
   int? get parsedAge => int.tryParse(age);
 
   String get submitLabel =>
-      isSettingsEntry ? personalInfoSaveCta : personalInfoCta;
+      isProfileEntry ? personalInfoSaveCta : personalInfoCta;
 
   bool get canSubmit {
     final ageValue = parsedAge;

@@ -15,8 +15,8 @@ final class ProfileSignOutPressed extends ProfileEvent {
   const ProfileSignOutPressed();
 }
 
-final class ProfileSettingsPressed extends ProfileEvent {
-  const ProfileSettingsPressed();
+final class ProfilePersonalInfoPressed extends ProfileEvent {
+  const ProfilePersonalInfoPressed();
 }
 
 final class ProfileNavigationHandled extends ProfileEvent {
