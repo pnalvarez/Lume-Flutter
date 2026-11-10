@@ -10,14 +10,12 @@ import 'package:lume/layers/presentation/screens/personal_info/personal_info_sta
 import '../../helpers/fake_analytics.dart';
 
 class _GetProfile implements IGetProfile {
-  _GetProfile(this.profile, {this.error});
+  _GetProfile(this.profile);
 
   final ProfileDomain profile;
-  final Object? error;
 
   @override
   Future<ProfileDomain> call({bool forceRefresh = false}) async {
-    if (error != null) throw error!;
     return profile;
   }
 }
@@ -87,13 +85,13 @@ void main() {
   );
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'settings start loads existing profile values',
+    'profile start loads existing profile values',
     build: _bloc,
     act: (bloc) =>
-        bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings)),
+        bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile)),
     expect: () => [
       isA<PersonalInfoState>()
-          .having((s) => s.entry, 'entry', PersonalInfoEntry.settings)
+          .having((s) => s.entry, 'entry', PersonalInfoEntry.profile)
           .having((s) => s.status, 'status', PersonalInfoStatus.loading),
       isA<PersonalInfoState>()
           .having((s) => s.status, 'status', PersonalInfoStatus.ready)
@@ -104,10 +102,10 @@ void main() {
   );
 
   blocTest<PersonalInfoBloc, PersonalInfoState>(
-    'settings submit saves and pops to profile',
+    'profile submit saves and pops to profile',
     build: _bloc,
     act: (bloc) async {
-      bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+      bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile));
       await pumpEventQueue();
       bloc.add(const PersonalInfoSubmitted());
     },
@@ -199,10 +197,10 @@ void main() {
     await bloc.close();
   });
 
-  test('settings submit does not log onboarding event', () async {
+  test('profile submit does not log onboarding event', () async {
     final analytics = FakeAnalytics();
     final bloc = _bloc(analytics: analytics);
-    bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.settings));
+    bloc.add(const PersonalInfoStarted(entry: PersonalInfoEntry.profile));
     await pumpEventQueue();
     bloc.add(const PersonalInfoSubmitted());
     await bloc.stream.firstWhere(

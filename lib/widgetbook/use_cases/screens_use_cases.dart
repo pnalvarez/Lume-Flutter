@@ -331,13 +331,13 @@ Widget personalInfoEmpty(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Personal info',
-  name: 'Settings prefilled',
+  name: 'Profile prefilled',
   type: PersonalInfoBody,
 )
-Widget personalInfoSettingsPrefilled(BuildContext context) {
+Widget personalInfoProfilePrefilled(BuildContext context) {
   return PersonalInfoBody(
     state: const PersonalInfoState(
-      entry: PersonalInfoEntry.settings,
+      entry: PersonalInfoEntry.profile,
       firstName: 'Ada',
       lastName: 'Lovelace',
       age: '28',
@@ -352,13 +352,13 @@ Widget personalInfoSettingsPrefilled(BuildContext context) {
 
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Personal info',
-  name: 'Settings loading',
+  name: 'Profile loading',
   type: PersonalInfoBody,
 )
-Widget personalInfoSettingsLoading(BuildContext context) {
+Widget personalInfoProfileLoading(BuildContext context) {
   return PersonalInfoBody(
     state: const PersonalInfoState(
-      entry: PersonalInfoEntry.settings,
+      entry: PersonalInfoEntry.profile,
       status: PersonalInfoStatus.loading,
     ),
     onBack: _noop,
