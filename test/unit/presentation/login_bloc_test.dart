@@ -6,7 +6,6 @@ import 'package:lume/layers/domain/models/auth/auth_session.dart';
 import 'package:lume/layers/domain/models/auth/auth_sign_up_result.dart';
 import 'package:lume/layers/domain/models/auth/auth_user.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
-import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_bloc.dart';
@@ -56,36 +55,23 @@ class _HasPersonalInfo implements IHasCompletedPersonalInfo {
   }
 }
 
-class _HasSelected implements IHasSelectedCategories {
-  _HasSelected(this.value);
-
-  final bool value;
-
-  @override
-  Future<bool> call({bool forceRefresh = false}) async {
-    return value;
-  }
-}
-
 LoginBloc _bloc(
   _SignIn signIn,
   _SignUp signUp, {
   IHasCompletedPersonalInfo? hasPersonalInfo,
-  IHasSelectedCategories? hasSelected,
   FakeAnalytics? analytics,
 }) {
   return LoginBloc(
     signIn,
     signUp,
     hasPersonalInfo ?? _HasPersonalInfo(true),
-    hasSelected ?? _HasSelected(true),
     analytics ?? FakeAnalytics(),
   );
 }
 
 void main() {
   blocTest<LoginBloc, LoginState>(
-    'successful sign-in with personal info and categories goes home',
+    'successful sign-in with personal info goes home',
     build: () => _bloc(_SignIn(), _SignUp()),
     act: (bloc) {
       bloc
@@ -106,12 +92,8 @@ void main() {
 
   blocTest<LoginBloc, LoginState>(
     'successful sign-in without personal info goes to personal info',
-    build: () => _bloc(
-      _SignIn(),
-      _SignUp(),
-      hasPersonalInfo: _HasPersonalInfo(false),
-      hasSelected: _HasSelected(false),
-    ),
+    build: () =>
+        _bloc(_SignIn(), _SignUp(), hasPersonalInfo: _HasPersonalInfo(false)),
     act: (bloc) {
       bloc
         ..add(const LoginEmailChanged('a@b.c'))
@@ -125,31 +107,6 @@ void main() {
         (s) => s.destination,
         'destination',
         LoginDestination.personalInfo,
-      ),
-    ],
-  );
-
-  blocTest<LoginBloc, LoginState>(
-    'successful sign-in without categories goes to select category',
-    build: () => _bloc(
-      _SignIn(),
-      _SignUp(),
-      hasPersonalInfo: _HasPersonalInfo(true),
-      hasSelected: _HasSelected(false),
-    ),
-    act: (bloc) {
-      bloc
-        ..add(const LoginEmailChanged('a@b.c'))
-        ..add(const LoginPasswordChanged('secret1'))
-        ..add(const LoginSubmitted());
-    },
-    skip: 2,
-    expect: () => [
-      isA<LoginState>().having((s) => s.isSubmitting, 'submitting', true),
-      isA<LoginState>().having(
-        (s) => s.destination,
-        'destination',
-        LoginDestination.selectCategory,
       ),
     ],
   );

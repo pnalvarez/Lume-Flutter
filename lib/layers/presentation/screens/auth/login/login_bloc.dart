@@ -4,7 +4,6 @@ import 'package:lume/common/strings/auth_strings.dart';
 import 'package:lume/core/analytics/analytics.dart';
 import 'package:lume/core/errors/auth_failure.dart';
 import 'package:lume/layers/domain/usecases/has_completed_personal_info.dart';
-import 'package:lume/layers/domain/usecases/has_selected_categories.dart';
 import 'package:lume/layers/domain/usecases/sign_in_with_email.dart';
 import 'package:lume/layers/domain/usecases/sign_up_with_email.dart';
 import 'package:lume/layers/presentation/screens/auth/login/login_event.dart';
@@ -17,7 +16,6 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     this._signInWithEmail,
     this._signUpWithEmail,
     this._hasCompletedPersonalInfo,
-    this._hasSelectedCategories,
     this._analytics,
   ) : super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
@@ -32,7 +30,6 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final ISignInWithEmail _signInWithEmail;
   final ISignUpWithEmail _signUpWithEmail;
   final IHasCompletedPersonalInfo _hasCompletedPersonalInfo;
-  final IHasSelectedCategories _hasSelectedCategories;
   final IAnalytics _analytics;
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
@@ -158,7 +155,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  /// Personal info → categories → home. Prefs/profile check failures go home.
+  /// Personal info → home. Profile check failures go home.
   Future<LoginDestination> _destinationAfterSignIn() async {
     try {
       final hasPersonalInfo = await _hasCompletedPersonalInfo(
@@ -167,15 +164,7 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (!hasPersonalInfo) {
         return LoginDestination.personalInfo;
       }
-    } on Object {
       return LoginDestination.home;
-    }
-
-    try {
-      final hasSelected = await _hasSelectedCategories(forceRefresh: true);
-      return hasSelected
-          ? LoginDestination.home
-          : LoginDestination.selectCategory;
     } on Object {
       return LoginDestination.home;
     }
