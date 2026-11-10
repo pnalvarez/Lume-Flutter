@@ -41,7 +41,7 @@ void main() {
     );
   }
 
-  testWidgets('chips layout keeps every category chip', (tester) async {
+  testWidgets('chips layout keeps every status chip', (tester) async {
     await tester.pumpWidget(
       wrap(
         const AchievementsState(
@@ -60,7 +60,7 @@ void main() {
     expect(find.text('Arcade 50'), findsOneWidget);
   });
 
-  testWidgets('tabs layout shows one category and reports the tapped tab', (
+  testWidgets('tabs layout shows one status and reports the tapped tab', (
     tester,
   ) async {
     AchievementListItemStatus? selected;
@@ -85,7 +85,7 @@ void main() {
     expect(selected, AchievementListItemStatus.locked);
   });
 
-  testWidgets('selector layout opens the sheet for the selected category', (
+  testWidgets('selector layout opens the sheet for the selected status', (
     tester,
   ) async {
     AchievementListItemStatus? selected;
