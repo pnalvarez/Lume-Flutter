@@ -109,14 +109,14 @@ void main() {
   );
 
   blocTest<ProfileBloc, ProfileState>(
-    'settings opens category preferences',
+    'personal info opens personal info form',
     build: buildBloc,
-    act: (bloc) => bloc.add(const ProfileSettingsPressed()),
+    act: (bloc) => bloc.add(const ProfilePersonalInfoPressed()),
     expect: () => [
       isA<ProfileState>().having(
         (s) => s.destination,
         'destination',
-        ProfileDestination.settings,
+        ProfileDestination.personalInfo,
       ),
     ],
   );
@@ -152,7 +152,8 @@ void main() {
   blocTest<ProfileBloc, ProfileState>(
     'clears destination after navigation is handled',
     build: buildBloc,
-    seed: () => const ProfileState(destination: ProfileDestination.settings),
+    seed: () =>
+        const ProfileState(destination: ProfileDestination.personalInfo),
     act: (bloc) => bloc.add(const ProfileNavigationHandled()),
     expect: () => [
       isA<ProfileState>().having((s) => s.destination, 'destination', isNull),

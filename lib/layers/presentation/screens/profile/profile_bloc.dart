@@ -14,7 +14,7 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     : super(const ProfileState()) {
     on<ProfileStarted>(_onStarted);
     on<ProfileSignOutPressed>(_onSignOutPressed);
-    on<ProfileSettingsPressed>(_onSettingsPressed);
+    on<ProfilePersonalInfoPressed>(_onPersonalInfoPressed);
     on<ProfileNavigationHandled>(_onNavigationHandled);
   }
 
@@ -71,11 +71,11 @@ final class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
   }
 
-  void _onSettingsPressed(
-    ProfileSettingsPressed event,
+  void _onPersonalInfoPressed(
+    ProfilePersonalInfoPressed event,
     Emitter<ProfileState> emit,
   ) {
-    emit(state.copyWith(destination: ProfileDestination.settings));
+    emit(state.copyWith(destination: ProfileDestination.personalInfo));
   }
 
   void _onNavigationHandled(

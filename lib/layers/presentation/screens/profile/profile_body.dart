@@ -16,13 +16,13 @@ class ProfileBody extends StatelessWidget {
     super.key,
     required this.state,
     required this.onRetry,
-    required this.onSettingsPressed,
+    required this.onPersonalInfoPressed,
     required this.onSignOutPressed,
   });
 
   final ProfileState state;
   final VoidCallback onRetry;
-  final VoidCallback onSettingsPressed;
+  final VoidCallback onPersonalInfoPressed;
   final VoidCallback onSignOutPressed;
 
   @override
@@ -47,7 +47,7 @@ class ProfileBody extends StatelessWidget {
                 displayName: state.displayName,
                 memberSince: state.memberSince,
                 isLoading: state.isLoading,
-                onSettingsPressed: onSettingsPressed,
+                onPersonalInfoPressed: onPersonalInfoPressed,
                 onSignOutPressed: onSignOutPressed,
               ),
             ),

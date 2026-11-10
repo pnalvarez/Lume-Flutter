@@ -5,7 +5,7 @@ library;
 
 const String trailHomeGreetingFallback = 'Explorador';
 const String trailHomeGreetingPrefix = 'Olá, ';
-const String trailHomeSubtitle = 'Vamos aprender algo novo hoje?';
+const String trailHomeSubtitle = 'Vamos explorar História hoje?';
 const String trailHomeSectionTitle = 'Suas trilhas';
 const String trailHomeEmpty = 'Nenhuma trilha disponível no momento.';
 const String trailHomeLoadError = 'Não foi possível carregar suas trilhas.';
