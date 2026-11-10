@@ -13,14 +13,14 @@ import 'package:lume_design_system/organisms/selector/selector.dart';
 import 'package:lume_design_system/organisms/tabs/tab_container.dart';
 import 'package:lume_design_system/organisms/tabs/tab_container_layout_type.dart';
 
-/// Scrollable achievement rows for the statuses in [statusFilters].
+/// Scrollable achievement rows for the statuses in [filterStatuses].
 ///
 /// The filter chrome above the rows follows [variation]. Rows stay the same
 /// list for every layout.
 class AchievementsList extends StatelessWidget {
   const AchievementsList({
     super.key,
-    required this.statusFilters,
+    required this.filterStatuses,
     required this.variation,
     required this.selectedStatuses,
     required this.items,
@@ -32,7 +32,7 @@ class AchievementsList extends StatelessWidget {
     this.onRefresh,
   });
 
-  final List<AchievementListItemStatus> statusFilters;
+  final List<AchievementListItemStatus> filterStatuses;
   final AchievementListFilterVariation variation;
   final Set<AchievementListItemStatus> selectedStatuses;
   final List<AchievementListItemUi> items;
@@ -46,7 +46,7 @@ class AchievementsList extends StatelessWidget {
   List<AchievementListItemUi> get _shown {
     return [
       for (final item in items)
-        if (statusFilters.contains(item.status)) item,
+        if (filterStatuses.contains(item.status)) item,
     ];
   }
 
@@ -68,7 +68,7 @@ class AchievementsList extends StatelessWidget {
             onRefresh: onRefresh,
           );
 
-    if (!showFilters || statusFilters.isEmpty) return content;
+    if (!showFilters || filterStatuses.isEmpty) return content;
 
     return switch (variation) {
       AchievementListFilterVariation.chips => Column(
@@ -83,7 +83,7 @@ class AchievementsList extends StatelessWidget {
             ),
             child: SelectableChipGroup<AchievementListItemStatus>(
               options: [
-                for (final status in statusFilters)
+                for (final status in filterStatuses)
                   SelectableChipOption(id: status, label: _label(status)),
               ],
               selectedIds: selectedStatuses,
@@ -94,7 +94,7 @@ class AchievementsList extends StatelessWidget {
         ],
       ),
       AchievementListFilterVariation.tabs => TabContainer(
-        tabs: [for (final status in statusFilters) _label(status)],
+        tabs: [for (final status in filterStatuses) _label(status)],
         selectedTab: _label(_selectedStatus),
         layoutType: TabContainerLayoutType.fixed,
         onTabSelected: (label) => onStatusSelected(_statusForLabel(label)),
@@ -116,7 +116,7 @@ class AchievementsList extends StatelessWidget {
                 bottomsheetTitle: achievementsFilterSheetTitle,
                 selectedOption: _label(_selectedStatus),
                 hasChevronDown: true,
-                options: [for (final status in statusFilters) _label(status)],
+                options: [for (final status in filterStatuses) _label(status)],
                 onSelectOption: (label) =>
                     onStatusSelected(_statusForLabel(label)),
               ),
@@ -129,17 +129,17 @@ class AchievementsList extends StatelessWidget {
   }
 
   AchievementListItemStatus get _selectedStatus {
-    for (final status in statusFilters) {
+    for (final status in filterStatuses) {
       if (selectedStatuses.contains(status)) return status;
     }
-    return statusFilters.first;
+    return filterStatuses.first;
   }
 
   AchievementListItemStatus _statusForLabel(String label) {
-    for (final status in statusFilters) {
+    for (final status in filterStatuses) {
       if (_label(status) == label) return status;
     }
-    return statusFilters.first;
+    return filterStatuses.first;
   }
 }
 

@@ -151,10 +151,10 @@ final class AchievementsBloc
     Set<AchievementListItemStatus> current,
   ) {
     if (!variation.isExclusive) return current;
-    for (final status in statusFilters) {
+    for (final status in achievementFilterStatuses) {
       if (current.contains(status)) return {status};
     }
-    return {statusFilters.first};
+    return {achievementFilterStatuses.first};
   }
 
   static Set<AchievementListItemStatus> _toggledChips(

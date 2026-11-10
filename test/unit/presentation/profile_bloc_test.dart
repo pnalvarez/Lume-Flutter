@@ -109,7 +109,7 @@ void main() {
   );
 
   blocTest<ProfileBloc, ProfileState>(
-    'personal info opens personal info form',
+    'gear opens personal info form',
     build: buildBloc,
     act: (bloc) => bloc.add(const ProfilePersonalInfoPressed()),
     expect: () => [

@@ -47,7 +47,7 @@ class AchievementsBody extends StatelessWidget {
           onRefresh: onRefresh,
         ),
         final s => AchievementsList(
-          statusFilters: statusFilters,
+          filterStatuses: achievementFilterStatuses,
           variation: s.filterVariation,
           selectedStatuses: s.selectedStatusFilters,
           items: s.visibleItems,

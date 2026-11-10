@@ -36,6 +36,7 @@ abstract final class AnalyticsEvents {
   static const loginFailed = 'login_failed';
 
   /// Fired when onboarding personal info is saved (not profile edit).
+  /// Last onboarding funnel step.
   static const onboardingPersonalInfoCompleted =
       'onboarding_personal_info_completed';
 

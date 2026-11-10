@@ -41,7 +41,7 @@ class _SelectorPreviewState extends State<_SelectorPreview> {
       body: Padding(
         padding: const EdgeInsets.all(AppSpacings.xl2),
         child: Selector(
-          bottomsheetTitle: 'Escolha uma trilha',
+          bottomsheetTitle: 'Escolha uma opção',
           selectedOption: _selected,
           hasChevronDown: widget.hasChevronDown,
           options: _options,
