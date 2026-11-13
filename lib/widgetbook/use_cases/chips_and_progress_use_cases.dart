@@ -80,6 +80,47 @@ Widget badgeChipWithNumber(BuildContext context) {
   );
 }
 
+@widgetbook.UseCase(name: 'Custom hex color', type: BadgeChip)
+Widget badgeChipCustomColor(BuildContext context) {
+  final label = context.knobs.string(label: 'Label', initialValue: 'Roma');
+  final hex = context.knobs.string(label: 'Hex', initialValue: '#C9A0DC');
+  final showBadge = context.knobs.boolean(
+    label: 'Show badge',
+    initialValue: true,
+  );
+
+  return Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          BadgeChip.custom(
+            label: label,
+            hex: BadgeChip.tryParseHex(hex) == null ? '#C9A0DC' : hex,
+            badgeLabel: showBadge ? '1' : null,
+            onTap: () {},
+          ),
+          const SizedBox(height: 16),
+          BadgeChip.custom(
+            label: 'Laranja',
+            hex: '#F4A261',
+            badgeLabel: showBadge ? '2' : null,
+            onTap: () {},
+          ),
+          const SizedBox(height: 16),
+          BadgeChip.custom(
+            label: 'Verde com um texto bem mais longo para quebrar linha',
+            hex: '#A8D5A2',
+            badgeLabel: showBadge ? '3' : null,
+            onTap: () {},
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 @widgetbook.UseCase(name: 'All states', type: StatusChip)
 Widget statusChipAll(BuildContext context) {
   final hasDot = context.knobs.boolean(label: 'Has dot', initialValue: true);
