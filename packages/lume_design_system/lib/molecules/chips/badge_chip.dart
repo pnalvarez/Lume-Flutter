@@ -6,6 +6,9 @@ import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 /// Tappable chip with an optional top-trailing badge (e.g. pair number).
 ///
 /// Colors are provided by the caller so features can map domain states to UI.
+///
+/// Compact by design (`body4Medium` label, `AppSpacings.s` padding) so
+/// side-by-side chips leave horizontal room, e.g. for drag and drop.
 class BadgeChip extends StatelessWidget {
   const BadgeChip({
     super.key,
@@ -109,15 +112,15 @@ class BadgeChip extends StatelessWidget {
               borderRadius: radius,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacings.m,
-                  vertical: AppSpacings.m,
+                  horizontal: AppSpacings.s,
+                  vertical: AppSpacings.s,
                 ),
                 child: SizedBox(
                   width: double.infinity,
                   child: Text(
                     label,
                     textAlign: TextAlign.center,
-                    style: typ.body3Medium.copyWith(color: foregroundColor),
+                    style: typ.body4Medium.copyWith(color: foregroundColor),
                   ),
                 ),
               ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume_design_system/atoms/spacing/spacings.dart';
+import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/chips/badge_chip.dart';
 import 'package:lume_design_system/theme/lume_theme.dart';
 
@@ -93,5 +95,33 @@ void main() {
         throwsAssertionError,
       );
     });
+  });
+
+  testWidgets('BadgeChip is compact: body4Medium label and small padding', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: lumeLightTheme(),
+        home: Scaffold(
+          body: BadgeChip(
+            label: 'Roma',
+            backgroundColor: Colors.white,
+            borderColor: Colors.grey,
+            foregroundColor: Colors.black,
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('Roma'));
+    expect(label.style?.fontSize, typ.body4Medium.fontSize);
+
+    final padding = tester.widget<Padding>(
+      find
+          .ancestor(of: find.byType(SizedBox), matching: find.byType(Padding))
+          .first,
+    );
+    expect(padding.padding, const EdgeInsets.all(AppSpacings.s));
   });
 }
