@@ -25,6 +25,10 @@ class ConnectionsBody extends StatelessWidget {
   final VoidCallback onSubmit;
   final VoidCallback onNext;
 
+  /// Column : gap : column width ratio (5 : 2 : 5).
+  static const int _columnFlex = 5;
+  static const int _gapFlex = 2;
+
   @override
   Widget build(BuildContext context) {
     final game = state.game;
@@ -51,6 +55,7 @@ class ConnectionsBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: _columnFlex,
                 child: Column(
                   children: [
                     for (final item in game.leftColumn) ...[
@@ -67,8 +72,11 @@ class ConnectionsBody extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: AppSpacings.m),
+              // Empty lane between the columns: room to drag a left item onto
+              // a right item without covering the other chips.
+              const Spacer(flex: _gapFlex),
               Expanded(
+                flex: _columnFlex,
                 child: Column(
                   children: [
                     for (final item in game.rightColumn) ...[
