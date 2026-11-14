@@ -63,6 +63,7 @@ class ConnectionsBody extends StatelessWidget {
                         label: item.text,
                         visual: state.leftVisual(item.id),
                         pairNumber: state.pairNumberForLeft(item.id),
+                        pairHex: state.pairHexForLeft(item.id),
                         onTap: state.answered
                             ? null
                             : () => onLeftSelected(item.id),
@@ -84,6 +85,7 @@ class ConnectionsBody extends StatelessWidget {
                         label: item.text,
                         visual: state.rightVisual(item.id),
                         pairNumber: state.pairNumberForRight(item.id),
+                        pairHex: state.pairHexForRight(item.id),
                         onTap: state.canSelectRight
                             ? () => onRightSelected(item.id)
                             : null,
@@ -124,16 +126,30 @@ class _ConnectionsBadgeChip extends StatelessWidget {
     required this.label,
     required this.visual,
     required this.pairNumber,
+    required this.pairHex,
     required this.onTap,
   });
 
   final String label;
   final ConnectionsChipVisual visual;
   final int? pairNumber;
+
+  /// Pair color; when set the chip is painted with it instead of [visual].
+  final String? pairHex;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final hex = pairHex;
+    if (hex != null) {
+      return BadgeChip.custom(
+        label: label,
+        hex: hex,
+        badgeLabel: pairNumber?.toString(),
+        onTap: onTap,
+      );
+    }
+
     final cs = Theme.of(context).colorScheme;
     final (Color bg, Color border, Color fg) = switch (visual) {
       ConnectionsChipVisual.idle => (
