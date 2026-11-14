@@ -115,6 +115,8 @@ Deep-link schemes used for auth:
 flutter run -t lib/widgetbook/main.widgetbook.dart
 ```
 
+Deployed to Vercel by the **Deploy** workflow (tag pushes, or manually via *Run workflow* → **Widgetbook** on any branch; non-`main` branches get a preview URL). See [docs/deploy.md](docs/deploy.md).
+
 ---
 
 ## Development
