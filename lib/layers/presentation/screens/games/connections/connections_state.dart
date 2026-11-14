@@ -51,6 +51,14 @@ final class ConnectionsState {
     return null;
   }
 
+  /// Color a left item shows while being dragged: its own pair color when
+  /// already linked, otherwise the next free color.
+  String dragHexForLeft(String leftId) =>
+      pairHexForLeft(leftId) ?? _hexForPairIndex(linkOrder.length);
+
+  /// Whether a left item can be dragged (same rule as tapping it).
+  bool get canDrag => !answered;
+
   /// Hex color for a right item: the color of the left item it is linked to.
   String? pairHexForRight(String rightId) {
     if (answered) return null;

@@ -107,4 +107,22 @@ void main() {
     expect(state.pairHexForLeft('l1'), isNull);
     expect(state.pairHexForRight('r1'), isNull);
   });
+
+  test('drag color is the own pair color when linked, else the next free', () {
+    const state = ConnectionsState(
+      game: _game,
+      links: {'l1': 'r1'},
+      linkOrder: ['l1'],
+    );
+    expect(state.dragHexForLeft('l1'), _purple);
+    expect(state.dragHexForLeft('l2'), _orange);
+  });
+
+  test('cannot drag once answered', () {
+    expect(const ConnectionsState(game: _game).canDrag, isTrue);
+    expect(
+      const ConnectionsState(game: _game, answered: true).canDrag,
+      isFalse,
+    );
+  });
 }
