@@ -7,6 +7,7 @@ Deploys **Lume** to:
 - **iOS App Store RC** → App Store Connect version (attach uploaded build; manual submit)
 - **macOS** → [TestFlight](https://developer.apple.com/testflight/) (same App Store Connect app / bundle ID)
 - **Web** → [Vercel](https://vercel.com) (`flutter build web` → production deploy)
+- **Widgetbook** → a second Vercel project (design / screen catalog)
 
 Workflow file: `.github/workflows/deploy.yml`
 
@@ -16,8 +17,8 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 
 | Trigger | Behavior |
 |---------|----------|
-| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web |
-| Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web (macOS and RC default off) |
+| Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web + Widgetbook |
+| Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web / **Widgetbook** (macOS, RC and Widgetbook default off) |
 
 Actions run titles use `run-name`, e.g. `Deploy v1.0.1 (android, ios, macos, web)` on a tag, or `Deploy manual (android, ios)` when only those platforms are selected.
 
@@ -338,6 +339,22 @@ Do **not** commit `.vercel/` (keep it gitignored). SPA routing is handled by `we
 CI runs `flutter build web --release`, then `vercel deploy build/web --prod`. When the `FIREBASE_WEB_*` secrets above are set, the build writes `secrets.json` and passes `--dart-define-from-file=secrets.json`. Tag pushes always include Web; manual runs include it when the **Web** checkbox is enabled.
 
 Optional: override Supabase at build time with repository Variables / secrets and pass `--dart-define=SUPABASE_URL=…` / `SUPABASE_ANON_KEY=…` in the workflow (defaults in `AppConfig` match production today).
+
+### Widgetbook / Vercel
+
+Widgetbook is deployed from the same `deploy.yml` workflow (job `deploy-widgetbook`) to its **own** Vercel project, so it never overwrites the app.
+
+| Secret | Description |
+|--------|-------------|
+| `VERCEL_TOKEN`, `VERCEL_ORG_ID` | Same as Web above |
+| `VERCEL_WIDGETBOOK_PROJECT_ID` | Project ID of the Widgetbook Vercel project (`vercel link` in a separate folder or with `--project`) |
+
+Which branch is deployed:
+
+- Tag push `v*` → production.
+- Manual run: pick the branch in the **Run workflow** dropdown and enable **Widgetbook**. `main` deploys to production; any other branch deploys a **preview** whose URL is printed in the job summary.
+
+CI runs `flutter build web --release -t lib/widgetbook/main.widgetbook.dart --output build/widgetbook`, then `vercel deploy build/widgetbook`. No Firebase / Supabase secrets are needed. Set the Vercel project's *Production Branch* to `main`.
 
 ## Cost notes
 
