@@ -59,13 +59,21 @@ class ConnectionsBody extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final item in game.leftColumn) ...[
-                      _ConnectionsBadgeChip(
+                      _DraggableLeftChip(
+                        leftId: item.id,
+                        dragHex: state.dragHexForLeft(item.id),
+                        canDrag: state.canDrag,
+                        onDragStarted: () => onLeftSelected(item.id),
+                        chip: _ConnectionsBadgeChip(
+                          label: item.text,
+                          visual: state.leftVisual(item.id),
+                          pairNumber: state.pairNumberForLeft(item.id),
+                          pairHex: state.pairHexForLeft(item.id),
+                          onTap: state.answered
+                              ? null
+                              : () => onLeftSelected(item.id),
+                        ),
                         label: item.text,
-                        visual: state.leftVisual(item.id),
-                        pairNumber: state.pairNumberForLeft(item.id),
-                        onTap: state.answered
-                            ? null
-                            : () => onLeftSelected(item.id),
                       ),
                       const SizedBox(height: AppSpacings.s),
                     ],
@@ -80,13 +88,18 @@ class ConnectionsBody extends StatelessWidget {
                 child: Column(
                   children: [
                     for (final item in game.rightColumn) ...[
-                      _ConnectionsBadgeChip(
-                        label: item.text,
-                        visual: state.rightVisual(item.id),
-                        pairNumber: state.pairNumberForRight(item.id),
-                        onTap: state.canSelectRight
-                            ? () => onRightSelected(item.id)
-                            : null,
+                      _DropTargetRightChip(
+                        canAccept: !state.answered,
+                        onDropped: () => onRightSelected(item.id),
+                        chip: _ConnectionsBadgeChip(
+                          label: item.text,
+                          visual: state.rightVisual(item.id),
+                          pairNumber: state.pairNumberForRight(item.id),
+                          pairHex: state.pairHexForRight(item.id),
+                          onTap: state.canSelectRight
+                              ? () => onRightSelected(item.id)
+                              : null,
+                        ),
                       ),
                       const SizedBox(height: AppSpacings.s),
                     ],
@@ -119,21 +132,107 @@ class ConnectionsBody extends StatelessWidget {
   }
 }
 
+/// Left-column chip that can be dragged onto a right-column chip.
+///
+/// Starting the drag selects the item (same callback as tapping it), so the
+/// bloc already holds the selection and its color when the drop happens.
+class _DraggableLeftChip extends StatelessWidget {
+  const _DraggableLeftChip({
+    required this.leftId,
+    required this.label,
+    required this.dragHex,
+    required this.canDrag,
+    required this.onDragStarted,
+    required this.chip,
+  });
+
+  final String leftId;
+  final String label;
+  final String dragHex;
+  final bool canDrag;
+  final VoidCallback onDragStarted;
+  final Widget chip;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Draggable<String>(
+          data: leftId,
+          maxSimultaneousDrags: canDrag ? 1 : 0,
+          onDragStarted: onDragStarted,
+          feedback: Material(
+            type: MaterialType.transparency,
+            child: SizedBox(
+              width: constraints.maxWidth,
+              child: BadgeChip.custom(label: label, hex: dragHex),
+            ),
+          ),
+          childWhenDragging: Opacity(opacity: 0.35, child: chip),
+          child: chip,
+        );
+      },
+    );
+  }
+}
+
+/// Right-column chip that accepts a dragged left item.
+class _DropTargetRightChip extends StatelessWidget {
+  const _DropTargetRightChip({
+    required this.canAccept,
+    required this.onDropped,
+    required this.chip,
+  });
+
+  final bool canAccept;
+  final VoidCallback onDropped;
+  final Widget chip;
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (_) => canAccept,
+      onAcceptWithDetails: (_) => onDropped(),
+      builder: (context, candidates, rejected) {
+        return AnimatedScale(
+          scale: candidates.isNotEmpty ? 1.06 : 1,
+          duration: const Duration(milliseconds: 120),
+          child: chip,
+        );
+      },
+    );
+  }
+}
+
 class _ConnectionsBadgeChip extends StatelessWidget {
   const _ConnectionsBadgeChip({
     required this.label,
     required this.visual,
     required this.pairNumber,
+    required this.pairHex,
     required this.onTap,
   });
 
   final String label;
   final ConnectionsChipVisual visual;
   final int? pairNumber;
+
+  /// Pair color; when set the chip is painted with it instead of [visual].
+  final String? pairHex;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final hex = pairHex;
+    if (hex != null) {
+      return BadgeChip.custom(
+        label: label,
+        hex: hex,
+        badgeLabel: pairNumber?.toString(),
+        onTap: onTap,
+      );
+    }
+
     final cs = Theme.of(context).colorScheme;
     final (Color bg, Color border, Color fg) = switch (visual) {
       ConnectionsChipVisual.idle => (
