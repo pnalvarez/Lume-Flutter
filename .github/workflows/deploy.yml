@@ -1,5 +1,5 @@
 # Deploy Lume to Firebase App Distribution (Android + iOS), TestFlight (iOS / macOS),
-# App Store Connect release candidate (iOS), and Vercel (Flutter web).
+# App Store Connect release candidate (iOS), and Vercel (Flutter web + Widgetbook).
 #
 # Triggers:
 #   - Push a version tag: git tag v1.0.0 && git push origin v1.0.0
@@ -14,12 +14,13 @@ name: Deploy
 # Manual   → "Deploy manual (android, ios)" (selected inputs only)
 run-name: >-
   Deploy ${{ github.ref_type == 'tag' && github.ref_name || 'manual' }} (${{
-    format('{0}{1}{2}{3}{4}',
+    format('{0}{1}{2}{3}{4}{5}',
       (github.event_name == 'push' || inputs.android) && 'android' || '',
       (github.event_name == 'push' || inputs.ios || inputs.ios_release_candidate) && format('{0}ios', (github.event_name == 'push' || inputs.android) && ', ' || '') || '',
       (github.event_name == 'workflow_dispatch' && inputs.ios_release_candidate) && format('{0}ios-rc', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate) && ', ' || '') || '',
       (github.event_name == 'push' || inputs.macos) && format('{0}macos', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate) && ', ' || '') || '',
-      (github.event_name == 'push' || inputs.web) && format('{0}web', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate || inputs.macos) && ', ' || '') || ''
+      (github.event_name == 'push' || inputs.web) && format('{0}web', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate || inputs.macos) && ', ' || '') || '',
+      (github.event_name == 'push' || inputs.widgetbook) && format('{0}widgetbook', (github.event_name == 'push' || inputs.android || inputs.ios || inputs.ios_release_candidate || inputs.macos || inputs.web) && ', ' || '') || ''
     )
   }})
 
@@ -49,6 +50,10 @@ on:
         description: Deploy Web → Vercel
         type: boolean
         default: true
+      widgetbook:
+        description: Deploy Widgetbook → Vercel (prod on main / tags, preview on other branches)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,6 +64,9 @@ concurrency:
 
 env:
   FLUTTER_CHANNEL: stable
+  # Keep in sync with ci.yml. Floating on stable broke the release when stable
+  # moved to a Flutter that requires Gradle 9.3.1.
+  FLUTTER_VERSION: '3.47.0'
   FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
   FIREBASE_IOS_APP_ID: 1:145151164143:ios:879a519584454d1eca251a
   FIREBASE_TESTER_GROUPS: internal
@@ -76,9 +84,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pin the JDK: ubuntu-latest now defaults to Java 25, which Gradle 8.14
+      # cannot run on. Keep in sync with the Android job in ci.yml.
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -146,6 +163,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -259,7 +277,8 @@ jobs:
               headers=headers,
               timeout=60,
           )
-          apps.raise_for_status()
+          if not apps.ok:
+              raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
           if not data:
               raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
@@ -281,7 +300,8 @@ jobs:
           }
           while url:
               resp = requests.get(url, params=params, headers=headers, timeout=60)
-              resp.raise_for_status()
+              if not resp.ok:
+                  raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
               for item in body.get("data", []):
                   raw = item.get("attributes", {}).get("version")
@@ -670,6 +690,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -851,7 +872,8 @@ jobs:
               headers=headers,
               timeout=60,
           )
-          apps.raise_for_status()
+          if not apps.ok:
+              raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
           if not data:
               raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
@@ -873,7 +895,8 @@ jobs:
           }
           while url:
               resp = requests.get(url, params=params, headers=headers, timeout=60)
-              resp.raise_for_status()
+              if not resp.ok:
+                  raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
               for item in body.get("data", []):
                   raw = item.get("attributes", {}).get("version")
@@ -992,6 +1015,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -1049,3 +1073,57 @@ jobs:
           done
           # Flutter copies web/vercel.json into build/web for SPA rewrites.
           vercel deploy build/web --prod --yes --token="$VERCEL_TOKEN"
+
+  deploy-widgetbook:
+    name: Widgetbook → Vercel
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.widgetbook)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # The catalog needs no Firebase / Supabase secrets. Flutter also copies
+      # web/vercel.json (SPA rewrites) into the output folder.
+      - name: Build Widgetbook web
+        run: flutter build web --release -t lib/widgetbook/main.widgetbook.dart --output build/widgetbook
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WIDGETBOOK_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          for var in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [[ -z "${!var:-}" ]]; then
+              echo "::error::Missing $var secret (VERCEL_PROJECT_ID comes from VERCEL_WIDGETBOOK_PROJECT_ID). See docs/deploy.md"
+              exit 1
+            fi
+          done
+          # Production for tags and main; any other branch gets a preview URL.
+          if [[ "$GITHUB_REF_TYPE" == "tag" || "$GITHUB_REF_NAME" == "main" ]]; then
+            url=$(vercel deploy build/widgetbook --prod --yes --token="$VERCEL_TOKEN")
+          else
+            url=$(vercel deploy build/widgetbook --yes --token="$VERCEL_TOKEN")
+          fi
+          echo "Widgetbook deployed: $url"
+          echo "### Widgetbook ($GITHUB_REF_NAME)" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url" >> "$GITHUB_STEP_SUMMARY"
