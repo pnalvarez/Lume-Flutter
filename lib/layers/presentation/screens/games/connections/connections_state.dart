@@ -27,6 +27,46 @@ final class ConnectionsState {
   final bool isCorrect;
   final bool finished;
 
+  /// Pair colors in pair order (purple, orange, green); cycles after the
+  /// third pair. Light/mid tones: the chip text is black on these.
+  static const List<String> pairHexColors = [
+    '#C9A0DC', // purple
+    '#F4A261', // orange
+    '#A8D5A2', // green
+  ];
+
+  static String _hexForPairIndex(int index) =>
+      pairHexColors[index % pairHexColors.length];
+
+  /// Hex color for a left item, or null when it should use its status look.
+  ///
+  /// A linked item takes the color of its pair (same order as the pair
+  /// badge); the selected, not yet linked item previews the next free color.
+  /// Null when idle or after answering (positive/negative feedback wins).
+  String? pairHexForLeft(String leftId) {
+    if (answered) return null;
+    final pair = pairNumberForLeft(leftId);
+    if (pair != null) return _hexForPairIndex(pair - 1);
+    if (selectedLeftId == leftId) return _hexForPairIndex(linkOrder.length);
+    return null;
+  }
+
+  /// Color a left item shows while being dragged: its own pair color when
+  /// already linked, otherwise the next free color.
+  String dragHexForLeft(String leftId) =>
+      pairHexForLeft(leftId) ?? _hexForPairIndex(linkOrder.length);
+
+  /// Whether a left item can be dragged (same rule as tapping it).
+  bool get canDrag => !answered;
+
+  /// Hex color for a right item: the color of the left item it is linked to.
+  String? pairHexForRight(String rightId) {
+    if (answered) return null;
+    final pair = pairNumberForRight(rightId);
+    if (pair == null) return null;
+    return _hexForPairIndex(pair - 1);
+  }
+
   bool get allLinked {
     final left = game?.leftColumn;
     if (left == null) return false;

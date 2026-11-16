@@ -64,6 +64,9 @@ concurrency:
 
 env:
   FLUTTER_CHANNEL: stable
+  # Keep in sync with ci.yml. Floating on stable broke the release when stable
+  # moved to a Flutter that requires Gradle 9.3.1.
+  FLUTTER_VERSION: '3.47.0'
   FIREBASE_ANDROID_APP_ID: 1:145151164143:android:2d2d7ec6d6ad0e73ca251a
   FIREBASE_IOS_APP_ID: 1:145151164143:ios:879a519584454d1eca251a
   FIREBASE_TESTER_GROUPS: internal
@@ -81,9 +84,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pin the JDK: ubuntu-latest now defaults to Java 25, which Gradle 8.14
+      # cannot run on. Keep in sync with the Android job in ci.yml.
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -151,6 +163,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -264,7 +277,8 @@ jobs:
               headers=headers,
               timeout=60,
           )
-          apps.raise_for_status()
+          if not apps.ok:
+              raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
           if not data:
               raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
@@ -286,7 +300,8 @@ jobs:
           }
           while url:
               resp = requests.get(url, params=params, headers=headers, timeout=60)
-              resp.raise_for_status()
+              if not resp.ok:
+                  raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
               for item in body.get("data", []):
                   raw = item.get("attributes", {}).get("version")
@@ -675,6 +690,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -856,7 +872,8 @@ jobs:
               headers=headers,
               timeout=60,
           )
-          apps.raise_for_status()
+          if not apps.ok:
+              raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
           if not data:
               raise SystemExit(f"No App Store Connect app for bundle ID {bundle_id}")
@@ -878,7 +895,8 @@ jobs:
           }
           while url:
               resp = requests.get(url, params=params, headers=headers, timeout=60)
-              resp.raise_for_status()
+              if not resp.ok:
+                  raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
               for item in body.get("data", []):
                   raw = item.get("attributes", {}).get("version")
@@ -997,6 +1015,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
@@ -1068,6 +1087,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
 
