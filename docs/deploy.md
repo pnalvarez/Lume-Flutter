@@ -18,7 +18,7 @@ Ensure `android/app/google-services.json` is committed — the Android release b
 | Trigger | Behavior |
 |---------|----------|
 | Push tag `v*` (e.g. `v1.0.1`) | Deploy Android + iOS + macOS + Web + Widgetbook |
-| Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web / **Widgetbook** (macOS, RC and Widgetbook default off) |
+| Manual **workflow_dispatch** | Toggle Android / iOS / **iOS App Store RC** / macOS / Web / **Widgetbook** (macOS and RC default off; Widgetbook defaults on) |
 
 Actions run titles use `run-name`, e.g. `Deploy v1.0.1 (android, ios, macos, web)` on a tag, or `Deploy manual (android, ios)` when only those platforms are selected.
 
