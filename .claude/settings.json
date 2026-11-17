@@ -1,0 +1,57 @@
+{
+  "enabledPlugins": {
+    "commit-commands@anthropic-plugin-directory": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/protect-secrets.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "timeout": 60,
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-architecture-on-commit.sh"
+          },
+          {
+            "type": "agent",
+            "if": "Bash(git commit*)",
+            "timeout": 120,
+            "prompt": "A `git commit` is about to run. Hook input: $ARGUMENTS\n\nReview ONLY the staged diff (`git diff --cached`) of Dart files against the judgment rules in `.claude/skills/lume-auror-architecture/SKILL.md` (and `.claude/rules/dumb-screen-bodies.md`): design-system usage, copy/strings conventions, naming, DI, and logic leaking into *_body.dart. Ignore anything the mechanical `tool/check_architecture.sh` already covers. If there are no staged Dart files, return ok=true. If you find a clear violation, return ok=false with a short list of file:line and the rule broken. Do not nitpick style or flag uncertain cases."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-dart-on-edit.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 180,
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/analyze-on-stop.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
