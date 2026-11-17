@@ -271,12 +271,27 @@ jobs:
           headers = {"Authorization": f"Bearer {token}"}
           base = "https://api.appstoreconnect.apple.com/v1"
 
-          apps = requests.get(
-              f"{base}/apps",
-              params={"filter[bundleId]": bundle_id},
-              headers=headers,
-              timeout=60,
-          )
+          def asc_get(url, **kwargs):
+              # App Store Connect intermittently answers 5xx/429; retry those with
+              # backoff. 4xx (bad key, wrong bundle ID) fails immediately.
+              last = None
+              for attempt in range(1, 6):
+                  try:
+                      resp = requests.get(url, headers=headers, timeout=60, **kwargs)
+                      if resp.status_code < 500 and resp.status_code != 429:
+                          return resp
+                      last = resp
+                      print(f"ASC GET {url} -> {resp.status_code} (attempt {attempt}/5)")
+                  except requests.RequestException as exc:
+                      last = None
+                      print(f"ASC GET {url} raised {exc!r} (attempt {attempt}/5)")
+                  if attempt < 5:
+                      time.sleep(5 * 2 ** (attempt - 1))
+              if last is None:
+                  raise SystemExit(f"ASC GET {url} failed after 5 attempts (network errors)")
+              return last
+
+          apps = asc_get(f"{base}/apps", params={"filter[bundleId]": bundle_id})
           if not apps.ok:
               raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
@@ -299,7 +314,7 @@ jobs:
               "fields[builds]": "version",
           }
           while url:
-              resp = requests.get(url, params=params, headers=headers, timeout=60)
+              resp = asc_get(url, params=params)
               if not resp.ok:
                   raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
@@ -866,12 +881,27 @@ jobs:
           headers = {"Authorization": f"Bearer {token}"}
           base = "https://api.appstoreconnect.apple.com/v1"
 
-          apps = requests.get(
-              f"{base}/apps",
-              params={"filter[bundleId]": bundle_id},
-              headers=headers,
-              timeout=60,
-          )
+          def asc_get(url, **kwargs):
+              # App Store Connect intermittently answers 5xx/429; retry those with
+              # backoff. 4xx (bad key, wrong bundle ID) fails immediately.
+              last = None
+              for attempt in range(1, 6):
+                  try:
+                      resp = requests.get(url, headers=headers, timeout=60, **kwargs)
+                      if resp.status_code < 500 and resp.status_code != 429:
+                          return resp
+                      last = resp
+                      print(f"ASC GET {url} -> {resp.status_code} (attempt {attempt}/5)")
+                  except requests.RequestException as exc:
+                      last = None
+                      print(f"ASC GET {url} raised {exc!r} (attempt {attempt}/5)")
+                  if attempt < 5:
+                      time.sleep(5 * 2 ** (attempt - 1))
+              if last is None:
+                  raise SystemExit(f"ASC GET {url} failed after 5 attempts (network errors)")
+              return last
+
+          apps = asc_get(f"{base}/apps", params={"filter[bundleId]": bundle_id})
           if not apps.ok:
               raise SystemExit(f"ASC GET /apps failed ({apps.status_code}): {apps.text}")
           data = apps.json()["data"]
@@ -894,7 +924,7 @@ jobs:
               "fields[builds]": "version",
           }
           while url:
-              resp = requests.get(url, params=params, headers=headers, timeout=60)
+              resp = asc_get(url, params=params)
               if not resp.ok:
                   raise SystemExit(f"ASC GET builds failed ({resp.status_code}): {resp.text}")
               body = resp.json()
