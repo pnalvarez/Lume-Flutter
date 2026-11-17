@@ -1,0 +1,71 @@
+# Cut a release when a bumped version lands on main.
+#
+# Trigger: a push to main that changes `version:` in pubspec.yaml.
+# Effect:  creates release/<version> from that commit, tags it v<version>,
+#          then starts the Deploy workflow on the tag.
+#
+# Why we dispatch Deploy explicitly: tags pushed with the default GITHUB_TOKEN
+# do NOT trigger other workflows, so deploy.yml's `push: tags` trigger would
+# never fire from here.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [pubspec.yaml]
+
+permissions:
+  contents: write # create branch + tag
+  actions: write  # dispatch deploy.yml
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Branch, tag and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from pubspec.yaml
+        id: version
+        run: |
+          # "2.0.1+7" -> "2.0.1" (drop the build number)
+          version=$(grep -E '^version:' pubspec.yaml | head -1 | awk '{print $2}' | cut -d+ -f1)
+          [ -n "$version" ] || { echo "No version found in pubspec.yaml"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # The path filter fires on any pubspec.yaml edit (e.g. a dependency
+      # bump). Only continue when the version has no tag yet.
+      - name: Check if this version is already released
+        id: check
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null; then
+            echo "Tag v${{ steps.version.outputs.version }} already exists, skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release branch and tag
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "release/${version}"
+          git tag -a "v${version}" -m "Release v${version}"
+          git push origin "release/${version}" "v${version}"
+
+      - name: Start Deploy on the tag
+        if: steps.check.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # macos=true so a dispatched run matches what a tag push deploys
+          # (android, ios, macos, web, widgetbook).
+          gh workflow run deploy.yml \
+            --ref "v${{ steps.version.outputs.version }}" \
+            -f macos=true
