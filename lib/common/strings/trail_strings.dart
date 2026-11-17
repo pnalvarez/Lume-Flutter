@@ -41,6 +41,11 @@ String trailDetailRetryHint({required int minCorrect, required int total}) =>
 // --- Submodule session ------------------------------------------------------
 
 const String trailPreviewContinue = 'Prosseguir';
+
+/// Accessibility label for the preview slide dots ("Slide 2 de 3").
+String trailPreviewSlideLabel({required int current, required int total}) =>
+    'Slide $current de $total';
+
 const String trailSessionCompleteTitle = 'Você concluiu\no submódulo';
 const String trailSessionIncompleteTitle = 'Você não completou\no submódulo';
 const String trailSessionCompleteBodyPrefix = 'Você acertou ';

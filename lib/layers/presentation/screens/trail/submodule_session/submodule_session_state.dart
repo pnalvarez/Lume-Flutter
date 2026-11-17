@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:lume/layers/domain/models/game/preview_slides_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 import 'package:lume/layers/presentation/screens/games/games_complete_body.dart';
 
@@ -16,6 +17,8 @@ final class SubmoduleSessionState {
     this.title = '',
     this.levelTitle,
     this.preview = '',
+    this.previewSlides = const PreviewSlidesDomain(),
+    this.currentSlideIndex = 0,
     this.imageUrl,
     this.games = const [],
     this.correctCount = 0,
@@ -34,6 +37,13 @@ final class SubmoduleSessionState {
   final String title;
   final String? levelTitle;
   final String preview;
+
+  /// Preview split into introduction / elaboration / conclusion. Empty for
+  /// submodules without slides; the screen then falls back to [preview].
+  final PreviewSlidesDomain previewSlides;
+
+  /// Zero-based index into [slides]; only meaningful when [hasSlides].
+  final int currentSlideIndex;
   final String? imageUrl;
   final List<TrailGameDomain> games;
   final int correctCount;
@@ -54,6 +64,19 @@ final class SubmoduleSessionState {
     return 0.0;
   }
 
+  /// Non-empty slide texts in display order.
+  List<String> get slides => previewSlides.slides;
+
+  bool get hasSlides => previewSlides.hasSlides;
+
+  /// The dots only make sense when there is more than one slide to move through.
+  bool get showSlideIndicator => slides.length > 1;
+
+  bool get isFirstSlide => currentSlideIndex <= 0;
+
+  /// Without slides the single-block preview is the last (only) step.
+  bool get isLastSlide => !hasSlides || currentSlideIndex >= slides.length - 1;
+
   bool get canRetrySave =>
       status == SubmoduleSessionStatus.error &&
       pairScores.isNotEmpty &&
@@ -67,6 +90,8 @@ final class SubmoduleSessionState {
     String? title,
     String? levelTitle,
     String? preview,
+    PreviewSlidesDomain? previewSlides,
+    int? currentSlideIndex,
     String? imageUrl,
     List<TrailGameDomain>? games,
     int? correctCount,
@@ -92,6 +117,8 @@ final class SubmoduleSessionState {
       title: title ?? this.title,
       levelTitle: clearLevelTitle ? null : levelTitle ?? this.levelTitle,
       preview: preview ?? this.preview,
+      previewSlides: previewSlides ?? this.previewSlides,
+      currentSlideIndex: currentSlideIndex ?? this.currentSlideIndex,
       imageUrl: clearImageUrl ? null : imageUrl ?? this.imageUrl,
       games: games ?? this.games,
       correctCount: correctCount ?? this.correctCount,
@@ -118,6 +145,8 @@ final class SubmoduleSessionState {
       other.title == title &&
       other.levelTitle == levelTitle &&
       other.preview == preview &&
+      listEquals(other.slides, slides) &&
+      other.currentSlideIndex == currentSlideIndex &&
       other.imageUrl == imageUrl &&
       listEquals(other.games, games) &&
       other.correctCount == correctCount &&
@@ -137,6 +166,8 @@ final class SubmoduleSessionState {
     title,
     levelTitle,
     preview,
+    Object.hashAll(slides),
+    currentSlideIndex,
     imageUrl,
     Object.hashAll(games),
     correctCount,

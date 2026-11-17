@@ -6,18 +6,28 @@ import 'package:lume_design_system/atoms/spacing/spacings.dart';
 import 'package:lume_design_system/atoms/typography/typography.dart' as typ;
 import 'package:lume_design_system/molecules/buttons/lume_button.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
+import 'package:lume_design_system/molecules/progress/slide_dots_indicator.dart';
 
 /// Preview step UI. No Bloc, router, or GetIt — safe for Widgetbook.
+///
+/// The image and title are pinned at the top; only the text below scrolls. With
+/// [slides] (introduction, elaboration, conclusion) the text is paginated, one
+/// slide at a time with a dots indicator. With no slides it falls back to the
+/// single [preview] block.
 class SubmodulePreviewBody extends StatelessWidget {
   const SubmodulePreviewBody({
     super.key,
     required this.isLoading,
-    required this.onAbandoned,
+    required this.onBack,
     required this.onContinue,
     required this.onRetry,
+    this.onSlideChanged,
     this.progressValue = 0,
     this.title = '',
     this.preview = '',
+    this.slides = const [],
+    this.currentSlideIndex = 0,
+    this.showSlideIndicator = false,
     this.imageUrl,
     this.errorMessage,
   });
@@ -26,11 +36,19 @@ class SubmodulePreviewBody extends StatelessWidget {
   final double progressValue;
   final String title;
   final String preview;
+
+  /// Slide texts in display order. Empty means "use [preview]".
+  final List<String> slides;
+  final int currentSlideIndex;
+  final bool showSlideIndicator;
   final String? imageUrl;
   final String? errorMessage;
-  final VoidCallback onAbandoned;
+  final VoidCallback onBack;
   final VoidCallback onContinue;
   final VoidCallback onRetry;
+
+  /// Called with the new index when the user swipes to another slide.
+  final ValueChanged<int>? onSlideChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +56,7 @@ class SubmodulePreviewBody extends StatelessWidget {
 
     return SubmoduleSessionChrome(
       progressValue: progressValue,
-      onBack: onAbandoned,
+      onBack: onBack,
       child: switch ((isLoading, errorMessage)) {
         (true, _) => const Center(child: CircularLoader()),
         (_, final String message) => Padding(
@@ -60,10 +78,21 @@ class SubmodulePreviewBody extends StatelessWidget {
             ],
           ),
         ),
-        _ => _PreviewContent(
+        _ when slides.isEmpty => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _PreviewHeader(title: title, imageUrl: imageUrl),
+            Expanded(child: _SlideText(text: preview)),
+            _ContinueBar(onContinue: onContinue),
+          ],
+        ),
+        _ => _SlidesPreview(
+          slides: slides,
+          currentSlideIndex: currentSlideIndex,
+          showIndicator: showSlideIndicator,
           title: title,
-          preview: preview,
           imageUrl: imageUrl,
+          onSlideChanged: onSlideChanged,
           onContinue: onContinue,
         ),
       },
@@ -71,108 +100,220 @@ class SubmodulePreviewBody extends StatelessWidget {
   }
 }
 
-class _PreviewContent extends StatelessWidget {
-  const _PreviewContent({
-    required this.preview,
+/// Swipeable slides + dots + Continue. Owns only the [PageController], kept in
+/// sync with [currentSlideIndex] (which lives on the session state).
+class _SlidesPreview extends StatefulWidget {
+  const _SlidesPreview({
+    required this.slides,
+    required this.currentSlideIndex,
+    required this.showIndicator,
+    required this.title,
     required this.onContinue,
     this.imageUrl,
-    this.title = '',
+    this.onSlideChanged,
   });
 
-  final String preview;
+  final List<String> slides;
+  final int currentSlideIndex;
+  final bool showIndicator;
+  final String title;
+  final String? imageUrl;
+  final ValueChanged<int>? onSlideChanged;
+  final VoidCallback onContinue;
+
+  @override
+  State<_SlidesPreview> createState() => _SlidesPreviewState();
+}
+
+class _SlidesPreviewState extends State<_SlidesPreview> {
+  static const _pageDuration = Duration(milliseconds: 300);
+
+  late final PageController _controller = PageController(initialPage: _index);
+
+  int get _index => widget.currentSlideIndex.clamp(0, widget.slides.length - 1);
+
+  @override
+  void didUpdateWidget(covariant _SlidesPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Continue / back changed the state index: bring the pager along. A swipe
+    // already sits on the right page, so nothing animates in that case.
+    final page = _controller.hasClients ? _controller.page?.round() : null;
+    if (page != null && page != _index) {
+      _controller.animateToPage(
+        _index,
+        duration: _pageDuration,
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final total = widget.slides.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _PreviewHeader(title: widget.title, imageUrl: widget.imageUrl),
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: total,
+            onPageChanged: widget.onSlideChanged,
+            itemBuilder: (context, i) => _SlideText(text: widget.slides[i]),
+          ),
+        ),
+        if (widget.showIndicator)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacings.s),
+            child: Center(
+              child: SlideDotsIndicator(
+                count: total,
+                currentIndex: _index,
+                semanticsLabel: trailPreviewSlideLabel(
+                  current: _index + 1,
+                  total: total,
+                ),
+              ),
+            ),
+          ),
+        _ContinueBar(onContinue: widget.onContinue),
+      ],
+    );
+  }
+}
+
+/// Image + title, pinned above the paginated text.
+class _PreviewHeader extends StatelessWidget {
+  const _PreviewHeader({this.imageUrl, this.title = ''});
+
   final String? imageUrl;
   final String title;
-  final VoidCallback onContinue;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final image = imageUrl?.trim();
+    final hasImage = image != null && image.isNotEmpty;
+    if (!hasImage && title.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacings.xl2,
-              AppSpacings.m,
-              AppSpacings.xl2,
-              AppSpacings.l,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (image != null && image.isNotEmpty) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.xl2),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 10,
-                      child: Image.network(
-                        image,
-                        fit: BoxFit.cover,
-                        gaplessPlayback: true,
-                        loadingBuilder: (context, child, progress) {
-                          if (progress == null) return child;
-                          return ColoredBox(
-                            color: cs.surfaceContainerHighest,
-                            child: const Center(child: CircularLoader()),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          assert(() {
-                            debugPrint(
-                              'Submodule preview image failed: $image → $error',
-                            );
-                            return true;
-                          }());
-                          return ColoredBox(
-                            color: cs.surfaceContainerHighest,
-                            child: Icon(
-                              Icons.broken_image_outlined,
-                              color: cs.onSurfaceVariant,
-                              size: 40,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacings.l),
-                ],
-                if (title.isNotEmpty) ...[
-                  Text(
-                    title,
-                    style: typ.headingH5.copyWith(color: cs.secondary),
-                  ),
-                  const SizedBox(height: AppSpacings.l),
-                ],
-                Text(
-                  preview,
-                  style: typ.body3Light.copyWith(
-                    color: cs.onSurface,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.xl2,
+        AppSpacings.m,
+        AppSpacings.xl2,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (hasImage) ...[
+            _PreviewImage(url: image),
+            const SizedBox(height: AppSpacings.l),
+          ],
+          if (title.isNotEmpty)
+            Text(title, style: typ.headingH5.copyWith(color: cs.secondary)),
+        ],
+      ),
+    );
+  }
+}
+
+/// The only scrollable part of a slide.
+class _SlideText extends StatelessWidget {
+  const _SlideText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.xl2,
+        AppSpacings.l,
+        AppSpacings.xl2,
+        AppSpacings.l,
+      ),
+      child: Text(
+        text,
+        style: typ.body3Light.copyWith(color: cs.onSurface, height: 1.5),
+      ),
+    );
+  }
+}
+
+class _PreviewImage extends StatelessWidget {
+  const _PreviewImage({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.xl2),
+      child: AspectRatio(
+        aspectRatio: 16 / 10,
+        child: Image.network(
+          url,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return ColoredBox(
+              color: cs.surfaceContainerHighest,
+              child: const Center(child: CircularLoader()),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            assert(() {
+              debugPrint('Submodule preview image failed: $url → $error');
+              return true;
+            }());
+            return ColoredBox(
+              color: cs.surfaceContainerHighest,
+              child: Icon(
+                Icons.broken_image_outlined,
+                color: cs.onSurfaceVariant,
+                size: 40,
+              ),
+            );
+          },
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacings.xl2,
-            AppSpacings.s,
-            AppSpacings.xl2,
-            AppSpacings.l,
-          ),
-          child: LumeButton(
-            label: trailPreviewContinue,
-            size: LumeButtonSize.lg,
-            isExpanded: true,
-            onPressed: onContinue,
-          ),
-        ),
-      ],
+      ),
+    );
+  }
+}
+
+class _ContinueBar extends StatelessWidget {
+  const _ContinueBar({required this.onContinue});
+
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.xl2,
+        AppSpacings.s,
+        AppSpacings.xl2,
+        AppSpacings.l,
+      ),
+      child: LumeButton(
+        label: trailPreviewContinue,
+        size: LumeButtonSize.lg,
+        isExpanded: true,
+        onPressed: onContinue,
+      ),
     );
   }
 }

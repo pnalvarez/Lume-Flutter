@@ -24,6 +24,9 @@ final class SubmoduleSessionBloc
     on<SubmoduleSessionGamesCancelled>(_onGamesCancelled);
     on<SubmoduleSessionRetrySave>(_onRetrySave);
     on<SubmoduleSessionAbandoned>(_onAbandoned);
+    on<SubmoduleSessionSlideAdvanced>(_onSlideAdvanced);
+    on<SubmoduleSessionSlideSelected>(_onSlideSelected);
+    on<SubmoduleSessionBackPressed>(_onBackPressed);
     on<SubmoduleSessionBackToTrailPressed>(_onBackToTrailPressed);
     on<SubmoduleSessionNavigationHandled>(_onNavigationHandled);
   }
@@ -50,6 +53,7 @@ final class SubmoduleSessionBloc
         stage: SubmoduleSessionStage.preview,
         trailId: event.trailId,
         submoduleId: event.submoduleId,
+        currentSlideIndex: 0,
         correctCount: 0,
         clearPairScores: true,
         clearCompleteStatus: true,
@@ -71,6 +75,7 @@ final class SubmoduleSessionBloc
             status: SubmoduleSessionStatus.error,
             title: data.title,
             preview: data.preview,
+            previewSlides: data.previewSlides,
             imageUrl: data.imageUrl,
             games: const [],
             errorMessage: trailSessionEmptyGames,
@@ -85,6 +90,7 @@ final class SubmoduleSessionBloc
           stage: SubmoduleSessionStage.preview,
           title: data.title,
           preview: data.preview,
+          previewSlides: data.previewSlides,
           imageUrl: data.imageUrl,
           games: data.games,
           correctCount: 0,
@@ -226,6 +232,37 @@ final class SubmoduleSessionBloc
         goBackToTrail: true,
       ),
     );
+  }
+
+  void _onSlideAdvanced(
+    SubmoduleSessionSlideAdvanced event,
+    Emitter<SubmoduleSessionState> emit,
+  ) {
+    if (state.isLastSlide) return;
+    emit(state.copyWith(currentSlideIndex: state.currentSlideIndex + 1));
+  }
+
+  void _onSlideSelected(
+    SubmoduleSessionSlideSelected event,
+    Emitter<SubmoduleSessionState> emit,
+  ) {
+    if (!state.hasSlides) return;
+    final index = event.index.clamp(0, state.slides.length - 1);
+    if (index == state.currentSlideIndex) return;
+    emit(state.copyWith(currentSlideIndex: index));
+  }
+
+  Future<void> _onBackPressed(
+    SubmoduleSessionBackPressed event,
+    Emitter<SubmoduleSessionState> emit,
+  ) async {
+    final onLaterSlide =
+        state.stage == SubmoduleSessionStage.preview && !state.isFirstSlide;
+    if (onLaterSlide) {
+      emit(state.copyWith(currentSlideIndex: state.currentSlideIndex - 1));
+      return;
+    }
+    await _onAbandoned(const SubmoduleSessionAbandoned(), emit);
   }
 
   void _onBackToTrailPressed(
