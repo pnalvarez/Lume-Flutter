@@ -275,9 +275,54 @@ Widget trailDetailError(BuildContext context) {
 
 // --- Submodule session ------------------------------------------------------
 
+const _previewSlideTexts = [
+  'Para colonizar o território sem gastar recursos próprios, a Coroa '
+      'portuguesa dividiu o Brasil, a partir de 1534, em faixas de terra '
+      'chamadas capitanias hereditárias, entregues a donatários.',
+  'O sistema falhou na maioria dos casos: faltavam recursos, havia ataques '
+      'indígenas e corsários e as distâncias eram enormes. Só Pernambuco, '
+      'graças ao açúcar, e São Vicente prosperaram. Em 1549, a Coroa criou o '
+      'Governo-Geral, com sede em Salvador, para centralizar a administração.',
+  'A centralização nasceu, assim, do fracasso da delegação.',
+];
+
+Widget _previewSlide(int index) {
+  return SubmodulePreviewBody(
+    isLoading: false,
+    title: 'Capitanias Hereditárias e Governo-Geral',
+    slides: _previewSlideTexts,
+    currentSlideIndex: index,
+    showSlideIndicator: true,
+    onBack: _noop,
+    onContinue: _noop,
+    onRetry: _noop,
+  );
+}
+
 @widgetbook.UseCase(
   path: '[Lume]/[Screens]/Submodule Preview',
-  name: 'Default',
+  name: 'Slide 1 (introduction)',
+  type: SubmodulePreviewBody,
+)
+Widget submodulePreviewSlide1(BuildContext context) => _previewSlide(0);
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Submodule Preview',
+  name: 'Slide 2 (elaboration)',
+  type: SubmodulePreviewBody,
+)
+Widget submodulePreviewSlide2(BuildContext context) => _previewSlide(1);
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Submodule Preview',
+  name: 'Slide 3 (conclusion)',
+  type: SubmodulePreviewBody,
+)
+Widget submodulePreviewSlide3(BuildContext context) => _previewSlide(2);
+
+@widgetbook.UseCase(
+  path: '[Lume]/[Screens]/Submodule Preview',
+  name: 'Single block (no slides)',
   type: SubmodulePreviewBody,
 )
 Widget submodulePreview(BuildContext context) {
@@ -287,7 +332,7 @@ Widget submodulePreview(BuildContext context) {
     preview:
         'Neste submódulo você vai explorar como o açúcar moldou a economia '
         'colonial e a sociedade do Brasil nos primeiros séculos.',
-    onAbandoned: _noop,
+    onBack: _noop,
     onContinue: _noop,
     onRetry: _noop,
   );
@@ -301,7 +346,7 @@ Widget submodulePreview(BuildContext context) {
 Widget submodulePreviewLoading(BuildContext context) {
   return SubmodulePreviewBody(
     isLoading: true,
-    onAbandoned: _noop,
+    onBack: _noop,
     onContinue: _noop,
     onRetry: _noop,
   );
@@ -316,7 +361,7 @@ Widget submodulePreviewError(BuildContext context) {
   return SubmodulePreviewBody(
     isLoading: false,
     errorMessage: 'Não foi possível carregar este submódulo.',
-    onAbandoned: _noop,
+    onBack: _noop,
     onContinue: _noop,
     onRetry: _noop,
   );

@@ -85,7 +85,7 @@ class _SubmoduleSessionShellState extends State<_SubmoduleSessionShell> {
         onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
           context.read<SubmoduleSessionBloc>().add(
-            const SubmoduleSessionAbandoned(),
+            const SubmoduleSessionBackPressed(),
           );
         },
         child: BlocBuilder<SubmoduleSessionBloc, SubmoduleSessionState>(

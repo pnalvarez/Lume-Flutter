@@ -68,14 +68,29 @@ class SubmodulePreviewView extends StatelessWidget {
           progressValue: state.progressValue,
           title: state.title,
           preview: state.preview,
+          slides: state.slides,
+          currentSlideIndex: state.currentSlideIndex,
+          showSlideIndicator: state.showSlideIndicator,
           imageUrl: state.imageUrl,
           errorMessage: errorMessage,
-          onAbandoned: () {
+          onBack: () {
             context.read<SubmoduleSessionBloc>().add(
-              const SubmoduleSessionAbandoned(),
+              const SubmoduleSessionBackPressed(),
             );
           },
-          onContinue: () => _openGames(context),
+          onSlideChanged: (index) {
+            context.read<SubmoduleSessionBloc>().add(
+              SubmoduleSessionSlideSelected(index),
+            );
+          },
+          onContinue: () {
+            final bloc = context.read<SubmoduleSessionBloc>();
+            if (bloc.state.isLastSlide) {
+              _openGames(context);
+            } else {
+              bloc.add(const SubmoduleSessionSlideAdvanced());
+            }
+          },
           onRetry: () {
             if (state.canRetrySave) {
               context.read<SubmoduleSessionBloc>().add(

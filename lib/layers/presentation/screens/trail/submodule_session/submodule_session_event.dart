@@ -44,6 +44,24 @@ final class SubmoduleSessionRetrySave extends SubmoduleSessionEvent {
   const SubmoduleSessionRetrySave();
 }
 
+/// Preview: move to the next slide (Continue on a non-last slide).
+final class SubmoduleSessionSlideAdvanced extends SubmoduleSessionEvent {
+  const SubmoduleSessionSlideAdvanced();
+}
+
+/// Preview: jump to [index] (swipe). Out-of-range values are clamped.
+final class SubmoduleSessionSlideSelected extends SubmoduleSessionEvent {
+  const SubmoduleSessionSlideSelected(this.index);
+
+  final int index;
+}
+
+/// Header back button / system back. On a later preview slide it steps to the
+/// previous slide; otherwise it behaves like [SubmoduleSessionAbandoned].
+final class SubmoduleSessionBackPressed extends SubmoduleSessionEvent {
+  const SubmoduleSessionBackPressed();
+}
+
 final class SubmoduleSessionAbandoned extends SubmoduleSessionEvent {
   const SubmoduleSessionAbandoned();
 }
