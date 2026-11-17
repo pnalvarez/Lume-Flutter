@@ -53,6 +53,52 @@ void main() {
     ).called(1);
   });
 
+  test('getSubmoduleGames maps preview and preview_slides', () async {
+    when(
+      dataSource.fetchSubmoduleGames(submoduleId: 9, forceRefresh: false),
+    ).thenAnswer(
+      (_) async => SubmoduleGamesData.fromJson({
+        'id': 9,
+        'title': 'Preview',
+        'sort_order': 1,
+        'preview': 'Full text',
+        'preview_slides': {
+          'introduction': 'Intro',
+          'elaboration': 'Elab',
+          'conclusion': 'Concl',
+        },
+      }),
+    );
+
+    final domain = await sut.getSubmoduleGames(submoduleId: 9);
+
+    expect(domain.preview, 'Full text');
+    expect(domain.previewSlides.introduction, 'Intro');
+    expect(domain.previewSlides.elaboration, 'Elab');
+    expect(domain.previewSlides.conclusion, 'Concl');
+    expect(domain.previewSlides.slides, ['Intro', 'Elab', 'Concl']);
+  });
+
+  test('getSubmoduleGames falls back to empty slides without key', () async {
+    when(
+      dataSource.fetchSubmoduleGames(submoduleId: 9, forceRefresh: false),
+    ).thenAnswer(
+      (_) async => SubmoduleGamesData.fromJson({
+        'id': 9,
+        'title': 'Preview',
+        'sort_order': 1,
+        'preview': 'Full text',
+        'preview_slides': null,
+      }),
+    );
+
+    final domain = await sut.getSubmoduleGames(submoduleId: 9);
+
+    expect(domain.preview, 'Full text');
+    expect(domain.previewSlides.hasSlides, isFalse);
+    expect(domain.previewSlides.slides, isEmpty);
+  });
+
   test('getHubGames maps catalog rows into HubGameDomain', () async {
     when(dataSource.fetchHubGames(forceRefresh: false)).thenAnswer(
       (_) async => [

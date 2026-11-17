@@ -2,6 +2,7 @@ import 'package:lume/layers/data/models/trail_catalog_data.dart';
 import 'package:lume/layers/data/models/trail_progress_data.dart';
 import 'package:lume/layers/data/mappers/trail_game_mapper.dart';
 import 'package:lume/layers/domain/models/game/game_trail_domain.dart';
+import 'package:lume/layers/domain/models/game/preview_slides_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_catalog_domain.dart';
 import 'package:lume/layers/domain/models/trail/trail_progress_domain.dart';
 import 'package:lume/layers/data/models/game_data.dart';
@@ -104,6 +105,7 @@ abstract final class TrailMapper {
       sortOrder: data.sortOrder,
       imageUrl: data.imageUrl,
       preview: data.preview,
+      previewSlides: toPreviewSlidesDomain(data.previewSlides),
       games: TrailGameMapper.parseAll(data.games),
     );
   }
@@ -117,7 +119,16 @@ abstract final class TrailMapper {
       levelId: data.levelId,
       moduleId: data.moduleId,
       preview: data.preview,
+      previewSlides: toPreviewSlidesDomain(data.previewSlides),
       games: TrailGameMapper.parseAll(data.games),
+    );
+  }
+
+  static PreviewSlidesDomain toPreviewSlidesDomain(PreviewSlidesData data) {
+    return PreviewSlidesDomain(
+      introduction: data.introduction,
+      elaboration: data.elaboration,
+      conclusion: data.conclusion,
     );
   }
 

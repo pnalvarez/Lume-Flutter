@@ -89,6 +89,73 @@ void main() {
   );
 
   test(
+    'fetchGameTrails parses preview and preview_slides per submodule',
+    () async {
+      when(
+        apiClient.rpc<List<dynamic>>(
+          'get_game_trails',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => [
+          {
+            'id': 1,
+            'title': 'History',
+            'sort_order': 1,
+            'levels': [
+              {
+                'id': 2,
+                'title': 'Level 1',
+                'sort_order': 1,
+                'submodules': [
+                  {
+                    'id': 10,
+                    'title': 'With slides',
+                    'sort_order': 1,
+                    'preview': 'Full text',
+                    'preview_slides': {
+                      'introduction': 'Intro',
+                      'elaboration': 'Elab',
+                      'conclusion': 'Concl',
+                    },
+                  },
+                  {
+                    'id': 11,
+                    'title': 'Old payload',
+                    'sort_order': 2,
+                    'preview': 'Only text',
+                  },
+                  {
+                    'id': 12,
+                    'title': 'Null slides',
+                    'sort_order': 3,
+                    'preview_slides': null,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      );
+
+      final data = await sut.fetchGameTrails();
+      final submodules = data.first.levels.first.submodules;
+
+      expect(submodules[0].preview, 'Full text');
+      expect(submodules[0].previewSlides.introduction, 'Intro');
+      expect(submodules[0].previewSlides.elaboration, 'Elab');
+      expect(submodules[0].previewSlides.conclusion, 'Concl');
+      expect(submodules[1].preview, 'Only text');
+      expect(submodules[1].previewSlides.introduction, isEmpty);
+      expect(submodules[1].previewSlides.elaboration, isEmpty);
+      expect(submodules[1].previewSlides.conclusion, isEmpty);
+      expect(submodules[2].preview, isEmpty);
+      expect(submodules[2].previewSlides.introduction, isEmpty);
+    },
+  );
+
+  test(
     'fetchGameTrails retries transient RPC failures up to 3 attempts',
     () async {
       var calls = 0;
