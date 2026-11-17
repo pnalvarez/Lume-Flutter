@@ -10,9 +10,10 @@ import 'package:lume_design_system/molecules/progress/slide_dots_indicator.dart'
 
 /// Preview step UI. No Bloc, router, or GetIt — safe for Widgetbook.
 ///
-/// With [slides] (introduction, elaboration, conclusion) it shows one slide at
-/// a time with a dots indicator. With no slides it falls back to the single
-/// [preview] block.
+/// The image and title are pinned at the top; only the text below scrolls. With
+/// [slides] (introduction, elaboration, conclusion) the text is paginated, one
+/// slide at a time with a dots indicator. With no slides it falls back to the
+/// single [preview] block.
 class SubmodulePreviewBody extends StatelessWidget {
   const SubmodulePreviewBody({
     super.key,
@@ -80,13 +81,8 @@ class SubmodulePreviewBody extends StatelessWidget {
         _ when slides.isEmpty => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: _SlidePage(
-                title: title,
-                text: preview,
-                imageUrl: imageUrl,
-              ),
-            ),
+            _PreviewHeader(title: title, imageUrl: imageUrl),
+            Expanded(child: _SlideText(text: preview)),
             _ContinueBar(onContinue: onContinue),
           ],
         ),
@@ -164,17 +160,13 @@ class _SlidesPreviewState extends State<_SlidesPreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _PreviewHeader(title: widget.title, imageUrl: widget.imageUrl),
         Expanded(
           child: PageView.builder(
             controller: _controller,
             itemCount: total,
             onPageChanged: widget.onSlideChanged,
-            itemBuilder: (context, i) => _SlidePage(
-              title: widget.title,
-              text: widget.slides[i],
-              // The image belongs to the introduction only.
-              imageUrl: i == 0 ? widget.imageUrl : null,
-            ),
+            itemBuilder: (context, i) => _SlideText(text: widget.slides[i]),
           ),
         ),
         if (widget.showIndicator)
@@ -197,10 +189,10 @@ class _SlidesPreviewState extends State<_SlidesPreview> {
   }
 }
 
-class _SlidePage extends StatelessWidget {
-  const _SlidePage({required this.text, this.imageUrl, this.title = ''});
+/// Image + title, pinned above the paginated text.
+class _PreviewHeader extends StatelessWidget {
+  const _PreviewHeader({this.imageUrl, this.title = ''});
 
-  final String text;
   final String? imageUrl;
   final String title;
 
@@ -208,30 +200,51 @@ class _SlidePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final image = imageUrl?.trim();
+    final hasImage = image != null && image.isNotEmpty;
+    if (!hasImage && title.isEmpty) return const SizedBox.shrink();
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacings.xl2,
         AppSpacings.m,
         AppSpacings.xl2,
-        AppSpacings.l,
+        0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (image != null && image.isNotEmpty) ...[
+          if (hasImage) ...[
             _PreviewImage(url: image),
             const SizedBox(height: AppSpacings.l),
           ],
-          if (title.isNotEmpty) ...[
+          if (title.isNotEmpty)
             Text(title, style: typ.headingH5.copyWith(color: cs.secondary)),
-            const SizedBox(height: AppSpacings.l),
-          ],
-          Text(
-            text,
-            style: typ.body3Light.copyWith(color: cs.onSurface, height: 1.5),
-          ),
         ],
+      ),
+    );
+  }
+}
+
+/// The only scrollable part of a slide.
+class _SlideText extends StatelessWidget {
+  const _SlideText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.xl2,
+        AppSpacings.l,
+        AppSpacings.xl2,
+        AppSpacings.l,
+      ),
+      child: Text(
+        text,
+        style: typ.body3Light.copyWith(color: cs.onSurface, height: 1.5),
       ),
     );
   }
