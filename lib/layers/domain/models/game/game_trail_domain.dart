@@ -1,3 +1,4 @@
+import 'package:lume/layers/domain/models/game/preview_slides_domain.dart';
 import 'package:lume/layers/domain/models/trail_game/trail_game.dart';
 
 /// Game-focused trail tree used by the games home experience.
@@ -38,6 +39,7 @@ class GameTrailSubmoduleDomain {
     required this.sortOrder,
     this.imageUrl,
     this.preview = '',
+    this.previewSlides = const PreviewSlidesDomain(),
     this.games = const [],
   });
 
@@ -46,5 +48,6 @@ class GameTrailSubmoduleDomain {
   final int sortOrder;
   final String? imageUrl;
   final String preview;
+  final PreviewSlidesDomain previewSlides;
   final List<TrailGameDomain> games;
 }

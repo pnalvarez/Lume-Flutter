@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/layers/domain/models/game/preview_slides_domain.dart';
 import 'package:lume/layers/domain/models/game/submodule_games_domain.dart';
 import 'package:lume/layers/domain/usecases/get_submodule_games.dart';
 import 'package:mockito/mockito.dart';
@@ -13,6 +14,8 @@ void main() {
       id: 9,
       title: 'Preview',
       sortOrder: 1,
+      preview: 'Full text',
+      previewSlides: PreviewSlidesDomain(introduction: 'Intro'),
     );
     when(
       repository.getSubmoduleGames(submoduleId: 9, forceRefresh: false),
@@ -21,6 +24,8 @@ void main() {
     final result = await sut.call(submoduleId: 9);
 
     expect(result, expected);
+    expect(result.preview, 'Full text');
+    expect(result.previewSlides.slides, ['Intro']);
     verify(
       repository.getSubmoduleGames(submoduleId: 9, forceRefresh: false),
     ).called(1);
