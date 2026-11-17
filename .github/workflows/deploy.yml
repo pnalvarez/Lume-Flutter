@@ -53,7 +53,7 @@ on:
       widgetbook:
         description: Deploy Widgetbook → Vercel (prod on main / tags, preview on other branches)
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
