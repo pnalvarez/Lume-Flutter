@@ -4,6 +4,38 @@ import 'package:lume/layers/data/models/game_type.dart';
 
 part 'game_data.g.dart';
 
+/// Three-slide split of a submodule preview (`preview_slides`).
+@JsonSerializable(fieldRename: FieldRename.snake)
+class PreviewSlidesData {
+  const PreviewSlidesData({
+    this.introduction = '',
+    this.elaboration = '',
+    this.conclusion = '',
+  });
+
+  @JsonKey(defaultValue: '')
+  final String introduction;
+
+  @JsonKey(defaultValue: '')
+  final String elaboration;
+
+  @JsonKey(defaultValue: '')
+  final String conclusion;
+
+  factory PreviewSlidesData.fromJson(Map<String, dynamic> json) =>
+      _$PreviewSlidesDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PreviewSlidesDataToJson(this);
+}
+
+/// Tolerates a missing / null `preview_slides` (older backend, cached payloads).
+PreviewSlidesData _previewSlidesFromJson(Object? json) {
+  if (json is Map) {
+    return PreviewSlidesData.fromJson(Map<String, dynamic>.from(json));
+  }
+  return const PreviewSlidesData();
+}
+
 @JsonSerializable(fieldRename: FieldRename.snake)
 class GameItemData {
   const GameItemData({
@@ -40,6 +72,7 @@ class GameTrailSubmoduleData {
     required this.sortOrder,
     this.imageUrl,
     this.preview = '',
+    this.previewSlides = const PreviewSlidesData(),
     this.games = const [],
   });
 
@@ -50,6 +83,9 @@ class GameTrailSubmoduleData {
 
   @JsonKey(defaultValue: '')
   final String preview;
+
+  @JsonKey(fromJson: _previewSlidesFromJson)
+  final PreviewSlidesData previewSlides;
 
   @JsonKey(defaultValue: <GameItemData>[])
   final List<GameItemData> games;
@@ -116,6 +152,7 @@ class SubmoduleGamesData {
     this.levelId,
     this.moduleId,
     this.preview = '',
+    this.previewSlides = const PreviewSlidesData(),
     this.games = const [],
   });
 
@@ -128,6 +165,9 @@ class SubmoduleGamesData {
 
   @JsonKey(defaultValue: '')
   final String preview;
+
+  @JsonKey(fromJson: _previewSlidesFromJson)
+  final PreviewSlidesData previewSlides;
 
   @JsonKey(defaultValue: <GameItemData>[])
   final List<GameItemData> games;

@@ -7,6 +7,7 @@ import 'package:lume_design_system/molecules/chips/selectable_chip.dart';
 import 'package:lume_design_system/molecules/chips/selectable_chip_group.dart';
 import 'package:lume_design_system/molecules/chips/status_chip.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
+import 'package:lume_design_system/molecules/progress/slide_dots_indicator.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
@@ -262,6 +263,49 @@ Widget stepProgressInteractive(BuildContext context) {
     ),
   );
 }
+
+@widgetbook.UseCase(name: 'Interactive', type: SlideDotsIndicator)
+Widget slideDotsInteractive(BuildContext context) {
+  final current = context.knobs.int.slider(
+    label: 'Current index',
+    initialValue: 0,
+    min: 0,
+    max: 2,
+  );
+  return _slideDotsScaffold(SlideDotsIndicator(currentIndex: current));
+}
+
+@widgetbook.UseCase(name: 'Slide 1', type: SlideDotsIndicator)
+Widget slideDotsFirst(BuildContext context) =>
+    _slideDotsScaffold(const SlideDotsIndicator(currentIndex: 0));
+
+@widgetbook.UseCase(name: 'Slide 2', type: SlideDotsIndicator)
+Widget slideDotsSecond(BuildContext context) =>
+    _slideDotsScaffold(const SlideDotsIndicator(currentIndex: 1));
+
+@widgetbook.UseCase(name: 'Slide 3', type: SlideDotsIndicator)
+Widget slideDotsThird(BuildContext context) =>
+    _slideDotsScaffold(const SlideDotsIndicator(currentIndex: 2));
+
+@widgetbook.UseCase(name: 'Five dots', type: SlideDotsIndicator)
+Widget slideDotsFive(BuildContext context) {
+  final current = context.knobs.int.slider(
+    label: 'Current index',
+    initialValue: 2,
+    min: 0,
+    max: 4,
+  );
+  return _slideDotsScaffold(
+    SlideDotsIndicator(count: 5, currentIndex: current),
+  );
+}
+
+Widget _slideDotsScaffold(Widget child) => Scaffold(
+  body: Padding(
+    padding: const EdgeInsets.all(24),
+    child: Center(child: child),
+  ),
+);
 
 @widgetbook.UseCase(name: 'With leading badge', type: LumeProgressBar)
 Widget progressBarWithLeading(BuildContext context) {
