@@ -13,6 +13,7 @@ import 'package:lume_design_system/molecules/chips/status_chip.dart';
 import 'package:lume_design_system/molecules/input_fields/input_field.dart';
 import 'package:lume_design_system/molecules/loaders/circular_loader.dart';
 import 'package:lume_design_system/molecules/progress/lume_progress_bar.dart';
+import 'package:lume_design_system/molecules/progress/slide_dots_indicator.dart';
 import 'package:lume_design_system/molecules/progress/step_progress_bar.dart';
 import 'package:lume_design_system/molecules/tiles/feedback_tile.dart';
 import 'package:lume_design_system/molecules/tiles/score_tile.dart';
@@ -337,6 +338,68 @@ void main() {
         _wrap(const StepProgressBar(currentValue: 2, totalValue: 5)),
       );
       expect(find.text('2/5'), findsOneWidget);
+    });
+  });
+
+  group('SlideDotsIndicator', () {
+    double sizeOf(WidgetTester tester, int i) =>
+        tester.getSize(find.byKey(ValueKey('slide-dot-$i'))).width;
+
+    testWidgets('shows the 1-based number of the current dot only', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(const SlideDotsIndicator(currentIndex: 1)));
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
+      expect(find.text('3'), findsNothing);
+    });
+
+    testWidgets('only the current dot is large', (tester) async {
+      await tester.pumpWidget(_wrap(const SlideDotsIndicator(currentIndex: 2)));
+      expect(sizeOf(tester, 0), SlideDotsIndicator.dotSize);
+      expect(sizeOf(tester, 1), SlideDotsIndicator.dotSize);
+      expect(sizeOf(tester, 2), SlideDotsIndicator.currentDotSize);
+    });
+
+    testWidgets('animates when the current index changes', (tester) async {
+      await tester.pumpWidget(_wrap(const SlideDotsIndicator(currentIndex: 0)));
+      await tester.pumpWidget(_wrap(const SlideDotsIndicator(currentIndex: 1)));
+      await tester.pumpAndSettle();
+      expect(sizeOf(tester, 0), SlideDotsIndicator.dotSize);
+      expect(sizeOf(tester, 1), SlideDotsIndicator.currentDotSize);
+    });
+
+    testWidgets('clamps out-of-range index', (tester) async {
+      await tester.pumpWidget(_wrap(const SlideDotsIndicator(currentIndex: 9)));
+      expect(find.text('3'), findsOneWidget);
+      await tester.pumpWidget(
+        _wrap(const SlideDotsIndicator(currentIndex: -4)),
+      );
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('renders nothing when count <= 0', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const SlideDotsIndicator(count: 0, currentIndex: 0)),
+      );
+      expect(find.byType(Text), findsNothing);
+      expect(find.byKey(const ValueKey('slide-dot-0')), findsNothing);
+    });
+
+    testWidgets('respects a custom count and exposes the semantics label', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          const SlideDotsIndicator(
+            count: 5,
+            currentIndex: 3,
+            semanticsLabel: 'Slide 4 of 5',
+          ),
+        ),
+      );
+      expect(find.byKey(const ValueKey('slide-dot-4')), findsOneWidget);
+      expect(find.bySemanticsLabel('Slide 4 of 5'), findsOneWidget);
     });
   });
 
