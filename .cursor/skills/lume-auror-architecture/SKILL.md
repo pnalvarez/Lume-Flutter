@@ -98,6 +98,7 @@ design system → Flutter only; never `package:lume/` or `package:auror/`
 - Crashlytics: `ICrashReporter` / `CrashReporting` in `lib/core/observability/` — `firebase_core` / `firebase_crashlytics` only there and `bootstrap.dart`
 - Remote Config: `IRemoteConfig` / `RemoteConfigService` in `lib/core/remote_config/` — `firebase_remote_config` only there and `bootstrap.dart`
 - Analytics: `IAnalytics` / `AnalyticsService` in `lib/core/analytics/` — `firebase_analytics` only there and `bootstrap.dart` (required for A/B Testing)
+- Push: `IPushService` / `PushService` in `lib/core/push/` — `firebase_messaging` only there; device timezone via `IDeviceTimezone` in `lib/core/device/`
 
 ## Tests
 

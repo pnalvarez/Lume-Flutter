@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="curiosity_channel_id" translatable="false">curiosity_of_the_day</string>
+    <string name="curiosity_channel_name">Curiosidade do Dia</string>
+    <string name="curiosity_channel_description">Lembretes da Curiosidade do Dia</string>
+</resources>
