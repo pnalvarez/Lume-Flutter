@@ -1,0 +1,35 @@
+/// A short historical fun fact assigned to the user for a given day.
+class Curiosity {
+  const Curiosity({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.teaser,
+    required this.opened,
+    this.imageUrl,
+  });
+
+  final String id;
+
+  /// Optional: some curiosities have no illustration.
+  final String? imageUrl;
+  final String title;
+  final String content;
+  final String teaser;
+
+  /// True once the user dismissed the dialog for this curiosity.
+  final bool opened;
+
+  bool get hasImage => imageUrl != null && imageUrl!.isNotEmpty;
+
+  Curiosity copyWith({bool? opened}) {
+    return Curiosity(
+      id: id,
+      imageUrl: imageUrl,
+      title: title,
+      content: content,
+      teaser: teaser,
+      opened: opened ?? this.opened,
+    );
+  }
+}

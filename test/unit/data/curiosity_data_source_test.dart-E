@@ -1,0 +1,243 @@
+import 'dart:convert';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/core/errors/api_exception.dart';
+import 'package:lume/core/storage/cache_keys.dart';
+import 'package:lume/core/storage/in_memory_storage_client.dart';
+import 'package:lume/layers/data/datasource/curiosity_data_source.dart';
+import 'package:mockito/mockito.dart';
+
+import '../../helpers/mocks.mocks.dart';
+
+void main() {
+  late MockIApiClient apiClient;
+  late InMemoryStorageClient storage;
+  late CuriosityDataSource sut;
+
+  final day = DateTime(2026, 3, 7);
+  final nextDay = DateTime(2026, 3, 8);
+
+  Map<String, dynamic> row({
+    String id = 'c-1',
+    Object? imageUrl = 'https://img/1.png',
+    bool opened = false,
+  }) => {
+    'id': id,
+    'image_url': imageUrl,
+    'title': 'Titulo',
+    'content': 'Conteudo',
+    'teaser': 'Teaser',
+    'opened': opened,
+  };
+
+  void stubDaily(Object response) {
+    when(
+      apiClient.rpc<List<dynamic>>(
+        'get_daily_curiosity',
+        params: anyNamed('params'),
+        headers: anyNamed('headers'),
+      ),
+    ).thenAnswer((_) async => response as List<dynamic>);
+  }
+
+  void stubDailyError(Object error) {
+    when(
+      apiClient.rpc<List<dynamic>>(
+        'get_daily_curiosity',
+        params: anyNamed('params'),
+        headers: anyNamed('headers'),
+      ),
+    ).thenThrow(error);
+  }
+
+  setUp(() {
+    apiClient = MockIApiClient();
+    storage = InMemoryStorageClient();
+    sut = CuriosityDataSource(apiClient, storage);
+  });
+
+  group('fetchDailyCuriosity', () {
+    test('sends the local date as p_day and parses the row', () async {
+      stubDaily([row()]);
+
+      final data = await sut.fetchDailyCuriosity(day);
+
+      expect(data!.id, 'c-1');
+      expect(data.imageUrl, 'https://img/1.png');
+      expect(data.title, 'Titulo');
+      expect(data.opened, isFalse);
+      verify(
+        apiClient.rpc<List<dynamic>>(
+          'get_daily_curiosity',
+          params: {'p_day': '2026-03-07'},
+        ),
+      ).called(1);
+    });
+
+    test('tolerates null and missing fields', () async {
+      stubDaily([
+        {'id': 'c-2', 'image_url': null, 'title': 'T'},
+      ]);
+
+      final data = await sut.fetchDailyCuriosity(day);
+
+      expect(data!.imageUrl, isNull);
+      expect(data.content, isNull);
+      expect(data.teaser, isNull);
+      expect(data.opened, isFalse);
+    });
+
+    test('returns null for an empty result and does not cache', () async {
+      stubDaily(<dynamic>[]);
+
+      expect(await sut.fetchDailyCuriosity(day), isNull);
+      expect(await storage.containsKey(CacheKeys.dailyCuriosity), isFalse);
+    });
+
+    test('caches the result keyed by day', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+
+      final stored =
+          jsonDecode((await storage.read(CacheKeys.dailyCuriosity))!) as Map;
+      expect(stored['day'], '2026-03-07');
+      expect((stored['curiosity'] as Map)['id'], 'c-1');
+    });
+
+    test('offline: serves the cache for the same day', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+
+      stubDailyError(const ApiNetworkException('offline'));
+      final data = await sut.fetchDailyCuriosity(day);
+
+      expect(data!.id, 'c-1');
+    });
+
+    test('day rollover: stale cache is not served for a new day', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+
+      stubDailyError(const ApiNetworkException('offline'));
+      await expectLater(
+        sut.fetchDailyCuriosity(nextDay),
+        throwsA(isA<ApiNetworkException>()),
+      );
+    });
+
+    test('online on a new day overwrites the cache', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+      stubDaily([row(id: 'c-2')]);
+      await sut.fetchDailyCuriosity(nextDay);
+
+      stubDailyError(const ApiNetworkException('offline'));
+      expect((await sut.fetchDailyCuriosity(nextDay))!.id, 'c-2');
+    });
+
+    test('rethrows when the RPC fails and nothing is cached', () async {
+      stubDailyError(const ApiHttpException(400, 'bad'));
+
+      await expectLater(
+        sut.fetchDailyCuriosity(day),
+        throwsA(isA<ApiHttpException>()),
+      );
+    });
+
+    test('corrupt cache is treated as a miss', () async {
+      await storage.write(CacheKeys.dailyCuriosity, '{not json');
+      stubDailyError(const ApiHttpException(400, 'bad'));
+
+      await expectLater(
+        sut.fetchDailyCuriosity(day),
+        throwsA(isA<ApiHttpException>()),
+      );
+    });
+
+    test('retries transient failures before succeeding', () async {
+      var calls = 0;
+      when(
+        apiClient.rpc<List<dynamic>>(
+          'get_daily_curiosity',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async {
+        calls++;
+        if (calls < 2) throw const ApiNetworkException('flaky');
+        return [row()];
+      });
+
+      expect((await sut.fetchDailyCuriosity(day))!.id, 'c-1');
+      expect(calls, 2);
+    });
+  });
+
+  group('markSeen', () {
+    setUp(() {
+      when(
+        apiClient.rpc<dynamic>(
+          'mark_curiosity_seen',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async => null);
+    });
+
+    test('calls mark_curiosity_seen with p_curiosity_id', () async {
+      await sut.markSeen('c-1');
+
+      verify(
+        apiClient.rpc<dynamic>(
+          'mark_curiosity_seen',
+          params: {'p_curiosity_id': 'c-1'},
+        ),
+      ).called(1);
+    });
+
+    test('marks the cached curiosity as opened', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+
+      await sut.markSeen('c-1');
+
+      stubDailyError(const ApiNetworkException('offline'));
+      expect((await sut.fetchDailyCuriosity(day))!.opened, isTrue);
+    });
+
+    test('leaves the cache alone when the id differs', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+
+      await sut.markSeen('other');
+
+      stubDailyError(const ApiNetworkException('offline'));
+      expect((await sut.fetchDailyCuriosity(day))!.opened, isFalse);
+    });
+
+    test('works without a cache entry', () async {
+      await sut.markSeen('c-1');
+      expect(await storage.containsKey(CacheKeys.dailyCuriosity), isFalse);
+    });
+
+    test('propagates RPC errors and keeps the cache unopened', () async {
+      stubDaily([row()]);
+      await sut.fetchDailyCuriosity(day);
+      when(
+        apiClient.rpc<dynamic>(
+          'mark_curiosity_seen',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenThrow(const ApiNetworkException('offline'));
+
+      await expectLater(
+        sut.markSeen('c-1'),
+        throwsA(isA<ApiNetworkException>()),
+      );
+
+      stubDailyError(const ApiNetworkException('offline'));
+      expect((await sut.fetchDailyCuriosity(day))!.opened, isFalse);
+    });
+  });
+}

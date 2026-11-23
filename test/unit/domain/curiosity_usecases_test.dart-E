@@ -1,0 +1,81 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/usecases/get_daily_curiosity.dart';
+import 'package:lume/layers/domain/usecases/mark_curiosity_seen.dart';
+import 'package:mockito/mockito.dart';
+
+import '../../helpers/mocks.mocks.dart';
+
+void main() {
+  late MockICuriosityRepository repository;
+
+  setUp(() => repository = MockICuriosityRepository());
+
+  group('GetDailyCuriosity', () {
+    test('passes the local calendar date without time of day', () async {
+      const curiosity = Curiosity(
+        id: 'c-1',
+        title: 'T',
+        content: 'C',
+        teaser: 'S',
+        opened: false,
+      );
+      final day = DateTime(2026, 3, 7);
+      when(
+        repository.getDailyCuriosity(day),
+      ).thenAnswer((_) async => curiosity);
+
+      final result = await GetDailyCuriosity(
+        repository,
+      ).call(now: DateTime(2026, 3, 7, 23, 59, 30));
+
+      expect(result, same(curiosity));
+      verify(repository.getDailyCuriosity(day)).called(1);
+    });
+
+    test('defaults to the device clock', () async {
+      when(repository.getDailyCuriosity(any)).thenAnswer((_) async => null);
+
+      final result = await GetDailyCuriosity(repository).call();
+
+      expect(result, isNull);
+      final now = DateTime.now();
+      final captured =
+          verify(repository.getDailyCuriosity(captureAny)).captured.single
+              as DateTime;
+      expect(captured.hour, 0);
+      expect(
+        DateTime(captured.year, captured.month, captured.day),
+        anyOf(
+          DateTime(now.year, now.month, now.day),
+          DateTime(now.year, now.month, now.day - 1),
+        ),
+      );
+    });
+
+    test('propagates repository errors', () async {
+      when(repository.getDailyCuriosity(any)).thenThrow(StateError('boom'));
+
+      await expectLater(GetDailyCuriosity(repository).call(), throwsStateError);
+    });
+  });
+
+  group('MarkCuriositySeen', () {
+    test('delegates to the repository', () async {
+      when(repository.markCuriositySeen('c-1')).thenAnswer((_) async {});
+
+      await MarkCuriositySeen(repository).call('c-1');
+
+      verify(repository.markCuriositySeen('c-1')).called(1);
+    });
+
+    test('propagates repository errors', () async {
+      when(repository.markCuriositySeen('c-1')).thenThrow(StateError('boom'));
+
+      await expectLater(
+        MarkCuriositySeen(repository).call('c-1'),
+        throwsStateError,
+      );
+    });
+  });
+}
