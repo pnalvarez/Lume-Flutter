@@ -13,7 +13,7 @@ void main() {
 
   group('GetDailyCuriosity', () {
     test('passes the local calendar date without time of day', () async {
-      const curiosity = Curiosity(
+      const curiosity = CuriosityDomain(
         id: 'c-1',
         title: 'T',
         content: 'C',

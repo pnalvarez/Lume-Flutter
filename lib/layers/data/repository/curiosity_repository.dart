@@ -11,7 +11,7 @@ final class CuriosityRepository implements ICuriosityRepository {
   final ICuriosityDataSource _dataSource;
 
   @override
-  Future<Curiosity?> getDailyCuriosity(DateTime day) async {
+  Future<CuriosityDomain?> getDailyCuriosity(DateTime day) async {
     final data = await _dataSource.fetchDailyCuriosity(day);
     return data == null ? null : CuriosityMapper.toDomain(data);
   }

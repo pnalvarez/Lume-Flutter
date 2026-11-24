@@ -1,6 +1,6 @@
 /// A short historical fun fact assigned to the user for a given day.
-class Curiosity {
-  const Curiosity({
+class CuriosityDomain {
+  const CuriosityDomain({
     required this.id,
     required this.title,
     required this.content,
@@ -22,8 +22,8 @@ class Curiosity {
 
   bool get hasImage => imageUrl != null && imageUrl!.isNotEmpty;
 
-  Curiosity copyWith({bool? opened}) {
-    return Curiosity(
+  CuriosityDomain copyWith({bool? opened}) {
+    return CuriosityDomain(
       id: id,
       imageUrl: imageUrl,
       title: title,
