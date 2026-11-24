@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity_domain.dart';
 import 'package:lume/layers/domain/repository/curiosity_repository.dart';
 
 abstract interface class IGetDailyCuriosity {

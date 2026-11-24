@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:lume/layers/data/datasource/curiosity_data_source.dart';
 import 'package:lume/layers/data/mappers/curiosity_mapper.dart';
-import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity_domain.dart';
 import 'package:lume/layers/domain/repository/curiosity_repository.dart';
 
 @Injectable(as: ICuriosityRepository)

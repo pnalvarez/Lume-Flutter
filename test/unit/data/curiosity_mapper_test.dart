@@ -57,7 +57,7 @@ void main() {
     expect(domain.opened, isFalse);
   });
 
-  test('Curiosity.copyWith only changes opened', () {
+  test('CuriosityDomain.copyWith only changes opened', () {
     final domain = CuriosityMapper.toDomain(
       const CuriosityData(id: 'c-3', title: 'T'),
     );

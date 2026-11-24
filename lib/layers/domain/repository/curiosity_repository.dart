@@ -1,4 +1,4 @@
-import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity_domain.dart';
 
 abstract interface class ICuriosityRepository {
   /// Today's curiosity for the client-local calendar [day], or `null` when the

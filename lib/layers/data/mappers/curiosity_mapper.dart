@@ -1,5 +1,5 @@
 import 'package:lume/layers/data/models/curiosity_data.dart';
-import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity_domain.dart';
 
 abstract final class CuriosityMapper {
   const CuriosityMapper._();

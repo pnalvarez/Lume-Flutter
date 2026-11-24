@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lume/layers/domain/models/curiosity/curiosity.dart';
+import 'package:lume/layers/domain/models/curiosity/curiosity_domain.dart';
 import 'package:lume/layers/domain/usecases/get_daily_curiosity.dart';
 import 'package:lume/layers/domain/usecases/mark_curiosity_seen.dart';
 import 'package:mockito/mockito.dart';
