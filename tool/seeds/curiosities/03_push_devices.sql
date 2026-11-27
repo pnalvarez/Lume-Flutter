@@ -1,5 +1,6 @@
 -- #239 Curiosity of the Day: push notification devices (FCM tokens + device timezone).
--- Consumed by the push scheduler (#240) with the service role. Idempotent.
+-- Consumed by the push scheduler (#240) with the service role. Idempotent (safe to re-run, also
+-- upgrades the earlier FOR ALL policy).
 -- Rollback: 03_push_devices.rollback.sql.
 
 BEGIN;
@@ -17,11 +18,40 @@ CREATE INDEX IF NOT EXISTS push_devices_user_id_idx ON public.push_devices (user
 
 ALTER TABLE public.push_devices ENABLE ROW LEVEL SECURITY;
 
--- Users manage only their own rows (the scheduler uses the service role, which bypasses RLS).
+-- Writes go through register_push_device / unregister_push_device only: they validate the
+-- platform and the IANA timezone, which the table CHECKs cannot (the #240 scheduler relies on
+-- a valid timezone). Supabase grants every privilege on new public tables to anon and
+-- authenticated by default, so RLS alone would still let a user INSERT/UPDATE arbitrary
+-- values through PostgREST. Revoke those and grant back only what clients need:
+--   SELECT, DELETE            their own rows
+--   UPDATE (notifications_enabled)   the Settings toggle (#241); no other column
+-- The scheduler uses the service role, which keeps its own privileges and bypasses RLS.
+REVOKE ALL ON TABLE public.push_devices FROM PUBLIC, anon, authenticated;
+GRANT SELECT, DELETE ON TABLE public.push_devices TO authenticated;
+GRANT UPDATE (notifications_enabled) ON TABLE public.push_devices TO authenticated;
+
+-- Replaces the earlier FOR ALL policy (kept in the DROP list so re-running upgrades it).
 DROP POLICY IF EXISTS "Users manage own push_devices" ON public.push_devices;
-CREATE POLICY "Users manage own push_devices"
+DROP POLICY IF EXISTS "Users read own push_devices" ON public.push_devices;
+DROP POLICY IF EXISTS "Users delete own push_devices" ON public.push_devices;
+DROP POLICY IF EXISTS "Users toggle own push_devices" ON public.push_devices;
+
+CREATE POLICY "Users read own push_devices"
   ON public.push_devices
-  FOR ALL
+  FOR SELECT
+  TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users delete own push_devices"
+  ON public.push_devices
+  FOR DELETE
+  TO authenticated
+  USING (user_id = auth.uid());
+
+-- Row filter only; the column-level GRANT above limits this to notifications_enabled.
+CREATE POLICY "Users toggle own push_devices"
+  ON public.push_devices
+  FOR UPDATE
   TO authenticated
   USING (user_id = auth.uid())
   WITH CHECK (user_id = auth.uid());
@@ -104,3 +134,7 @@ COMMIT;
 --   SELECT register_push_device('tok-1', 'ios', 'Europe/Lisbon');  -- same row, timezone updated
 --   SELECT unregister_push_device('tok-1');          -- row gone
 --   SELECT register_push_device('tok-2', 'web', 'UTC');            -- raises: invalid platform
+--   -- Direct writes are denied (PostgREST / as role authenticated):
+--   INSERT INTO push_devices (token, user_id, platform, timezone) VALUES ('x', auth.uid(), 'ios', 'garbage');  -- permission denied
+--   UPDATE push_devices SET timezone = 'garbage';             -- permission denied for column timezone
+--   UPDATE push_devices SET notifications_enabled = false;    -- allowed, own rows only

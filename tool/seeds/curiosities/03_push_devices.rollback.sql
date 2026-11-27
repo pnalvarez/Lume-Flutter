@@ -6,6 +6,9 @@ DROP FUNCTION IF EXISTS public.unregister_push_device(text);
 DROP FUNCTION IF EXISTS public.register_push_device(text, text, text);
 
 DROP POLICY IF EXISTS "Users manage own push_devices" ON public.push_devices;
+DROP POLICY IF EXISTS "Users read own push_devices" ON public.push_devices;
+DROP POLICY IF EXISTS "Users delete own push_devices" ON public.push_devices;
+DROP POLICY IF EXISTS "Users toggle own push_devices" ON public.push_devices;
 DROP TABLE IF EXISTS public.push_devices;
 
 COMMIT;
