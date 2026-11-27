@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lume/core/auth/auth_session.dart';
 import 'package:lume/core/push/push_service.dart';
@@ -189,13 +191,118 @@ void main() {
       expect(push.deleteTokenCalls, 1);
     });
 
-    test('allows registering again afterwards', () async {
+    test('blocks registering while the session is still active', () async {
       await sut.register();
       await sut.unregister();
+      reset(api);
+
+      expect(await sut.register(), isFalse);
+      verifyNever(
+        api.rpc<Object?>(
+          'register_push_device',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      );
+    });
+
+    test('does not register the token FCM mints right after deleteToken '
+        'while signing out', () async {
+      await sut.register();
+      await sut.unregister(); // deleteToken() makes FCM mint a new token
+      reset(api);
+
+      // FCM emits onTokenRefresh; the coordinator calls register() while the
+      // session still exists (SignOut ends it only after unregister).
+      push.token = 'token-minted-by-fcm';
+      push.refresh.add('token-minted-by-fcm');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(await sut.register(), isFalse);
+      verifyNever(
+        api.rpc<Object?>(
+          'register_push_device',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      );
+
+      // The session ends and the user signs in again: now it registers.
+      session.emit(null);
+      await Future<void>.delayed(Duration.zero);
+      session.emit(snapshot);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(await sut.register(), isTrue);
+      expect(
+        lastParams('register_push_device')['p_token'],
+        'token-minted-by-fcm',
+      );
+    });
+
+    test('allows registering again once the session has ended', () async {
+      await sut.register();
+      await sut.unregister();
+      session.emit(null);
+      await Future<void>.delayed(Duration.zero);
+
+      // Next login of the same user.
+      session.emit(snapshot);
+      await Future<void>.delayed(Duration.zero);
       push.token = 'token-2';
 
       expect(await sut.register(), isTrue);
       expect(lastParams('register_push_device')['p_token'], 'token-2');
+    });
+
+    test('allows registering when a different user signs in', () async {
+      await sut.register();
+      await sut.unregister();
+      session.session = const AuthSessionSnapshot(
+        accessToken: 'jwt-2',
+        userId: 'user-2',
+        isEmailConfirmed: true,
+      );
+      push.token = 'token-2';
+
+      expect(await sut.register(), isTrue);
+    });
+
+    test('does not remember a registration that raced with sign-out', () async {
+      final unblock = Completer<void>();
+      when(
+        api.rpc<Object?>(
+          'register_push_device',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer((_) async {
+        await unblock.future;
+        return null;
+      });
+
+      final inFlight = sut.register();
+      await Future<void>.delayed(Duration.zero);
+      reset(api);
+      await sut.unregister();
+      unblock.complete();
+
+      expect(await inFlight, isFalse);
+
+      // After the session ends and the user returns, the same payload is sent.
+      session.emit(null);
+      await Future<void>.delayed(Duration.zero);
+      session.emit(snapshot);
+      await Future<void>.delayed(Duration.zero);
+      push.token = 'token-1'; // the SDK issues a fresh token after logout
+      expect(await sut.register(), isTrue);
+      verify(
+        api.rpc<Object?>(
+          'register_push_device',
+          params: anyNamed('params'),
+          headers: anyNamed('headers'),
+        ),
+      ).called(1);
     });
 
     test('is a no-op on unsupported platforms', () async {
