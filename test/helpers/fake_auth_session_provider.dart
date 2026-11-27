@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:lume/core/auth/auth_session.dart';
 import 'package:lume/core/auth/auth_session_provider.dart';
 
@@ -26,8 +28,16 @@ class FakeAuthSessionProvider implements IAuthSessionProvider {
   @override
   String? get email => session?.email;
 
+  final _changes = StreamController<void>.broadcast();
+
   @override
-  Stream<void> get changes => const Stream.empty();
+  Stream<void> get changes => _changes.stream;
+
+  /// Sets [session] and notifies listeners, like the real provider does.
+  void emit(AuthSessionSnapshot? next) {
+    session = next;
+    _changes.add(null);
+  }
 
   @override
   void clearPasswordRecovery() {
@@ -38,5 +48,7 @@ class FakeAuthSessionProvider implements IAuthSessionProvider {
   Future<void> restore() async {}
 
   @override
-  void dispose() {}
+  void dispose() {
+    _changes.close();
+  }
 }
